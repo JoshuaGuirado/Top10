@@ -1,8 +1,8 @@
-/* Identidade visual Top 10 — ver brand.html */
+/* Identidade visual TT · Top Ten — ver brand.html */
 :root {
   --ink: #16133A;      /* azul-noite: texto e traço da marca */
-  --gold: #FFC23D;     /* amarelo-troféu: cor principal */
-  --coral: #FF5D5D;    /* coral: brilho, vidas e erros */
+  --gold: #FFC23D;     /* amarelo-lâmpada: cor principal */
+  --coral: #FF5D5D;    /* coral: raios de luz, vidas e erros */
   --mint: #1FA874;     /* verde: acertos */
   --cream: #FFF7E8;    /* creme: fundo */
 
@@ -47,7 +47,7 @@ main {
 
 header { text-align: center; margin-bottom: 28px; }
 h1 { margin: 0; line-height: 0; }
-.logo { width: 220px; max-width: 70%; height: auto; }
+.logo { width: 300px; max-width: 70%; height: auto; }
 .logo-dark { display: none; }
 @media (prefers-color-scheme: dark) {
   .logo-light { display: none; }

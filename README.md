@@ -1,4 +1,4 @@
-# Top 10
+# TT · Top Ten
 
 Jogo de adivinhar listas: escolha um desafio (ex.: "Os 10 estados brasileiros mais populosos") e tente acertar os 10 itens. Cada erro custa uma vida, e você tem 3.
 
