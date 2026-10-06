@@ -1,4 +1,4 @@
-// Tten — fluxo do jogo.
+// Top Ten — fluxo do jogo.
 // Telas: início → jogadores → lista (ou criar lista) → partida → pódio.
 
 const MAX_PLAYERS = 8;
@@ -171,7 +171,7 @@ const fx = (() => {
   const ctx = canvas.getContext("2d");
   let parts = [];
   let running = false;
-  const colors = ["#0A0A0A", "#0A0A0A", "#6B6B6B", "#BDBDBD", "#E5322D"];
+  const colors = ["#2450F5", "#2450F5", "#0A0A0A", "#9AA0B5", "#8FA8FF"];
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function resize() {
@@ -348,7 +348,7 @@ function renderAvatarDialog() {
   [...PRESET_GROUPS, "builder"].forEach((g) => {
     const b = document.createElement("button");
     b.type = "button";
-    b.className = "tab" + (g === dialogTab ? " active" : "");
+    b.className = "tab" + (g === "builder" ? " tab-builder" : "") + (g === dialogTab ? " active" : "");
     b.textContent = g === "builder" ? "Personalizar" : g;
     b.addEventListener("click", () => { dialogTab = g; renderAvatarDialog(); });
     tabs.appendChild(b);
@@ -524,11 +524,11 @@ function filteredLists() {
   });
 }
 
-function chipButton(label, count, active, onClick) {
+function chipButton(label, count, active, onClick, iconHtml = "") {
   const b = document.createElement("button");
   b.type = "button";
   b.className = "chip" + (active ? " active" : "");
-  b.innerHTML = `${escapeHtml(label)}${count !== null ? ` <small>${count}</small>` : ""}`;
+  b.innerHTML = `${iconHtml}${escapeHtml(label)}${count !== null ? ` <small>${count}</small>` : ""}`;
   b.addEventListener("click", onClick);
   return b;
 }
@@ -545,7 +545,7 @@ function renderChips() {
       activeCat = cat.id;
       renderChips();
       renderListGrid();
-    }));
+    }, cat.id === "all" ? "" : icon(cat.id)));
   });
 
   const sizes = $("size-chips");
@@ -576,7 +576,7 @@ function renderListGrid() {
     card.className = "list-card" + (played ? " played" : "");
     card.innerHTML = `
       <button type="button" class="list-play">
-        <span class="list-cat">${escapeHtml(cat.label)} · ${l.items.length} itens</span>
+        <span class="list-cat">${icon(cat.id)}${escapeHtml(cat.label)} · ${l.items.length} itens</span>
         <span class="list-title">${escapeHtml(l.title)}</span>
         ${played ? '<span class="list-played">jogada recentemente</span>' : ""}
       </button>
@@ -742,7 +742,7 @@ function startGame(list) {
     busy: false,
     over: false,
   };
-  $("game-cat").textContent = `${categoryOf(list).label} · ${list.items.length} itens`;
+  $("game-cat").innerHTML = `${icon(categoryOf(list).id)}${escapeHtml(categoryOf(list).label)} · ${list.items.length} itens`;
   $("game-title").textContent = list.title;
   $("source").textContent = `Fonte: ${list.source}`;
   $("pass-btn").hidden = playerCount === 1;
@@ -1072,7 +1072,22 @@ $("builder-save").addEventListener("click", () => {
   renderPlayersScreen();
 });
 
+// Modo claro/escuro: começa seguindo o aparelho; o botão fixa a escolha.
+function currentTheme() {
+  return document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+}
+function renderThemeBtn() {
+  $("theme-btn").textContent = currentTheme() === "dark" ? "Modo claro" : "Modo escuro";
+}
+$("theme-btn").addEventListener("click", () => {
+  const next = currentTheme() === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  store("theme", next);
+  renderThemeBtn();
+});
+
 renderSoundBtn();
+renderThemeBtn();
 ensurePlayers();
 $("list-total").textContent = allLists().length;
 if (!importFromHash()) show("home");

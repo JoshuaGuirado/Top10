@@ -1,8 +1,8 @@
 // Mais listas de 10 itens. Mesmo formato de data.js.
-// Listas de opinião ou de popularidade não têm dado oficial: a fonte diz "Curadoria Tten".
+// Listas de opinião ou de popularidade não têm dado oficial: a fonte diz "Curadoria Top Ten".
 
-const CUR = "Curadoria Tten (ranking de opinião)";
-const POP = "Curadoria Tten: do mais lembrado ao menos óbvio";
+const CUR = "Curadoria Top Ten (ranking de opinião)";
+const POP = "Curadoria Top Ten: do mais lembrado ao menos óbvio";
 
 CATEGORIES.push(
   { id: "personagens", label: "Personagens" },

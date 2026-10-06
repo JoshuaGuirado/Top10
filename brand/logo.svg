@@ -1,12 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 4 252 98" role="img" aria-label="Tten">
-  <path fill="#0A0A0A" d="M38 82 V75 C38 67 20 61 20 40 A30 30 0 0 1 80 40 C80 61 62 67 62 75 V82 Z"/>
-  <path fill="none" stroke="#FFFFFF" stroke-width="8" d="M35 30 H65 M50 30 V62"/>
-  <rect x="38" y="86" width="24" height="4.5" fill="#0A0A0A"/>
-  <rect x="42" y="93" width="16" height="4.5" fill="#0A0A0A"/>
-  <g transform="translate(98 33)"><g fill="none" stroke="#0A0A0A" stroke-width="9">
-    <path d="M0 4.5 H34 M17 4.5 V48"/>
-    <path d="M47 2 V48 M38 18.5 H58"/>
-    <path d="M68.5 31 H97.5 A13.5 13.5 0 1 0 93.5 40.5"/>
-    <path d="M112.5 13 V48 M112.5 28 A11 11 0 0 1 134.5 28 V48"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="14 4 336 100" role="img" aria-label="Top Ten">
+  <path fill="#2450F5" d="M38 81 V75 C38 67 20 61 20 40 A30 30 0 0 1 80 40 C80 61 62 67 62 75 V81 Q62 83 60 83 H40 Q38 83 38 81 Z"/>
+  <path fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" d="M36 30 H64 M50 30 V61"/>
+  <rect x="38" y="87" width="24" height="5" rx="2.5" fill="#0A0A0A"/>
+  <rect x="42" y="95" width="16" height="5" rx="2.5" fill="#0A0A0A"/>
+  <g transform="translate(100 31)"><g fill="none" stroke="#0A0A0A" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4.5 4.5 H33 M18.75 4.5 V47.5"/>
+    <circle cx="56" cy="31" r="12.5"/>
+    <path d="M84.5 18.5 V62.5"/><circle cx="97" cy="31" r="12.5"/>
+    <path d="M136.5 4.5 H165 M150.75 4.5 V47.5"/>
+    <path d="M181 31 H203.5 A13.5 13.5 0 1 0 199.5 40.5"/>
+    <path d="M218 18.5 V47.5 M218 29 A11 11 0 0 1 240 29 V47.5"/>
   </g></g>
 </svg>

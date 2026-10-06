@@ -1,4 +1,4 @@
-# Tten
+# Top Ten
 
 Jogo de adivinhar listas para jogar sozinho ou com até 8 pessoas. Cada lista tem 10, 30 ou 50 itens em ordem, e o número do item é a pontuação: o nº 1 é o óbvio e vale 1 ponto, o último é o mais difícil e vale mais. Quem somar mais pontos vence.
 
@@ -26,7 +26,7 @@ Na tela de listas, "Criar lista" monta uma lista sua de 10, 30 ou 50 itens, do m
 - `style.css`: visual
 - `brand/` e `brand.html`: logo e guia de identidade visual (preto e branco)
 
-Listas sem dado oficial (rankings de opinião e de popularidade) indicam "Curadoria Tten" como fonte.
+Listas sem dado oficial (rankings de opinião e de popularidade) indicam "Curadoria Top Ten" como fonte.
 
 ## Adicionar uma lista ao jogo
 

@@ -8,14 +8,14 @@ const HAIR_COLORS = ["#1A1A1A", "#4A2F1B", "#8B5E3C", "#B5651D", "#E9C46A", "#F5
 
 // Opções do editor: [valor, rótulo]
 const PARTS = {
-  hair: [["none", "Careca"], ["buzz", "Raspado"], ["short", "Curto"], ["spiky", "Espetado"], ["messy", "Bagunçado"], ["slick", "Penteado"], ["side", "Franja de lado"], ["bob", "Chanel"], ["long", "Longo"], ["ponytail", "Rabo de cavalo"], ["pigtails", "Maria-chiquinha"], ["bun", "Coque"], ["curly", "Cacheado"], ["afro", "Black power"], ["braids", "Tranças"], ["dreads", "Dreads"], ["mohawk", "Moicano"]],
+  hair: [["none", "Careca"], ["buzz", "Raspado"], ["short", "Curto"], ["spiky", "Espetado"], ["messy", "Bagunçado"], ["slick", "Penteado"], ["side", "Franja de lado"], ["bob", "Chanel"], ["long", "Longo"], ["ponytail", "Rabo de cavalo"], ["pigtails", "Maria-chiquinha"], ["bun", "Coque"], ["curly", "Cacheado"], ["afro", "Black power"], ["buns", "Coquinhos"], ["braids", "Tranças"], ["dreads", "Dreads"], ["mohawk", "Moicano"], ["fivehairs", "Cinco fios"]],
   eyes: [["normal", "Normal"], ["happy", "Feliz"], ["angry", "Bravo"], ["sleepy", "Sonolento"], ["wide", "Arregalado"], ["lashes", "Cílios"], ["wink", "Piscadinha"], ["glasses", "Óculos"], ["shades", "Óculos escuros"]],
   mouth: [["smile", "Sorriso"], ["grin", "Sorrisão"], ["smirk", "Sorriso de canto"], ["teeth", "Dentuço"], ["open", "Surpreso"], ["line", "Sério"], ["sad", "Triste"], ["tongue", "Língua"], ["lips", "Batom"], ["evil", "Malvado"]],
   beard: [["none", "Sem barba"], ["mustache", "Bigode"], ["goatee", "Cavanhaque"], ["sideburns", "Costeletas"], ["stubble", "Barba por fazer"], ["beard", "Barba"], ["long", "Barba longa"]],
-  head: [["none", "Nada"], ["cap", "Boné"], ["beanie", "Gorro"], ["headband", "Faixa"], ["headphones", "Fone"], ["bow", "Laço"], ["flowers", "Coroa de flores"], ["crown", "Coroa"], ["tiara", "Tiara"], ["halo", "Auréola"], ["devil", "Chifrinhos"], ["bunny", "Orelhas de coelho"], ["cat", "Orelhas de gato"], ["fedora", "Chapéu"], ["cowboy", "Chapéu de caubói"], ["party", "Chapéu de festa"], ["bandana", "Bandana"], ["pirate", "Chapéu pirata"], ["wizard", "Chapéu de mago"], ["chef", "Chapéu de chef"], ["hardhat", "Capacete de obra"], ["firehat", "Capacete de bombeiro"], ["viking", "Capacete viking"], ["knight", "Elmo de cavaleiro"], ["astro", "Capacete espacial"], ["robot", "Cabeça de robô"], ["heromask", "Máscara de herói"], ["ninja", "Máscara ninja"], ["hood", "Capuz"]],
+  head: [["none", "Nada"], ["cap", "Boné"], ["beanie", "Gorro"], ["headband", "Faixa"], ["headphones", "Fone"], ["bow", "Laço"], ["flowers", "Coroa de flores"], ["crown", "Coroa"], ["tiara", "Tiara"], ["halo", "Auréola"], ["devil", "Chifrinhos"], ["bighorns", "Chifres grandes"], ["antennae", "Anteninhas"], ["mouse", "Orelhas de rato"], ["bunny", "Orelhas de coelho"], ["cat", "Orelhas de gato"], ["fedora", "Chapéu"], ["tophat", "Cartola"], ["straw", "Chapéu de palha"], ["cowboy", "Chapéu de caubói"], ["party", "Chapéu de festa"], ["bandana", "Bandana"], ["pirate", "Chapéu pirata"], ["wizard", "Chapéu de mago"], ["chef", "Chapéu de chef"], ["hardhat", "Capacete de obra"], ["firehat", "Capacete de bombeiro"], ["viking", "Capacete viking"], ["knight", "Elmo de cavaleiro"], ["astro", "Capacete espacial"], ["robot", "Cabeça de robô"], ["heromask", "Máscara de herói"], ["ninja", "Máscara ninja"], ["hood", "Capuz"]],
   pattern: [["plain", "Lisa"], ["stripes", "Listras"], ["hoops", "Faixas"], ["sash", "Faixa diagonal"], ["dots", "Bolinhas"], ["plaid", "Xadrez"], ["camo", "Camuflada"], ["number", "Número"], ["star", "Estrela"], ["heart", "Coração"], ["bolt", "Raio"], ["hoodie", "Moletom"], ["tank", "Regata"], ["suit", "Terno"], ["jacket", "Jaqueta"], ["overalls", "Macacão"], ["armor", "Armadura"], ["robe", "Manto"], ["scarf", "Cachecol"]],
-  extra: [["none", "Nada"], ["cheeks", "Bochechas"], ["freckles", "Sardas"], ["mole", "Pinta"], ["scar", "Cicatriz"], ["bandaid", "Curativo"], ["warpaint", "Pintura de guerra"], ["tattoo", "Tatuagem"], ["eyepatch", "Tapa-olho"]],
-  item: [["none", "Nada"], ["ball", "Bola"], ["mic", "Microfone"], ["phone", "Celular"], ["trophy", "Troféu"], ["sword", "Espada"], ["shield", "Escudo"], ["wand", "Varinha"], ["balloon", "Balão"], ["guitar", "Guitarra"]],
+  extra: [["none", "Nada"], ["cheeks", "Bochechas"], ["freckles", "Sardas"], ["mole", "Pinta"], ["scar", "Cicatriz"], ["bandaid", "Curativo"], ["warpaint", "Pintura de guerra"], ["whiskers", "Bigodes de raposa"], ["nose", "Nariz de palhaço"], ["domino", "Máscara nos olhos"], ["tattoo", "Tatuagem"], ["eyepatch", "Tapa-olho"]],
+  item: [["none", "Nada"], ["ball", "Bola"], ["mic", "Microfone"], ["phone", "Celular"], ["trophy", "Troféu"], ["sword", "Espada"], ["shield", "Escudo"], ["wand", "Varinha"], ["balloon", "Balão"], ["guitar", "Guitarra"], ["pokeball", "Pokébola"], ["hammer", "Marreta"], ["bat", "Taco"], ["book", "Livro"], ["flask", "Frasco"], ["magnifier", "Lupa"], ["watch", "Relógio"]],
 };
 
 let avatarSeq = 0;
@@ -84,6 +84,7 @@ function renderAvatar(input) {
   if (!covered) {
     out.push(faceExtra(c));
     out.push(eyes(c.eyes, ink));
+    if (c.extra === "domino") out.push(`<path d="M31 33 Q41 29 50 34 Q59 29 69 33 L67 41 Q58 44 50 39 Q42 44 33 41 Z" fill="#111"/>${lenses("#fff", "#111")}`);
     out.push(mouth(c.mouth, ink));
     out.push(beard(c));
     if (c.extra === "eyepatch") out.push(`<path d="M30 30 L70 25" stroke="${ink}" stroke-width="1.6"/><ellipse cx="58" cy="37" rx="5.5" ry="5" fill="${ink}"/>`);
@@ -176,6 +177,10 @@ function faceExtra(c) {
       return `<g fill="#B5651D" fill-opacity=".7"><circle cx="36" cy="43" r=".9"/><circle cx="39" cy="45" r=".9"/><circle cx="35" cy="46" r=".9"/><circle cx="64" cy="43" r=".9"/><circle cx="61" cy="45" r=".9"/><circle cx="65" cy="46" r=".9"/></g>`;
     case "scar":
       return `<path d="M56 23 L52 28 L56 28 L52 33" stroke="#B23A48" stroke-width="1.6" fill="none" stroke-linejoin="round"/>`;
+    case "whiskers":
+      return `<path d="M32 41 L39 42.5 M32 44.5 L39 44.5 M32 48 L39 46.5 M68 41 L61 42.5 M68 44.5 L61 44.5 M68 48 L61 46.5" stroke="#3B2A1A" stroke-width="1.2" stroke-linecap="round"/>`;
+    case "nose":
+      return `<circle cx="50" cy="42" r="4.2" fill="#D62828"/><circle cx="48.6" cy="40.6" r="1.1" fill="#fff" opacity=".6"/>`;
     case "mole":
       return `<circle cx="59.5" cy="45" r="1.2" fill="#3B2A1A"/>`;
     case "bandaid":
@@ -249,6 +254,10 @@ function hairFront(c) {
       return `<g fill="${h}"><circle cx="32" cy="26" r="9"/><circle cx="40" cy="18" r="10"/><circle cx="50" cy="15" r="10"/><circle cx="60" cy="18" r="10"/><circle cx="68" cy="26" r="9"/></g>`;
     case "braids":
       return `<path d="M28 34 Q27 15 50 15 Q73 15 72 34 Q66 22 50 22 Q34 22 28 34 Z" fill="${h}"/><g fill="${h}"><rect x="24" y="36" width="7" height="34" rx="3.5"/><rect x="69" y="36" width="7" height="34" rx="3.5"/></g><g stroke="${darken(h, 0.4)}" stroke-width="1"><path d="M24 46 H31 M24 54 H31 M24 62 H31 M69 46 H76 M69 54 H76 M69 62 H76"/></g>`;
+    case "buns":
+      return `<g fill="${h}"><circle cx="31" cy="15" r="8"/><circle cx="69" cy="15" r="8"/></g>${top}`;
+    case "fivehairs":
+      return `<path d="M42 21 L38 8 M46 20 L45 6 M50 20 V5 M54 20 L55 6 M58 21 L62 8" stroke="${h}" stroke-width="2" stroke-linecap="round"/>`;
     case "mohawk":
       return `<rect x="45" y="3" width="10" height="24" rx="5" fill="${h}"/>`;
     default:
@@ -265,6 +274,10 @@ function headBack(c) {
       return `<path d="M30 26 L30 8 L44 18 Z M70 26 L70 8 L56 18 Z" fill="${col}"/>`;
     case "ogre":
       return `<path d="M30 34 L19 29 L18 37 L30 39 Z M70 34 L81 29 L82 37 L70 39 Z" fill="${c.skin}"/>`;
+    case "mouse":
+      return `<circle cx="28" cy="13" r="10" fill="${col}"/><circle cx="72" cy="13" r="10" fill="${col}"/>`;
+    case "bighorns":
+      return `<path d="M35 24 Q22 10 29 -7 Q33 10 43 18 Z M65 24 Q78 10 71 -7 Q67 10 57 18 Z" fill="${col}"/>`;
     case "bunny":
       return `<rect x="33" y="-7" width="10" height="30" rx="5" fill="${col}"/><rect x="57" y="-7" width="10" height="30" rx="5" fill="${col}"/><rect x="36" y="-3" width="4" height="22" rx="2" fill="#F4A6B7"/><rect x="60" y="-3" width="4" height="22" rx="2" fill="#F4A6B7"/>`;
     case "hood":
@@ -301,6 +314,14 @@ function headFront(c, ink) {
       return `<path d="M28 30 Q28 9 50 9 Q72 9 72 30 Z" fill="${col}"/><rect x="24" y="28" width="52" height="5" rx="2" fill="${darken(col)}"/><rect x="46.5" y="9" width="7" height="19" fill="${darken(col)}" opacity=".45"/>`;
     case "viking":
       return `<path d="M34 22 Q21 18 19 3 Q27 13 38 16 Z M66 22 Q79 18 81 3 Q73 13 62 16 Z" fill="#F1E9D2"/><path d="M28 30 Q28 11 50 11 Q72 11 72 30 Z" fill="${col}"/><rect x="27" y="26" width="46" height="5" fill="${darken(col)}"/><rect x="48" y="11" width="4" height="15" fill="${darken(col)}"/>`;
+    case "bighorns":
+      return `<path d="M28 36 Q27 14 50 14 Q73 14 72 36 Q68 24 50 24 Q32 24 28 36 Z" fill="${col}"/>`;
+    case "antennae":
+      return `<path d="M42 15 L35 -1 M58 15 L65 -1" stroke="${col}" stroke-width="2.2" stroke-linecap="round"/><circle cx="35" cy="-2" r="3.2" fill="${col}"/><circle cx="65" cy="-2" r="3.2" fill="${col}"/><path d="M28 33 Q28 13 50 13 Q72 13 72 33 Q50 26 28 33 Z" fill="${col}"/>`;
+    case "straw":
+      return `<path d="M34 22 Q34 6 50 6 Q66 6 66 22 Z" fill="#E9C46A"/><rect x="34" y="15" width="32" height="5" fill="${col}"/><ellipse cx="50" cy="22" rx="30" ry="5.5" fill="#E2B84F"/>`;
+    case "tophat":
+      return `<rect x="37" y="-3" width="26" height="24" rx="2" fill="${col}"/><rect x="37" y="13" width="26" height="4" fill="${col2}"/><rect x="27" y="19" width="46" height="5" rx="2.5" fill="${col}"/>`;
     case "crown":
       return `<path d="M31 25 V9 L39 17 L45 6 L50 15 L55 6 L61 17 L69 9 V25 Z" fill="#FFC23D"/><circle cx="50" cy="21" r="2.5" fill="#D62828"/>`;
     case "tiara":
@@ -347,6 +368,8 @@ function mask(c, ink) {
       return `<path d="M31 24 L33 14 L40 21 Z M69 24 L67 14 L60 21 Z" fill="${col}"/>${base}<path d="M50 21 L46 34 L50 38 L54 34 Z" fill="${col2}" opacity=".7"/>${lenses("#E9ECEF")}`;
     case "flash":
       return `${base}<path d="M28 33 L19 28 L24 36 L18 38 L29 40 Z M72 33 L81 28 L76 36 L82 38 L71 40 Z" fill="${col2}"/>${lenses()}<path d="M33 44 H67 V50 Q67 56 58 56 H42 Q33 56 33 50 Z" fill="${c.skin}"/>${mouth(c.mouth, ink)}`;
+    case "deadpool":
+      return `${base}<path d="M31 30 Q41 27 47 36 Q41 45 32 41 Z M69 30 Q59 27 53 36 Q59 45 68 41 Z" fill="#111"/>${lenses()}`;
     case "ninja":
       return `${base}<rect x="31" y="31" width="38" height="12" rx="5" fill="${c.skin}"/>${eyes("angry", ink)}<path d="M70 30 L84 26 L80 36 Z" fill="${col}"/>`;
     default:
@@ -464,6 +487,20 @@ function handItem(type) {
       return `<path d="M81 92 Q85 72 87 61" stroke="#777" stroke-width=".8" fill="none"/><ellipse cx="87" cy="52" rx="8" ry="10" fill="#D62828"/><path d="M85.5 62 L88.5 62 L87 60 Z" fill="#D62828"/>`;
     case "guitar":
       return `<path d="M60 70 L90 58" stroke="#3B2A1A" stroke-width="3"/><ellipse cx="62" cy="86" rx="10" ry="8" fill="#D62828" transform="rotate(-20 62 86)"/><ellipse cx="68" cy="79" rx="7" ry="6" fill="#D62828" transform="rotate(-20 68 79)"/><circle cx="64" cy="83" r="2" fill="#1A1A1A"/>`;
+    case "pokeball":
+      return `<circle cx="84" cy="99" r="6.5" fill="#fff" stroke="#111" stroke-width="1"/><path d="M77.5 99 A6.5 6.5 0 0 1 90.5 99 Z" fill="#D62828" stroke="#111" stroke-width="1"/><circle cx="84" cy="99" r="2" fill="#fff" stroke="#111" stroke-width="1"/>`;
+    case "hammer":
+      return `<path d="M80 94 V70" stroke="#FFC23D" stroke-width="3"/><rect x="71" y="61" width="18" height="10" rx="3" fill="#D62828"/><rect x="71" y="61" width="5" height="10" rx="2" fill="#FFC23D"/><rect x="84" y="61" width="5" height="10" rx="2" fill="#FFC23D"/>`;
+    case "bat":
+      return `<path d="M80 95 L91 65" stroke="#B5651D" stroke-width="4.5" stroke-linecap="round"/>`;
+    case "book":
+      return `<rect x="73" y="83" width="15" height="12" rx="1.5" fill="#1F4BA5"/><rect x="75" y="85" width="11" height="8" fill="#fff" opacity=".85"/>`;
+    case "flask":
+      return `<path d="M78.5 75 V81 L73.5 91 Q72.5 94.5 76 94.5 H84 Q87.5 94.5 86.5 91 L81.5 81 V75 Z" fill="#7FDBFF" stroke="#555" stroke-width="1"/><path d="M75 89 H85" stroke="#2BA84A" stroke-width="3"/>`;
+    case "magnifier":
+      return `<circle cx="86" cy="79" r="5.5" fill="#BDE0FE" fill-opacity=".5" stroke="#333" stroke-width="2"/><path d="M82.5 83.5 L80 94" stroke="#333" stroke-width="2.5" stroke-linecap="round"/>`;
+    case "watch":
+      return `<rect x="15.5" y="85" width="9" height="6.5" rx="2" fill="#2BA84A" stroke="#1A1A1A" stroke-width="1.2"/>`;
     default:
       return "";
   }
@@ -472,7 +509,7 @@ function handItem(type) {
 // ───────────── skins prontas ─────────────
 // Inspiradas em personagens, jogadores e profissões reais. Todas usam as peças acima.
 
-const PRESET_GROUPS = ["Heróis", "Vilões", "Filmes e séries", "Games", "Futebol", "Profissões"];
+const PRESET_GROUPS = ["Heróis", "Vilões", "Animes", "Desenhos", "Filmes e séries", "Games", "Futebol", "Profissões"];
 
 const PRESETS = [
   // Heróis
@@ -537,6 +574,81 @@ const PRESETS = [
   { id: "rockstar", name: "Rockstar", group: "Profissões", cfg: { skin: "#F6D7BE", hair: "long", hairColor: "#1A1A1A", eyes: "shades", mouth: "tongue", top: "#1A1A1A", top2: "#D62828", pattern: "jacket", legs: "#1F2A44" } },
   { id: "gamer", name: "Gamer", group: "Profissões", cfg: { skin: "#C68642", hair: "messy", hairColor: "#2B1A10", head: "headphones", headColor: "#7B2CBF", mouth: "open", top: "#7B2CBF", top2: "#4CC9F0", pattern: "bolt", legs: "#222222" } },
   { id: "realeza", name: "Rei/Rainha", group: "Profissões", cfg: { skin: "#F6D7BE", hair: "long", hairColor: "#E9C46A", head: "crown", top: "#7B2CBF", top2: "#FFC23D", pattern: "robe", cape: "#7B2CBF", legs: "#3C096C" } },
+
+  // Mais heróis
+  { id: "viuva", name: "Viúva Negra", group: "Heróis", cfg: { skin: "#F6D7BE", hair: "bob", hairColor: "#C1440E", top: "#1A1A1A", sleeve: "#1A1A1A", belt: "#9AA0B5", legs: "#1A1A1A", mouth: "smirk" } },
+  { id: "capita", name: "Capitã Marvel", group: "Heróis", cfg: { skin: "#F6D7BE", hair: "long", hairColor: "#E9C46A", top: "#D62828", top2: "#FFC23D", pattern: "star", sleeve: "#1F4BA5", legs: "#1F4BA5", belt: "#FFC23D" } },
+  { id: "deadpool", name: "Deadpool", group: "Heróis", cfg: { skin: "#F6D7BE", head: "mask", headStyle: "deadpool", headColor: "#B3001B", top: "#B3001B", top2: "#1A1A1A", pattern: "strap", legs: "#B3001B", item: "sword" } },
+  { id: "robin", name: "Robin", group: "Heróis", cfg: { skin: "#F6D7BE", hair: "slick", hairColor: "#1A1A1A", extra: "domino", top: "#D62828", top2: "#FFC23D", pattern: "emblem", text: "R", textColor: "#1A1A1A", sleeve: "#2BA84A", cape: "#FFC23D", legs: "#2BA84A" } },
+  { id: "estranho", name: "Doutor Estranho", group: "Heróis", cfg: { skin: "#F6D7BE", hair: "slick", hairColor: "#1A1A1A", beard: "goatee", top: "#1F2A5C", top2: "#C0C6D4", pattern: "robe", cape: "#C1121F", legs: "#1F2A5C" } },
+  { id: "chapolin", name: "Chapolin Colorado", group: "Heróis", cfg: { skin: "#F6D7BE", head: "antennae", headColor: "#D62828", eyes: "wide", top: "#D62828", top2: "#FFC23D", pattern: "heart", legs: "#D62828", item: "hammer" } },
+
+  // Mais vilões
+  { id: "arlequina", name: "Arlequina", group: "Vilões", cfg: { skin: "#F1F1F1", hair: "pigtails", hairColor: "#F5E6A8", mouth: "lips", eyes: "lashes", top: "#1A1A1A", top2: "#D62828", pattern: "jacket", sleeve: "#1F4BA5", legs: "#D62828", item: "bat" } },
+  { id: "malevola", name: "Malévola", group: "Vilões", cfg: { skin: "#E6E9EF", head: "bighorns", headColor: "#1A1A1A", eyes: "angry", mouth: "lips", top: "#1A1A1A", top2: "#3A3A3A", pattern: "robe", cape: "#1A1A1A", legs: "#1A1A1A" } },
+  { id: "duende", name: "Duende Verde", group: "Vilões", cfg: { skin: "#5FA548", hair: "none", eyes: "angry", mouth: "evil", top: "#5FA548", top2: "#6A2C91", pattern: "vest", legs: "#5FA548" } },
+  { id: "bowser", name: "Bowser", group: "Vilões", cfg: { skin: "#F2C14E", hair: "mohawk", hairColor: "#D62828", head: "devil", headColor: "#F1E9D2", eyes: "angry", mouth: "grin", top: "#2BA84A", top2: "#F2C14E", pattern: "belly", legs: "#2BA84A" } },
+
+  // Animes
+  { id: "goku", name: "Goku", group: "Animes", cfg: { skin: "#F6D7BE", hair: "spiky", hairColor: "#1A1A1A", mouth: "grin", top: "#F77F00", top2: "#1F4BA5", pattern: "jacket", sleeve: "#1F4BA5", belt: "#1F4BA5", legs: "#F77F00" } },
+  { id: "vegeta", name: "Vegeta", group: "Animes", cfg: { skin: "#F6D7BE", hair: "spiky", hairColor: "#1A1A1A", eyes: "angry", mouth: "smirk", top: "#1F4BA5", top2: "#FFFFFF", pattern: "armor", legs: "#1F4BA5" } },
+  { id: "naruto", name: "Naruto", group: "Animes", cfg: { skin: "#F6D7BE", hair: "spiky", hairColor: "#F2C14E", head: "headband", headColor: "#1F4BA5", extra: "whiskers", mouth: "grin", top: "#F77F00", top2: "#1A1A1A", pattern: "jacket", legs: "#F77F00" } },
+  { id: "sasuke", name: "Sasuke", group: "Animes", cfg: { skin: "#F6D7BE", hair: "messy", hairColor: "#1A1A1A", eyes: "angry", mouth: "line", top: "#F1F1F1", top2: "#2B2D42", pattern: "jacket", belt: "#6A2C91", legs: "#2B2D42" } },
+  { id: "luffy", name: "Luffy", group: "Animes", cfg: { skin: "#F6D7BE", hair: "short", hairColor: "#1A1A1A", head: "straw", headColor: "#D62828", mouth: "grin", top: "#D62828", top2: "#F6D7BE", pattern: "jacket", legs: "#1F4BA5", belt: "#FFC23D" } },
+  { id: "zoro", name: "Zoro", group: "Animes", cfg: { skin: "#E8B48A", hair: "short", hairColor: "#2BA84A", eyes: "angry", mouth: "smirk", top: "#FFFFFF", top2: "#2BA84A", pattern: "sash", legs: "#1A1A1A", item: "sword" } },
+  { id: "seiya", name: "Seiya", group: "Animes", cfg: { skin: "#F6D7BE", hair: "messy", hairColor: "#7A3E1D", head: "tiara", top: "#D62828", top2: "#E9ECEF", pattern: "armor", legs: "#D62828" } },
+  { id: "ash", name: "Ash", group: "Animes", cfg: { skin: "#F6D7BE", hair: "spiky", hairColor: "#1A1A1A", head: "cap", headColor: "#D62828", top: "#1F4BA5", top2: "#FFFFFF", pattern: "jacket", legs: "#2B4C7E", item: "pokeball" } },
+  { id: "sailor", name: "Sailor Moon", group: "Animes", cfg: { skin: "#F6D7BE", hair: "pigtails", hairColor: "#F5E6A8", head: "tiara", eyes: "lashes", top: "#FFFFFF", top2: "#1F4BA5", pattern: "collar", belt: "#D62828", legs: "#1F4BA5" } },
+  { id: "tanjiro", name: "Tanjiro", group: "Animes", cfg: { skin: "#F6D7BE", hair: "short", hairColor: "#7A1F1F", extra: "scar", top: "#2BA84A", top2: "#1A1A1A", pattern: "plaid", legs: "#1A1A1A", item: "sword" } },
+
+  // Desenhos
+  { id: "homer", name: "Homer", group: "Desenhos", cfg: { skin: "#FFD90F", hair: "none", beard: "stubble", beardColor: "#8B5E3C", eyes: "wide", top: "#FFFFFF", legs: "#1F4BA5" } },
+  { id: "bart", name: "Bart", group: "Desenhos", cfg: { skin: "#FFD90F", hair: "spiky", hairColor: "#FFD90F", eyes: "wide", mouth: "smirk", top: "#F77F00", legs: "#1F4BA5" } },
+  { id: "monica", name: "Mônica", group: "Desenhos", cfg: { skin: "#F6D7BE", hair: "bob", hairColor: "#1A1A1A", mouth: "teeth", top: "#D62828", legs: "#D62828" } },
+  { id: "cebolinha", name: "Cebolinha", group: "Desenhos", cfg: { skin: "#F6D7BE", hair: "fivehairs", hairColor: "#1A1A1A", mouth: "smirk", top: "#2BA84A", legs: "#1A1A1A" } },
+  { id: "cascao", name: "Cascão", group: "Desenhos", cfg: { skin: "#F6D7BE", hair: "messy", hairColor: "#1A1A1A", extra: "freckles", mouth: "grin", top: "#FFC23D", legs: "#D62828" } },
+  { id: "magali", name: "Magali", group: "Desenhos", cfg: { skin: "#F6D7BE", hair: "bob", hairColor: "#1A1A1A", mouth: "tongue", top: "#FFC23D", legs: "#FFC23D" } },
+  { id: "chaves", name: "Chaves", group: "Desenhos", cfg: { skin: "#F6D7BE", hair: "short", hairColor: "#7A4E2D", head: "cap", headColor: "#8B5E3C", extra: "freckles", top: "#9A8C5A", top2: "#5C4033", pattern: "overalls", legs: "#5C4033" } },
+  { id: "mickey", name: "Mickey", group: "Desenhos", cfg: { skin: "#F6D7BE", hair: "none", head: "mouse", headColor: "#1A1A1A", mouth: "grin", top: "#1A1A1A", top2: "#FFC23D", pattern: "buttons", legs: "#D62828" } },
+  { id: "picapau", name: "Pica-Pau", group: "Desenhos", cfg: { skin: "#1F4BA5", hair: "mohawk", hairColor: "#D62828", extra: "muzzle", mouth: "grin", top: "#1F4BA5", top2: "#F6D7BE", pattern: "belly", legs: "#1F4BA5" } },
+  { id: "fred", name: "Fred Flintstone", group: "Desenhos", cfg: { skin: "#F6D7BE", hair: "messy", hairColor: "#1A1A1A", beard: "stubble", top: "#F77F00", top2: "#1A1A1A", pattern: "dots", legs: "#F77F00" } },
+  { id: "ben10", name: "Ben 10", group: "Desenhos", cfg: { skin: "#F6D7BE", hair: "side", hairColor: "#7A4E2D", top: "#FFFFFF", top2: "#1A1A1A", pattern: "stripes", legs: "#2BA84A", item: "watch" } },
+  { id: "dora", name: "Dora", group: "Desenhos", cfg: { skin: "#C68642", hair: "bob", hairColor: "#4A2F1B", top: "#F4A6B7", legs: "#F77F00" } },
+
+  // Mais filmes e séries
+  { id: "barbie", name: "Barbie", group: "Filmes e séries", cfg: { skin: "#F6D7BE", hair: "long", hairColor: "#F5E6A8", eyes: "lashes", mouth: "lips", top: "#F72585", top2: "#FFFFFF", pattern: "dots", legs: "#F72585" } },
+  { id: "joel", name: "Sobrevivente", group: "Filmes e séries", cfg: { skin: "#E8B48A", hair: "messy", hairColor: "#4A2F1B", beard: "beard", top: "#2B4C7E", top2: "#8B5E3C", pattern: "plaid", legs: "#5B4636" } },
+  { id: "rocky", name: "Rocky", group: "Filmes e séries", cfg: { skin: "#E8B48A", hair: "short", hairColor: "#1A1A1A", eyes: "sleepy", top: "#E8B48A", top2: "#D62828", pattern: "abs", legs: "#D62828", item: "trophy" } },
+  { id: "tarzan", name: "Tarzan", group: "Filmes e séries", cfg: { skin: "#E8B48A", hair: "long", hairColor: "#5A3A22", top: "#E8B48A", top2: "#C9A27E", pattern: "abs", legs: "#8B5E3C" } },
+
+  // Mais games
+  { id: "ryu", name: "Ryu", group: "Games", cfg: { skin: "#F6D7BE", hair: "short", hairColor: "#1A1A1A", head: "headband", headColor: "#D62828", eyes: "angry", mouth: "line", top: "#FFFFFF", top2: "#E6E6E6", pattern: "robe", belt: "#1A1A1A", legs: "#FFFFFF" } },
+  { id: "chunli", name: "Chun-Li", group: "Games", cfg: { skin: "#F6D7BE", hair: "buns", hairColor: "#1A1A1A", top: "#1F4BA5", top2: "#FFC23D", pattern: "chevron", legs: "#1F4BA5" } },
+  { id: "peach", name: "Princesa Peach", group: "Games", cfg: { skin: "#F6D7BE", hair: "long", hairColor: "#F5E6A8", head: "crown", eyes: "lashes", top: "#F4A6B7", legs: "#F4A6B7" } },
+  { id: "kirby", name: "Kirby", group: "Games", cfg: { skin: "#F4A6B7", hair: "none", eyes: "wide", extra: "cheeks", mouth: "open", top: "#F4A6B7", legs: "#D62828" } },
+  { id: "crash", name: "Crash", group: "Games", cfg: { skin: "#F77F00", hair: "spiky", hairColor: "#7A3E1D", eyes: "wide", mouth: "grin", top: "#F77F00", legs: "#1F4BA5" } },
+  { id: "zelda", name: "Zelda", group: "Games", cfg: { skin: "#F6D7BE", hair: "long", hairColor: "#E9C46A", head: "tiara", top: "#F1F1F1", top2: "#7B2CBF", pattern: "robe", legs: "#F1F1F1" } },
+  { id: "geralt", name: "Bruxo", group: "Games", cfg: { skin: "#E6E2DA", hair: "long", hairColor: "#E6E6E6", beard: "stubble", eyes: "angry", mouth: "line", top: "#1A1A1A", top2: "#8B5E3C", pattern: "strap", legs: "#1A1A1A", item: "sword" } },
+
+  // Mais futebol
+  { id: "ronaldo", name: "Ronaldo Fenômeno", group: "Futebol", cfg: { skin: "#C68642", hair: "buzz", hairColor: "#1A1A1A", mouth: "teeth", top: "#FFDF00", top2: "#009C3B", pattern: "number", text: "9", legs: "#1F4BA5" } },
+  { id: "zico", name: "Zico", group: "Futebol", cfg: { skin: "#F6D7BE", hair: "curly", hairColor: "#3B2A1A", top: "#D62828", top2: "#1A1A1A", textColor: "#FFFFFF", pattern: ["hoops", "number"], text: "10", legs: "#FFFFFF" } },
+  { id: "romario", name: "Romário", group: "Futebol", cfg: { skin: "#8D5524", hair: "buzz", hairColor: "#1A1A1A", mouth: "smirk", top: "#FFDF00", top2: "#009C3B", pattern: "number", text: "11", legs: "#1F4BA5" } },
+  { id: "kaka", name: "Kaká", group: "Futebol", cfg: { skin: "#F6D7BE", hair: "side", hairColor: "#3B2A1A", top: "#D62828", top2: "#1A1A1A", textColor: "#FFFFFF", pattern: ["stripes", "number"], text: "22", legs: "#FFFFFF" } },
+  { id: "haaland", name: "Haaland", group: "Futebol", cfg: { skin: "#F6D7BE", hair: "bun", hairColor: "#F5E6A8", top: "#6CABDD", top2: "#FFFFFF", pattern: "number", text: "9", legs: "#FFFFFF" } },
+  { id: "cafu", name: "Cafu", group: "Futebol", cfg: { skin: "#5C3A21", hair: "buzz", hairColor: "#1A1A1A", mouth: "grin", top: "#FFDF00", top2: "#009C3B", pattern: "number", text: "2", legs: "#1F4BA5", item: "trophy" } },
+
+  // Mais profissões
+  { id: "policial", name: "Policial", group: "Profissões", cfg: { skin: "#C68642", hair: "short", hairColor: "#1A1A1A", head: "cap", headColor: "#1F2A5C", top: "#1F2A5C", top2: "#FFC23D", pattern: "buttons", legs: "#1F2A5C" } },
+  { id: "professora", name: "Professora", group: "Profissões", cfg: { skin: "#EBBE97", hair: "bun", hairColor: "#9AA0B5", eyes: "glasses", top: "#7B2CBF", top2: "#FFFFFF", pattern: "collar", legs: "#3C096C", item: "book" } },
+  { id: "cientista", name: "Cientista", group: "Profissões", cfg: { skin: "#F6D7BE", hair: "messy", hairColor: "#E6E6E6", eyes: "glasses", top: "#4CC9F0", top2: "#2A9D8F", pattern: "coat", legs: "#333333", item: "flask" } },
+  { id: "magico", name: "Mágico", group: "Profissões", cfg: { skin: "#F6D7BE", hair: "short", hairColor: "#1A1A1A", beard: "mustache", head: "tophat", headColor: "#1A1A1A", headColor2: "#D62828", top: "#1A1A1A", top2: "#D62828", pattern: "suit", cape: "#1A1A1A", legs: "#1A1A1A", item: "wand" } },
+  { id: "palhaco", name: "Palhaço", group: "Profissões", cfg: { skin: "#F6D7BE", hair: "afro", hairColor: "#D62828", extra: "nose", mouth: "grin", top: "#FFC23D", top2: "#D62828", pattern: "dots", legs: "#1F4BA5", item: "balloon" } },
+  { id: "detetive", name: "Detetive", group: "Profissões", cfg: { skin: "#F6D7BE", hair: "short", hairColor: "#4A2F1B", head: "fedora", headColor: "#8B5E3C", headColor2: "#3B2A1A", top: "#C9B48A", top2: "#8B5E3C", pattern: "jacket", legs: "#5B4636", item: "magnifier" } },
+  { id: "fazendeiro", name: "Fazendeiro", group: "Profissões", cfg: { skin: "#E8B48A", hair: "short", hairColor: "#4A2F1B", beard: "stubble", head: "cowboy", headColor: "#E9C46A", headColor2: "#8B5E3C", top: "#D62828", top2: "#1A1A1A", pattern: "plaid", legs: "#1F4BA5" } },
+  { id: "dj", name: "DJ", group: "Profissões", cfg: { skin: "#8D5524", hair: "curly", hairColor: "#1A1A1A", head: "headphones", headColor: "#1A1A1A", eyes: "shades", top: "#1A1A1A", top2: "#4CC9F0", pattern: "bolt", legs: "#1F2A44" } },
+  { id: "skatista", name: "Skatista", group: "Profissões", cfg: { skin: "#F6D7BE", hair: "long", hairColor: "#8B5E3C", head: "beanie", headColor: "#2A9D8F", headColor2: "#FFFFFF", top: "#2A9D8F", top2: "#FFFFFF", pattern: "hoodie", legs: "#555555" } },
+  { id: "surfista", name: "Surfista", group: "Profissões", cfg: { skin: "#C68642", hair: "long", hairColor: "#E9C46A", mouth: "grin", top: "#4CC9F0", top2: "#FFFFFF", pattern: "tank", legs: "#F77F00" } },
 ];
 
 function presetById(id) {

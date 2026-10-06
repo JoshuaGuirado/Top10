@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Tten">
-  <rect width="100" height="100" fill="#0A0A0A"/>
-  <g transform="translate(10 4) scale(.94)"><path fill="#FFFFFF" d="M38 82 V75 C38 67 20 61 20 40 A30 30 0 0 1 80 40 C80 61 62 67 62 75 V82 Z"/>
-  <path fill="none" stroke="#0A0A0A" stroke-width="8" d="M35 30 H65 M50 30 V62"/>
-  <rect x="38" y="86" width="24" height="4.5" fill="#FFFFFF"/>
-  <rect x="42" y="93" width="16" height="4.5" fill="#FFFFFF"/></g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Top Ten">
+  <rect width="100" height="100" rx="22" fill="#2450F5"/>
+  <g transform="translate(14 6) scale(.86)"><path fill="#FFFFFF" d="M38 81 V75 C38 67 20 61 20 40 A30 30 0 0 1 80 40 C80 61 62 67 62 75 V81 Q62 83 60 83 H40 Q38 83 38 81 Z"/>
+  <path fill="none" stroke="#2450F5" stroke-width="8" stroke-linecap="round" d="M36 30 H64 M50 30 V61"/>
+  <rect x="38" y="87" width="24" height="5" rx="2.5" fill="#FFFFFF"/>
+  <rect x="42" y="95" width="16" height="5" rx="2.5" fill="#FFFFFF"/></g>
 </svg>

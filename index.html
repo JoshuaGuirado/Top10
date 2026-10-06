@@ -3,11 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tten</title>
+  <title>Top Ten</title>
   <meta name="description" content="Jogo de listas: o óbvio vale 1, o difícil vale 10. De 1 a 8 jogadores.">
-  <meta name="theme-color" content="#0A0A0A">
+  <meta name="theme-color" content="#2450F5">
   <link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
-  <meta property="og:title" content="Tten">
+  <link rel="icon" href="brand/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
+  <script>try { var t = localStorage.getItem("tt:theme"); if (t) document.documentElement.dataset.theme = JSON.parse(t); } catch (e) {}</script>
+  <meta property="og:title" content="Top Ten">
   <meta property="og:description" content="Jogo de listas: o óbvio vale 1, o difícil vale 10. De 1 a 8 jogadores.">
   <meta property="og:image" content="brand/og-image.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,17 +21,17 @@
 <body>
   <div class="topbar">
     <button type="button" class="logo-btn" id="home-btn" aria-label="Início">
-      <img class="logo logo-light" src="brand/logo.svg" alt="Tten">
+      <img class="logo logo-light" src="brand/logo.svg" alt="Top Ten">
       <img class="logo logo-dark" src="brand/logo-dark.svg" alt="" aria-hidden="true">
     </button>
-    <button type="button" class="text-btn" id="sound-btn">Som</button>
+    <div class="topbar-actions"><button type="button" class="text-btn" id="theme-btn">Modo escuro</button><button type="button" class="text-btn" id="sound-btn">Som</button></div>
   </div>
 
   <main>
     <!-- Início -->
     <section id="screen-home" class="screen">
       <div class="hero">
-        <h1><span>O óbvio vale 1.</span><span class="out">O difícil vale 10.</span></h1>
+        <h1><span>O óbvio vale 1.</span><span class="accent">O difícil vale 10.</span></h1>
         <p class="lead">Um jogo de listas para jogar sozinho ou com até 8 pessoas. São <span id="list-total">300</span> listas de 10, 30 e 50 itens: futebol, filmes, heróis, comida, frases de mãe. E você ainda pode criar as suas.</p>
         <button type="button" class="btn big" id="start-btn">Jogar</button>
       </div>
@@ -161,6 +164,7 @@
   <script src="data.js"></script>
   <script src="data-mais.js"></script>
   <script src="data-grandes.js"></script>
+  <script src="icons.js"></script>
   <script src="avatars.js"></script>
   <script src="script.js"></script>
 </body>
