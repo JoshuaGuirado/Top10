@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Top 10</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Top 10</h1>
+      <p class="tagline">Adivinhe os 10 itens da lista. Você tem 3 vidas.</p>
+    </header>
+
+    <section id="menu">
+      <h2>Escolha um desafio</h2>
+      <ul id="list-picker"></ul>
+    </section>
+
+    <section id="game" hidden>
+      <h2 id="game-title"></h2>
+      <div class="status">
+        <span id="score">0/10</span>
+        <span id="lives" aria-label="Vidas"></span>
+      </div>
+
+      <form id="guess-form" autocomplete="off">
+        <input id="guess" type="text" placeholder="Digite um palpite..." aria-label="Palpite" required>
+        <button type="submit">Chutar</button>
+      </form>
+      <p id="feedback" role="status"></p>
+
+      <ol id="board"></ol>
+
+      <p id="wrong-guesses"></p>
+      <p id="source" class="source"></p>
+
+      <div class="actions">
+        <button id="give-up" type="button" class="secondary">Desistir</button>
+        <button id="back" type="button" class="secondary">Outras listas</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
