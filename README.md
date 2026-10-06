@@ -15,3 +15,7 @@ Edite `data.js` e acrescente um bloco ao array `LISTS` com `id`, `title`, `sourc
 ## Publicar
 
 Para jogar online, ative o GitHub Pages em **Settings → Pages** e selecione a branch `main`.
+
+## Identidade visual
+
+Logo, ícone, cores e tipografia estão na pasta `brand/`. O guia completo fica em `brand.html`: abra no navegador para ver.

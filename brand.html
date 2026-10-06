@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Top 10 · Identidade visual</title>
+  <link rel="icon" href="brand/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Archivo+Black&display=swap">
+  <style>
+    :root { --ink:#16133A; --gold:#FFC23D; --coral:#FF5D5D; --mint:#1FA874; --cream:#FFF7E8; --muted:#6E6A8F; --border:#EADFC8; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--cream); color:var(--ink); font-family:"Archivo",system-ui,sans-serif; line-height:1.55; }
+    main { max-width:880px; margin:0 auto; padding:48px 16px 80px; }
+    h1, h2 { font-family:"Archivo Black","Arial Black",sans-serif; font-weight:400; line-height:1.15; }
+    h1 { font-size:2.4rem; margin:24px 0 8px; }
+    h2 { font-size:1.4rem; margin:56px 0 12px; }
+    p { max-width:62ch; }
+    .muted { color:var(--muted); }
+    .grid { display:grid; gap:16px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
+    .panel { border-radius:18px; padding:32px; display:grid; place-items:center; min-height:180px; border:2px solid var(--border); background:#fff; }
+    .panel.dark { background:var(--ink); border-color:var(--ink); }
+    .panel.gold { background:var(--gold); border-color:var(--gold); }
+    .panel img { max-width:100%; height:auto; }
+    .swatch { border-radius:18px; overflow:hidden; border:2px solid var(--border); background:#fff; }
+    .swatch div:first-child { height:110px; }
+    .swatch div:last-child { padding:12px 14px; font-size:.9rem; }
+    .swatch b { display:block; }
+    code { font-family:ui-monospace,Menlo,monospace; font-size:.85em; }
+    .type-sample { background:#fff; border:2px solid var(--border); border-radius:18px; padding:24px; }
+    .display { font-family:"Archivo Black",sans-serif; font-size:2.6rem; line-height:1.1; }
+    ul.rules { padding-left:20px; }
+    ul.rules li { margin-bottom:6px; }
+  </style>
+</head>
+<body>
+<main>
+  <img src="brand/logo.svg" alt="Top 10" width="200">
+  <h1>Identidade visual</h1>
+  <p class="muted">Clima de programa de auditório: chamativa, divertida e fácil de ler. A marca nasce de uma ideia só: o <b>10 dentro da plaquinha dourada</b>, como um prêmio.</p>
+
+  <h2>Logo</h2>
+  <p>As letras são montadas com formas geométricas do mesmo peso, sem depender de fonte. O brilho coral marca o momento do acerto.</p>
+  <div class="grid">
+    <div class="panel"><img src="brand/logo.svg" alt="Logo em fundo claro" width="280"></div>
+    <div class="panel dark"><img src="brand/logo-dark.svg" alt="Logo em fundo escuro" width="280"></div>
+  </div>
+
+  <h2>Ícone</h2>
+  <p>A plaquinha sozinha funciona como favicon, ícone de app e avatar de rede social.</p>
+  <div class="grid">
+    <div class="panel"><img src="brand/icon.svg" alt="Ícone grande" width="140"></div>
+    <div class="panel dark"><img src="brand/icon.svg" alt="Ícone em fundo escuro" width="96"></div>
+    <div class="panel"><img src="brand/icon.svg" alt="Ícone pequeno" width="32"></div>
+  </div>
+
+  <h2>Cores</h2>
+  <div class="grid">
+    <div class="swatch"><div style="background:#FFC23D"></div><div><b>Amarelo-troféu</b><code>#FFC23D</code> · cor principal, botões, acertos</div></div>
+    <div class="swatch"><div style="background:#16133A"></div><div><b>Azul-noite</b><code>#16133A</code> · texto, logo, fundo escuro</div></div>
+    <div class="swatch"><div style="background:#FF5D5D"></div><div><b>Coral</b><code>#FF5D5D</code> · brilho, vidas, erros</div></div>
+    <div class="swatch"><div style="background:#1FA874"></div><div><b>Verde</b><code>#1FA874</code> · mensagens de acerto</div></div>
+    <div class="swatch"><div style="background:#FFF7E8"></div><div><b>Creme</b><code>#FFF7E8</code> · fundo claro</div></div>
+  </div>
+
+  <h2>Tipografia</h2>
+  <div class="type-sample">
+    <div class="display">Archivo Black</div>
+    <p class="muted">Títulos, números do ranking e placar.</p>
+    <p style="font-size:1.15rem;margin-top:20px"><b>Archivo</b> — textos, botões e palpites. Pesos 400, 600 e 700.</p>
+    <p class="muted">Ambas gratuitas no Google Fonts.</p>
+  </div>
+
+  <h2>Regras de uso</h2>
+  <ul class="rules">
+    <li>Use <code>logo.svg</code> em fundos claros e <code>logo-dark.svg</code> em fundos escuros.</li>
+    <li>Não mude as cores da plaquinha: ela é sempre amarela com o 10 azul-noite.</li>
+    <li>Deixe um respiro em volta do logo de pelo menos a altura da letra O.</li>
+    <li>Não distorça, rotacione ou aplique sombras no logo.</li>
+    <li>Coral é cor de destaque: use pouco, só para brilho, vidas e erros.</li>
+  </ul>
+
+  <h2>Arquivos</h2>
+  <ul class="rules">
+    <li><code>brand/logo.svg</code>: logo horizontal, fundo claro</li>
+    <li><code>brand/logo-dark.svg</code>: logo horizontal, fundo escuro</li>
+    <li><code>brand/icon.svg</code>: ícone / favicon</li>
+    <li><code>brand/og-image.png</code>: imagem de compartilhamento (1200×630)</li>
+  </ul>
+</main>
+</body>
+</html>
