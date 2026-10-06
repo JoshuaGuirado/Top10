@@ -1,16 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-23 6 146 128" role="img" aria-label="TT · Top Ten">
-  <g>
-    <path fill="#FFC23D" d="M30 98 V87 C30 79 12 69 12 48 A38 38 0 0 1 88 48 C88 69 70 79 70 87 V98 Z"/>
-    <g fill="#16133A">
-      <rect x="22" y="32" width="27" height="12" rx="3"/>
-      <rect x="29.5" y="32" width="12" height="40" rx="3"/>
-      <rect x="51" y="32" width="27" height="12" rx="3"/>
-      <rect x="58.5" y="32" width="12" height="40" rx="3"/>
-    </g>
-    <g fill="#16133A">
-      <rect x="30" y="102" width="40" height="8" rx="4"/>
-      <rect x="32" y="113" width="36" height="8" rx="4"/>
-      <rect x="41" y="124" width="18" height="6" rx="3"/>
-    </g>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 4 80 98" role="img" aria-label="TT · Top Ten">
+  <path fill="#FFC23D" d="M38 82 V75 C38 67 20 61 20 40 A30 30 0 0 1 80 40 C80 61 62 67 62 75 V82 Z"/>
+  <path fill="none" stroke="#16133A" stroke-width="7" d="M29 31 H48 M38.5 31 V59 M52 31 H71 M61.5 31 V59"/>
+  <rect x="38" y="86" width="24" height="4.5" rx="2.25" fill="#16133A"/>
+  <rect x="42" y="93" width="16" height="4.5" rx="2.25" fill="#16133A"/>
 </svg>
