@@ -29,13 +29,13 @@
     <section id="screen-home" class="screen">
       <div class="hero">
         <h1><span>O óbvio vale 1.</span><span class="out">O difícil vale 10.</span></h1>
-        <p class="lead">Um jogo de listas para jogar sozinho ou com até 8 pessoas. São 105 listas: futebol, filmes, heróis, frases de mãe e muito mais.</p>
+        <p class="lead">Um jogo de listas para jogar sozinho ou com até 8 pessoas. São <span id="list-total">300</span> listas de 10, 30 e 50 itens: futebol, filmes, heróis, comida, frases de mãe. E você ainda pode criar as suas.</p>
         <button type="button" class="btn big" id="start-btn">Jogar</button>
       </div>
       <ol class="rules">
         <li><b class="n">1–8</b><p>Jogadores. Cada um com nickname e skin.</p></li>
         <li><b class="n">Nº 8</b><p>Acertou o 8º da lista? Ganhou 8 pontos.</p></li>
-        <li><b class="n">3</b><p>Vidas por jogador. Errou, perdeu uma.</p></li>
+        <li><b class="n">50</b><p>Nas listas grandes, o último item vale 50 pontos.</p></li>
         <li><b class="n">1º</b><p>Quem somar mais pontos sobe no pódio.</p></li>
       </ol>
     </section>
@@ -47,7 +47,7 @@
       <p class="mode-label" id="mode-label"></p>
       <div class="player-grid" id="player-grid"></div>
       <div class="actions end">
-        <button type="button" class="btn" id="to-lists-btn">Escolher a lista →</button>
+        <button type="button" class="btn" id="to-lists-btn">Escolher a lista</button>
       </div>
     </section>
 
@@ -55,12 +55,36 @@
     <section id="screen-lists" class="screen" hidden>
       <div class="lists-head">
         <h2>Escolha a lista</h2>
-        <button type="button" class="btn ghost" id="random-list-btn">Sortear</button>
+        <div class="head-actions">
+          <button type="button" class="btn ghost" id="create-list-btn">Criar lista</button>
+          <button type="button" class="btn ghost" id="random-list-btn">Sortear</button>
+        </div>
       </div>
       <input type="search" id="list-search" class="search" placeholder="Pesquisar: copa, marvel, pokémon…" aria-label="Pesquisar listas" autocomplete="off">
       <div class="chips" id="category-chips"></div>
+      <div class="chips sizes" id="size-chips"></div>
       <p class="muted small" id="list-count"></p>
       <div class="list-grid" id="list-grid"></div>
+    </section>
+
+    <!-- Criar lista -->
+    <section id="screen-editor" class="screen" hidden>
+      <form id="editor-form" autocomplete="off">
+        <h2 id="editor-title">Criar lista</h2>
+        <p class="muted">Monte seu próprio tema. Coloque do mais óbvio (vale 1 ponto) ao menos óbvio (vale mais).</p>
+        <label class="nick editor-name-label">
+          <span>Nome da lista</span>
+          <input type="text" id="editor-name" maxlength="120" placeholder="Ex.: Os 10 lanches favoritos da turma">
+        </label>
+        <p class="ctrl-label editor-size-label">Tamanho</p>
+        <div class="chips" id="editor-sizes"></div>
+        <div class="editor-rows" id="editor-rows"></div>
+        <p class="feedback bad" id="editor-error" role="alert"></p>
+        <div class="actions">
+          <button type="submit" class="btn">Salvar lista</button>
+          <button type="button" class="btn ghost" id="editor-cancel">Cancelar</button>
+        </div>
+      </form>
     </section>
 
     <!-- Partida -->
@@ -68,6 +92,7 @@
       <div class="game-head">
         <span class="tag" id="game-cat"></span>
         <h2 id="game-title"></h2>
+        <p class="progress" id="progress"></p>
       </div>
       <div class="scoreboard" id="scoreboard"></div>
 
@@ -119,7 +144,10 @@
       <div id="avatar-presets" class="preset-grid"></div>
       <div id="avatar-builder" class="builder" hidden>
         <div class="builder-preview" id="builder-preview"></div>
-        <div class="builder-controls" id="builder-controls"></div>
+        <div>
+          <div class="chips builder-sections" id="builder-sections"></div>
+          <div class="builder-controls" id="builder-controls"></div>
+        </div>
       </div>
       <div class="dialog-foot" id="builder-foot" hidden>
         <button type="button" class="btn ghost" id="builder-random">Sortear</button>
@@ -131,6 +159,8 @@
   <canvas id="fx" aria-hidden="true"></canvas>
 
   <script src="data.js"></script>
+  <script src="data-mais.js"></script>
+  <script src="data-grandes.js"></script>
   <script src="avatars.js"></script>
   <script src="script.js"></script>
 </body>

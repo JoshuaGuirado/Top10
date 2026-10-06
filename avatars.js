@@ -4,17 +4,18 @@
 
 const SKIN_TONES = ["#F7C948", "#F6D7BE", "#EBBE97", "#C68642", "#8D5524", "#5C3A21", "#E6E9EF", "#5FA548", "#8E6FB5", "#4C8BF5"];
 const COLORS = ["#16133A", "#1A1A1A", "#FFFFFF", "#D62828", "#F77F00", "#FFC23D", "#2BA84A", "#2A9D8F", "#1F4BA5", "#4CC9F0", "#7B2CBF", "#F4A6B7", "#8B5E3C", "#9AA0B5"];
-const HAIR_COLORS = ["#1A1A1A", "#4A2F1B", "#8B5E3C", "#E9C46A", "#D9D9D9", "#C1440E", "#D62828", "#2BA84A", "#4C8BF5", "#F4A6B7"];
+const HAIR_COLORS = ["#1A1A1A", "#4A2F1B", "#8B5E3C", "#B5651D", "#E9C46A", "#F5E6A8", "#D9D9D9", "#FFFFFF", "#C1440E", "#D62828", "#2BA84A", "#4C8BF5", "#7B2CBF", "#F4A6B7"];
 
 // Opções do editor: [valor, rótulo]
 const PARTS = {
-  hair: [["none", "Careca"], ["short", "Curto"], ["spiky", "Espetado"], ["messy", "Bagunçado"], ["slick", "Penteado"], ["long", "Longo"], ["ponytail", "Rabo de cavalo"], ["bun", "Coque"], ["curly", "Black power"], ["braids", "Tranças"], ["dreads", "Dreads"], ["mohawk", "Moicano"]],
-  eyes: [["normal", "Normal"], ["happy", "Feliz"], ["angry", "Bravo"], ["glasses", "Óculos"], ["shades", "Óculos escuros"], ["wink", "Piscadinha"]],
-  mouth: [["smile", "Sorriso"], ["grin", "Sorrisão"], ["open", "Surpreso"], ["line", "Sério"], ["tongue", "Língua"], ["evil", "Malvado"]],
-  beard: [["none", "Sem barba"], ["mustache", "Bigode"], ["goatee", "Cavanhaque"], ["stubble", "Barba por fazer"], ["beard", "Barba"], ["long", "Barba longa"]],
-  head: [["none", "Nada"], ["cap", "Boné"], ["beanie", "Gorro"], ["headband", "Faixa"], ["headphones", "Fone"], ["crown", "Coroa"], ["tiara", "Tiara"], ["fedora", "Chapéu"], ["bandana", "Bandana"], ["pirate", "Chapéu pirata"], ["wizard", "Chapéu de mago"], ["chef", "Chapéu de chef"], ["firehat", "Capacete de bombeiro"], ["astro", "Capacete espacial"], ["cat", "Orelhas de gato"]],
-  pattern: [["plain", "Lisa"], ["stripes", "Listras"], ["hoops", "Faixas"], ["number", "Número"], ["star", "Estrela"], ["bolt", "Raio"], ["suit", "Terno"], ["jacket", "Jaqueta"], ["overalls", "Macacão"], ["armor", "Armadura"], ["robe", "Manto"], ["scarf", "Cachecol"]],
-  extra: [["none", "Nada"], ["cheeks", "Bochechas"], ["freckles", "Sardas"], ["scar", "Cicatriz"], ["eyepatch", "Tapa-olho"]],
+  hair: [["none", "Careca"], ["buzz", "Raspado"], ["short", "Curto"], ["spiky", "Espetado"], ["messy", "Bagunçado"], ["slick", "Penteado"], ["side", "Franja de lado"], ["bob", "Chanel"], ["long", "Longo"], ["ponytail", "Rabo de cavalo"], ["pigtails", "Maria-chiquinha"], ["bun", "Coque"], ["curly", "Cacheado"], ["afro", "Black power"], ["braids", "Tranças"], ["dreads", "Dreads"], ["mohawk", "Moicano"]],
+  eyes: [["normal", "Normal"], ["happy", "Feliz"], ["angry", "Bravo"], ["sleepy", "Sonolento"], ["wide", "Arregalado"], ["lashes", "Cílios"], ["wink", "Piscadinha"], ["glasses", "Óculos"], ["shades", "Óculos escuros"]],
+  mouth: [["smile", "Sorriso"], ["grin", "Sorrisão"], ["smirk", "Sorriso de canto"], ["teeth", "Dentuço"], ["open", "Surpreso"], ["line", "Sério"], ["sad", "Triste"], ["tongue", "Língua"], ["lips", "Batom"], ["evil", "Malvado"]],
+  beard: [["none", "Sem barba"], ["mustache", "Bigode"], ["goatee", "Cavanhaque"], ["sideburns", "Costeletas"], ["stubble", "Barba por fazer"], ["beard", "Barba"], ["long", "Barba longa"]],
+  head: [["none", "Nada"], ["cap", "Boné"], ["beanie", "Gorro"], ["headband", "Faixa"], ["headphones", "Fone"], ["bow", "Laço"], ["flowers", "Coroa de flores"], ["crown", "Coroa"], ["tiara", "Tiara"], ["halo", "Auréola"], ["devil", "Chifrinhos"], ["bunny", "Orelhas de coelho"], ["cat", "Orelhas de gato"], ["fedora", "Chapéu"], ["cowboy", "Chapéu de caubói"], ["party", "Chapéu de festa"], ["bandana", "Bandana"], ["pirate", "Chapéu pirata"], ["wizard", "Chapéu de mago"], ["chef", "Chapéu de chef"], ["hardhat", "Capacete de obra"], ["firehat", "Capacete de bombeiro"], ["viking", "Capacete viking"], ["knight", "Elmo de cavaleiro"], ["astro", "Capacete espacial"], ["robot", "Cabeça de robô"], ["heromask", "Máscara de herói"], ["ninja", "Máscara ninja"], ["hood", "Capuz"]],
+  pattern: [["plain", "Lisa"], ["stripes", "Listras"], ["hoops", "Faixas"], ["sash", "Faixa diagonal"], ["dots", "Bolinhas"], ["plaid", "Xadrez"], ["camo", "Camuflada"], ["number", "Número"], ["star", "Estrela"], ["heart", "Coração"], ["bolt", "Raio"], ["hoodie", "Moletom"], ["tank", "Regata"], ["suit", "Terno"], ["jacket", "Jaqueta"], ["overalls", "Macacão"], ["armor", "Armadura"], ["robe", "Manto"], ["scarf", "Cachecol"]],
+  extra: [["none", "Nada"], ["cheeks", "Bochechas"], ["freckles", "Sardas"], ["mole", "Pinta"], ["scar", "Cicatriz"], ["bandaid", "Curativo"], ["warpaint", "Pintura de guerra"], ["tattoo", "Tatuagem"], ["eyepatch", "Tapa-olho"]],
+  item: [["none", "Nada"], ["ball", "Bola"], ["mic", "Microfone"], ["phone", "Celular"], ["trophy", "Troféu"], ["sword", "Espada"], ["shield", "Escudo"], ["wand", "Varinha"], ["balloon", "Balão"], ["guitar", "Guitarra"]],
 };
 
 let avatarSeq = 0;
@@ -39,19 +40,25 @@ const DEFAULT_AVATAR = {
   skin: "#F7C948", hair: "short", hairColor: "#4A2F1B", eyes: "normal", mouth: "smile",
   beard: "none", extra: "none", top: "#1F4BA5", top2: "#FFFFFF", pattern: "plain", text: "10",
   legs: "#16133A", belt: null, cape: null, head: "none", headColor: "#D62828", headColor2: "#FFC23D",
-  headStyle: "", headText: "",
+  headStyle: "", headText: "", item: "none", bg: null,
 };
+
+// Opções do editor que viram combinações de peça + estilo.
+const HEAD_ALIASES = { knight: ["helmet", "knight"], robot: ["helmet", "robot"], heromask: ["mask", "plain"], ninja: ["mask", "ninja"] };
 
 function renderAvatar(input) {
   const c = { ...DEFAULT_AVATAR, ...input };
+  if (HEAD_ALIASES[c.head]) [c.head, c.headStyle] = HEAD_ALIASES[c.head];
   const id = "av" + ++avatarSeq;
   const skinDark = darken(c.skin, 0.12);
   const ink = "#1D1B2F";
   const patterns = Array.isArray(c.pattern) ? c.pattern : [c.pattern];
   const covered = c.head === "mask" || c.head === "helmet";
   const out = [];
+  if (patterns.includes("tank")) c.sleeve = c.skin;
 
   // ── atrás ──
+  if (c.bg) out.push(`<rect x="0" y="-8" width="100" height="119" fill="${c.bg}"/>`);
   if (c.cape) out.push(`<path d="M30 60 H70 L86 110 H14 Z" fill="${c.cape}"/>`);
   if (!covered) out.push(hairBack(c));
   out.push(headBack(c));
@@ -67,6 +74,7 @@ function renderAvatar(input) {
   out.push(`<path d="M34 58 H66 L74 100 H26 Z" fill="${c.top}"/>`);
   out.push(`<g clip-path="url(#${id}t)">${patterns.map((p) => torsoPattern(p, c)).join("")}</g>`);
   if (c.belt) out.push(`<rect x="26" y="94" width="48" height="6" fill="${c.belt}"/>`);
+  out.push(handItem(c.item));
 
   // ── cabeça ──
   out.push(`<rect x="44" y="53" width="12" height="7" fill="${skinDark}"/>`);
@@ -98,6 +106,12 @@ function eyes(type, ink) {
       return `<circle cx="42" cy="37" r="5.5" fill="#fff" fill-opacity=".35" stroke="${ink}" stroke-width="1.8"/><circle cx="58" cy="37" r="5.5" fill="#fff" fill-opacity=".35" stroke="${ink}" stroke-width="1.8"/><path d="M47.5 37 H52.5" stroke="${ink}" stroke-width="1.8"/><circle cx="42" cy="37.5" r="2" fill="${ink}"/><circle cx="58" cy="37.5" r="2" fill="${ink}"/>`;
     case "shades":
       return `<path d="M34 33 H66 V36 Q66 42 59 42 Q53 42 52 36 H48 Q47 42 41 42 Q34 42 34 36 Z" fill="${ink}"/><path d="M37 35 L40 35" stroke="#fff" stroke-opacity=".6" stroke-width="1.4"/>`;
+    case "sleepy":
+      return `<path d="M38 38.5 H46 M54 38.5 H62" stroke="${ink}" stroke-width="2.2" stroke-linecap="round"/><path d="M38 36 Q42 34.6 46 36 M54 36 Q58 34.6 62 36" stroke="${ink}" stroke-width="1.1" fill="none" opacity=".55"/>`;
+    case "wide":
+      return `<circle cx="42" cy="37" r="4.4" fill="#fff" stroke="${ink}" stroke-width="1.3"/><circle cx="58" cy="37" r="4.4" fill="#fff" stroke="${ink}" stroke-width="1.3"/><circle cx="42" cy="37.6" r="1.9" fill="${ink}"/><circle cx="58" cy="37.6" r="1.9" fill="${ink}"/>`;
+    case "lashes":
+      return `<ellipse cx="42" cy="37.5" rx="2.5" ry="3" fill="${ink}"/><ellipse cx="58" cy="37.5" rx="2.5" ry="3" fill="${ink}"/><path d="M39.4 35 L37.4 33 M41 34.3 L40.4 32 M60.6 35 L62.6 33 M59 34.3 L59.6 32" stroke="${ink}" stroke-width="1.2" stroke-linecap="round"/>`;
     case "wink":
       return `<circle cx="42" cy="37.5" r="2.6" fill="${ink}"/><path d="M55 38 Q58 35 61 38" stroke="${ink}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
     default:
@@ -119,6 +133,14 @@ function mouth(type, ink) {
       return `<path d="M44 47 H56" stroke="${ink}" stroke-width="2.2" stroke-linecap="round"/>`;
     case "tongue":
       return `<path d="M42 45 Q50 52 58 45" stroke="${ink}" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M47 48.5 Q50 54 53 48.5 Z" fill="#E5646E"/>`;
+    case "smirk":
+      return `<path d="M44 47.5 Q52 49 57.5 44" stroke="${ink}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+    case "teeth":
+      return `<path d="M43 46 Q50 51 57 46" stroke="${ink}" stroke-width="2.2" fill="none" stroke-linecap="round"/><rect x="47" y="48" width="6" height="4" rx=".8" fill="#fff" stroke="${ink}" stroke-width=".8"/><path d="M50 48 V52" stroke="${ink}" stroke-width=".6"/>`;
+    case "sad":
+      return `<path d="M43 49 Q50 44 57 49" stroke="${ink}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+    case "lips":
+      return `<path d="M43 46 Q46.5 44 50 45.5 Q53.5 44 57 46 Q50 52 43 46 Z" fill="#C1121F"/>`;
     case "evil":
       return `<path d="M35 43 Q50 56 65 43" stroke="#C1121F" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M39 46 Q50 53 61 46" stroke="${ink}" stroke-width="1.6" fill="none"/>`;
     default:
@@ -133,6 +155,8 @@ function beard(c) {
       return `<path d="M40 45 Q45 40 50 43 Q55 40 60 45 Q55 44 50 46 Q45 44 40 45 Z" fill="${col}"/>`;
     case "goatee":
       return `<path d="M45 51 Q50 58 55 51 Q50 53 45 51 Z" fill="${col}"/><path d="M42 44 Q50 41 58 44 Q50 43 42 44 Z" fill="${col}"/>`;
+    case "sideburns":
+      return `<rect x="29.5" y="27" width="4.5" height="17" rx="2" fill="${col}"/><rect x="66" y="27" width="4.5" height="17" rx="2" fill="${col}"/>`;
     case "stubble":
       return `<path d="M30 40 Q30 56 50 56 Q70 56 70 40 Q66 50 50 51 Q34 50 30 40 Z" fill="${col}" fill-opacity=".3"/>`;
     case "beard":
@@ -152,6 +176,12 @@ function faceExtra(c) {
       return `<g fill="#B5651D" fill-opacity=".7"><circle cx="36" cy="43" r=".9"/><circle cx="39" cy="45" r=".9"/><circle cx="35" cy="46" r=".9"/><circle cx="64" cy="43" r=".9"/><circle cx="61" cy="45" r=".9"/><circle cx="65" cy="46" r=".9"/></g>`;
     case "scar":
       return `<path d="M56 23 L52 28 L56 28 L52 33" stroke="#B23A48" stroke-width="1.6" fill="none" stroke-linejoin="round"/>`;
+    case "mole":
+      return `<circle cx="59.5" cy="45" r="1.2" fill="#3B2A1A"/>`;
+    case "bandaid":
+      return `<g transform="rotate(-20 62 29)"><rect x="56" y="26.5" width="12" height="5" rx="2" fill="#E9C9A8" stroke="#C9A27E" stroke-width=".6"/><rect x="60.5" y="27.5" width="3" height="3" fill="#F5DFC8"/></g>`;
+    case "warpaint":
+      return `<path d="M32 41.5 H39.5 M32 44.5 H39.5 M60.5 41.5 H68 M60.5 44.5 H68" stroke="#D62828" stroke-width="1.8"/>`;
     case "tattoo":
       return `<path d="M58 20 Q60 30 57 36 Q55 44 60 56 L64 56 Q59 44 61 36 Q64 28 62 20 Z" fill="#B3001B"/>`;
     case "muzzle":
@@ -178,6 +208,12 @@ function hairBack(c) {
       return `<circle cx="74" cy="27" r="6" fill="${h}"/><path d="M76 28 Q86 40 78 56 Q76 42 72 32 Z" fill="${h}"/>`;
     case "curly":
       return `<circle cx="27" cy="38" r="8" fill="${h}"/><circle cx="73" cy="38" r="8" fill="${h}"/>`;
+    case "afro":
+      return `<circle cx="50" cy="28" r="28" fill="${h}"/>`;
+    case "bob":
+      return `<rect x="25" y="22" width="50" height="32" rx="10" fill="${h}"/>`;
+    case "pigtails":
+      return `<g fill="${h}"><circle cx="23" cy="31" r="7"/><circle cx="77" cy="31" r="7"/><path d="M19 35 Q13 49 20 58 Q22 46 26 37 Z M81 35 Q87 49 80 58 Q78 46 74 37 Z"/></g>`;
     case "dreads":
       return `<g fill="${h}"><rect x="24" y="24" width="6" height="34" rx="3"/><rect x="31" y="26" width="6" height="30" rx="3"/><rect x="63" y="26" width="6" height="30" rx="3"/><rect x="70" y="24" width="6" height="34" rx="3"/></g>`;
     default:
@@ -189,8 +225,16 @@ function hairFront(c) {
   const h = c.hairColor;
   const top = `<path d="M28 33 Q27 15 50 15 Q73 15 72 33 Q70 25 60 23 Q50 21 40 23 Q30 25 28 33 Z" fill="${h}"/>`;
   switch (c.hair) {
-    case "short": case "long": case "dreads":
+    case "short": case "long": case "dreads": case "pigtails":
       return top;
+    case "buzz":
+      return `<path d="M29 31 Q28 17 50 17 Q72 17 71 31 Q69 25 60 24 Q50 23 40 24 Q31 25 29 31 Z" fill="${h}" fill-opacity=".55"/>`;
+    case "side":
+      return `<path d="M28 34 Q27 15 50 15 Q73 15 72 31 Q66 22 56 22 L37 35 Q31 35 28 34 Z" fill="${h}"/>`;
+    case "bob":
+      return `${top}<rect x="30" y="17" width="40" height="10" rx="5" fill="${h}"/>`;
+    case "afro":
+      return `<g fill="${h}"><circle cx="34" cy="23" r="10"/><circle cx="50" cy="17" r="12"/><circle cx="66" cy="23" r="10"/></g>`;
     case "spiky":
       return `<path d="M28 34 L29 20 L35 23 L38 10 L45 20 L50 6 L55 20 L62 10 L65 23 L71 20 L72 34 Q66 24 50 24 Q34 24 28 34 Z" fill="${h}"/>`;
     case "messy":
@@ -221,6 +265,8 @@ function headBack(c) {
       return `<path d="M30 26 L30 8 L44 18 Z M70 26 L70 8 L56 18 Z" fill="${col}"/>`;
     case "ogre":
       return `<path d="M30 34 L19 29 L18 37 L30 39 Z M70 34 L81 29 L82 37 L70 39 Z" fill="${c.skin}"/>`;
+    case "bunny":
+      return `<rect x="33" y="-7" width="10" height="30" rx="5" fill="${col}"/><rect x="57" y="-7" width="10" height="30" rx="5" fill="${col}"/><rect x="36" y="-3" width="4" height="22" rx="2" fill="#F4A6B7"/><rect x="60" y="-3" width="4" height="22" rx="2" fill="#F4A6B7"/>`;
     case "hood":
       return `<path d="M22 58 Q20 10 50 9 Q80 10 78 58 Z" fill="${col}"/>`;
     default:
@@ -239,6 +285,22 @@ function headFront(c, ink) {
       return `<rect x="28" y="24" width="44" height="6" rx="2" fill="${col}"/>`;
     case "headphones":
       return `<path d="M26 38 Q25 9 50 9 Q75 9 74 38" stroke="${col}" stroke-width="4" fill="none"/><rect x="21" y="30" width="9" height="15" rx="4" fill="${col}"/><rect x="70" y="30" width="9" height="15" rx="4" fill="${col}"/>`;
+    case "bow":
+      return `<path d="M50 17 L37 9 L37 25 Z M50 17 L63 9 L63 25 Z" fill="${col}"/><circle cx="50" cy="17" r="3.5" fill="${darken(col)}"/>`;
+    case "flowers":
+      return [32, 41, 50, 59, 68].map((x, i) => `<circle cx="${x}" cy="${i % 2 ? 19 : 21}" r="4.5" fill="${[col, col2, "#fff", col2, col][i]}"/><circle cx="${x}" cy="${i % 2 ? 19 : 21}" r="1.6" fill="#FFC23D"/>`).join("");
+    case "halo":
+      return `<ellipse cx="50" cy="5" rx="16" ry="4" fill="none" stroke="#FFC23D" stroke-width="3"/>`;
+    case "devil":
+      return `<path d="M33 23 L29 9 L41 19 Z M67 23 L71 9 L59 19 Z" fill="${col}"/>`;
+    case "cowboy":
+      return `<path d="M34 22 Q34 7 42 8 L50 12 L58 8 Q66 7 66 22 Z" fill="${col}"/><rect x="34" y="17" width="32" height="4" fill="${col2}"/><path d="M15 19 Q22 27 34 24 Q50 21 66 24 Q78 27 85 19 Q83 29 70 29 Q50 26 30 29 Q17 29 15 19 Z" fill="${darken(col)}"/>`;
+    case "party":
+      return `<path d="M40 19 L50 -6 L60 19 Z" fill="${col}"/><path d="M43 12 L56 8 M41.5 16 L58 12" stroke="${col2}" stroke-width="2"/><circle cx="50" cy="-6" r="3.2" fill="${col2}"/>`;
+    case "hardhat":
+      return `<path d="M28 30 Q28 9 50 9 Q72 9 72 30 Z" fill="${col}"/><rect x="24" y="28" width="52" height="5" rx="2" fill="${darken(col)}"/><rect x="46.5" y="9" width="7" height="19" fill="${darken(col)}" opacity=".45"/>`;
+    case "viking":
+      return `<path d="M34 22 Q21 18 19 3 Q27 13 38 16 Z M66 22 Q79 18 81 3 Q73 13 62 16 Z" fill="#F1E9D2"/><path d="M28 30 Q28 11 50 11 Q72 11 72 30 Z" fill="${col}"/><rect x="27" y="26" width="46" height="5" fill="${darken(col)}"/><rect x="48" y="11" width="4" height="15" fill="${darken(col)}"/>`;
     case "crown":
       return `<path d="M31 25 V9 L39 17 L45 6 L50 15 L55 6 L61 17 L69 9 V25 Z" fill="#FFC23D"/><circle cx="50" cy="21" r="2.5" fill="#D62828"/>`;
     case "tiara":
@@ -313,6 +375,20 @@ function torsoPattern(p, c) {
   switch (p) {
     case "stripes":
       return `<g fill="${a}"><rect x="31" y="56" width="6" height="46"/><rect x="43" y="56" width="6" height="46"/><rect x="55" y="56" width="6" height="46"/><rect x="67" y="56" width="6" height="46"/></g>`;
+    case "dots":
+      return `<g fill="${a}">${[[34, 64], [46, 62], [58, 64], [40, 74], [52, 73], [64, 75], [34, 86], [46, 84], [58, 86], [40, 96], [52, 95], [66, 95]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.6"/>`).join("")}</g>`;
+    case "plaid":
+      return `<g stroke="${a}" stroke-width="3" opacity=".6"><path d="M20 66 H80 M20 80 H80 M20 94 H80 M38 56 V102 M50 56 V102 M62 56 V102"/></g><g stroke="${a}" stroke-width="1" opacity=".5"><path d="M20 73 H80 M20 87 H80 M44 56 V102 M56 56 V102"/></g>`;
+    case "camo":
+      return `<g fill="${a}"><ellipse cx="38" cy="66" rx="7" ry="4"/><ellipse cx="60" cy="72" rx="8" ry="5"/><ellipse cx="44" cy="86" rx="9" ry="5"/><ellipse cx="66" cy="92" rx="6" ry="4"/></g><g fill="${darken(c.top, 0.35)}"><ellipse cx="54" cy="62" rx="5" ry="3"/><ellipse cx="34" cy="78" rx="5" ry="4"/><ellipse cx="58" cy="84" rx="5" ry="3"/><ellipse cx="40" cy="97" rx="6" ry="3"/></g>`;
+    case "hoodie":
+      return `<path d="M35 58 Q50 68 65 58" stroke="${darken(c.top, 0.3)}" stroke-width="3" fill="none"/><path d="M45 61 V72 M55 61 V72" stroke="${a}" stroke-width="1.5"/><path d="M38 84 H62 L60 98 H40 Z" fill="${darken(c.top, 0.18)}"/>`;
+    case "tank":
+      return `<path d="M34 58 H42 L41 65 Q37 64 34 62 Z M66 58 H58 L59 65 Q63 64 66 62 Z" fill="${c.skin}"/>`;
+    case "heart":
+      return `<path d="M50 84 C38 76 40 66 46 67 C48 67.5 49.5 69 50 70.5 C50.5 69 52 67.5 54 67 C60 66 62 76 50 84 Z" fill="${a}"/>`;
+    case "sash":
+      return `<path d="M34 58 L44 58 L76 94 L76 102 L68 102 Z" fill="${a}"/>`;
     case "hoops":
       return `<g fill="${a}"><rect x="20" y="70" width="60" height="5"/><rect x="20" y="84" width="60" height="5"/></g>`;
     case "number":
@@ -363,6 +439,31 @@ function torsoPattern(p, c) {
       return `<path d="M34 58 H44 L48 100 H26 Z M66 58 H56 L52 100 H74 Z" fill="#fff"/><path d="M40 60 Q36 76 46 80 Q54 82 56 74" stroke="${a}" stroke-width="2" fill="none"/><circle cx="56" cy="73" r="2.5" fill="#9AA0B5"/>`;
     case "buttons":
       return `<g fill="${a}"><circle cx="45" cy="68" r="1.8"/><circle cx="55" cy="68" r="1.8"/><circle cx="45" cy="78" r="1.8"/><circle cx="55" cy="78" r="1.8"/><circle cx="45" cy="88" r="1.8"/><circle cx="55" cy="88" r="1.8"/></g>`;
+    default:
+      return "";
+  }
+}
+
+function handItem(type) {
+  switch (type) {
+    case "ball":
+      return `<circle cx="84" cy="100" r="7" fill="#fff" stroke="#111" stroke-width="1"/><path d="M84 96.5 L87 98.7 L86 102.2 L82 102.2 L81 98.7 Z" fill="#111"/>`;
+    case "mic":
+      return `<path d="M80 93 L82.5 81" stroke="#333" stroke-width="3" stroke-linecap="round"/><circle cx="83" cy="77.5" r="4.2" fill="#555"/>`;
+    case "phone":
+      return `<rect x="76" y="78" width="9" height="15" rx="1.8" fill="#111"/><rect x="77.2" y="79.6" width="6.6" height="10.6" fill="#4CC9F0"/>`;
+    case "trophy":
+      return `<path d="M73 78 H87 V82 Q87 91 80 91 Q73 91 73 82 Z" fill="#FFC23D"/><rect x="78" y="91" width="4" height="3" fill="#FFC23D"/><rect x="74.5" y="93.5" width="11" height="3" fill="#B8860B"/>`;
+    case "sword":
+      return `<path d="M80 90 V54" stroke="#C0C6D4" stroke-width="3.2"/><path d="M80 54 L78.4 57 H81.6 Z" fill="#C0C6D4"/><path d="M74.5 89 H85.5" stroke="#8B5E3C" stroke-width="3" stroke-linecap="round"/>`;
+    case "shield":
+      return `<path d="M9 79 H31 V93 Q31 104 20 109 Q9 104 9 93 Z" fill="#1F4BA5" stroke="#9AA0B5" stroke-width="2"/><path d="M20 84 L22.4 89.5 L28 90 L23.6 93.6 L25 99 L20 96 L15 99 L16.4 93.6 L12 90 L17.6 89.5 Z" fill="#fff"/>`;
+    case "wand":
+      return `<path d="M80 95 L91 79" stroke="#5C3A21" stroke-width="2.4" stroke-linecap="round"/><circle cx="91.5" cy="78.5" r="1.8" fill="#FFC23D"/>`;
+    case "balloon":
+      return `<path d="M81 92 Q85 72 87 61" stroke="#777" stroke-width=".8" fill="none"/><ellipse cx="87" cy="52" rx="8" ry="10" fill="#D62828"/><path d="M85.5 62 L88.5 62 L87 60 Z" fill="#D62828"/>`;
+    case "guitar":
+      return `<path d="M60 70 L90 58" stroke="#3B2A1A" stroke-width="3"/><ellipse cx="62" cy="86" rx="10" ry="8" fill="#D62828" transform="rotate(-20 62 86)"/><ellipse cx="68" cy="79" rx="7" ry="6" fill="#D62828" transform="rotate(-20 68 79)"/><circle cx="64" cy="83" r="2" fill="#1A1A1A"/>`;
     default:
       return "";
   }
