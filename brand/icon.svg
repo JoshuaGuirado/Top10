@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 4 80 98" role="img" aria-label="TT · Top Ten">
-  <path fill="#FFC23D" d="M38 82 V75 C38 67 20 61 20 40 A30 30 0 0 1 80 40 C80 61 62 67 62 75 V82 Z"/>
-  <path fill="none" stroke="#16133A" stroke-width="7" d="M29 31 H48 M38.5 31 V59 M52 31 H71 M61.5 31 V59"/>
-  <rect x="38" y="86" width="24" height="4.5" rx="2.25" fill="#16133A"/>
-  <rect x="42" y="93" width="16" height="4.5" rx="2.25" fill="#16133A"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 4 80 98" role="img" aria-label="Tten">
+  <path fill="#0A0A0A" d="M38 82 V75 C38 67 20 61 20 40 A30 30 0 0 1 80 40 C80 61 62 67 62 75 V82 Z"/>
+  <path fill="none" stroke="#FFFFFF" stroke-width="8" d="M35 30 H65 M50 30 V62"/>
+  <rect x="38" y="86" width="24" height="4.5" fill="#0A0A0A"/>
+  <rect x="42" y="93" width="16" height="4.5" fill="#0A0A0A"/>
 </svg>

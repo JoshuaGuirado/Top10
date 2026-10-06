@@ -3,42 +3,41 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TT · Top Ten</title>
-  <meta name="description" content="Acenda a memória: adivinhe os 10 itens da lista. Quanto menos óbvio, mais pontos.">
-  <meta name="theme-color" content="#FFC23D">
+  <title>Tten</title>
+  <meta name="description" content="Jogo de listas: o óbvio vale 1, o difícil vale 10. De 1 a 8 jogadores.">
+  <meta name="theme-color" content="#0A0A0A">
   <link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
-  <meta property="og:title" content="TT · Top Ten">
-  <meta property="og:description" content="Acenda a memória: adivinhe os 10 itens da lista. Quanto menos óbvio, mais pontos.">
+  <meta property="og:title" content="Tten">
+  <meta property="og:description" content="Jogo de listas: o óbvio vale 1, o difícil vale 10. De 1 a 8 jogadores.">
   <meta property="og:image" content="brand/og-image.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="topbar">
     <button type="button" class="logo-btn" id="home-btn" aria-label="Início">
-      <img class="logo logo-light" src="brand/logo.svg" alt="TT · Top Ten">
+      <img class="logo logo-light" src="brand/logo.svg" alt="Tten">
       <img class="logo logo-dark" src="brand/logo-dark.svg" alt="" aria-hidden="true">
     </button>
-    <button type="button" class="icon-btn" id="sound-btn" aria-label="Som">🔊</button>
+    <button type="button" class="text-btn" id="sound-btn">Som</button>
   </div>
 
   <main>
     <!-- Início -->
     <section id="screen-home" class="screen">
       <div class="hero">
-        <img class="hero-icon" src="brand/icon.svg" alt="">
-        <h1>Acenda a memória.</h1>
-        <p class="lead">Adivinhe os 10 itens da lista. Mas cuidado: o óbvio vale pouco.</p>
+        <h1><span>O óbvio vale 1.</span><span class="out">O difícil vale 10.</span></h1>
+        <p class="lead">Um jogo de listas para jogar sozinho ou com até 8 pessoas. São 105 listas: futebol, filmes, heróis, frases de mãe e muito mais.</p>
         <button type="button" class="btn big" id="start-btn">Jogar</button>
       </div>
-      <div class="rules">
-        <div class="rule"><span class="rule-num">1</span><p>Escolha de <b>1 a 8 jogadores</b>, um nickname e uma skin para cada.</p></div>
-        <div class="rule"><span class="rule-num">8</span><p>Na sua vez, dê um palpite. Acertou o <b>nº 8</b> da lista? Ganhou <b>8 pontos</b>.</p></div>
-        <div class="rule"><span class="rule-num">10</span><p>O nº 1 é o óbvio e vale 1. O <b>nº 10</b> é o mais difícil e vale <b>10</b>.</p></div>
-        <div class="rule"><span class="rule-num">♥</span><p>Cada jogador tem <b>3 vidas</b>. Errou, perde uma. Quem somar mais pontos vence.</p></div>
-      </div>
+      <ol class="rules">
+        <li><b class="n">1–8</b><p>Jogadores. Cada um com nickname e skin.</p></li>
+        <li><b class="n">Nº 8</b><p>Acertou o 8º da lista? Ganhou 8 pontos.</p></li>
+        <li><b class="n">3</b><p>Vidas por jogador. Errou, perdeu uma.</p></li>
+        <li><b class="n">1º</b><p>Quem somar mais pontos sobe no pódio.</p></li>
+      </ol>
     </section>
 
     <!-- Jogadores -->
@@ -56,9 +55,9 @@
     <section id="screen-lists" class="screen" hidden>
       <div class="lists-head">
         <h2>Escolha a lista</h2>
-        <button type="button" class="btn ghost" id="random-list-btn">🎲 Aleatória</button>
+        <button type="button" class="btn ghost" id="random-list-btn">Sortear</button>
       </div>
-      <input type="search" id="list-search" class="search" placeholder="Pesquisar listas…" aria-label="Pesquisar listas" autocomplete="off">
+      <input type="search" id="list-search" class="search" placeholder="Pesquisar: copa, marvel, pokémon…" aria-label="Pesquisar listas" autocomplete="off">
       <div class="chips" id="category-chips"></div>
       <p class="muted small" id="list-count"></p>
       <div class="list-grid" id="list-grid"></div>
@@ -81,7 +80,7 @@
       </div>
 
       <form id="guess-form" class="guess" autocomplete="off">
-        <input id="guess" type="text" placeholder="Digite seu palpite…" aria-label="Palpite" enterkeyhint="send">
+        <input id="guess" type="text" placeholder="Seu palpite" aria-label="Palpite" enterkeyhint="send">
         <button type="submit" class="btn">Chutar</button>
       </form>
       <div class="guess-actions">
@@ -114,7 +113,7 @@
     <form method="dialog" class="dialog-inner" id="avatar-form">
       <div class="dialog-head">
         <h2 id="avatar-dialog-title">Escolha sua skin</h2>
-        <button type="submit" value="cancel" class="icon-btn" aria-label="Fechar">✕</button>
+        <button type="submit" value="cancel" class="text-btn">Fechar</button>
       </div>
       <div class="tabs" id="avatar-tabs" role="tablist"></div>
       <div id="avatar-presets" class="preset-grid"></div>
@@ -123,7 +122,7 @@
         <div class="builder-controls" id="builder-controls"></div>
       </div>
       <div class="dialog-foot" id="builder-foot" hidden>
-        <button type="button" class="btn ghost" id="builder-random">🎲 Sortear</button>
+        <button type="button" class="btn ghost" id="builder-random">Sortear</button>
         <button type="button" class="btn" id="builder-save">Usar esta skin</button>
       </div>
     </form>

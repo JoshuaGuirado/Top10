@@ -1,4 +1,4 @@
-// TT · Top Ten — fluxo do jogo.
+// Tten — fluxo do jogo.
 // Telas: início → jogadores → lista → partida → pódio.
 
 const MAX_PLAYERS = 8;
@@ -146,8 +146,8 @@ const sfx = {
 };
 
 function renderSoundBtn() {
-  $("sound-btn").textContent = soundOn ? "🔊" : "🔇";
-  $("sound-btn").setAttribute("aria-label", soundOn ? "Desligar som" : "Ligar som");
+  $("sound-btn").textContent = soundOn ? "Som: ligado" : "Som: desligado";
+  $("sound-btn").setAttribute("aria-pressed", String(soundOn));
 }
 
 // ───────────── efeitos ─────────────
@@ -157,7 +157,7 @@ const fx = (() => {
   const ctx = canvas.getContext("2d");
   let parts = [];
   let running = false;
-  const colors = ["#FFC23D", "#FF5D5D", "#1FA874", "#4CC9F0", "#7B2CBF", "#FFF7E8"];
+  const colors = ["#0A0A0A", "#0A0A0A", "#6B6B6B", "#BDBDBD", "#E5322D"];
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function resize() {
@@ -332,7 +332,7 @@ function renderAvatarDialog() {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "tab" + (g === dialogTab ? " active" : "");
-    b.textContent = g === "builder" ? "✏️ Criar o meu" : g;
+    b.textContent = g === "builder" ? "Criar o meu" : g;
     b.addEventListener("click", () => { dialogTab = g; renderAvatarDialog(); });
     tabs.appendChild(b);
   });
@@ -469,13 +469,13 @@ function filteredLists() {
 function renderChips() {
   const wrap = $("category-chips");
   wrap.innerHTML = "";
-  const all = [{ id: "all", label: "Todas", emoji: "✨" }, ...CATEGORIES];
+  const all = [{ id: "all", label: "Todas" }, ...CATEGORIES];
   all.forEach((cat) => {
     const count = cat.id === "all" ? LISTS.length : LISTS.filter((l) => l.cat === cat.id).length;
     const b = document.createElement("button");
     b.type = "button";
     b.className = "chip" + (activeCat === cat.id ? " active" : "");
-    b.innerHTML = `${cat.emoji} ${cat.label} <small>${count}</small>`;
+    b.innerHTML = `${cat.label} <small>${count}</small>`;
     b.addEventListener("click", () => {
       activeCat = cat.id;
       renderChips();
@@ -499,7 +499,7 @@ function renderListGrid() {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "list-card" + (lastListIds.includes(l.id) ? " played" : "");
-    b.innerHTML = `<span class="list-cat">${cat.emoji} ${cat.label}</span><span class="list-title">${escapeHtml(l.title)}</span>${lastListIds.includes(l.id) ? '<span class="list-played">jogada recentemente</span>' : ""}`;
+    b.innerHTML = `<span class="list-cat">${cat.label}</span><span class="list-title">${escapeHtml(l.title)}</span>${lastListIds.includes(l.id) ? '<span class="list-played">jogada recentemente</span>' : ""}`;
     b.addEventListener("click", () => startGame(l));
     grid.appendChild(b);
   });
@@ -527,7 +527,7 @@ function startGame(list) {
     over: false,
   };
   const cat = categoryById[list.cat];
-  $("game-cat").textContent = `${cat.emoji} ${cat.label}`;
+  $("game-cat").textContent = cat.label;
   $("game-title").textContent = list.title;
   $("source").textContent = `Fonte: ${list.source}`;
   $("pass-btn").hidden = playerCount === 1;
@@ -578,7 +578,7 @@ function renderGame() {
       li.innerHTML = `<span class="rank">${i + 1}</span><span class="slot-name">${escapeHtml(item.name)}</span><span class="pts">${i + 1} pts</span>`;
     } else {
       li.className = "slot";
-      li.innerHTML = `<span class="rank">${i + 1}</span><span class="slot-name hidden-name">? ? ?</span><span class="pts">${i + 1} pts</span>`;
+      li.innerHTML = `<span class="rank">${i + 1}</span><span class="slot-name"><span class="hidden-name"></span></span><span class="pts">${i + 1} pts</span>`;
     }
     board.appendChild(li);
   });
@@ -637,7 +637,7 @@ function handleGuess(raw) {
     flash("flash-bad");
     shake($("guess-form"));
     const chip = $("scoreboard").querySelector(`[data-player="${game.turn}"]`);
-    if (chip) { shake(chip); floatText(chip, "−♥", "bad"); }
+    if (chip) { shake(chip); floatText(chip, "−1 vida", "bad"); }
     setFeedback(p.lives > 0 ? `"${text}" não está na lista. ${p.name} perdeu uma vida.` : `"${text}" não está na lista. ${p.name} está fora!`, "bad");
     return nextTurn();
   }
@@ -658,7 +658,7 @@ function handleGuess(raw) {
   floatText(slot, `+${pts}`, pts >= 8 ? "epic" : "good");
   sfx.right(pts);
   const tier = pts >= 8 ? "high" : pts >= 4 ? "mid" : "low";
-  flash(tier === "high" ? "flash-epic" : "flash-good");
+  if (tier === "high") flash("flash-epic");
   setFeedback(`${pick(HYPE[tier])} ${game.items[i].name} é o nº ${pts}: +${pts} para ${p.name}.`, tier === "high" ? "epic" : "good");
   nextTurn();
 }
@@ -755,10 +755,10 @@ function showResults() {
     else if (p.place === lastPlace && ranked.length >= 4) p.phrase = pick(PHRASES.last);
     else p.phrase = pick(PHRASES.rest);
     p.badges = [];
-    if (p.hits.includes(10)) p.badges.push("🎯 Achou o nº 10");
-    if (!solo && p.hits.length === maxHits && maxHits > 0) p.badges.push("💡 Mais acertos");
-    if (!solo && p.misses === maxMiss && maxMiss > 0) p.badges.push("💀 Mais chutes errados");
-    if (p.hits.length && p.hits.every((h) => h <= 3)) p.badges.push("🥱 Só o óbvio");
+    if (p.hits.includes(10)) p.badges.push("Achou o nº 10");
+    if (!solo && p.hits.length === maxHits && maxHits > 0) p.badges.push("Mais acertos");
+    if (!solo && p.misses === maxMiss && maxMiss > 0) p.badges.push("Mais chutes errados");
+    if (p.hits.length && p.hits.every((h) => h <= 3)) p.badges.push("Só o óbvio");
   });
 
   const winners = ranked.filter((p) => p.place === 1);
@@ -777,7 +777,7 @@ function showResults() {
     col.className = `podium-col place-${pl}`;
     col.innerHTML = `
       <div class="podium-people">${group.map((p) => `<div class="podium-person"><div class="podium-avatar">${renderAvatar(p.avatar)}</div><b>${escapeHtml(p.name)}</b><span>${p.score} pts</span></div>`).join("")}</div>
-      <div class="podium-block"><span>${solo ? "💡" : pl + "º"}</span></div>`;
+      <div class="podium-block"><span>${solo ? group[0].score : pl + "º"}</span></div>`;
     podium.appendChild(col);
   });
 
@@ -804,7 +804,7 @@ function showResults() {
 
   show("results");
   sfx.win();
-  setTimeout(() => fx.rain(), 250);
+  setTimeout(() => fx.rain(120), 250);
 }
 
 // ───────────── eventos ─────────────

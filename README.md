@@ -1,4 +1,4 @@
-# TT · Top Ten
+# Tten
 
 Jogo de adivinhar listas para jogar sozinho ou com até 8 pessoas. Cada lista tem 10 itens em ordem, e o número do item é a pontuação: o nº 1 é o óbvio e vale 1 ponto, o nº 10 é o mais difícil e vale 10. Quem somar mais pontos vence.
 
@@ -20,7 +20,7 @@ Os palpites não diferenciam maiúsculas nem acentos, aceitam siglas e apelidos 
 - `avatars.js`: peças dos bonecos, editor e skins prontas
 - `script.js`: regras e telas do jogo
 - `style.css`: visual
-- `brand/` e `brand.html`: logo e guia de identidade visual
+- `brand/` e `brand.html`: logo e guia de identidade visual (preto e branco)
 
 ## Adicionar uma lista
 
