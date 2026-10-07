@@ -11,6 +11,8 @@ const FILES = [
   "data/listas-mais.js",
   "data/listas-grandes.js",
   "data/listas-grandes-2.js",
+  "data/listas-extra.js",
+  "data/listas-grandes-3.js",
   "js/icons.js",
   "js/avatars.js",
   "js/util.js",

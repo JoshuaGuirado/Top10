@@ -209,15 +209,16 @@ store.onWrite = (key) => {
 function accountLine() {
   if (!onlineConfigured()) return "Para salvar o perfil numa conta, o modo online precisa estar configurado.";
   if (me && !me.anon) return `Conta conectada: <b>${escapeHtml(me.email)}</b>. Perfil, estatísticas e recordes ficam salvos.`;
-  return "Seu perfil está só neste aparelho. Conecte um e-mail para não perder nada e usar em outro celular.";
+  return "Entre com seu e-mail para salvar perfil, estatísticas e recordes, e jogar em qualquer celular.";
 }
 
 function renderAccount() {
   document.querySelectorAll(".account-line").forEach((el) => (el.innerHTML = accountLine()));
   document.querySelectorAll(".account-btn").forEach((b) => {
     b.hidden = !onlineConfigured();
-    b.textContent = me && !me.anon ? "Conta" : "Conectar conta";
+    b.textContent = me && !me.anon ? "Minha conta" : b.dataset.label || "Conectar conta";
   });
+  document.querySelectorAll(".home-account").forEach((el) => (el.hidden = !onlineConfigured()));
 }
 
 async function openAccount() {
@@ -425,8 +426,11 @@ function connectChannel(code) {
     })
     .on("broadcast", { event: "suggest" }, ({ payload }) => receiveSuggestion(payload))
     .on("presence", { event: "sync" }, () => {
-      presentIds = new Set(Object.keys(channel.presenceState()));
-      if (document.body.dataset.screen === "lobby") renderLobby();
+      const now = new Set(Object.keys(channel.presenceState()));
+      const changed = now.size !== presentIds.size || [...now].some((id) => !presentIds.has(id));
+      presentIds = now;
+      // Só redesenha quando alguém entra ou sai (senão um clique pode cair no meio do redesenho).
+      if (changed && document.body.dataset.screen === "lobby") renderLobby();
       watchHost();
     })
     .subscribe(async (status) => {

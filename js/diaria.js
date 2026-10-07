@@ -7,13 +7,23 @@ function todayNumber(date = new Date()) {
   return Math.floor((Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - DAILY_START) / 864e5) + 1;
 }
 
-function dailyPool() {
-  return LISTS.filter((l) => l.items.length === 10);
+// Quantas listas de 10 entram no sorteio a partir de cada dia. Assim, listas novas não
+// mudam a lista do dia de hoje: ao adicionar listas de 10, acrescente uma linha que vale
+// a partir de amanhã (as listas novas precisam vir depois das antigas na ordem dos arquivos).
+const DAILY_POOLS = [
+  { from: 1, size: 294 },
+  { from: 8, size: 483 },
+];
+
+function dailyPool(num = todayNumber()) {
+  const all = LISTS.filter((l) => l.items.length === 10);
+  const rule = DAILY_POOLS.filter((p) => num >= p.from).pop() || DAILY_POOLS[0];
+  return all.slice(0, Math.min(rule.size, all.length));
 }
 
 // Pula pela lista com um passo primo: não repete até passar por todas.
 function dailyList(num) {
-  const pool = dailyPool();
+  const pool = dailyPool(num);
   const idx = (((num * 7919 + 17) % pool.length) + pool.length) % pool.length;
   return pool[idx];
 }

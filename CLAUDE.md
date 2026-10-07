@@ -10,3 +10,5 @@
 - Antes de enviar: `npm test` e testar o fluxo no navegador (Playwright com o Chromium do ambiente).
 - Mexeu no online (`js/online.js`, partida ou resultado)? Rode também `npm run test:online` (duas abas com o
   Supabase falso de `tests/supabase-falso.js`). Mudou o banco? Atualize `supabase/schema.sql` (precisa poder rodar de novo).
+- Listas novas de 10 itens: entram no fim (arquivo novo carregado depois dos outros) e precisam de uma linha
+  nova em `DAILY_POOLS` (`js/diaria.js`) valendo a partir de amanhã, senão a lista do dia de hoje muda.

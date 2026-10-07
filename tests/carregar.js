@@ -12,6 +12,6 @@ function carregar(...arquivos) {
   return (expr) => vm.runInContext(expr, ctx);
 }
 
-const DADOS = ["data/listas.js", "data/listas-mais.js", "data/listas-grandes.js", "data/listas-grandes-2.js"];
+const DADOS = ["data/listas.js", "data/listas-mais.js", "data/listas-grandes.js", "data/listas-grandes-2.js", "data/listas-extra.js", "data/listas-grandes-3.js"];
 
 module.exports = { carregar, DADOS, ROOT };
