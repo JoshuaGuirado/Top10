@@ -18,8 +18,8 @@ Isso cria `profiles` (perfis), `rooms` (salas), `room_players` (quem está em ca
 1. **Authentication → Sign In / Providers**: ative **Allow anonymous sign-ins**. É o que deixa todo mundo jogar sem criar conta.
 2. O provedor **Email** já vem ligado. É ele que manda o link de "Conectar conta" (sem senha).
 3. **Authentication → URL Configuration**:
-   - **Site URL**: `https://joshuaguirado.github.io/Top10/`
-   - **Redirect URLs**: adicione o mesmo endereço (e `http://localhost:8000/**` se for testar no computador).
+   - **Site URL**: `https://top10-bay.vercel.app/`
+   - **Redirect URLs**: adicione o mesmo endereço terminando com `/**`: `https://top10-bay.vercel.app/**`.
 
 ## 4. Colocar as chaves no site
 1. **Project Settings → API** (ou **API Keys**): copie a **Project URL** e a chave **anon public** (ou **publishable**).

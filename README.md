@@ -64,4 +64,4 @@ Depois rode `npm test`: ele confere tamanho, categoria, ids repetidos e se algum
 
 ## Publicar
 
-Para jogar online, ative o GitHub Pages em **Settings → Pages** e selecione a branch `main`. Publicado, o jogo pode ser instalado no celular ("Adicionar à tela inicial") e funciona sem internet. Abrindo o arquivo direto no computador, o modo offline não liga, mas o resto funciona.
+O site está em **https://top10-bay.vercel.app**. A Vercel publica sozinha a cada envio para a branch `main`. O jogo pode ser instalado no celular ("Adicionar à tela inicial") e funciona sem internet, menos o modo online. Abrindo o arquivo direto no computador, o modo offline não liga, mas o resto funciona.
