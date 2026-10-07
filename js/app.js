@@ -20,7 +20,15 @@ $("sound-btn").addEventListener("click", () => {
   sfx.tick();
 });
 $("start-btn").addEventListener("click", openModes);
-$("stats-btn").addEventListener("click", openStats);
+$("stats-btn").addEventListener("click", openProfile);
+$("profile-btn").addEventListener("click", openProfile);
+$("profile-avatar").addEventListener("click", () => openAvatarDialog(0));
+$("profile-nick").addEventListener("input", (e) => {
+  ensurePlayers();
+  players[0].nick = e.target.value;
+  savePlayers();
+  $("profile-name").textContent = e.target.value.trim() || "Sem nickname";
+});
 $("stats-reset").addEventListener("click", resetStats);
 $("stats-back").addEventListener("click", goHome);
 $("change-mode-btn").addEventListener("click", openModes);
@@ -144,6 +152,7 @@ renderSoundBtn();
 renderThemeBtn();
 ensurePlayers();
 renderDailyCard();
+renderProfileButton();
 $("list-total").textContent = allLists().length;
 if (!importFromHash()) show("home");
 initOnline();

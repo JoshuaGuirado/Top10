@@ -18,9 +18,13 @@ function startGame(list, opts = {}) {
   const teams = !daily && !!mode().teams;
   const roster = daily ? [players[0]] : online ? online.roster : players.slice(0, playerCount);
   const lives = daily ? 3 : TEAM_LIVES[n] || Math.max(3, Math.round(n / 5));
+  const withLives = daily ? true : online ? !!online.lives : livesOn();
+  // Fora do modo equipe, cada jogador tem as próprias vidas.
+  const ownLives = withLives && !vsList;
   const gamePlayers = roster.map((p, i) => ({
     name: online ? p.name : playerName(p, i), avatar: p.avatar, team: p.team, uid: online ? p.uid : null,
     score: 0, hits: [], misses: 0, passes: 0, timeouts: 0, streak: 0, bestStreak: 0, clutch: 0,
+    lives: ownLives ? lives : null, out: false,
   }));
   game = {
     list,
@@ -42,7 +46,9 @@ function startGame(list, opts = {}) {
     teams,
     daily,
     dailyCounts: !!opts.counts,
-    lives,
+    livesOn: withLives,
+    ownLives,
+    lives: vsList && withLives ? lives : null,
     maxLives: lives,
     timeLimit: daily ? 0 : online ? online.timer : turnTime,
     timeLeft: 0,
@@ -78,16 +84,30 @@ function myTurn() {
   return !game.online || game.turn === game.me;
 }
 
+// Próximo do time que ainda está no jogo (quem ficou sem vidas é pulado).
 function takeNext(team) {
-  const list = game.members[team];
+  const list = game.members[team].filter((i) => !game.players[i].out);
+  if (!list.length) return null;
   const idx = list[game.nextOf[team] % list.length];
   game.nextOf[team] += 1;
   return idx;
 }
 
 function nextPlayerIndex() {
-  if (game.teams) return takeNext(1 - game.players[game.turn].team);
-  return (game.turn + 1) % game.players.length;
+  if (game.teams) {
+    const other = 1 - game.players[game.turn].team;
+    const next = takeNext(other);
+    return next !== null ? next : takeNext(1 - other);
+  }
+  for (let k = 1; k <= game.players.length; k++) {
+    const i = (game.turn + k) % game.players.length;
+    if (!game.players[i].out) return i;
+  }
+  return game.turn;
+}
+
+function activePlayers() {
+  return game.players.filter((p) => !p.out).length;
 }
 
 // Pontos da equipe e da lista: o que ninguém achou fica com a lista.
@@ -134,11 +154,11 @@ function renderVersus() {
       <p class="vs-goal">${left > 0 ? `Faltam ${left} pts para vencer a lista` : "A lista já foi vencida!"}</p>
     </div>
     <div class="vs-side list"><span class="vs-label">Lista</span><b class="vs-pts">${t.list}</b></div>
-    <div class="lives" role="img" aria-label="${game.lives} de ${game.maxLives} vidas">${hearts}<span class="lives-label">${plural(game.lives, "vida", "vidas")}</span></div>`;
+    ${game.livesOn ? `<div class="lives" role="img" aria-label="${game.lives} de ${game.maxLives} vidas">${hearts}<span class="lives-label">${plural(game.lives, "vida", "vidas")}</span></div>` : ""}`;
 }
 
 function canHint() {
-  return game.vsList && !game.over && !game.busy && game.lives > 1 &&
+  return game.vsList && game.livesOn && !game.over && !game.busy && game.lives > 1 &&
     game.items.some((_, i) => !game.found.has(i) && !game.hints.has(i));
 }
 
@@ -150,11 +170,11 @@ function renderGame() {
   sb.innerHTML = "";
   game.players.forEach((p, i) => {
     const el = document.createElement("div");
-    el.className = "score-chip" + (i === game.turn && !game.over ? " current" : "") + (game.teams ? ` t${p.team}` : "");
+    el.className = "score-chip" + (i === game.turn && !game.over ? " current" : "") + (game.teams ? ` t${p.team}` : "") + (p.out ? " out" : "");
     el.dataset.player = i;
     el.innerHTML = `<div class="mini">${renderAvatar(p.avatar)}</div>
       <div class="score-info"><span class="score-name">${escapeHtml(p.name)}</span>
-      <span class="score-sub">${plural(p.hits.length, "acerto", "acertos")}</span></div>
+      <span class="score-sub">${p.out ? "fora: sem vidas" : plural(p.hits.length, "acerto", "acertos")}${game.ownLives && !p.out ? ` <span class="chip-lives" aria-label="${plural(p.lives, "vida", "vidas")}">${p.lives <= 5 ? HEART.repeat(p.lives) : `${HEART}${p.lives}`}</span>` : ""}</span></div>
       <span class="score-pts">${p.score}</span>`;
     sb.appendChild(el);
   });
@@ -201,7 +221,7 @@ function renderGame() {
   $("guess-form").querySelector("button").disabled = disabled;
   $("pass-btn").hidden = game.players.length === 1;
   $("pass-btn").disabled = disabled;
-  $("hint-btn").hidden = !game.vsList;
+  $("hint-btn").hidden = !game.vsList || !game.livesOn;
   $("hint-btn").disabled = !myTurn() || (!game.hintMode && !canHint());
   $("hint-btn").textContent = game.hintMode ? "Cancelar dica" : "Dica (−1 vida)";
   $("end-btn").hidden = game.online && !game.isHost;
@@ -261,10 +281,10 @@ function handleGuess(raw) {
 }
 
 const STREAK_LINES = [
-  "{nome} está em chamas! 🔥 {n} seguidos!",
-  "Alguém para {nome}! {n} acertos seguidos! 🔥",
-  "{nome} ligou o modo turbo: {n} seguidos! ⚡",
-  "{n} seguidos! {nome} tá com a cola, só pode. 🔥",
+  "{nome} está em chamas: {n} seguidos!",
+  "Alguém para {nome}! {n} acertos seguidos!",
+  "{nome} ligou o modo turbo: {n} seguidos!",
+  "{n} seguidos! {nome} tá com a cola, só pode.",
 ];
 
 function scoreHit(i, who) {
@@ -300,7 +320,7 @@ function hitEffects(i, who) {
   floatText(slot, `+${pts}`, ratio >= 0.7 ? "epic" : "");
   sfx.right(ratio);
   if (ratio >= 0.7) flash("flash-epic");
-  if (game.players[who].streak >= 3) floatText($("scoreboard").querySelector(`[data-player="${who}"]`), "🔥", "epic");
+  if (game.players[who].streak >= 3) floatText($("scoreboard").querySelector(`[data-player="${who}"]`), `${game.players[who].streak} seguidos`, "streak");
 }
 
 function missEffects(who, timeout) {
@@ -332,12 +352,21 @@ function registerMiss(message, wrong) {
   missEffects(who, !wrong);
   let tail = game.players.length > 1 ? " Passa a vez." : "";
 
-  if (game.vsList) {
+  if (game.vsList && game.livesOn) {
     game.lives -= 1;
     renderVersus();
     lifeEffects();
     if (game.lives <= 0) return endGame(`${message} Acabaram as vidas${game.players.length > 1 ? " da equipe" : ""}!`);
     tail = ` ${game.lives === 1 ? "Resta 1 vida!" : `Restam ${game.lives} vidas.`}${tail}`;
+  } else if (game.ownLives) {
+    p.lives -= 1;
+    if (p.lives <= 0) {
+      p.out = true;
+      if (!activePlayers()) return endGame(`${message} ${game.players.length > 1 ? "Todo mundo ficou sem vidas!" : "Acabaram as vidas!"}`);
+      tail = ` ${p.name} ficou sem vidas e está fora!`;
+    } else {
+      tail = ` ${p.name}: ${p.lives === 1 ? "resta 1 vida" : `restam ${p.lives} vidas`}.${tail}`;
+    }
   }
   setFeedback(message + tail, "bad");
   nextTurn();
@@ -374,7 +403,7 @@ function passTurn() {
   p.passes += 1;
   p.streak = 0;
   game.passStreak += 1;
-  if (game.passStreak >= game.players.length) {
+  if (game.passStreak >= activePlayers()) {
     return endGame(game.vsList ? "A equipe toda passou a vez. A lista fica com o resto!" : "Todo mundo passou a vez. Ninguém lembra de mais nenhum!");
   }
   setFeedback(`${p.name} passou a vez.`, "info");

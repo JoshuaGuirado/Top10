@@ -197,7 +197,8 @@ async function loadProfile() {
   await saveProfileNow();
   renderDailyCard();
   if (document.body.dataset.screen === "online") renderOnline();
-  if (document.body.dataset.screen === "stats") renderStats();
+  if (document.body.dataset.screen === "profile") openProfile();
+  renderProfileButton();
 }
 
 store.onWrite = (key) => {
@@ -315,7 +316,7 @@ async function createRoom() {
   await busyButton($("create-room-btn"), "Criando sala…", async () => {
     const t0 = performance.now();
     await ensureOnline();
-    const settings = { mode: modeId, timer: turnTime, list: null };
+    const settings = { mode: modeId, timer: turnTime, lives: livesOn(modeId), list: null };
     let code = null;
     for (let attempt = 0; attempt < 6 && !code; attempt++) {
       const tryCode = randomCode();
@@ -482,7 +483,7 @@ function renderLobby() {
     row.innerHTML = `
       <div class="mini">${renderAvatar(p.avatar || DEFAULT_AVATAR)}</div>
       <b>${escapeHtml(p.nick)}${mine ? " <small>(você)</small>" : ""}</b>
-      ${p.user_id === room.host_id ? '<span class="host-tag">👑 anfitrião</span>' : ""}
+      ${p.user_id === room.host_id ? `<span class="host-tag">${uiIcon("crown")}anfitrião</span>` : ""}
       ${m.teams ? `<button type="button" class="team-toggle t${p.team}"${mine ? "" : " disabled"}>${TEAM_NAMES[p.team]}</button>` : ""}
       ${host && !mine ? '<button type="button" class="kick" aria-label="Remover da sala">×</button>' : ""}`;
     const toggle = row.querySelector(".team-toggle");
@@ -496,10 +497,11 @@ function renderLobby() {
     ? `<b>${escapeHtml(st.list.title)}</b> <span class="muted small">· ${st.list.items.length} itens</span>`
     : '<span class="muted">nenhuma lista escolhida</span>';
   const timerLabel = st.timer ? `${st.timer} segundos por vez` : "sem limite de tempo";
+  const roomLives = st.lives === undefined ? !!m.team : !!st.lives;
   const box = $("lobby-settings");
   if (!host) {
     box.innerHTML = `
-      <p class="lobby-summary"><span class="mode-pill">${modeIcon(m)}${m.name}</span> ${timerLabel}</p>
+      <p class="lobby-summary"><span class="mode-pill">${modeIcon(m)}${m.name}</span> ${timerLabel} · ${roomLives ? "com vidas" : "sem vidas"}</p>
       <p>Lista: ${listLine}</p>
       <div class="lobby-list"><p class="muted small">Quem escolhe é o anfitrião, mas você pode sugerir.</p>
         <button type="button" class="btn ghost small" id="lobby-suggest">${mySuggestion ? "Trocar sugestão" : "Ver listas e sugerir"}</button></div>`;
@@ -513,12 +515,14 @@ function renderLobby() {
     box.innerHTML = `
       <p class="ctrl-label">Modo</p><div class="chips" id="lobby-modes"></div>
       <p class="ctrl-label">Tempo por vez</p><div class="chips" id="lobby-timer"></div>
+      <p class="ctrl-label">Vidas</p><div class="chips" id="lobby-lives"></div>
       <p class="ctrl-label">Lista</p>
       <div class="lobby-list"><p>${listLine}</p>
         <div class="head-actions"><button type="button" class="btn ghost small" id="lobby-pick">Escolher lista</button><button type="button" class="btn ghost small" id="lobby-random">Sortear</button></div>
       </div>`;
     Object.entries(MODES).forEach(([id, mm]) => $("lobby-modes").appendChild(chipButton(mm.name, null, id === st.mode, () => updateSettings({ mode: id }))));
     TIMER_OPTIONS.forEach((s) => $("lobby-timer").appendChild(chipButton(s ? `${s}s` : "Sem limite", null, s === (st.timer || 0), () => updateSettings({ timer: s }))));
+    [[false, "Sem vidas"], [true, "Com vidas"]].forEach(([on, label]) => $("lobby-lives").appendChild(chipButton(label, null, on === roomLives, () => updateSettings({ lives: on }))));
     $("lobby-pick").addEventListener("click", () => {
       pickingForRoom = "pick";
       modeId = st.mode;
@@ -558,6 +562,7 @@ async function updateSettings(patch) {
   const settings = { ...(room.settings || {}), ...patch };
   const m = MODES[settings.mode];
   if (patch.mode && settings.list && m.size && settings.list.items.length !== m.size) settings.list = null;
+  if (patch.mode && patch.lives === undefined) settings.lives = livesOn(patch.mode);
   room.settings = settings;
   if (patch.mode) modeId = patch.mode;
   renderLobby();
@@ -619,7 +624,7 @@ function renderSuggestions() {
       <div><p class="list-cat">${icon(cat.id)}${escapeHtml(cat.label)} · ${g.list.items.length} itens</p>
         <b>${escapeHtml(g.list.title)}</b>
         <p class="muted small">sugerida por ${g.who.map(escapeHtml).join(", ")}${g.who.length > 1 ? ` · ${g.who.length} votos` : ""}</p></div>
-      ${g.list.id === chosen ? '<span class="suggestion-ok">✓ escolhida</span>' : isHost() ? '<button type="button" class="btn small">Usar</button>' : ""}`;
+      ${g.list.id === chosen ? `<span class="suggestion-ok">${uiIcon("check")}escolhida</span>` : isHost() ? '<button type="button" class="btn small">Usar</button>' : ""}`;
     const use = row.querySelector("button");
     if (use) use.addEventListener("click", () => pickRoomList(g.list));
     box.appendChild(row);
@@ -676,7 +681,7 @@ async function startOnlineGame() {
   modeId = st.mode;
   const roster = roomPlayers.map((p) => ({ uid: p.user_id, name: p.nick, avatar: p.avatar || DEFAULT_AVATAR, team: p.team }));
   suggestions = new Map();
-  startGame(st.list, { online: { roster, timer: st.timer || 0 } });
+  startGame(st.list, { online: { roster, timer: st.timer || 0, lives: st.lives === undefined ? !!MODES[st.mode].team : !!st.lives } });
   sb.from("rooms").update({ status: "playing" }).eq("code", room.code).then(() => {}, () => {});
 }
 
@@ -702,6 +707,8 @@ function snapshot() {
     teams: game.teams,
     lives: game.lives,
     maxLives: game.maxLives,
+    livesOn: game.livesOn,
+    ownLives: game.ownLives,
     timeLimit: game.timeLimit,
     timeLeft: game.timeLeft,
     feedback: game.feedback || null,
@@ -768,6 +775,8 @@ function applyState(s) {
     teams: s.teams,
     lives: s.lives,
     maxLives: s.maxLives,
+    livesOn: s.livesOn,
+    ownLives: s.ownLives,
     timeLimit: s.timeLimit,
     timeLeft: s.timeLeft,
     feedback: s.feedback,
@@ -960,7 +969,7 @@ async function renderOnlineHistory() {
     const ranked = m.players.slice().sort((a, b) => b.score - a.score);
     const pos = ranked.findIndex((p) => p.uid === me.id) + 1;
     const mine = ranked[pos - 1] || { score: 0 };
-    return `<div class="record-row"><span class="record-pts">${pos ? MEDALS[pos] || pos + "º" : "—"}</span>
+    return `<div class="record-row"><span class="record-pts">${pos ? medal(pos) : "—"}</span>
       <div><b>${escapeHtml(m.list_title || "Lista")}</b><p class="muted small">${mine.score} pts · ${ranked.map((p) => escapeHtml(p.nick)).join(", ")}</p></div></div>`;
   }).join("");
 }

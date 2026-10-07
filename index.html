@@ -26,7 +26,11 @@
       <img class="logo logo-light" src="brand/logo.svg" alt="Topzi">
       <img class="logo logo-dark" src="brand/logo-dark.svg" alt="" aria-hidden="true">
     </button>
-    <div class="topbar-actions"><button type="button" class="text-btn" id="theme-btn">Modo escuro</button><button type="button" class="text-btn" id="sound-btn">Som</button></div>
+    <div class="topbar-actions">
+      <button type="button" class="text-btn" id="theme-btn">Modo escuro</button>
+      <button type="button" class="text-btn" id="sound-btn">Som</button>
+      <button type="button" class="profile-btn" id="profile-btn" aria-label="Abrir perfil"><span class="profile-btn-avatar" id="profile-btn-avatar"></span><span class="profile-btn-label">Perfil</span></button>
+    </div>
   </div>
 
   <main>
@@ -40,11 +44,11 @@
         <div class="hero-actions">
           <button type="button" class="btn big" id="start-btn">Jogar</button>
           <button type="button" class="btn big dark" id="online-btn">Jogar online</button>
-          <button type="button" class="btn ghost" id="stats-btn">Estatísticas</button>
+          <button type="button" class="btn ghost" id="stats-btn">Perfil</button>
         </div>
       </div>
       <div class="home-account">
-        <span class="home-account-ico" aria-hidden="true">👤</span>
+        <span class="home-account-ico"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c.9-3.8 3.9-6 7.5-6s6.6 2.2 7.5 6"/></svg></span>
         <p class="small account-line"></p>
         <button type="button" class="btn small account-btn" data-label="Entrar ou criar conta">Entrar ou criar conta</button>
       </div>
@@ -75,6 +79,9 @@
         <p class="ctrl-label">Tempo por vez</p>
         <div class="chips" id="timer-chips"></div>
         <p class="muted small" id="timer-help"></p>
+        <p class="ctrl-label">Vidas</p>
+        <div class="chips" id="lives-chips"></div>
+        <p class="muted small" id="lives-help"></p>
       </div>
       <div class="actions end">
         <button type="button" class="btn" id="to-lists-btn">Escolher a lista</button>
@@ -227,16 +234,25 @@
       </div>
     </section>
 
-    <!-- Estatísticas -->
-    <section id="screen-stats" class="screen" hidden>
-      <h2>Estatísticas</h2>
-      <p class="muted small">Salvas só neste navegador.</p>
-      <div class="stats-tiles" id="stats-tiles"></div>
-      <p id="stats-best"></p>
+    <!-- Perfil -->
+    <section id="screen-profile" class="screen" hidden>
+      <div class="profile-head">
+        <button type="button" class="avatar-btn" id="profile-avatar" aria-label="Trocar skin"></button>
+        <div class="profile-info">
+          <p class="ctrl-label">Perfil</p>
+          <h2 id="profile-name"></h2>
+          <label class="nick"><span>Nickname</span><input type="text" id="profile-nick" maxlength="16" placeholder="Como a turma te chama"></label>
+          <p class="muted small" id="profile-skin"></p>
+        </div>
+      </div>
       <div class="stats-account">
         <p class="small account-line"></p>
         <button type="button" class="btn ghost small account-btn">Conectar conta</button>
       </div>
+      <h3>Estatísticas</h3>
+      <p class="muted small">Salvas neste aparelho e, com a conta conectada, também na conta.</p>
+      <div class="stats-tiles" id="stats-tiles"></div>
+      <p id="stats-best"></p>
       <h3>Partidas por modo</h3>
       <div class="chips" id="stats-modes"></div>
       <h3>Recordes</h3>

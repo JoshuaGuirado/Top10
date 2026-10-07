@@ -727,3 +727,59 @@ body.flash-bad .guess input { border-color: var(--bad); }
 .hero h1 { letter-spacing: -0.02em; }
 .logo { height: 30px; }
 @media (max-width: 480px) { .logo { height: 26px; } .hero-symbol { width: 72px; } }
+
+/* ── ícones da interface e selos de colocação (sem emoji) ── */
+.ui-ico { width: 1.1em; height: 1.1em; vertical-align: -0.18em; flex: none; }
+.medal {
+  display: inline-grid; place-items: center; min-width: 40px; height: 40px; padding: 0 6px; border-radius: 999px;
+  font-stretch: 75%; font-weight: 800; font-size: 1.1rem; line-height: 1;
+  border: 2.5px solid var(--fg); color: var(--fg);
+}
+.medal.m1 { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.medal.m2 { background: var(--fg); color: var(--bg); }
+.medal.m4 { border: 2px dashed var(--line); color: var(--muted); }
+.result-place { font-size: 1rem; min-width: 44px; padding-top: 2px; }
+.podium-block .medal { min-width: 52px; height: 52px; font-size: 1.45rem; }
+.place-1 .podium-block .medal { background: var(--on-accent); border-color: var(--on-accent); color: var(--accent); }
+.record-pts .medal { min-width: 36px; height: 36px; font-size: 1rem; }
+.crown { top: -34px; font-size: inherit; color: var(--accent); }
+.crown-ico { width: 38px; height: 38px; display: block; }
+.reveal-crown { display: block; line-height: 0; margin-bottom: -14px; color: #171717; }
+.reveal-crown .crown-ico { width: 74px; height: 74px; }
+.highlight-ico { color: var(--accent-ink); line-height: 0; }
+.highlight-ico .ui-ico { width: 26px; height: 26px; }
+.host-tag { display: inline-flex; align-items: center; gap: 4px; }
+.host-tag .ui-ico { color: var(--accent); }
+.suggestion-ok { display: inline-flex; align-items: center; gap: 4px; }
+.home-account-ico { line-height: 0; color: var(--accent-ink); }
+.home-account-ico .ui-ico { width: 26px; height: 26px; }
+.float.streak { font-size: 1.3rem; color: var(--accent); white-space: nowrap; }
+
+/* ── perfil ── */
+.topbar-actions { align-items: center; }
+.profile-btn {
+  display: inline-flex; align-items: center; gap: 6px; border: 0; background: var(--surface);
+  border-radius: 999px; padding: 3px 12px 3px 3px; font-size: .8rem; font-weight: 700;
+}
+.profile-btn:hover { background: var(--line); }
+.profile-btn-avatar { width: 30px; height: 30px; border-radius: 50%; overflow: hidden; background: var(--bg); line-height: 0; flex: none; }
+.profile-btn-avatar svg { width: 100%; height: 125%; }
+body[data-screen="game"] .profile-btn, body[data-screen="profile"] .profile-btn { display: none; }
+@media (max-width: 480px) {
+  .profile-btn { padding: 3px; }
+  .profile-btn-label { display: none; }
+}
+.profile-head { display: grid; grid-template-columns: 150px 1fr; gap: 18px; align-items: center; margin: 20px 0 16px; }
+.profile-head .avatar-btn { padding: 10px 18px 0; background: var(--surface); }
+.profile-info { display: grid; gap: 8px; }
+.profile-info .ctrl-label, .profile-info p { margin: 0; }
+.profile-info h2 { margin: 0; font-size: 2.4rem; overflow-wrap: anywhere; }
+@media (max-width: 560px) { .profile-head { grid-template-columns: 110px 1fr; gap: 14px; } .profile-info h2 { font-size: 1.9rem; } }
+
+/* ── vidas de cada jogador ── */
+.chip-lives { display: inline-flex; align-items: center; gap: 1px; margin-left: 4px; vertical-align: -1px; font-weight: 800; color: var(--accent-ink); }
+.chip-lives svg { width: 11px; height: 11px; fill: var(--accent); }
+.score-chip.current .chip-lives svg { fill: var(--on-accent); }
+.score-chip.current .chip-lives { color: var(--on-accent); }
+.score-chip.out { opacity: .45; }
+.score-chip.out .score-pts { text-decoration: line-through; text-decoration-thickness: 2px; }

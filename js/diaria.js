@@ -12,7 +12,7 @@ function todayNumber(date = new Date()) {
 // a partir de amanhã (as listas novas precisam vir depois das antigas na ordem dos arquivos).
 const DAILY_POOLS = [
   { from: 1, size: 294 },
-  { from: 8, size: 483 },
+  { from: 8, size: 490 },
 ];
 
 function dailyPool(num = todayNumber()) {
@@ -67,14 +67,14 @@ function recordDaily(g) {
 function dailyShareText(num, res) {
   const list = dailyList(num);
   const won = res.score > res.total / 2;
-  const squares = res.found.map((f) => (f ? "🟦" : "⬜")).join("");
-  const hearts = "❤️".repeat(Math.max(0, res.lives)) + "🖤".repeat(Math.max(0, res.maxLives - res.lives));
+  const squares = res.found.map((f) => (f ? "■" : "□")).join("");
+  const lives = `vidas ${Math.max(0, res.lives)}/${res.maxLives}`;
   return [
     `Topzi · Lista do dia #${num}`,
     list ? list.title : "",
     squares,
-    `${res.score} de ${res.total} pts ${hearts}${res.hints ? ` 💡${res.hints}` : ""}`,
-    won ? "Venci a lista! ✅" : "A lista venceu ❌",
+    `${res.score} de ${res.total} pts · ${lives}${res.hints ? ` · ${plural(res.hints, "dica", "dicas")}` : ""}`,
+    won ? "Venci a lista!" : "A lista venceu.",
     siteUrl(),
   ].filter(Boolean).join("\n");
 }

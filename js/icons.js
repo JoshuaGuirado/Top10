@@ -20,10 +20,27 @@ const CATEGORY_ICONS = {
   personagens: '<circle cx="12" cy="8.5" r="4.5"/><path d="M4 21c.8-4 4-6.5 8-6.5s7.2 2.5 8 6.5"/><path d="M10.3 8.3h.01M13.7 8.3h.01"/>',
   comida: '<path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 21V3c-2.5 1.5-3.5 4.5-3.5 8h3.5"/>',
   diaadia: '<path d="M3.5 11 12 4l8.5 7M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/>',
+  casais: '<path d="M12 20s-7-4.3-8.7-8.8C2.1 7.9 4.1 4.6 7.3 4.6c1.9 0 3.5 1 4.7 2.6 1.2-1.6 2.8-2.6 4.7-2.6 3.2 0 5.2 3.3 4 6.6C19 15.7 12 20 12 20z"/>',
   minhas: '<path d="M14.5 4.5l5 5L9 20H4v-5z"/><path d="m12.5 6.5 5 5"/>',
 };
 
 function icon(cat, cls = "ico") {
   const body = CATEGORY_ICONS[cat] || CATEGORY_ICONS.minhas;
   return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
+}
+
+// Ícones da interface (sem emoji): traço ou preenchimento na cor do texto.
+const UI_ICONS = {
+  crown: '<path fill="currentColor" stroke="none" d="M3 18.5 4.6 7.6l4.6 4.3L12 4.5l2.8 7.4 4.6-4.3L21 18.5z"/><rect fill="currentColor" stroke="none" x="3" y="19.6" width="18" height="2.4" rx="1.2"/>',
+  flame: '<path d="M12 21c-4 0-6.5-2.6-6.5-6.2 0-3.4 2.4-5.4 3.4-8.3.4 1.8 1.4 3 2.6 3.6C11 7 12.2 4.6 14.6 3c-.4 3 1.2 4.6 2.6 6.4 1 1.3 1.8 2.9 1.8 5.1C19 18.4 16 21 12 21z"/><path d="M12 21c-1.7 0-2.8-1.2-2.8-2.8 0-1.7 1.4-2.6 2-4 .8 1.3 3.6 2 3.6 4.1 0 1.6-1.2 2.7-2.8 2.7z"/>',
+  trophy: '<path d="M8 4h8v5a4 4 0 0 1-8 0V4z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7M10 17h4"/>',
+  question: '<circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.1-2.4 3.7"/><path d="M12 16.9h.01"/>',
+  ghost: '<path d="M6 20V10a6 6 0 0 1 12 0v10l-2-1.6-2 1.6-2-1.6-2 1.6-2-1.6z"/><path d="M10 10.5h.01M14 10.5h.01"/>',
+  bolt: '<path d="M13 3 5 13.5h6L10 21l8-10.5h-6z"/>',
+  user: '<circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c.9-3.8 3.9-6 7.5-6s6.6 2.2 7.5 6"/>',
+  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+};
+
+function uiIcon(name, cls = "ui-ico") {
+  return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${UI_ICONS[name] || ""}</svg>`;
 }

@@ -1,4 +1,4 @@
-// Estatísticas e recordes, salvos só neste navegador.
+// Perfil: skin, nickname, conta, estatísticas e recordes (salvos no navegador e, com conta, na conta).
 
 const MODE_LABELS = { top10: "Top 10", top30: "Top 30", top50: "Top 50", equipe: "Equipe contra a lista", times: "Times", diaria: "Lista do dia", online: "Online" };
 
@@ -135,11 +135,29 @@ function renderStats() {
     : '<p class="muted small">Ainda não há recordes.</p>';
 }
 
-function openStats() {
+// Cabeçalho do perfil e botão do topo: o perfil é o jogador 1.
+function renderProfileHead() {
+  ensurePlayers();
+  const p = players[0];
+  const preset = p.presetId && presetById(p.presetId);
+  $("profile-avatar").innerHTML = renderAvatar(p.avatar) + '<span class="avatar-edit">Trocar skin</span>';
+  $("profile-name").textContent = p.nick.trim() || "Sem nickname";
+  if (document.activeElement !== $("profile-nick")) $("profile-nick").value = p.nick;
+  $("profile-skin").textContent = preset ? `Skin: ${preset.name}` : "Skin personalizada";
+  renderProfileButton();
+}
+
+function renderProfileButton() {
+  ensurePlayers();
+  $("profile-btn-avatar").innerHTML = renderAvatar(players[0].avatar);
+}
+
+function openProfile() {
+  renderProfileHead();
   renderStats();
   renderAccount();
   renderOnlineHistory();
-  show("stats");
+  show("profile");
 }
 
 function resetStats() {

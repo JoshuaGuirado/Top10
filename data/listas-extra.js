@@ -426,3 +426,23 @@ LISTS.push(
   { id: "x-acordar", cat: "diaadia", title: "As 10 coisas que todo mundo faz ao acordar", source: EXTRA,
     items: ["Desligar o despertador|Despertador|Soneca", "Pegar o celular|Olhar o celular", "Escovar os dentes", "Tomar café|Café da manhã", "Ir ao banheiro", "Tomar banho", "Lavar o rosto", "Se espreguiçar|Espreguiçar", "Arrumar a cama", "Beber água"] },
 );
+
+// Casais: o nome completo vale, e cada nome sozinho também (palavras-chave).
+CATEGORIES.push({ id: "casais", label: "Casais" });
+
+LISTS.push(
+  { id: "x-casais-ficcao", cat: "casais", title: "Os 10 casais mais famosos da ficção", source: EXTRA,
+    items: ["Romeu e Julieta|~Romeu|~Julieta", "Jack e Rose|~Jack|~Rose", "Shrek e Fiona|~Shrek|~Fiona", "Mickey e Minnie|~Mickey|~Minnie", "Homer e Marge|~Homer|~Marge", "Bela e Fera|A Bela e a Fera|~Bela|~Fera", "Ross e Rachel|~Ross|~Rachel", "Aladdin e Jasmine|~Aladdin|~Jasmine", "Edward e Bella|~Edward|~Bella", "Popeye e Olívia Palito|Popeye e Olívia|~Popeye|~Olívia Palito"] },
+  { id: "x-casais-disney", cat: "casais", title: "Os 10 casais mais famosos da Disney", source: EXTRA,
+    items: ["Mickey e Minnie|~Mickey|~Minnie", "Donald e Margarida|Pato Donald e Margarida|~Donald|~Margarida", "Cinderela e Príncipe Encantado|~Cinderela|~Príncipe Encantado", "Ariel e Eric|~Ariel|~Eric", "Bela e Fera|~Bela|~Fera", "Aladdin e Jasmine|~Aladdin|~Jasmine", "Simba e Nala|~Simba|~Nala", "Rapunzel e Flynn|Rapunzel e Eugene|~Rapunzel|~Flynn", "Anna e Kristoff|~Anna|~Kristoff", "Tiana e Naveen|~Tiana|~Naveen"] },
+  { id: "x-casais-series", cat: "casais", title: "Os 10 casais mais famosos das séries", source: EXTRA,
+    items: ["Ross e Rachel|~Ross|~Rachel", "Monica e Chandler|~Monica|~Chandler", "Jim e Pam|~Jim|~Pam", "Leonard e Penny|~Leonard|~Penny", "Marshall e Lily|~Marshall|~Lily", "Barney e Robin|~Barney|~Robin", "Jon Snow e Daenerys|~Jon Snow|~Daenerys", "Carrie e Mr. Big|Carrie e Big|~Carrie|~Mr. Big", "Rick e Michonne|~Rick|~Michonne", "Meredith e Derek|~Meredith|~Derek"] },
+  { id: "x-casais-famosos", cat: "casais", title: "Os 10 casais de famosos mais lembrados", source: EXTRA,
+    items: ["Beyoncé e Jay-Z|~Beyoncé|~Jay-Z", "Brad Pitt e Angelina Jolie|Brangelina|~Brad Pitt|~Angelina Jolie", "Barack e Michelle Obama|Obamas|~Barack|~Michelle Obama", "David e Victoria Beckham|Beckhams|~David|~Victoria Beckham", "Kim Kardashian e Kanye West|~Kim Kardashian|~Kanye West", "Taylor Swift e Travis Kelce|~Taylor Swift|~Travis Kelce", "Neymar e Bruna Marquezine|~Neymar|~Bruna Marquezine", "Xuxa e Junno|~Xuxa|~Junno", "Sandy e Lucas|Sandy e Lucas Lima|~Sandy|~Lucas", "Justin e Hailey Bieber|Justin Bieber e Hailey|~Justin|~Hailey Bieber"] },
+  { id: "x-casais-faz", cat: "casais", title: "As 10 coisas que todo casal faz", source: EXTRA,
+    items: ["Assistir série junto|~serie|~filme|~netflix", "Sair para jantar|~jantar|~restaurante", "Viajar junto|~viajar|~viagem", "Brigar por besteira|~brigar|~briga|~besteira", "Postar foto junto|~foto|~fotos", "Comemorar o aniversário de namoro|~aniversario de namoro|~mesversario", "Dormir de conchinha|~conchinha", "Pedir comida em casa|~pedir comida|~delivery|~ifood", "Ter apelido carinhoso|~apelido", "Dividir a sobremesa|~sobremesa"] },
+  { id: "x-presentes-namorados", cat: "casais", title: "Os 10 presentes de Dia dos Namorados mais comuns", source: EXTRA,
+    items: ["Flores|Buquê|Rosas", "Chocolate|Bombom", "Perfume", "Urso de pelúcia|Ursinho|Pelúcia", "Joia|Colar|Anel", "Jantar romântico|Jantar", "Cesta de café da manhã|Cesta", "Roupa", "Relógio", "Carta|Cartinha"] },
+  { id: "x-frases-casal", cat: "casais", title: "Frases que todo casal fala", source: EXTRA,
+    items: ["Eu te amo|~te amo", "O que você quer comer?|~quer comer|~vamos comer", "Tanto faz|~tanto faz", "Você que sabe|~voce que sabe|~voce decide", "Saudade de você|~saudade", "Tá bravo comigo?|~bravo|~brava", "Bom dia, amor|~bom dia amor|~bom dia", "Já chegou?|~chegou", "Desliga você|~desliga", "Me manda foto|~foto"] },
+);

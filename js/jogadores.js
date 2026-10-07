@@ -8,6 +8,22 @@ let playerCount = store("count") || 2;
 let players = store("players") || [];
 let turnTime = TIMER_OPTIONS.includes(store("timer")) ? store("timer") : 0;
 
+// Com vidas ou sem vidas, guardado por modo (a equipe começa com vidas; os outros, sem).
+function livesOn(id = modeId) {
+  const saved = (store("vidas") || {})[id];
+  return saved === undefined ? !!MODES[id].team : !!saved;
+}
+
+function setLivesOn(on, id = modeId) {
+  store("vidas", { ...(store("vidas") || {}), [id]: on });
+}
+
+function livesText(teamMode) {
+  const counts = Object.entries(TEAM_LIVES).map(([size, v]) => `${v} no Top ${size}`).join(", ");
+  return teamMode ? `A equipe divide as vidas (${counts}). Cada erro custa uma, e dá para trocar uma vida por uma dica.`
+    : `Cada jogador tem as próprias vidas (${counts}). Quem zera fica de fora e os outros continuam.`;
+}
+
 function ensurePlayers() {
   while (players.length < MAX_PLAYERS) {
     const used = players.map((p) => p.presetId);
@@ -35,10 +51,7 @@ function teamSizes() {
 
 function modeLabel(n) {
   if (mode().team) {
-    const lives = Object.entries(TEAM_LIVES).map(([size, v]) => `${v} no Top ${size}`).join(", ");
-    return n === 1
-      ? `Só você contra a lista. Vidas: ${lives}.`
-      : `Equipe de ${n}: todos juntos contra a lista, revezando a vez. Vidas: ${lives}.`;
+    return n === 1 ? "Só você contra a lista." : `Equipe de ${n}: todos juntos contra a lista, revezando a vez.`;
   }
   if (mode().teams) {
     const [a, b] = teamSizes();
@@ -86,8 +99,24 @@ function renderTimerChips() {
     }));
   });
   $("timer-help").textContent = turnTime
-    ? `Modo relâmpago: quem não chutar em ${turnTime} segundos perde a vez${mode().team ? " e a equipe perde uma vida" : ""}.`
+    ? `Modo relâmpago: quem não chutar em ${turnTime} segundos perde a vez${livesOn() ? " e uma vida" : ""}.`
     : "Cada um pensa o tempo que quiser.";
+}
+
+function renderLivesChips() {
+  const wrap = $("lives-chips");
+  wrap.innerHTML = "";
+  [[false, "Sem vidas"], [true, "Com vidas"]].forEach(([on, label]) => {
+    wrap.appendChild(chipButton(label, null, on === livesOn(), () => {
+      setLivesOn(on);
+      renderLivesChips();
+      renderTimerChips();
+      renderCountPicker();
+    }));
+  });
+  $("lives-help").textContent = livesOn()
+    ? livesText(!!mode().team)
+    : mode().team ? "Sem vidas: a equipe joga até todo mundo passar a vez ou alguém encerrar. Sem dicas." : "Sem vidas: errou, passa a vez e segue o jogo.";
 }
 
 function renderPlayersScreen() {
@@ -96,6 +125,7 @@ function renderPlayersScreen() {
   $("players-title").textContent = mode().team ? "Quem joga na equipe?" : mode().teams ? "Monte os times" : "Quantos jogadores?";
   renderCountPicker();
   renderTimerChips();
+  renderLivesChips();
   const grid = $("player-grid");
   grid.innerHTML = "";
   players.slice(0, playerCount).forEach((p, i) => {
@@ -128,7 +158,9 @@ function renderPlayersScreen() {
 // Depois de trocar skin: atualiza a tela de jogadores e a do modo online.
 function refreshAfterAvatar() {
   renderPlayersScreen();
+  renderProfileButton();
   if (document.body.dataset.screen === "online") renderOnline();
+  if (document.body.dataset.screen === "profile") renderProfileHead();
 }
 
 // Antes de escolher a lista: no modo Times, os dois times precisam de gente.

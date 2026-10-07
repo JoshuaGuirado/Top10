@@ -42,7 +42,7 @@ function shareText(text, btn, label) {
 
 // ───────────── navegação ─────────────
 
-const screens = ["home", "modes", "players", "lists", "editor", "game", "results", "stats", "online", "lobby"];
+const screens = ["home", "modes", "players", "lists", "editor", "game", "results", "profile", "online", "lobby"];
 
 function show(name) {
   screens.forEach((s) => ($("screen-" + s).hidden = s !== name));

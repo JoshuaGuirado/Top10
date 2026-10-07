@@ -68,7 +68,10 @@ const TEAM_PHRASES = {
   zero: ["{nome} foi da torcida organizada.", "{nome} veio pelo lanche, né?", "{nome} estava aquecendo pra próxima."],
 };
 
-const MEDALS = { 1: "🥇", 2: "🥈", 3: "🥉" };
+// Selo de colocação (1º, 2º, 3º…) desenhado com as cores da marca.
+function medal(place) {
+  return `<span class="medal m${Math.min(place, 4)}">${place}º</span>`;
+}
 
 // A mesma frase até sair da tela, mesmo se o resultado for redesenhado.
 function phraseFor(p, key, list) {
@@ -101,14 +104,14 @@ function vsOutcome() {
 function awardsFor(p, ranked, n, extra = []) {
   const out = [...extra];
   const others = ranked.filter((q) => q.idx !== p.idx);
-  if (p.hits.includes(n)) out.push(`🧠 Achou o nº ${n}`);
-  if (p.bestStreak >= 3) out.push(`🔥 ${p.bestStreak} seguidos`);
-  if (p.clutch) out.push("🦸 Acertou com 1 vida");
-  if (p.hits.length >= 3 && !p.misses) out.push("🎯 Zero erros");
-  if (p.misses >= 2 && others.length && others.every((q) => q.misses < p.misses)) out.push("💥 Chutador oficial");
-  if (p.timeouts) out.push(p.timeouts === 1 ? "⏰ Dormiu no relógio" : `⏰ Dormiu ${p.timeouts}x no relógio`);
-  if (p.passes >= 2) out.push(`🙈 Passou ${p.passes} vezes`);
-  if (p.hits.length >= 2 && p.hits.every((h) => h <= Math.ceil(n * 0.3))) out.push("🐢 Só o óbvio");
+  if (p.hits.includes(n)) out.push(`Achou o nº ${n}`);
+  if (p.bestStreak >= 3) out.push(`${p.bestStreak} seguidos`);
+  if (p.clutch) out.push("Acertou com 1 vida");
+  if (p.hits.length >= 3 && !p.misses) out.push("Zero erros");
+  if (p.misses >= 2 && others.length && others.every((q) => q.misses < p.misses)) out.push("Chutador oficial");
+  if (p.timeouts) out.push(p.timeouts === 1 ? "Dormiu no relógio" : `Dormiu ${p.timeouts}x no relógio`);
+  if (p.passes >= 2) out.push(`Passou ${p.passes} vezes`);
+  if (p.hits.length >= 2 && p.hits.every((h) => h <= Math.ceil(n * 0.3))) out.push("Só o óbvio");
   return out.slice(0, 3);
 }
 
@@ -140,7 +143,7 @@ function duelView(ranked, n) {
     else if (p.place <= 3) p.phrase = phraseFor(p, "p" + p.place, PHRASES[p.place]);
     else if (p.place === lastPlace && ranked.length >= 4) p.phrase = phraseFor(p, "last", PHRASES.last);
     else p.phrase = phraseFor(p, "rest", PHRASES.rest);
-    p.badges = awardsFor(p, ranked, n, !solo && p.place === 1 && p.score > 0 ? ["👑 Venceu"] : []);
+    p.badges = awardsFor(p, ranked, n, !solo && p.place === 1 && p.score > 0 ? ["Venceu"] : []);
   });
 
   const podium = (solo ? [1] : [2, 1, 3]).map((pl) => {
@@ -150,11 +153,11 @@ function duelView(ranked, n) {
       <div class="podium-col place-${pl}">
         <div class="podium-people">${group.map((p) => `
           <div class="podium-person">
-            ${pl === 1 && p.score > 0 ? '<span class="crown" aria-hidden="true">👑</span>' : ""}
+            ${pl === 1 && p.score > 0 ? `<span class="crown">${uiIcon("crown", "crown-ico")}</span>` : ""}
             <div class="podium-avatar">${renderAvatar(p.avatar)}</div>
             <b>${escapeHtml(p.name)}</b><span><span data-count="${p.score}">${p.score}</span> pts</span>
           </div>`).join("")}</div>
-        <div class="podium-block"><span>${solo ? `<span data-count="${group[0].score}">${group[0].score}</span>` : MEDALS[pl]}</span></div>
+        <div class="podium-block"><span>${solo ? `<span data-count="${group[0].score}">${group[0].score}</span>` : medal(pl)}</span></div>
       </div>`;
   }).join("");
 
@@ -170,7 +173,7 @@ function duelView(ranked, n) {
   } else if (winners.length > 1) {
     reveal = { kicker: "E o vencedor é…", html: `${avatarStack(winners, "reveal-avatars")}<h2 class="reveal-title">EMPATE!</h2><p class="reveal-sub">${names(winners)} com ${top.score} pontos cada</p>`, mood: "tie" };
   } else {
-    reveal = { kicker: "E o vencedor é…", html: `<span class="reveal-crown">👑</span>${avatarStack([top], "reveal-avatars")}<h2 class="reveal-title">${escapeHtml(top.name)}!</h2><p class="reveal-sub">venceu com ${top.score} pontos</p>`, mood: "win" };
+    reveal = { kicker: "E o vencedor é…", html: `<span class="reveal-crown">${uiIcon("crown", "crown-ico")}</span>${avatarStack([top], "reveal-avatars")}<h2 class="reveal-title">${escapeHtml(top.name)}!</h2><p class="reveal-sub">venceu com ${top.score} pontos</p>`, mood: "win" };
   }
 
   return {
@@ -194,13 +197,14 @@ function teamView(ranked, n) {
     else if (p.score === 0) p.phrase = phraseFor(p, "zero", TEAM_PHRASES.zero);
     else if (mvp) p.phrase = phraseFor(p, "mvp", TEAM_PHRASES.mvp);
     else p.phrase = phraseFor(p, "help", TEAM_PHRASES.help);
-    const extra = mvp ? ["⭐ MVP"] : [];
-    if (!solo && t.team && p.score) extra.push(`📊 ${Math.round((p.score / t.team) * 100)}% dos pontos`);
+    const extra = mvp ? ["MVP"] : [];
+    if (!solo && t.team && p.score) extra.push(`${Math.round((p.score / t.team) * 100)}% dos pontos`);
     p.badges = awardsFor(p, ranked, n, extra);
   });
 
   const lost = game.maxLives - game.lives;
-  const extra = [`${game.found.size} de ${n} itens`, plural(lost, "vida perdida", "vidas perdidas")];
+  const extra = [`${game.found.size} de ${n} itens`];
+  if (game.livesOn) extra.push(plural(lost, "vida perdida", "vidas perdidas"));
   if (game.hints.size) extra.push(plural(game.hints.size, "dica", "dicas"));
   const verdict = game.phrases.verdict || (game.phrases.verdict = pick(TEAM_PHRASES[outcome]));
   const podium = `
@@ -247,7 +251,7 @@ function timesView(ranked, n) {
     else if (mvp) p.phrase = phraseFor(p, "mvp", TEAM_PHRASES.mvp);
     else if (winner === -1 || p.team === winner) p.phrase = phraseFor(p, "help", TEAM_PHRASES.help);
     else p.phrase = phraseFor(p, "lost", TEAM_PHRASES.lost);
-    p.badges = awardsFor(p, ranked, n, [TEAM_NAMES[p.team], ...(mvp ? ["⭐ MVP"] : [])]);
+    p.badges = awardsFor(p, ranked, n, [TEAM_NAMES[p.team], ...(mvp ? ["MVP"] : [])]);
   });
 
   const side = (t) => `
@@ -282,7 +286,7 @@ function showResults() {
   const record = recordGame(game, game.vsList ? vsOutcome() : null);
   if (game.daily) recordDaily(game);
   if (game.online) onlineGameFinished();
-  renderResults(record ? `🏆 Novo recorde da lista: ${record.score} pts!` : "");
+  renderResults(record ? `Novo recorde da lista: ${record.score} pts!` : "");
   show("results");
   playReveal(game.view);
 }
@@ -369,17 +373,17 @@ function renderHighlights(n) {
   game.found.forEach((_, i) => { if (i > best) best = i; });
   if (best >= 0) {
     const p = game.players[game.found.get(best)];
-    cards.push(["🔥", "Jogada da partida", `<b>${escapeHtml(p.name)}</b> achou <b>${escapeHtml(game.items[best].name)}</b>, o nº ${best + 1}.`]);
+    cards.push(["flame", "Jogada da partida", `<b>${escapeHtml(p.name)}</b> achou <b>${escapeHtml(game.items[best].name)}</b>, o nº ${best + 1}.`]);
   } else {
-    cards.push(["😶", "Placar zerado", "Ninguém achou nada. A lista agradece a visita."]);
+    cards.push(["ghost", "Placar zerado", "Ninguém achou nada. A lista agradece a visita."]);
   }
-  if (game.found.size === n) cards.push(["🏆", "Lista gabaritada", `Todos os ${n} itens. Não sobrou nada pra lista!`]);
-  else if (!game.found.has(n - 1)) cards.push(["😱", "O mais difícil", `O nº ${n} era <b>${escapeHtml(game.items[n - 1].name)}</b>. Alguém lembrava?`]);
-  if (!game.found.has(0)) cards.push(["🤦", "Esqueceram o óbvio", `Ninguém disse <b>${escapeHtml(game.items[0].name)}</b>, o nº 1!`]);
+  if (game.found.size === n) cards.push(["trophy", "Lista gabaritada", `Todos os ${n} itens. Não sobrou nada pra lista!`]);
+  else if (!game.found.has(n - 1)) cards.push(["question", "O mais difícil", `O nº ${n} era <b>${escapeHtml(game.items[n - 1].name)}</b>. Alguém lembrava?`]);
+  if (!game.found.has(0)) cards.push(["ghost", "Esqueceram o óbvio", `Ninguém disse <b>${escapeHtml(game.items[0].name)}</b>, o nº 1!`]);
   const hot = game.players.reduce((a, b) => (b.bestStreak > a.bestStreak ? b : a));
-  if (hot.bestStreak >= 3) cards.push(["⚡", "Sequência", `<b>${escapeHtml(hot.name)}</b> acertou ${hot.bestStreak} seguidos.`]);
+  if (hot.bestStreak >= 3) cards.push(["bolt", "Sequência", `<b>${escapeHtml(hot.name)}</b> acertou ${hot.bestStreak} seguidos.`]);
   $("highlights").innerHTML = cards.slice(0, 3).map(([ic, title, text], k) => `
-    <div class="highlight" style="--i:${k}"><span class="highlight-ico">${ic}</span><div><p class="highlight-title">${title}</p><p>${text}</p></div></div>`).join("");
+    <div class="highlight" style="--i:${k}"><span class="highlight-ico">${uiIcon(ic)}</span><div><p class="highlight-title">${title}</p><p>${text}</p></div></div>`).join("");
 }
 
 function renderResultsTable(ranked, n) {
@@ -387,12 +391,12 @@ function renderResultsTable(ranked, n) {
     const pills = p.hits.slice().sort((a, b) => b - a)
       .map((h) => `<span class="pill${h / n >= 0.45 ? " hot" : ""}" style="--a:${Math.round(25 + (h / n) * 75)}%">${h}</span>`).join("");
     const stats = [];
-    if (p.misses - p.timeouts > 0) stats.push(`❌ ${plural(p.misses - p.timeouts, "erro", "erros")}`);
-    if (p.timeouts) stats.push(`⏰ ${p.timeouts} no tempo`);
-    if (p.passes) stats.push(`⏭ passou ${p.passes}`);
+    if (p.misses - p.timeouts > 0) stats.push(plural(p.misses - p.timeouts, "erro", "erros"));
+    if (p.timeouts) stats.push(`${p.timeouts} no tempo`);
+    if (p.passes) stats.push(`passou ${p.passes}`);
     return `
     <div class="result-row${game.teams ? ` t${p.team}` : ""}" style="--i:${k}">
-      <span class="result-place">${MEDALS[p.place] || p.place + "º"}</span>
+      <span class="result-place">${medal(p.place)}</span>
       <div class="mini">${renderAvatar(p.avatar)}</div>
       <div class="result-info">
         <p class="result-head"><b>${escapeHtml(p.name)}</b> <span class="result-pts"><span data-count="${p.score}">${p.score}</span> pts</span></p>
@@ -462,8 +466,8 @@ function acceptLate(k, i) {
   p.misses -= 1;
   learnAnswer(game.list.id, i, normalize(w.text));
   const record = !game.online || w.player === game.me ? recordAccepted(game, i, w.player, game.vsList ? vsOutcome() : null) : null;
-  const notes = [`✅ Aceito! “${w.text}” valeu o nº ${i + 1}: +${i + 1} para ${p.name}.`];
-  if (record) notes.push(`🏆 Novo recorde da lista: ${record.score} pts!`);
+  const notes = [`Aceito! “${w.text}” valeu o nº ${i + 1}: +${i + 1} para ${p.name}.`];
+  if (record) notes.push(`Novo recorde da lista: ${record.score} pts!`);
   renderResults(notes.join(" "));
   const screen = $("screen-results");
   screen.classList.remove("play");
