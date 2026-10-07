@@ -1,4 +1,4 @@
-# Top Ten — instruções para o Claude
+# Topzi — instruções para o Claude
 
 - Responder em português.
 - Ao terminar uma mudança: commit na branch de trabalho e, em seguida, levar o mesmo commit para a `main`

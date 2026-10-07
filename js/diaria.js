@@ -70,7 +70,7 @@ function dailyShareText(num, res) {
   const squares = res.found.map((f) => (f ? "🟦" : "⬜")).join("");
   const hearts = "❤️".repeat(Math.max(0, res.lives)) + "🖤".repeat(Math.max(0, res.maxLives - res.lives));
   return [
-    `Top Ten · Lista do dia #${num}`,
+    `Topzi · Lista do dia #${num}`,
     list ? list.title : "",
     squares,
     `${res.score} de ${res.total} pts ${hearts}${res.hints ? ` 💡${res.hints}` : ""}`,

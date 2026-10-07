@@ -1,7 +1,7 @@
-// Service worker: deixa o Top Ten instalável e jogável offline.
+// Service worker: deixa o Topzi instalável e jogável offline.
 // Online, busca sempre a versão nova (rede primeiro); sem internet, usa a cópia guardada.
 
-const CACHE = "topten-v1";
+const CACHE = "topzi-v1";
 const FILES = [
   "./",
   "index.html",
@@ -31,6 +31,8 @@ const FILES = [
   "js/app.js",
   "brand/logo.svg",
   "brand/logo-dark.svg",
+  "brand/simbolo.svg",
+  "brand/simbolo-escuro.svg",
   "brand/favicon.svg",
   "brand/favicon-32.png",
   "brand/icon-192.png",

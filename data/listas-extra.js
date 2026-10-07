@@ -1,7 +1,7 @@
 // Ainda mais listas de 10 itens. Mesmo formato de listas.js.
-// Listas de popularidade não têm dado oficial: a fonte diz "Curadoria Top Ten".
+// Listas de popularidade não têm dado oficial: a fonte diz "Curadoria Topzi".
 
-const EXTRA = "Curadoria Top Ten: do mais lembrado ao menos óbvio";
+const EXTRA = "Curadoria Topzi: do mais lembrado ao menos óbvio";
 
 LISTS.push(
   // ───────────── geografia ─────────────
@@ -39,7 +39,7 @@ LISTS.push(
     items: ["Copacabana", "Ipanema", "Porto de Galinhas", "Jericoacoara|Jeri", "Baía do Sancho|Sancho", "Praia do Forte", "Maragogi", "Praia dos Carneiros|Carneiros", "Trancoso", "Barra da Tijuca"] },
 
   // ───────────── futebol ─────────────
-  { id: "x-torcidas", cat: "futebol", title: "As 10 maiores torcidas do Brasil", source: "Curadoria Top Ten a partir de pesquisas recentes",
+  { id: "x-torcidas", cat: "futebol", title: "As 10 maiores torcidas do Brasil", source: "Curadoria Topzi a partir de pesquisas recentes",
     items: ["Flamengo", "Corinthians", "São Paulo", "Palmeiras", "Vasco|Vasco da Gama", "Grêmio", "Cruzeiro", "Atlético Mineiro|Atlético-MG|Galo", "Internacional|Inter", "Santos"] },
   { id: "x-classicos", cat: "futebol", title: "Os 10 maiores clássicos do futebol brasileiro", source: EXTRA,
     items: ["Fla-Flu|Flamengo x Fluminense", "Derby Paulista|Derby|Corinthians x Palmeiras", "Grenal|Gre-Nal|Grêmio x Internacional", "Clássico dos Milhões|Flamengo x Vasco", "Majestoso|São Paulo x Corinthians", "Choque-Rei|Palmeiras x São Paulo", "Clássico Mineiro|Atlético x Cruzeiro|Cruzeiro x Atlético", "Ba-Vi|Bahia x Vitória", "San-São|Santos x São Paulo", "Clássico dos Gigantes|Vasco x Fluminense"] },
@@ -279,7 +279,7 @@ LISTS.push(
   // ───────────── curiosidades ─────────────
   { id: "x-empresarios", cat: "curiosidades", title: "Os 10 empresários mais famosos do mundo", source: EXTRA,
     items: ["Elon Musk|Musk", "Bill Gates", "Steve Jobs", "Jeff Bezos|Bezos", "Mark Zuckerberg|Zuckerberg", "Warren Buffett|Buffett", "Walt Disney", "Henry Ford", "Silvio Santos", "Bernard Arnault"] },
-  { id: "x-redes", cat: "curiosidades", title: "As 10 redes sociais e apps de mensagem mais usados do mundo", source: "Curadoria Top Ten (número aproximado de usuários)",
+  { id: "x-redes", cat: "curiosidades", title: "As 10 redes sociais e apps de mensagem mais usados do mundo", source: "Curadoria Topzi (número aproximado de usuários)",
     items: ["Facebook", "YouTube", "Instagram", "WhatsApp", "TikTok", "WeChat", "Telegram", "Messenger", "Snapchat", "X|Twitter"] },
   { id: "x-fobias", cat: "curiosidades", title: "As 10 fobias mais comuns", source: EXTRA,
     items: ["Aracnofobia|~aranha|~aranhas", "Acrofobia|~altura", "Claustrofobia|~lugar fechado|~lugares fechados", "Glossofobia|~falar em publico", "Agorafobia|~multidao|~multidoes", "Ofidiofobia|~cobra|~cobras", "Nictofobia|~escuro", "Aerofobia|~aviao|~voar", "Hemofobia|~sangue", "Tripofobia|~buraquinhos|~buracos"] },

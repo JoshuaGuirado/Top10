@@ -1,7 +1,7 @@
 // Mais listas grandes: 30 e 50 itens. Mesmo formato de listas.js.
-// Listas de popularidade não têm dado oficial: a fonte diz "Curadoria Top Ten".
+// Listas de popularidade não têm dado oficial: a fonte diz "Curadoria Topzi".
 
-const CURADORIA = "Curadoria Top Ten: do mais lembrado ao menos óbvio";
+const CURADORIA = "Curadoria Topzi: do mais lembrado ao menos óbvio";
 
 // Junta listas de 10 que já existem numa lista maior (ex.: MCU 1–10 + 11–20 + 21–30).
 const juntarListas = (...ids) => ids.flatMap((id) => LISTS.find((l) => l.id === id).items);

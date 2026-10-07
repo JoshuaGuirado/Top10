@@ -355,7 +355,7 @@ function playReveal(view) {
     else {
       sfx.crash();
       setTimeout(sfx.win, 120);
-      const palette = view.reveal.mood.includes("t1") ? ["#E5322D", "#FF8A80", "#FFFFFF", "#FFC23D"] : ["#FFFFFF", "#8FA8FF", "#FFC23D", "#2450F5"];
+      const palette = view.reveal.mood.includes("t1") ? ["#FF4D3D", "#FFF4DE", "#FF8A7F"] : ["#171717", "#FFF4DE", "#FFFFFF", "#8A1C12"];
       fx.fireworks(view.reveal.mood.startsWith("win") ? 6 : 2, palette);
     }
   }, suspense);

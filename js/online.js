@@ -664,7 +664,7 @@ async function leaveRoom() {
 }
 
 async function shareRoom(btn) {
-  shareText(`Bora jogar Top Ten! Entra na minha sala: ${room.code}\n${roomUrl()}`, btn, "Convidar");
+  shareText(`Bora jogar Topzi! Entra na minha sala: ${room.code}\n${roomUrl()}`, btn, "Convidar");
 }
 
 // ───────────── partida online ─────────────

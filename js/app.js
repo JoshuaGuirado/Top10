@@ -1,4 +1,4 @@
-// Top Ten — liga os botões às telas e inicia o jogo.
+// Topzi — liga os botões às telas e inicia o jogo.
 // Telas: início → modo → jogadores → lista (ou criar lista) → partida → resultado.
 
 function goHome() {

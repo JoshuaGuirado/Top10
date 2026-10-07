@@ -1,6 +1,6 @@
 // Mais listas grandes: 30 e 50 itens. Mesmo formato de listas.js.
 
-const GRANDE = "Curadoria Top Ten: do mais lembrado ao menos óbvio";
+const GRANDE = "Curadoria Topzi: do mais lembrado ao menos óbvio";
 
 LISTS.push(
   // ───────────── 30 itens ─────────────

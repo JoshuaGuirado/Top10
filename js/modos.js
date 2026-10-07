@@ -11,7 +11,7 @@ const MODES = {
   top30: { size: 30, name: "Top 30", badge: "30", desc: "Listas de 30 itens. Pede quem conhece o assunto a fundo.", who: "Solo, 1v1 ou todos contra todos" },
   top50: { size: 50, name: "Top 50", badge: "50", desc: "Listas de 50 itens. Partida longa, e o nº 50 vale 50 pontos.", who: "Solo, 1v1 ou todos contra todos" },
   equipe: { team: true, name: "Equipe contra a lista", badge: TEAM_ICON, desc: "Todos jogam juntos. O que a equipe não achar vira ponto da lista. Cada erro custa uma vida, e dá para trocar uma vida por uma dica.", who: "1 a 8 jogadores · 3, 6 ou 10 vidas" },
-  times: { teams: true, min: 2, name: "Times", badge: TIMES_ICON, desc: "Time Azul contra Time Vermelho na mesma lista. A vez alterna entre os times, e cada ponto vai para o time de quem acertou.", who: "2 a 8 jogadores · 1v1, 2v2, 3v3 ou 4v4" },
+  times: { teams: true, min: 2, name: "Times", badge: TIMES_ICON, desc: "Time Vermelho contra Time Preto na mesma lista. A vez alterna entre os times, e cada ponto vai para o time de quem acertou.", who: "2 a 8 jogadores · 1v1, 2v2, 3v3 ou 4v4" },
 };
 
 let modeId = MODES[store("mode")] ? store("mode") : "top10";

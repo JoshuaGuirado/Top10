@@ -53,7 +53,7 @@ const fx = (() => {
   const ctx = canvas.getContext("2d");
   let parts = [];
   let running = false;
-  const colors = ["#2450F5", "#2450F5", "#0A0A0A", "#9AA0B5", "#8FA8FF"];
+  const colors = ["#FF4D3D", "#FF4D3D", "#171717", "#FF8A7F", "#C9A86A"];
 
   function resize() {
     canvas.width = innerWidth * devicePixelRatio;

@@ -1,7 +1,7 @@
 // Jogadores: quantidade, nickname, skin, time (no modo Times) e tempo por vez.
 
 const MAX_PLAYERS = 8;
-const TEAM_NAMES = ["Time Azul", "Time Vermelho"];
+const TEAM_NAMES = ["Time Vermelho", "Time Preto"];
 const TIMER_OPTIONS = [0, 15, 30, 60];
 
 let playerCount = store("count") || 2;

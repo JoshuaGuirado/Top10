@@ -3,86 +3,83 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Top Ten · Identidade visual</title>
+  <title>Topzi · Identidade visual</title>
   <link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&display=swap">
   <style>
+    :root { --red: #FF4D3D; --ink: #171717; --cream: #FFF4DE; }
     * { box-sizing: border-box; }
-    body { margin: 0; background: #fff; color: #0A0A0A; font-family: "Archivo", "Helvetica Neue", Arial, sans-serif; line-height: 1.5; }
-    main { max-width: 880px; margin: 0 auto; padding: 40px 16px 80px; }
-    h1, h2, .display { font-stretch: 70%; font-weight: 800; text-transform: uppercase; line-height: .95; letter-spacing: -0.01em; }
-    h1 { font-size: clamp(3rem, 10vw, 5.5rem); margin: 32px 0 16px; }
-    h2 { font-size: 2rem; margin: 64px 0 16px; padding-top: 16px; border-top: 2px solid #0A0A0A; }
+    body { margin: 0; background: var(--cream); color: var(--ink); font-family: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif; line-height: 1.5; }
+    main { max-width: 920px; margin: 0 auto; padding: 40px 16px 80px; }
+    h1, h2 { font-stretch: 75%; font-weight: 800; line-height: .95; letter-spacing: -0.02em; text-transform: uppercase; }
+    h1 { font-size: clamp(3rem, 10vw, 5.5rem); margin: 28px 0 16px; }
+    h1 span { color: var(--red); }
+    h2 { font-size: 2rem; margin: 64px 0 16px; padding-top: 16px; border-top: 2px solid var(--ink); }
     p { max-width: 62ch; }
-    .muted { color: #6B6B6B; }
-    .grid { display: grid; gap: 0; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); border: 2px solid #0A0A0A; }
-    .panel { padding: 40px; display: grid; place-items: center; min-height: 200px; }
-    .panel + .panel { border-left: 2px solid #0A0A0A; }
-    .panel.dark { background: #0A0A0A; }
+    .muted { color: #6B6151; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); border: 2px solid var(--ink); border-radius: 18px; overflow: hidden; }
+    .panel { padding: 40px; display: grid; place-items: center; min-height: 220px; }
+    .panel.dark { background: var(--ink); }
     .panel img { max-width: 100%; height: auto; }
-    .swatch div:first-child { height: 120px; border: 2px solid #0A0A0A; }
-    .swatch div:last-child { padding: 10px 0; font-size: .9rem; }
-    .swatch b { display: block; }
-    .swatches { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+    .swatches { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+    .swatch div:first-child { height: 130px; border: 2px solid var(--ink); border-radius: 16px; }
+    .swatch p { margin: 8px 0 0; font-size: .95rem; }
+    .swatch b { display: block; font-size: 1.1rem; }
     code { font-family: ui-monospace, Menlo, monospace; font-size: .85em; }
-    .display { font-size: 3.6rem; }
+    .type { font-stretch: 75%; font-weight: 800; font-size: 3.4rem; line-height: 1; text-transform: uppercase; margin: 0; }
     ul { padding-left: 20px; }
     li { margin-bottom: 6px; }
+    .sizes { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
   </style>
 </head>
 <body>
 <main>
-  <img src="brand/logo.svg" alt="Top Ten" width="220">
-  <h1>Identidade visual</h1>
-  <p class="muted"><b>Top Ten</b> vem de <b>Top Ten</b>. A lâmpada lembra o momento em que a resposta "acende" na cabeça; o T vazado dentro dela é a inicial do nome. A marca é preto no branco: direta, sem brilho, sem degradê e sem sombra.</p>
+  <img src="brand/logo.svg" alt="Topzi" width="200">
+  <h1>Identidade <span>visual</span></h1>
+  <p class="muted"><b>Topzi</b> é o jogo de listas em que o óbvio vale 1 e o difícil vale 10. A marca tem duas peças: a <b>logo</b> com o nome, que apresenta o jogo, e o <b>símbolo 10</b>, que aparece onde falta espaço (ícone do app, aba do navegador, avatar de rede social).</p>
 
   <h2>Logo</h2>
-  <p>A lâmpada com o nome "Top Ten" ao lado. As letras são traços retos do mesmo peso e não dependem de fonte.</p>
+  <p>"TOPZI" em letras grossas, com o "O" mais baixo (dá ritmo e personalidade) e o <b>Z em vermelho</b>. É a assinatura principal: topo do site, imagem de compartilhamento, materiais.</p>
   <div class="grid">
-    <div class="panel"><img src="brand/logo.svg" alt="Logo em fundo branco" width="300"></div>
-    <div class="panel dark"><img src="brand/logo-dark.svg" alt="Logo em fundo preto" width="300"></div>
+    <div class="panel"><img src="brand/logo.svg" alt="Logo Topzi no fundo creme" width="320"></div>
+    <div class="panel dark"><img src="brand/logo-dark.svg" alt="Logo Topzi no fundo preto" width="320"></div>
   </div>
 
-  <h2>Ícone</h2>
-  <p>A lâmpada sozinha. O favicon é a versão branca dentro de um quadrado preto, legível até em 16 px.</p>
+  <h2>Símbolo 10</h2>
+  <p>O "10" é a pontuação máxima de uma lista: o item mais difícil. O pedaço vermelho no topo do zero é o <b>topo da lista</b>, o lugar que todo mundo quer alcançar. Funciona sozinho e em tamanhos pequenos.</p>
   <div class="grid">
-    <div class="panel"><img src="brand/icon.svg" alt="Ícone" width="110"></div>
-    <div class="panel dark"><img src="brand/icon-dark.svg" alt="Ícone em fundo preto" width="110"></div>
-    <div class="panel"><img src="brand/favicon.svg" alt="Favicon" width="48"></div>
+    <div class="panel"><img src="brand/simbolo.svg" alt="Símbolo 10 no fundo creme" width="180"></div>
+    <div class="panel dark"><img src="brand/simbolo-escuro.svg" alt="Símbolo 10 no fundo preto" width="180"></div>
+    <div class="panel"><div class="sizes"><img src="brand/icon-192.png" alt="Ícone do app" width="96" style="border-radius:22px;border:2px solid #171717"><img src="brand/favicon.svg" alt="Ícone da aba" width="32"><img src="brand/favicon.svg" alt="" width="16"></div></div>
   </div>
 
   <h2>Cores</h2>
-  <p>Preto e branco fazem todo o trabalho. O vermelho aparece só para erros e vidas perdidas. As skins dos jogadores são a única parte colorida do jogo, porque representam personagens.</p>
   <div class="swatches">
-    <div class="swatch"><div style="background:#0A0A0A"></div><div><b>Preto</b><code>#0A0A0A</code></div></div>
-    <div class="swatch"><div style="background:#FFFFFF"></div><div><b>Branco</b><code>#FFFFFF</code></div></div>
-    <div class="swatch"><div style="background:#6B6B6B"></div><div><b>Cinza</b><code>#6B6B6B</code> · textos de apoio</div></div>
-    <div class="swatch"><div style="background:#E6E6E6"></div><div><b>Cinza claro</b><code>#E6E6E6</code> · linhas finas</div></div>
-    <div class="swatch"><div style="background:#E5322D"></div><div><b>Vermelho</b><code>#E5322D</code> · só erros</div></div>
+    <div class="swatch"><div style="background:#FF4D3D"></div><p><b>Vermelho</b><code>#FF4D3D</code> · cor principal: botões, destaques, o Z e o topo do 10. Para texto pequeno sobre o creme, use <code>#D93A2B</code>.</p></div>
+    <div class="swatch"><div style="background:#171717"></div><p><b>Preto</b><code>#171717</code> · texto, contraste e fundo do modo escuro.</p></div>
+    <div class="swatch"><div style="background:#FFF4DE"></div><p><b>Creme</b><code>#FFF4DE</code> · fundo do modo claro e texto do modo escuro.</p></div>
   </div>
 
   <h2>Tipografia</h2>
-  <div class="display">Archivo Condensada</div>
-  <p class="muted">Títulos, números do ranking e placar: largura 70%, peso 800, sempre em caixa alta.</p>
-  <p style="font-size:1.15rem"><b>Archivo</b> normal para textos, botões e palpites (pesos 400 a 700). Uma família só, gratuita no Google Fonts.</p>
+  <p class="type">O difícil vale 10</p>
+  <p><b>Bricolage Grotesque</b> (Google Fonts, gratuita): títulos em peso 800 e largura condensada (<code>font-stretch: 75%</code>), texto corrido em peso 400 a 600.</p>
 
-  <h2>Regras de uso</h2>
+  <h2>Regras rápidas</h2>
   <ul>
-    <li>Use <code>logo.svg</code> em fundo branco e <code>logo-dark.svg</code> em fundo preto.</li>
-    <li>Não aplique cor, degradê, sombra ou contorno no logo.</li>
-    <li>Cantos retos e linhas de 2 px; evite cards arredondados.</li>
-    <li>Nada de emojis na interface: texto e números resolvem.</li>
-    <li>Deixe um respiro em volta do logo de pelo menos a altura do T.</li>
+    <li>Fundo sempre creme ou preto. O vermelho é destaque, não fundo de página inteira (exceto a tela de vitória).</li>
+    <li>Não mude as cores da logo, não estique e não coloque sombra ou degradê.</li>
+    <li>Na logo, só o Z é vermelho. No símbolo, só o topo do zero.</li>
+    <li>Deixe em volta da logo um espaço livre de pelo menos a altura do "O".</li>
   </ul>
 
   <h2>Arquivos</h2>
   <ul>
-    <li><code>brand/logo.svg</code> e <code>brand/logo-dark.svg</code>: logo horizontal</li>
-    <li><code>brand/icon.svg</code> e <code>brand/icon-dark.svg</code>: lâmpada sozinha</li>
-    <li><code>brand/favicon.svg</code>: favicon</li>
-    <li><code>brand/og-image.png</code>: imagem de compartilhamento (1200×630)</li>
+    <li><code>brand/logo.svg</code> e <code>brand/logo-dark.svg</code>: logo para fundo creme e fundo preto</li>
+    <li><code>brand/simbolo.svg</code> e <code>brand/simbolo-escuro.svg</code>: símbolo 10</li>
+    <li><code>brand/favicon.svg</code>, <code>favicon-32.png</code>, <code>apple-touch-icon.png</code>, <code>icon-192.png</code>, <code>icon-512.png</code>, <code>icon-maskable-512.png</code>: ícones</li>
+    <li><code>brand/og-image.png</code>: imagem de compartilhamento (1200 × 630)</li>
   </ul>
 </main>
 </body>

@@ -1,4 +1,4 @@
-# Top Ten
+# Topzi
 
 Jogo de adivinhar listas para jogar sozinho ou com até 8 pessoas. Cada lista tem 10, 30 ou 50 itens em ordem, e o número do item é a pontuação: o nº 1 é o óbvio e vale 1 ponto, o último é o mais difícil e vale mais.
 
@@ -10,7 +10,7 @@ Jogo de adivinhar listas para jogar sozinho ou com até 8 pessoas. Cada lista te
 | **Top 30** | 30 itens | Igual ao Top 10, com listas maiores |
 | **Top 50** | 50 itens | Igual ao Top 10, o nº 50 vale 50 pontos |
 | **Equipe contra a lista** | 10, 30 ou 50 | Todos somam juntos; o que ninguém achar vira ponto da lista. A equipe vence se fizer mais da metade dos pontos. Cada chute errado custa uma vida (3 no Top 10, 6 no Top 30, 10 no Top 50), e dá para trocar uma vida por uma dica (primeira letra e tamanho de um item). |
-| **Times** | 10, 30 ou 50 | Time Azul × Time Vermelho (1v1 a 4v4). A vez alterna entre os times e cada ponto vai para o time de quem acertou. |
+| **Times** | 10, 30 ou 50 | Time Vermelho × Time Preto (1v1 a 4v4). A vez alterna entre os times e cada ponto vai para o time de quem acertou. |
 
 **Jogar online**: cada um no próprio celular. Um cria a sala, manda o código ou o link, escolhe o modo, o tempo e a lista, e começa. Funciona em todos os modos (Top 10/30/50, Equipe contra a lista e Times). Usa o Supabase (gratuito): o passo a passo está em [`supabase/LEIAME.md`](supabase/LEIAME.md) e as tabelas em [`supabase/schema.sql`](supabase/schema.sql). Quem quiser pode **conectar a conta** com o e-mail para guardar perfil, skin, estatísticas e recordes.
 
@@ -52,9 +52,9 @@ Na tela de listas, "Criar lista" monta uma lista sua de 10, 30 ou 50 itens, do m
 - `supabase/`: SQL do banco e passo a passo de configuração
 - `sw.js` e `manifest.webmanifest`: instalar como app e jogar offline
 - `tests/`: testes automáticos (`npm test`), que também rodam no GitHub a cada push, e o teste do online com duas abas e um Supabase falso (`npm run test:online`)
-- `brand/` e `brand.html`: logo e guia de identidade visual
+- `brand/` e `brand.html`: logo TOPZI, símbolo 10, ícones e guia de identidade visual (vermelho `#FF4D3D`, preto `#171717`, creme `#FFF4DE`)
 
-Listas sem dado oficial (rankings de opinião e de popularidade) indicam "Curadoria Top Ten" como fonte.
+Listas sem dado oficial (rankings de opinião e de popularidade) indicam "Curadoria Topzi" como fonte.
 
 ## Adicionar uma lista ao jogo
 

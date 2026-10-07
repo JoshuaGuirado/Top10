@@ -3,26 +3,27 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Top Ten</title>
-  <meta name="description" content="Jogo de listas: o óbvio vale 1, o difícil vale 10. De 1 a 8 jogadores.">
-  <meta name="theme-color" content="#2450F5">
+  <title>Topzi · jogo de listas</title>
+  <meta name="description" content="Topzi, o jogo de listas: o óbvio vale 1, o difícil vale 10. Sozinho, com amigos ou online.">
+  <meta name="theme-color" content="#FFF4DE" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#171717" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="brand/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
   <script>try { var t = localStorage.getItem("tt:theme"); if (t) document.documentElement.dataset.theme = JSON.parse(t); } catch (e) {}</script>
-  <meta property="og:title" content="Top Ten">
-  <meta property="og:description" content="Jogo de listas: o óbvio vale 1, o difícil vale 10. De 1 a 8 jogadores.">
+  <meta property="og:title" content="Topzi · jogo de listas">
+  <meta property="og:description" content="O óbvio vale 1. O difícil vale 10. Jogue sozinho, com amigos ou online.">
   <meta property="og:image" content="brand/og-image.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="topbar">
     <button type="button" class="logo-btn" id="home-btn" aria-label="Início">
-      <img class="logo logo-light" src="brand/logo.svg" alt="Top Ten">
+      <img class="logo logo-light" src="brand/logo.svg" alt="Topzi">
       <img class="logo logo-dark" src="brand/logo-dark.svg" alt="" aria-hidden="true">
     </button>
     <div class="topbar-actions"><button type="button" class="text-btn" id="theme-btn">Modo escuro</button><button type="button" class="text-btn" id="sound-btn">Som</button></div>
@@ -32,6 +33,8 @@
     <!-- Início -->
     <section id="screen-home" class="screen">
       <div class="hero">
+        <img class="hero-symbol logo-light" src="brand/simbolo.svg" alt="" aria-hidden="true">
+        <img class="hero-symbol logo-dark" src="brand/simbolo-escuro.svg" alt="" aria-hidden="true">
         <h1><span>O óbvio vale 1.</span><span class="accent">O difícil vale 10.</span></h1>
         <p class="lead">Um jogo de listas para jogar sozinho, contra os amigos ou em equipe contra a lista. São <span id="list-total">300</span> listas de 10, 30 e 50 itens: futebol, filmes, heróis, comida, frases de mãe. E você ainda pode criar as suas.</p>
         <div class="hero-actions">
