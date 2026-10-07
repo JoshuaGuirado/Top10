@@ -28,7 +28,9 @@ Abra o `index.html` no navegador. Não precisa instalar nada.
 
 Os palpites não diferenciam maiúsculas, acentos, singular e plural, aceitam siglas e apelidos (ex.: "SP", "BH") e perdoam um errinho de digitação. Nas listas de frases, basta acertar a ideia principal (ex.: "todo mundo" vale "Você não é todo mundo").
 
-**Aceitar mesmo assim:** se o grupo concordar que um palpite estava certo (faltou um apelido na lista), o botão que aparece depois do erro deixa escolher o item. O ponto é dado, a vida volta, e essa resposta passa a valer nas próximas partidas neste navegador.
+**Algum chute estava certo?** No fim da partida, com a lista já aberta para todos, a turma pode aceitar um chute que valia (faltou um apelido na lista): escolhe o item, os pontos entram no placar e a resposta passa a valer nas próximas partidas. Só aparece com 2 ou mais jogadores e nunca na lista do dia, para ninguém aprovar o próprio chute.
+
+**Resultado:** suspense com rufar de tambor ("E o vencedor é…"), revelação com coroa e fogos (ou trombone triste quando a lista vence), pódio subindo, destaques da partida (jogada da partida, o óbvio que ninguém lembrou, sequências) e prêmios como 🔥 3 seguidos, 🎯 zero erros e 💥 chutador oficial. Durante a partida, quem acerta 3 seguidos fica "em chamas".
 
 **Estatísticas e recordes:** partidas, pontos, taxa de acerto, vitórias contra a lista, sequência da lista do dia e o recorde de cada lista (aparece no card da lista).
 

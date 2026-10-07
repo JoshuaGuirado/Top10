@@ -30,14 +30,39 @@ function recordGame(g, outcome) {
   });
   if (g.vsList) {
     s.vsGames += 1;
-    if (outcome === "win" || outcome === "perfect") s.vsWins += 1;
+    if (isWin(outcome)) s.vsWins += 1;
   }
   if (g.found.size === n) s.perfect += 1;
   g.found.forEach((who, i) => {
     if (!s.best || i + 1 > s.best.pos) s.best = { pos: i + 1, item: g.items[i].name, list: g.list.title, name: g.players[who].name };
   });
   store("stats", s);
+  g.saved = { outcome, perfect: g.found.size === n };
+  return updateRecord(g);
+}
 
+const isWin = (outcome) => outcome === "win" || outcome === "perfect";
+
+// Chute aceito pela turma depois da partida: corrige estatísticas e recorde.
+function recordAccepted(g, i, who, outcome) {
+  if (!g.saved) return updateRecord(g);
+  const s = loadStats();
+  s.points += i + 1;
+  s.hits += 1;
+  s.misses = Math.max(0, s.misses - 1);
+  if (g.vsList && isWin(outcome) !== isWin(g.saved.outcome)) s.vsWins += isWin(outcome) ? 1 : -1;
+  if (!g.saved.perfect && g.found.size === g.items.length) {
+    s.perfect += 1;
+    g.saved.perfect = true;
+  }
+  if (!s.best || i + 1 > s.best.pos) s.best = { pos: i + 1, item: g.items[i].name, list: g.list.title, name: g.players[who].name };
+  g.saved.outcome = outcome;
+  store("stats", s);
+  return updateRecord(g);
+}
+
+function updateRecord(g) {
+  const n = g.items.length;
   const all = allRecords();
   const r = (all[g.list.id] = all[g.list.id] || {});
   let record = null;

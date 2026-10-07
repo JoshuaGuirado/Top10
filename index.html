@@ -149,7 +149,13 @@
       <h2 class="center" id="results-title">Pódio</h2>
       <p class="center results-sub" id="results-sub"></p>
       <div class="podium" id="podium"></div>
+      <div class="highlights" id="highlights"></div>
       <div class="results-table" id="results-table"></div>
+      <section class="late-contest" id="late-contest" hidden>
+        <h3>Algum chute estava certo?</h3>
+        <p class="muted small">Se a turma concordar que um chute valia (faltou um apelido na lista), escolha o item. Os pontos entram no placar e essa resposta passa a valer nas próximas partidas.</p>
+        <div class="contest-rows" id="late-contest-rows"></div>
+      </section>
       <h3>A lista completa</h3>
       <ol class="board final" id="final-board"></ol>
       <div class="actions center">
@@ -200,18 +206,11 @@
     </form>
   </dialog>
 
-  <!-- Aceitar mesmo assim -->
-  <dialog id="contest-dialog" class="avatar-dialog contest-dialog">
-    <form method="dialog" class="dialog-inner">
-      <div class="dialog-head">
-        <h2>Aceitar o palpite?</h2>
-        <button type="submit" value="cancel" class="text-btn">Fechar</button>
-      </div>
-      <p class="muted" id="contest-text"></p>
-      <div class="contest-options" id="contest-options"></div>
-      <button type="button" class="link-btn" id="contest-all">Mostrar todos os itens escondidos</button>
-    </form>
-  </dialog>
+  <!-- Suspense antes do resultado -->
+  <div class="reveal" id="reveal" hidden>
+    <div class="reveal-inner" id="reveal-inner" role="status"></div>
+    <p class="reveal-skip">toque para pular</p>
+  </div>
 
   <canvas id="fx" aria-hidden="true"></canvas>
 

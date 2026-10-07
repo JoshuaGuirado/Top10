@@ -106,7 +106,7 @@ function similarity(a, b) {
   return score;
 }
 
-// Itens ainda escondidos mais parecidos com o palpite (para "Aceitar mesmo assim").
+// Itens ainda não achados, do mais parecido com o palpite ao menos (para "Algum chute estava certo?").
 function rankCandidates(items, found, raw, limit = 3) {
   const g = normalize(raw);
   return items

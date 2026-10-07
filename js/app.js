@@ -60,8 +60,6 @@ $("board").addEventListener("keydown", (e) => {
 $("end-btn").addEventListener("click", () => {
   if (confirm("Encerrar a partida e ver o resultado?")) endGame("Partida encerrada.");
 });
-$("contest-all").addEventListener("click", showAllContestOptions);
-$("contest-dialog").addEventListener("close", onContestClosed);
 
 $("rematch-btn").addEventListener("click", () => (game && game.daily ? openModes() : openLists()));
 $("share-btn").addEventListener("click", (e) => {

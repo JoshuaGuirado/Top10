@@ -1,4 +1,4 @@
-// Partida: palpites, vez de cada um, vidas, dicas, tempo por vez e "Aceitar mesmo assim".
+// Partida: palpites, vez de cada um, vidas, dicas e tempo por vez.
 
 const TURN_DELAY = 950;
 let game = null;
@@ -18,6 +18,7 @@ function startGame(list, opts = {}) {
   const lives = daily ? 3 : TEAM_LIVES[n] || Math.max(3, Math.round(n / 5));
   const gamePlayers = roster.map((p, i) => ({
     name: playerName(p, i), avatar: p.avatar, team: p.team, score: 0, hits: [], misses: 0, passes: 0, timeouts: 0,
+    streak: 0, bestStreak: 0, clutch: 0,
   }));
   game = {
     list,
@@ -43,7 +44,6 @@ function startGame(list, opts = {}) {
     maxLives: lives,
     timeLimit: daily ? 0 : turnTime,
     timeLeft: 0,
-    lastWrong: null,
     endTimer: null,
   };
   if (teams) game.turn = takeNext(0);
@@ -149,8 +149,7 @@ function renderGame() {
   if (game.over) $("turn-timer").hidden = true;
   $("progress").textContent = `Encontrados: ${game.found.size} de ${n}`;
 
-  // Com o "Aceitar mesmo assim" ainda aberto, a lista não é revelada.
-  const reveal = game.over && !game.lastWrong;
+  const reveal = game.over;
   const board = $("board");
   board.classList.toggle("big", n > 10);
   board.classList.toggle("picking", game.hintMode);
@@ -188,18 +187,10 @@ function renderGame() {
   $("hint-btn").textContent = game.hintMode ? "Cancelar dica" : "Dica (−1 vida)";
 }
 
-function setFeedback(text, kind, action = null) {
+function setFeedback(text, kind) {
   const f = $("feedback");
   f.className = "feedback " + kind;
   f.textContent = text;
-  if (action) {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "feedback-action";
-    b.textContent = action.label;
-    b.addEventListener("click", action.onClick);
-    f.append(" ", b);
-  }
 }
 
 function focusGuess() {
@@ -235,22 +226,30 @@ function handleGuess(raw) {
       renderGame();
       return;
     }
-    game.lastWrong = null;
     return registerMiss(`"${text}" não está na lista.`, { text, key });
   }
 
-  game.lastWrong = null;
   scoreHit(result.index, game.turn);
   nextTurn();
 }
 
-function scoreHit(i, who, lead = null) {
+const STREAK_LINES = [
+  "{nome} está em chamas! 🔥 {n} seguidos!",
+  "Alguém para {nome}! {n} acertos seguidos! 🔥",
+  "{nome} ligou o modo turbo: {n} seguidos! ⚡",
+  "{n} seguidos! {nome} tá com a cola, só pode. 🔥",
+];
+
+function scoreHit(i, who) {
   const p = game.players[who];
   const pts = i + 1;
   const ratio = pts / game.items.length;
   game.found.set(i, who);
   p.score += pts;
   p.hits.push(pts);
+  p.streak += 1;
+  p.bestStreak = Math.max(p.bestStreak, p.streak);
+  if (game.vsList && game.lives === 1) p.clutch += 1;
   game.passStreak = 0;
   renderGame();
 
@@ -264,7 +263,12 @@ function scoreHit(i, who, lead = null) {
   const tier = ratio >= 0.7 ? "high" : ratio >= 0.35 ? "mid" : "low";
   if (tier === "high") flash("flash-epic");
   const forWho = game.teams ? `${p.name} (${TEAM_NAMES[p.team]})` : p.name;
-  setFeedback(`${lead || pick(HYPE[tier])} ${game.items[i].name} é o nº ${pts}: +${pts} para ${forWho}.`, tier === "high" ? "epic" : "good");
+  let text = `${pick(HYPE[tier])} ${game.items[i].name} é o nº ${pts}: +${pts} para ${forWho}.`;
+  if (p.streak >= 3) {
+    text += " " + pick(STREAK_LINES).replace("{nome}", p.name).replace("{n}", p.streak);
+    floatText($("scoreboard").querySelector(`[data-player="${who}"]`), "🔥", "epic");
+  }
+  setFeedback(text, tier === "high" || p.streak >= 3 ? "epic" : "good");
 }
 
 // Erro (palpite fora da lista) ou tempo esgotado (wrong = null).
@@ -277,6 +281,7 @@ function registerMiss(message, wrong) {
     game.wrongLog.push({ text: wrong.text, player: who });
   }
   p.misses += 1;
+  p.streak = 0;
   game.passStreak = 0;
   sfx.wrong();
   flash("flash-bad");
@@ -284,7 +289,6 @@ function registerMiss(message, wrong) {
   const chip = $("scoreboard").querySelector(`[data-player="${who}"]`);
   shake(chip);
   floatText(chip, wrong ? "errou" : "tempo!", "bad");
-  const action = wrong ? { label: "Aceitar mesmo assim", onClick: openContest } : null;
   let tail = game.players.length > 1 ? " Passa a vez." : "";
 
   if (game.vsList) {
@@ -292,13 +296,10 @@ function registerMiss(message, wrong) {
     renderVersus();
     shake($("versus"));
     floatText($("versus").querySelector(".lives"), "-1 vida", "bad");
-    if (wrong) game.lastWrong = { ...wrong, player: who, lostLife: true };
-    if (game.lives <= 0) return endGame(`${message} Acabaram as vidas${game.players.length > 1 ? " da equipe" : ""}!`, action);
+    if (game.lives <= 0) return endGame(`${message} Acabaram as vidas${game.players.length > 1 ? " da equipe" : ""}!`);
     tail = ` ${game.lives === 1 ? "Resta 1 vida!" : `Restam ${game.lives} vidas.`}${tail}`;
-  } else if (wrong) {
-    game.lastWrong = { ...wrong, player: who, lostLife: false };
   }
-  setFeedback(message + tail, "bad", action);
+  setFeedback(message + tail, "bad");
   nextTurn();
 }
 
@@ -320,19 +321,17 @@ function nextTurn() {
       void $("turn").offsetWidth;
       $("turn").classList.add("pop");
     }
-    // Se o "Aceitar mesmo assim" estiver aberto, o relógio só começa quando ele fechar.
-    if ($("contest-dialog").open) g.timeLeft = g.timeLimit * 1000;
-    else startTurnTimer();
+    startTurnTimer();
     focusGuess();
   }, game.players.length > 1 ? TURN_DELAY : 350);
 }
 
 function passTurn() {
   if (!game || game.over || game.busy) return;
-  game.lastWrong = null;
   game.hintMode = false;
   const p = game.players[game.turn];
   p.passes += 1;
+  p.streak = 0;
   game.passStreak += 1;
   if (game.passStreak >= game.players.length) {
     return endGame(game.vsList ? "A equipe toda passou a vez. A lista fica com o resto!" : "Todo mundo passou a vez. Ninguém lembra de mais nenhum!");
@@ -341,16 +340,15 @@ function passTurn() {
   nextTurn();
 }
 
-function endGame(reason, action = null) {
+function endGame(reason) {
   if (!game || game.over) return;
   game.over = true;
   game.busy = false;
   game.hintMode = false;
   stopTurnTimer();
-  setFeedback(reason, "info", action);
+  setFeedback(reason, "info");
   renderGame();
-  // Com "Aceitar mesmo assim" na tela, o pódio espera um pouco mais.
-  game.endTimer = setTimeout(showResults, action ? 3500 : 1300);
+  game.endTimer = setTimeout(showResults, 1300);
 }
 
 // ───────────── tempo por vez (modo relâmpago) ─────────────
@@ -403,7 +401,6 @@ function renderTimer() {
 
 function timeUp() {
   if (!game || game.over || game.busy) return;
-  game.lastWrong = null;
   game.hintMode = false;
   const p = game.players[game.turn];
   p.timeouts += 1;
@@ -431,74 +428,4 @@ function useHint(i) {
   setFeedback(`Dica do nº ${i + 1}: ${hintFor(game.items[i].name)}. ${game.lives === 1 ? "Resta 1 vida." : `Restam ${game.lives} vidas.`}`, "info");
   floatText($("versus").querySelector(".lives"), "-1 vida", "bad");
   focusGuess();
-}
-
-// ───────────── aceitar mesmo assim ─────────────
-// Quando o grupo concorda que o palpite estava certo (faltava um apelido na lista).
-
-function openContest() {
-  const w = game && game.lastWrong;
-  if (!w) return;
-  stopTurnTimer();
-  if (game.over) {
-    clearTimeout(game.endTimer);
-    game.endTimer = null;
-  }
-  $("contest-text").textContent = `Qual item da lista é "${w.text}"? Decidam juntos: os itens abaixo ficam visíveis para quem olhar.`;
-  renderContestOptions(rankCandidates(game.items, game.found, w.text, 3));
-  $("contest-all").hidden = false;
-  $("contest-dialog").showModal();
-}
-
-function renderContestOptions(indices) {
-  const wrap = $("contest-options");
-  wrap.innerHTML = "";
-  indices.forEach((i) => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "contest-option";
-    b.innerHTML = `<span class="rank">${i + 1}</span><span>${escapeHtml(game.items[i].name)}</span>`;
-    b.addEventListener("click", () => acceptGuess(i));
-    wrap.appendChild(b);
-  });
-}
-
-function showAllContestOptions() {
-  renderContestOptions(game.items.map((_, i) => i).filter((i) => !game.found.has(i)));
-  $("contest-all").hidden = true;
-}
-
-function acceptGuess(i) {
-  const w = game.lastWrong;
-  if (!w) return;
-  game.lastWrong = null;
-  const p = game.players[w.player];
-  p.misses -= 1;
-  const k = game.wrongLog.map((x) => x.text).lastIndexOf(w.text);
-  if (k >= 0) game.wrongLog.splice(k, 1);
-  game.tried.delete(w.key);
-  if (w.lostLife) game.lives += 1;
-  learnAnswer(game.list.id, i, w.key);
-  game.items[i].exact.push(w.key);
-  game.items[i].stems.push(stem(w.key));
-  const revived = game.over;
-  game.over = false;
-  $("contest-dialog").close();
-  scoreHit(i, w.player, "Aceito!");
-  if (game.found.size === game.items.length) return endGame(`Todos os ${game.items.length} foram encontrados!`);
-  if (revived) nextTurn();
-  else if (!game.busy) {
-    resumeTurnTimer();
-    focusGuess();
-  }
-}
-
-function onContestClosed() {
-  if (!game) return;
-  if (game.over) {
-    if (!game.endTimer) game.endTimer = setTimeout(showResults, 500);
-  } else {
-    resumeTurnTimer();
-    focusGuess();
-  }
 }
