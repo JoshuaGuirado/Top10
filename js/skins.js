@@ -8,7 +8,7 @@ let draft = null;
 function openAvatarDialog(i) {
   dialogPlayer = i;
   draft = { ...DEFAULT_AVATAR, ...JSON.parse(JSON.stringify(players[i].avatar)) };
-  $("avatar-dialog-title").textContent = `Skin de ${playerName(players[i], i)}`;
+  $("avatar-dialog-title").textContent = t("skin.of", { nome: playerName(players[i], i) });
   const current = players[i].presetId && presetById(players[i].presetId);
   dialogTab = current ? current.group : "builder";
   renderAvatarDialog();
@@ -22,7 +22,7 @@ function renderAvatarDialog() {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "tab" + (g === "builder" ? " tab-builder" : "") + (g === dialogTab ? " active" : "");
-    b.textContent = g === "builder" ? "Personalizar" : g;
+    b.textContent = g === "builder" ? t("skin.custom") : t("group." + g);
     b.addEventListener("click", () => { dialogTab = g; renderAvatarDialog(); });
     tabs.appendChild(b);
   });
@@ -41,7 +41,7 @@ function renderAvatarDialog() {
     const card = document.createElement("div");
     card.className = "preset" + (players[dialogPlayer].presetId === preset.id ? " active" : "");
     const inUse = taken.includes(preset.id);
-    card.innerHTML = `<button type="button" class="preset-pick">${renderAvatar(preset.cfg)}<span>${escapeHtml(preset.name)}</span></button>${inUse ? '<em class="in-use">em uso</em>' : ""}<button type="button" class="preset-edit">Personalizar</button>`;
+    card.innerHTML = `<button type="button" class="preset-pick">${renderAvatar(preset.cfg)}<span>${escapeHtml(presetName(preset))}</span></button>${inUse ? `<em class="in-use">${t("skin.inUse")}</em>` : ""}<button type="button" class="preset-edit">${t("skin.custom")}</button>`;
     card.querySelector(".preset-pick").addEventListener("click", () => {
       players[dialogPlayer].presetId = preset.id;
       players[dialogPlayer].avatar = { ...preset.cfg };
@@ -86,9 +86,9 @@ function cycleRow(label, options, key) {
   row.className = "ctrl";
   const value = Array.isArray(draft[key]) ? draft[key][0] : draft[key];
   let idx = options.findIndex(([v]) => v === value);
-  const current = idx >= 0 ? options[idx][1] : "Especial";
+  const current = idx >= 0 ? partName(key, options[idx][0], options[idx][1]) : t("skin.special");
   row.innerHTML = `<span class="ctrl-label">${label}</span>
-    <div class="cycler"><button type="button" aria-label="Anterior">‹</button><span>${current}</span><button type="button" aria-label="Próximo">›</button></div>`;
+    <div class="cycler"><button type="button" aria-label="${t("skin.prev")}">‹</button><span>${current}</span><button type="button" aria-label="${t("skin.next")}">›</button></div>`;
   const [prev, next] = row.querySelectorAll("button");
   const step = (d) => {
     idx = idx < 0 ? 0 : (idx + d + options.length) % options.length;
@@ -114,39 +114,39 @@ function textRow(label, key, maxlength, filter = (v) => v) {
 
 const BUILDER_SECTIONS = {
   Rosto: () => [
-    swatchRow("Pele", SKIN_TONES, "skin"),
-    cycleRow("Olhos", PARTS.eyes, "eyes"),
-    cycleRow("Boca", PARTS.mouth, "mouth"),
-    cycleRow("Barba", PARTS.beard, "beard"),
-    swatchRow("Cor da barba", HAIR_COLORS, "beardColor", "Igual ao cabelo"),
-    cycleRow("Detalhe", PARTS.extra, "extra"),
+    swatchRow(t("ctrl.skin"), SKIN_TONES, "skin"),
+    cycleRow(t("ctrl.eyes"), PARTS.eyes, "eyes"),
+    cycleRow(t("ctrl.mouth"), PARTS.mouth, "mouth"),
+    cycleRow(t("ctrl.beard"), PARTS.beard, "beard"),
+    swatchRow(t("ctrl.beardColor"), HAIR_COLORS, "beardColor", t("ctrl.sameHair")),
+    cycleRow(t("ctrl.extra"), PARTS.extra, "extra"),
   ],
   Cabelo: () => [
-    cycleRow("Corte", PARTS.hair, "hair"),
-    swatchRow("Cor", HAIR_COLORS, "hairColor"),
+    cycleRow(t("ctrl.hair"), PARTS.hair, "hair"),
+    swatchRow(t("ctrl.color"), HAIR_COLORS, "hairColor"),
   ],
   "Cabeça": () => [
-    cycleRow("Acessório", PARTS.head, "head"),
-    swatchRow("Cor principal", COLORS, "headColor"),
-    swatchRow("Segunda cor", COLORS, "headColor2"),
-    ...(draft.head === "cap" ? [textRow("Letra do boné", "headText", 1, (v) => v.toUpperCase())] : []),
+    cycleRow(t("ctrl.head"), PARTS.head, "head"),
+    swatchRow(t("ctrl.headColor"), COLORS, "headColor"),
+    swatchRow(t("ctrl.headColor2"), COLORS, "headColor2"),
+    ...(draft.head === "cap" ? [textRow(t("ctrl.capLetter"), "headText", 1, (v) => v.toUpperCase())] : []),
   ],
   Roupa: () => {
     const pat = Array.isArray(draft.pattern) ? draft.pattern : [draft.pattern];
     return [
-      swatchRow("Camisa", COLORS, "top"),
-      cycleRow("Estampa", PARTS.pattern, "pattern"),
-      swatchRow("Cor da estampa", COLORS, "top2"),
-      ...(pat.includes("number") ? [textRow("Número", "text", 2, (v) => v.replace(/\D/g, ""))] : []),
-      swatchRow("Mangas", COLORS, "sleeve", "Igual à camisa"),
-      swatchRow("Cinto", COLORS, "belt", "Sem cinto"),
-      swatchRow("Calça", COLORS, "legs"),
-      swatchRow("Capa", COLORS, "cape", "Sem capa"),
+      swatchRow(t("ctrl.shirt"), COLORS, "top"),
+      cycleRow(t("ctrl.pattern"), PARTS.pattern, "pattern"),
+      swatchRow(t("ctrl.patternColor"), COLORS, "top2"),
+      ...(pat.includes("number") ? [textRow(t("ctrl.number"), "text", 2, (v) => v.replace(/\D/g, ""))] : []),
+      swatchRow(t("ctrl.sleeves"), COLORS, "sleeve", t("ctrl.sameShirt")),
+      swatchRow(t("ctrl.belt"), COLORS, "belt", t("ctrl.noBelt")),
+      swatchRow(t("ctrl.legs"), COLORS, "legs"),
+      swatchRow(t("ctrl.cape"), COLORS, "cape", t("ctrl.noCape")),
     ];
   },
   Extras: () => [
-    cycleRow("Na mão", PARTS.item, "item"),
-    swatchRow("Fundo", [...COLORS, ...SKIN_TONES.slice(1, 4)], "bg", "Sem fundo"),
+    cycleRow(t("ctrl.item"), PARTS.item, "item"),
+    swatchRow(t("ctrl.bg"), [...COLORS, ...SKIN_TONES.slice(1, 4)], "bg", t("ctrl.noBg")),
   ],
 };
 
@@ -158,7 +158,7 @@ function renderBuilder() {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "chip" + (name === builderSection ? " active" : "");
-    b.textContent = name;
+    b.textContent = t("builder." + name);
     b.addEventListener("click", () => { builderSection = name; renderBuilder(); });
     nav.appendChild(b);
   });

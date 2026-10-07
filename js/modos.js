@@ -6,12 +6,13 @@ const TEAM_LIVES = { 10: 3, 30: 6, 50: 10 };
 const TEAM_ICON = '<svg class="mode-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2.5 20c.5-3.4 2.7-5.5 5.5-5.5s5 2.1 5.5 5.5M13.2 15.3c.8-.5 1.8-.8 2.8-.8 2.8 0 5 2.1 5.5 5.5"/></svg>';
 const TIMES_ICON = '<svg class="mode-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="7" r="2.5"/><circle cx="18" cy="7" r="2.5"/><path d="M1.5 17c.4-2.8 2.1-4.5 4.5-4.5s4.1 1.7 4.5 4.5M13.5 17c.4-2.8 2.1-4.5 4.5-4.5s4.1 1.7 4.5 4.5M12 4v16"/></svg>';
 
+// Nomes e descrições vêm do idioma atual (getters).
 const MODES = {
-  top10: { size: 10, name: "Top 10", badge: "10", desc: "Listas de 10 itens. O nº 10 vale 10 pontos. Rápido e clássico.", who: "Solo, 1v1 ou todos contra todos" },
-  top30: { size: 30, name: "Top 30", badge: "30", desc: "Listas de 30 itens. Pede quem conhece o assunto a fundo.", who: "Solo, 1v1 ou todos contra todos" },
-  top50: { size: 50, name: "Top 50", badge: "50", desc: "Listas de 50 itens. Partida longa, e o nº 50 vale 50 pontos.", who: "Solo, 1v1 ou todos contra todos" },
-  equipe: { team: true, name: "Equipe contra a lista", badge: TEAM_ICON, desc: "Todos jogam juntos. O que a equipe não achar vira ponto da lista. Cada erro custa uma vida, e dá para trocar uma vida por uma dica.", who: "1 a 8 jogadores · 3, 6 ou 10 vidas" },
-  times: { teams: true, min: 2, name: "Times", badge: TIMES_ICON, desc: "Time Vermelho contra Time Preto na mesma lista. A vez alterna entre os times, e cada ponto vai para o time de quem acertou.", who: "2 a 8 jogadores · 1v1, 2v2, 3v3 ou 4v4" },
+  top10: { size: 10, badge: "10", name: "Top 10", get desc() { return t("mode.top10.desc"); }, get who() { return t("mode.duel.who"); } },
+  top30: { size: 30, badge: "30", name: "Top 30", get desc() { return t("mode.top30.desc"); }, get who() { return t("mode.duel.who"); } },
+  top50: { size: 50, badge: "50", name: "Top 50", get desc() { return t("mode.top50.desc"); }, get who() { return t("mode.duel.who"); } },
+  equipe: { team: true, badge: TEAM_ICON, get name() { return t("mode.equipe.name"); }, get desc() { return t("mode.equipe.desc"); }, get who() { return t("mode.equipe.who"); } },
+  times: { teams: true, min: 2, badge: TIMES_ICON, get name() { return t("mode.times.name"); }, get desc() { return t("mode.times.desc"); }, get who() { return t("mode.times.who"); } },
 };
 
 let modeId = MODES[store("mode")] ? store("mode") : "top10";
@@ -43,7 +44,7 @@ function renderModes() {
       <span class="mode-badge">${m.badge}</span>
       <span class="mode-name">${m.name}</span>
       <span class="mode-desc">${m.desc}</span>
-      <span class="mode-meta">${m.who} · ${count} listas</span>`;
+      <span class="mode-meta">${m.who} · ${t("mode.lists", { n: count })}</span>`;
     b.addEventListener("click", () => {
       setMode(id);
       activeCat = "all";
@@ -63,12 +64,12 @@ function openModes() {
 
 function renderModeBars() {
   document.querySelectorAll(".mode-bar").forEach((bar) => {
-    const extra = pickingForRoom === "suggest" ? " · toque numa lista para sugerir" : pickingForRoom ? " · sala online" : "";
+    const extra = pickingForRoom === "suggest" ? ` · ${t("mode.suggestTag")}` : pickingForRoom ? ` · ${t("mode.pickTag")}` : "";
     bar.innerHTML = `<span class="mode-pill">${modeIcon(mode())}${mode().name}${extra}</span>`;
     const b = document.createElement("button");
     b.type = "button";
     b.className = "link-btn";
-    b.textContent = pickingForRoom ? "Voltar à sala" : "Trocar modo";
+    b.textContent = pickingForRoom ? t("mode.backRoom") : t("mode.change");
     b.addEventListener("click", pickingForRoom ? showLobby : openModes);
     bar.appendChild(b);
   });

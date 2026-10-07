@@ -9,7 +9,7 @@ function normalize(text) {
     .replace(/&/g, " e ")
     .replace(/[^a-z0-9]+/g, " ")
     .trim()
-    .replace(/^(o|a|os|as|the|um|uma) (?=\S)/, "");
+    .replace(/^(o|a|os|as|the|um|uma|an|el|la|los|las|un|una) (?=\S)/, "");
 }
 
 // Singular e plural valem o mesmo ("bananas" = "banana").
@@ -117,10 +117,12 @@ function rankCandidates(items, found, raw, limit = 3) {
     .map((c) => c.i);
 }
 
-// Dica de um item: primeira letra e tamanho ("B… · 6 letras").
+// Dica de um item: primeira letra e tamanho ("B… · 6 letras"). Usa o idioma atual quando há
+// textos carregados (no navegador); nos testes, português.
 function hintFor(name) {
   const chars = name.match(/[\p{L}\p{N}]/gu) || [];
   const words = name.trim().split(/\s+/).length;
   const first = (chars[0] || "?").toUpperCase();
-  return `${first}… · ${chars.length} letras${words > 1 ? ` · ${words} palavras` : ""}`;
+  const tr = typeof t === "function" ? t : (key, v) => `${v.n} ${key === "hint.letters" ? "letras" : "palavras"}`;
+  return `${first}… · ${tr("hint.letters", { n: chars.length })}${words > 1 ? ` · ${tr("hint.words", { n: words })}` : ""}`;
 }

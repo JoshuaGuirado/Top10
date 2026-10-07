@@ -23,7 +23,7 @@ const server = http.createServer((req, res) => {
   await new Promise((r) => server.listen(0, r));
   const base = `http://localhost:${server.address().port}/index.html`;
   const browser = await playwright.chromium.launch(fs.existsSync("/opt/pw-browsers/chromium") ? { executablePath: "/opt/pw-browsers/chromium" } : {});
-  const ctx = await browser.newContext({ viewport: { width: 420, height: 900 }, serviceWorkers: "block" });
+  const ctx = await browser.newContext({ viewport: { width: 420, height: 900 }, serviceWorkers: "block", locale: "pt-BR" });
   await ctx.addInitScript(fs.readFileSync(path.join(__dirname, "supabase-falso.js"), "utf8"));
   await ctx.route("**/js/config.js", (r) => r.fulfill({ contentType: "application/javascript", body: 'const SUPABASE_URL = "https://falso.supabase.co"; const SUPABASE_ANON_KEY = "x";' }));
   const errors = [];

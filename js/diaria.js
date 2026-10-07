@@ -68,13 +68,13 @@ function dailyShareText(num, res) {
   const list = dailyList(num);
   const won = res.score > res.total / 2;
   const squares = res.found.map((f) => (f ? "■" : "□")).join("");
-  const lives = `vidas ${Math.max(0, res.lives)}/${res.maxLives}`;
+  const lives = t("daily.livesShare", { a: Math.max(0, res.lives), b: res.maxLives });
   return [
-    `Topzi · Lista do dia #${num}`,
+    `Topzi · ${t("daily.tag", { n: num })}`,
     list ? list.title : "",
     squares,
-    `${res.score} de ${res.total} pts · ${lives}${res.hints ? ` · ${plural(res.hints, "dica", "dicas")}` : ""}`,
-    won ? "Venci a lista!" : "A lista venceu.",
+    `${t("daily.ptsOf", { a: res.score, b: res.total })} · ${lives}${res.hints ? ` · ${t("rs.hints", { n: res.hints })}` : ""}`,
+    won ? t("daily.iWon") : t("rs.lose.all"),
     siteUrl(),
   ].filter(Boolean).join("\n");
 }
@@ -98,11 +98,11 @@ function renderDailyCard() {
   card.hidden = false;
   card.innerHTML = `
     <div class="daily-info">
-      <p class="daily-kicker">Lista do dia #${num} · ${icon(cat.id)}${escapeHtml(cat.label)}</p>
-      <p class="daily-title">${res ? escapeHtml(list.title) : "Você contra a lista: 10 itens, 3 vidas."}</p>
+      <p class="daily-kicker">${t("daily.tag", { n: num })} · ${icon(cat.id)}${escapeHtml(catLabel(cat))}</p>
+      <p class="daily-title">${res ? escapeHtml(list.title) : t("daily.pitch")}</p>
       <p class="daily-status">${res
-        ? `Você fez ${res.score} de ${res.total} pts${res.score > res.total / 2 ? " e venceu a lista" : ""}. Volte amanhã para a #${num + 1}.`
-        : "Todo mundo joga a mesma lista hoje. Compare o resultado com os amigos."}${current ? ` Sequência: ${plural(current, "dia", "dias")}.` : ""}</p>
+        ? t(res.score > res.total / 2 ? "daily.doneWon" : "daily.done", { a: res.score, b: res.total, next: num + 1 })
+        : t("daily.same")}${current ? ` ${t("daily.streak", { n: current })}` : ""}</p>
     </div>
     <div class="daily-actions"></div>`;
   const actions = card.querySelector(".daily-actions");
@@ -115,9 +115,9 @@ function renderDailyCard() {
     actions.appendChild(b);
   };
   if (res) {
-    btn("Compartilhar resultado", "btn", (b) => shareText(dailyShareText(num, res), b, "Compartilhar resultado"));
-    btn("Jogar de novo (não conta)", "link-btn", startDaily);
+    btn(t("results.share"), "btn", (b) => shareText(dailyShareText(num, res), b, t("results.share")));
+    btn(t("daily.again"), "link-btn", startDaily);
   } else {
-    btn("Jogar a lista do dia", "btn", startDaily);
+    btn(t("daily.play"), "btn", startDaily);
   }
 }

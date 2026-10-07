@@ -41,9 +41,17 @@ const sfx = {
   crash: () => beep([1568, 2093, 2637], "square", 0.3, 0.015, 0.05),
 };
 
+const SOUND_ICONS = {
+  on: '<svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18.2 6.5a8 8 0 0 1 0 11"/></svg>',
+  off: '<svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>',
+};
+
 function renderSoundBtn() {
-  $("sound-btn").textContent = soundOn ? "Som: ligado" : "Som: desligado";
-  $("sound-btn").setAttribute("aria-pressed", String(soundOn));
+  const b = $("sound-btn");
+  b.innerHTML = SOUND_ICONS[soundOn ? "on" : "off"];
+  b.title = t(soundOn ? "nav.soundOn" : "nav.soundOff");
+  b.setAttribute("aria-label", b.title);
+  b.setAttribute("aria-pressed", String(soundOn));
 }
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

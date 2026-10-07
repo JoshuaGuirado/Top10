@@ -46,7 +46,7 @@ function filteredLists() {
     if (activeCat !== "all" && l.cat !== activeCat) return false;
     if (!sizeOk(l)) return false;
     if (!q) return true;
-    return normalize(l.title + " " + categoryOf(l).label).includes(q);
+    return normalize(l.title + " " + categoryOf(l).label + " " + catLabel(categoryOf(l))).includes(q);
   });
 }
 
@@ -63,11 +63,11 @@ function renderChips() {
   const lists = allLists().filter(sizeOk);
   const cats = $("category-chips");
   cats.innerHTML = "";
-  const all = [{ id: "all", label: "Todas" }, MY_CAT, ...CATEGORIES];
+  const all = [{ id: "all", label: t("lists.all") }, MY_CAT, ...CATEGORIES];
   all.forEach((cat) => {
     const count = cat.id === "all" ? lists.length : lists.filter((l) => l.cat === cat.id).length;
     if (!count) return;
-    cats.appendChild(chipButton(cat.label, count, activeCat === cat.id, () => {
+    cats.appendChild(chipButton(catLabel(cat), count, activeCat === cat.id, () => {
       activeCat = cat.id;
       renderChips();
       renderListGrid();
@@ -78,7 +78,7 @@ function renderChips() {
   sizes.innerHTML = "";
   sizes.hidden = !!mode().size;
   ["all", ...LIST_SIZES].forEach((size) => {
-    const label = size === "all" ? "Qualquer tamanho" : mode().team ? `Top ${size} · ${TEAM_LIVES[size]} vidas` : `Top ${size}`;
+    const label = size === "all" ? t("lists.anySize") : mode().team && livesOn() ? `Top ${size} · ${t("game.lives", { n: TEAM_LIVES[size] })}` : `Top ${size}`;
     sizes.appendChild(chipButton(label, null, activeSize === size, () => {
       activeSize = size;
       renderChips();
@@ -90,18 +90,18 @@ function renderChips() {
 function recordLine(list) {
   const r = recordsFor(list.id);
   const parts = [];
-  if (r.individual) parts.push(`Recorde: ${r.individual.score} pts (${escapeHtml(r.individual.name)})`);
-  if (r.equipe) parts.push(`Equipe: ${r.equipe.score} pts`);
+  if (r.individual) parts.push(t("lists.record", { n: r.individual.score, nome: escapeHtml(r.individual.name) }));
+  if (r.equipe) parts.push(t("lists.teamRecord", { n: r.equipe.score }));
   return parts.length ? `<span class="list-record">${parts.join(" · ")}</span>` : "";
 }
 
 function renderListGrid() {
   const lists = filteredLists();
-  $("list-count").textContent = lists.length === 1 ? "1 lista" : `${lists.length} listas`;
+  $("list-count").textContent = t("mode.lists", { n: lists.length });
   const grid = $("list-grid");
   grid.innerHTML = "";
   if (!lists.length) {
-    grid.innerHTML = `<p class="muted">Nenhuma lista encontrada${mode().size ? ` no ${mode().name}` : ""}. Tente outra palavra ou crie a sua.</p>`;
+    grid.innerHTML = `<p class="muted">${mode().size ? t("lists.noneIn", { mode: mode().name }) : t("lists.none")}</p>`;
     return;
   }
   lists.forEach((l) => {
@@ -111,17 +111,17 @@ function renderListGrid() {
     card.className = "list-card" + (played ? " played" : "");
     card.innerHTML = `
       <button type="button" class="list-play">
-        <span class="list-cat">${icon(cat.id)}${escapeHtml(cat.label)} · ${l.items.length} itens</span>
+        <span class="list-cat">${icon(cat.id)}${escapeHtml(catLabel(cat))} · ${t("game.items", { n: l.items.length })}</span>
         <span class="list-title">${escapeHtml(l.title)}</span>
         ${recordLine(l)}
-        ${played ? '<span class="list-played">jogada recentemente</span>' : ""}
+        ${played ? `<span class="list-played">${t("lists.recent")}</span>` : ""}
       </button>
-      ${l.custom ? `<div class="list-tools"><button type="button" data-act="edit">Editar</button><button type="button" data-act="share">Compartilhar</button><button type="button" data-act="delete">Apagar</button></div>` : ""}`;
+      ${l.custom ? `<div class="list-tools"><button type="button" data-act="edit">${t("lists.edit")}</button><button type="button" data-act="share">${t("lists.share")}</button><button type="button" data-act="delete">${t("lists.delete")}</button></div>` : ""}`;
     card.querySelector(".list-play").addEventListener("click", () => chooseList(l));
     card.querySelectorAll(".list-tools button").forEach((b) => b.addEventListener("click", () => {
       if (b.dataset.act === "edit") openEditor(l);
       if (b.dataset.act === "share") shareList(l, b);
-      if (b.dataset.act === "delete" && confirm(`Apagar a lista "${l.title}"?`)) {
+      if (b.dataset.act === "delete" && confirm(t("lists.deleteConfirm", { title: l.title }))) {
         customLists = customLists.filter((x) => x.id !== l.id);
         saveCustomLists();
         if (!customLists.length && activeCat === MY_CAT.id) activeCat = "all";
@@ -162,12 +162,16 @@ let editorSize = 10;
 function openEditor(list = null) {
   editing = list;
   editorSize = list ? list.items.length : mode().size || (activeSize !== "all" ? activeSize : 10);
-  $("editor-title").textContent = list ? "Editar lista" : "Criar lista";
+  retitleEditor();
   $("editor-name").value = list ? list.title : "";
   $("editor-error").textContent = "";
   renderEditorRows(list ? list.items : []);
   show("editor");
   $("editor-name").focus();
+}
+
+function retitleEditor() {
+  $("editor-title").textContent = editing ? t("editor.edit") : t("btn.createList");
 }
 
 function readEditorRows() {
@@ -185,7 +189,7 @@ function renderEditorRows(items) {
   const sizes = $("editor-sizes");
   sizes.innerHTML = "";
   LIST_SIZES.forEach((n) => {
-    sizes.appendChild(chipButton(`${n} itens`, null, n === editorSize, () => {
+    sizes.appendChild(chipButton(t("game.items", { n }), null, n === editorSize, () => {
       const kept = readEditorRows();
       editorSize = n;
       renderEditorRows(kept.map((r) => [r.name, ...r.alts.split(",").map((a) => a.trim()).filter(Boolean)].join("|")));
@@ -200,8 +204,8 @@ function renderEditorRows(items) {
     row.innerHTML = `
       <span class="rank">${i + 1}</span>
       <div class="editor-fields">
-        <input type="text" class="editor-item" maxlength="80" placeholder="${i === 0 ? "O mais óbvio (vale 1 ponto)" : i === editorSize - 1 ? `O menos óbvio (vale ${editorSize} pontos)` : `Item nº ${i + 1}`}" value="${escapeHtml(v.name)}">
-        <input type="text" class="editor-alts" maxlength="160" placeholder="Outras respostas aceitas, separadas por vírgula (opcional)" value="${escapeHtml(v.alts)}">
+        <input type="text" class="editor-item" maxlength="80" placeholder="${i === 0 ? t("editor.first") : i === editorSize - 1 ? t("editor.last", { n: editorSize }) : t("editor.item", { n: i + 1 })}" value="${escapeHtml(v.name)}">
+        <input type="text" class="editor-alts" maxlength="160" placeholder="${t("editor.alts")}" value="${escapeHtml(v.alts)}">
       </div>`;
     wrap.appendChild(row);
   }
@@ -211,17 +215,17 @@ function saveEditor() {
   const title = $("editor-name").value.trim();
   const rows = readEditorRows();
   const err = (msg) => { $("editor-error").textContent = msg; };
-  if (!title) return err("Dê um nome para a lista.");
+  if (!title) return err(t("editor.errName"));
   const empty = rows.findIndex((r) => !r.name);
-  if (empty >= 0) return err(`Preencha o item nº ${empty + 1}.`);
+  if (empty >= 0) return err(t("editor.errEmpty", { n: empty + 1 }));
   const seen = new Map();
   for (let i = 0; i < rows.length; i++) {
     const key = normalize(rows[i].name);
-    if (seen.has(key)) return err(`Os itens nº ${seen.get(key) + 1} e nº ${i + 1} são iguais.`);
+    if (seen.has(key)) return err(t("editor.errDup", { a: seen.get(key) + 1, b: i + 1 }));
     seen.set(key, i);
   }
   const items = rows.map((r) => [r.name, ...r.alts.split(",").map((a) => a.trim()).filter(Boolean)].join("|"));
-  const list = { id: editing ? editing.id : "minha-" + Date.now(), cat: MY_CAT.id, title, source: "Lista criada por você", items, custom: true };
+  const list = { id: editing ? editing.id : "minha-" + Date.now(), cat: MY_CAT.id, title, source: t("editor.byYou"), items, custom: true };
   customLists = editing ? customLists.map((l) => (l.id === list.id ? list : l)) : [list, ...customLists];
   saveCustomLists();
   fitModeToSize(items.length);
@@ -254,7 +258,7 @@ function siteUrl() {
 }
 
 function shareList(list, btn) {
-  shareText(siteUrl() + "#lista=" + encodeList(list), btn, "Compartilhar");
+  shareText(siteUrl() + "#lista=" + encodeList(list), btn, t("lists.share"));
 }
 
 function importFromHash() {
@@ -263,11 +267,11 @@ function importFromHash() {
   history.replaceState(null, "", location.pathname + location.search);
   const data = decodeList(m[1]);
   if (!data) {
-    alert("Esse link de lista não é válido.");
+    alert(t("lists.badLink"));
     return false;
   }
-  if (!confirm(`Adicionar a lista "${data.title}" (${data.items.length} itens) às suas listas?`)) return false;
-  customLists = [{ id: "minha-" + Date.now(), cat: MY_CAT.id, title: data.title, source: "Lista compartilhada", items: data.items, custom: true }, ...customLists];
+  if (!confirm(t("lists.importConfirm", { title: data.title, n: data.items.length }))) return false;
+  customLists = [{ id: "minha-" + Date.now(), cat: MY_CAT.id, title: data.title, source: t("lists.shared"), items: data.items, custom: true }, ...customLists];
   saveCustomLists();
   fitModeToSize(data.items.length);
   activeCat = MY_CAT.id;

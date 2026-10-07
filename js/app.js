@@ -3,9 +3,9 @@
 
 function goHome() {
   if (game && game.online && !game.over) {
-    if (!confirm("Sair da partida online? Você sai da sala.")) return;
+    if (!confirm(t("confirm.leaveOnline"))) return;
     leaveRoom();
-  } else if (game && !game.over && !confirm("Sair da partida atual?")) return;
+  } else if (game && !game.over && !confirm(t("confirm.leaveGame"))) return;
   stopTurnTimer();
   game = null;
   renderDailyCard();
@@ -27,7 +27,7 @@ $("profile-nick").addEventListener("input", (e) => {
   ensurePlayers();
   players[0].nick = e.target.value;
   savePlayers();
-  $("profile-name").textContent = e.target.value.trim() || "Sem nickname";
+  $("profile-name").textContent = e.target.value.trim() || t("profile.noNick");
 });
 $("stats-reset").addEventListener("click", resetStats);
 $("stats-back").addEventListener("click", goHome);
@@ -83,7 +83,7 @@ $("board").addEventListener("keydown", (e) => {
   }
 });
 $("end-btn").addEventListener("click", () => {
-  if (confirm("Encerrar a partida e ver o resultado?")) endGame("Partida encerrada.");
+  if (confirm(t("confirm.end"))) endGame([["fb.ended"]]);
 });
 
 $("rematch-btn").addEventListener("click", () => {
@@ -92,7 +92,7 @@ $("rematch-btn").addEventListener("click", () => {
   else openLists();
 });
 $("share-btn").addEventListener("click", (e) => {
-  if (game && game.daily) shareText(dailyShareText(game.daily, dailyResultOf(game)), e.currentTarget, "Compartilhar resultado");
+  if (game && game.daily) shareText(dailyShareText(game.daily, dailyResultOf(game)), e.currentTarget, t("results.share"));
 });
 $("new-players-btn").addEventListener("click", () => {
   renderPlayersScreen();
@@ -122,7 +122,7 @@ $("join-form").addEventListener("submit", (e) => {
 });
 $("lobby-start").addEventListener("click", startOnlineGame);
 $("lobby-leave").addEventListener("click", () => {
-  if (confirm(isHost() ? "Fechar a sala para todo mundo?" : "Sair da sala?")) leaveRoom();
+  if (confirm(t(isHost() ? "confirm.closeRoom" : "confirm.leaveRoom"))) leaveRoom();
 });
 $("room-share").addEventListener("click", (e) => shareRoom(e.currentTarget));
 document.querySelectorAll(".account-btn").forEach((b) => b.addEventListener("click", openAccount));
@@ -133,8 +133,16 @@ $("account-logout").addEventListener("click", accountLogout);
 function currentTheme() {
   return document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
 }
+const THEME_ICONS = {
+  sun: '<svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>',
+  moon: '<svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>',
+};
 function renderThemeBtn() {
-  $("theme-btn").textContent = currentTheme() === "dark" ? "Modo claro" : "Modo escuro";
+  const dark = currentTheme() === "dark";
+  const b = $("theme-btn");
+  b.innerHTML = THEME_ICONS[dark ? "sun" : "moon"];
+  b.title = t(dark ? "nav.themeLight" : "nav.themeDark");
+  b.setAttribute("aria-label", b.title);
 }
 $("theme-btn").addEventListener("click", () => {
   const next = currentTheme() === "dark" ? "light" : "dark";
@@ -148,11 +156,50 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 }
 
+// Idioma: o seletor do topo troca tudo na hora, inclusive a tela aberta.
+function renderHeroLead() {
+  $("hero-lead").textContent = t("hero.lead", { total: allLists().length });
+}
+$("lang-select").value = lang;
+$("lang-select").addEventListener("change", (e) => setLang(e.target.value));
+function onLangChange() {
+  $("lang-select").value = lang;
+  renderSoundBtn();
+  renderThemeBtn();
+  renderHeroLead();
+  renderDailyCard();
+  renderAccount();
+  const screen = document.body.dataset.screen;
+  if (screen === "modes") renderModes();
+  if (screen === "players") renderPlayersScreen();
+  if (screen === "lists") openLists();
+  if (screen === "editor") {
+    retitleEditor();
+    renderEditorRows([]);
+  }
+  if (screen === "profile") openProfile();
+  if (screen === "online") renderOnline();
+  if (screen === "lobby") renderLobby();
+  if (game && (screen === "game" || screen === "results")) {
+    setupGameScreen();
+    if (screen === "results") renderResults(game.resultsNote || "");
+    else {
+      renderGame();
+      if (game.feedback) paintFeedback(game.feedback.msg, game.feedback.kind);
+    }
+  }
+  if ($("avatar-dialog").open) {
+    $("avatar-dialog-title").textContent = t("skin.of", { nome: playerName(players[dialogPlayer], dialogPlayer) });
+    renderAvatarDialog();
+  }
+}
+
+applyStaticTexts();
 renderSoundBtn();
 renderThemeBtn();
 ensurePlayers();
 renderDailyCard();
 renderProfileButton();
-$("list-total").textContent = allLists().length;
+renderHeroLead();
 if (!importFromHash()) show("home");
 initOnline();

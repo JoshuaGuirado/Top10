@@ -1,6 +1,9 @@
 // Perfil: skin, nickname, conta, estatísticas e recordes (salvos no navegador e, com conta, na conta).
 
-const MODE_LABELS = { top10: "Top 10", top30: "Top 30", top50: "Top 50", equipe: "Equipe contra a lista", times: "Times", diaria: "Lista do dia", online: "Online" };
+function modeStatLabel(k) {
+  if (MODES[k]) return MODES[k].name;
+  return k === "diaria" ? t("daily.title") : k === "online" ? "Online" : k;
+}
 
 // Online, cada aparelho guarda só os números do próprio jogador.
 function countedPlayers(g) {
@@ -98,32 +101,32 @@ function renderStats() {
   const daily = dailyStreaks();
   const rate = s.hits + s.misses ? Math.round((s.hits / (s.hits + s.misses)) * 100) + "%" : "—";
   $("stats-tiles").innerHTML = [
-    statTile(s.games, "partidas"),
-    statTile(s.points, "pontos somados"),
-    statTile(s.hits, "acertos"),
-    statTile(rate, "dos chutes certos"),
-    statTile(s.vsGames ? `${s.vsWins}/${s.vsGames}` : "—", "vitórias contra a lista"),
-    statTile(s.perfect, s.perfect === 1 ? "lista gabaritada" : "listas gabaritadas"),
-    statTile(daily.current, "dias seguidos na lista do dia"),
-    statTile(daily.best, "maior sequência"),
+    statTile(s.games, t("st.games")),
+    statTile(s.points, t("st.points")),
+    statTile(s.hits, t("st.hits")),
+    statTile(rate, t("st.rate")),
+    statTile(s.vsGames ? `${s.vsWins}/${s.vsGames}` : "—", t("st.vsWins")),
+    statTile(s.perfect, t("st.perfect", { n: s.perfect })),
+    statTile(daily.current, t("st.dailyStreak")),
+    statTile(daily.best, t("st.bestStreak")),
   ].join("");
 
   $("stats-best").innerHTML = s.best
-    ? `Maior acerto: <b>nº ${s.best.pos}</b>, ${escapeHtml(s.best.item)} (${escapeHtml(s.best.list)}), por ${escapeHtml(s.best.name)}.`
-    : "Jogue uma partida para começar suas estatísticas.";
+    ? t("st.best", { n: `<b>${t("st.no", { n: s.best.pos })}</b>`, item: escapeHtml(s.best.item), list: escapeHtml(s.best.list), nome: escapeHtml(s.best.name) })
+    : t("st.empty");
 
   const modes = Object.entries(s.byMode).sort((a, b) => b[1] - a[1]);
   $("stats-modes").innerHTML = modes.length
-    ? modes.map(([k, v]) => `<span class="chip static">${MODE_LABELS[k] || k} <small>${v}</small></span>`).join("")
-    : '<p class="muted small">Nenhuma partida ainda.</p>';
+    ? modes.map(([k, v]) => `<span class="chip static">${escapeHtml(modeStatLabel(k))} <small>${v}</small></span>`).join("")
+    : `<p class="muted small">${t("st.noGames")}</p>`;
 
   const lists = new Map(allLists().map((l) => [l.id, l]));
   const rows = [];
   Object.entries(allRecords()).forEach(([id, r]) => {
     const list = lists.get(id);
     if (!list) return;
-    if (r.individual) rows.push({ list, kind: "Individual", ...r.individual });
-    if (r.equipe) rows.push({ list, kind: "Equipe", ...r.equipe });
+    if (r.individual) rows.push({ list, kind: t("st.individual"), ...r.individual });
+    if (r.equipe) rows.push({ list, kind: t("game.team"), ...r.equipe });
   });
   rows.sort((a, b) => b.score / b.total - a.score / a.total || b.score - a.score);
   $("stats-records").innerHTML = rows.length
@@ -132,7 +135,7 @@ function renderStats() {
         <span class="record-pts">${r.score}<small>/${r.total}</small></span>
         <div><b>${escapeHtml(r.list.title)}</b><p class="muted small">${r.kind} · ${escapeHtml(r.name)}</p></div>
       </div>`).join("")
-    : '<p class="muted small">Ainda não há recordes.</p>';
+    : `<p class="muted small">${t("st.noRecords")}</p>`;
 }
 
 // Cabeçalho do perfil e botão do topo: o perfil é o jogador 1.
@@ -140,10 +143,10 @@ function renderProfileHead() {
   ensurePlayers();
   const p = players[0];
   const preset = p.presetId && presetById(p.presetId);
-  $("profile-avatar").innerHTML = renderAvatar(p.avatar) + '<span class="avatar-edit">Trocar skin</span>';
-  $("profile-name").textContent = p.nick.trim() || "Sem nickname";
+  $("profile-avatar").innerHTML = renderAvatar(p.avatar) + `<span class="avatar-edit">${t("skin.change")}</span>`;
+  $("profile-name").textContent = p.nick.trim() || t("profile.noNick");
   if (document.activeElement !== $("profile-nick")) $("profile-nick").value = p.nick;
-  $("profile-skin").textContent = preset ? `Skin: ${preset.name}` : "Skin personalizada";
+  $("profile-skin").textContent = preset ? t("skin.label", { nome: presetName(preset) }) : t("players.skinCustom");
   renderProfileButton();
 }
 
@@ -161,7 +164,7 @@ function openProfile() {
 }
 
 function resetStats() {
-  if (!confirm("Apagar estatísticas e recordes deste navegador?")) return;
+  if (!confirm(t("profile.resetConfirm"))) return;
   store("stats", null);
   store("recordes", null);
   renderStats();

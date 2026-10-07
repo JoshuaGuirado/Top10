@@ -29,15 +29,15 @@ function plural(n, one, many) {
 function shareText(text, btn, label) {
   const done = () => {
     if (!btn) return;
-    btn.textContent = "Copiado!";
+    btn.textContent = t("copied");
     setTimeout(() => (btn.textContent = label), 1800);
   };
   if (navigator.share && matchMedia("(hover: none)").matches) {
     navigator.share({ text }).catch(() => {});
     return;
   }
-  if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, () => prompt("Copie:", text));
-  else prompt("Copie:", text);
+  if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, () => prompt(t("copyPrompt"), text));
+  else prompt(t("copyPrompt"), text);
 }
 
 // ───────────── navegação ─────────────

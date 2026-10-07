@@ -1,7 +1,9 @@
 // Jogadores: quantidade, nickname, skin, time (no modo Times) e tempo por vez.
 
 const MAX_PLAYERS = 8;
-const TEAM_NAMES = ["Time Vermelho", "Time Preto"];
+function teamName(i) {
+  return t("team." + i);
+}
 const TIMER_OPTIONS = [0, 15, 30, 60];
 
 let playerCount = store("count") || 2;
@@ -19,9 +21,8 @@ function setLivesOn(on, id = modeId) {
 }
 
 function livesText(teamMode) {
-  const counts = Object.entries(TEAM_LIVES).map(([size, v]) => `${v} no Top ${size}`).join(", ");
-  return teamMode ? `A equipe divide as vidas (${counts}). Cada erro custa uma, e dá para trocar uma vida por uma dica.`
-    : `Cada jogador tem as próprias vidas (${counts}). Quem zera fica de fora e os outros continuam.`;
+  const counts = t("opt.livesCounts", { a: TEAM_LIVES[10], b: TEAM_LIVES[30], c: TEAM_LIVES[50] });
+  return t(teamMode ? "opt.livesTeam" : "opt.livesOwn", { counts });
 }
 
 function ensurePlayers() {
@@ -35,7 +36,7 @@ function ensurePlayers() {
 }
 
 function playerName(p, i) {
-  return p.nick.trim() || `Jogador ${i + 1}`;
+  return p.nick.trim() || t("players.player", { n: i + 1 });
 }
 
 function savePlayers() {
@@ -50,17 +51,15 @@ function teamSizes() {
 }
 
 function modeLabel(n) {
-  if (mode().team) {
-    return n === 1 ? "Só você contra a lista." : `Equipe de ${n}: todos juntos contra a lista, revezando a vez.`;
-  }
+  if (mode().team) return n === 1 ? t("label.teamSolo") : t("label.team", { n });
   if (mode().teams) {
     const [a, b] = teamSizes();
-    if (!a || !b) return "Cada time precisa de pelo menos um jogador. Toque no time de alguém para trocar.";
-    return `${TEAM_NAMES[0]}: ${plural(a, "jogador", "jogadores")} · ${TEAM_NAMES[1]}: ${plural(b, "jogador", "jogadores")}. Toque no time de alguém para trocar.`;
+    if (!a || !b) return t("label.teamsEmpty");
+    return `${teamName(0)}: ${t("players.n", { n: a })} · ${teamName(1)}: ${t("players.n", { n: b })}. ${t("label.teamsTap")}`;
   }
-  if (n === 1) return "Modo solo: tente fazer o máximo de pontos.";
-  if (n === 2) return "Modo 1v1: um contra o outro.";
-  return `Todos contra todos: ${n} jogadores.`;
+  if (n === 1) return t("label.solo");
+  if (n === 2) return t("label.1v1");
+  return t("label.ffa", { n });
 }
 
 function renderCountPicker() {
@@ -73,7 +72,7 @@ function renderCountPicker() {
     b.type = "button";
     b.className = "count" + (n === playerCount ? " active" : "");
     b.disabled = n < min;
-    const sub = mode().teams ? (n % 2 ? `${Math.ceil(n / 2)}v${Math.floor(n / 2)}` : `${n / 2}v${n / 2}`) : n === 1 ? "Solo" : n === 2 && !mode().team ? "1v1" : n + " jog.";
+    const sub = mode().teams ? (n % 2 ? `${Math.ceil(n / 2)}v${Math.floor(n / 2)}` : `${n / 2}v${n / 2}`) : n === 1 ? "Solo" : n === 2 && !mode().team ? "1v1" : t("players.count", { n });
     b.innerHTML = `<b>${n}</b><span>${n < min ? "—" : sub}</span>`;
     b.addEventListener("click", () => {
       playerCount = n;
@@ -92,21 +91,19 @@ function renderTimerChips() {
   const wrap = $("timer-chips");
   wrap.innerHTML = "";
   TIMER_OPTIONS.forEach((s) => {
-    wrap.appendChild(chipButton(s ? `${s} segundos` : "Sem limite", null, s === turnTime, () => {
+    wrap.appendChild(chipButton(s ? t("opt.seconds", { n: s }) : t("opt.noLimit"), null, s === turnTime, () => {
       turnTime = s;
       store("timer", s);
       renderTimerChips();
     }));
   });
-  $("timer-help").textContent = turnTime
-    ? `Modo relâmpago: quem não chutar em ${turnTime} segundos perde a vez${livesOn() ? " e uma vida" : ""}.`
-    : "Cada um pensa o tempo que quiser.";
+  $("timer-help").textContent = turnTime ? t(livesOn() ? "opt.timerHelpLives" : "opt.timerHelp", { n: turnTime }) : t("opt.timerOff");
 }
 
 function renderLivesChips() {
   const wrap = $("lives-chips");
   wrap.innerHTML = "";
-  [[false, "Sem vidas"], [true, "Com vidas"]].forEach(([on, label]) => {
+  [[false, t("opt.noLives")], [true, t("opt.withLives")]].forEach(([on, label]) => {
     wrap.appendChild(chipButton(label, null, on === livesOn(), () => {
       setLivesOn(on);
       renderLivesChips();
@@ -116,13 +113,13 @@ function renderLivesChips() {
   });
   $("lives-help").textContent = livesOn()
     ? livesText(!!mode().team)
-    : mode().team ? "Sem vidas: a equipe joga até todo mundo passar a vez ou alguém encerrar. Sem dicas." : "Sem vidas: errou, passa a vez e segue o jogo.";
+    : t(mode().team ? "opt.noLivesTeam" : "opt.noLivesDuel");
 }
 
 function renderPlayersScreen() {
   ensurePlayers();
   renderModeBars();
-  $("players-title").textContent = mode().team ? "Quem joga na equipe?" : mode().teams ? "Monte os times" : "Quantos jogadores?";
+  $("players-title").textContent = t(mode().team ? "players.team" : mode().teams ? "players.teams" : "players.howMany");
   renderCountPicker();
   renderTimerChips();
   renderLivesChips();
@@ -133,13 +130,13 @@ function renderPlayersScreen() {
     card.className = "player-card" + (mode().teams ? ` t${p.team}` : "");
     const preset = p.presetId && presetById(p.presetId);
     card.innerHTML = `
-      <button type="button" class="avatar-btn" aria-label="Trocar skin do jogador ${i + 1}">${renderAvatar(p.avatar)}<span class="avatar-edit">Trocar skin</span></button>
+      <button type="button" class="avatar-btn" aria-label="${t("players.skinOf", { n: i + 1 })}">${renderAvatar(p.avatar)}<span class="avatar-edit">${t("skin.change")}</span></button>
       <label class="nick">
-        <span>Jogador ${i + 1}</span>
-        <input type="text" maxlength="16" placeholder="Seu nickname" value="${escapeHtml(p.nick)}">
+        <span>${t("players.player", { n: i + 1 })}</span>
+        <input type="text" maxlength="16" placeholder="${t("players.nickPh")}" value="${escapeHtml(p.nick)}">
       </label>
-      ${mode().teams ? `<button type="button" class="team-toggle t${p.team}">${TEAM_NAMES[p.team]}</button>` : ""}
-      <p class="skin-name">${preset ? escapeHtml(preset.name) : "Skin personalizada"}</p>`;
+      ${mode().teams ? `<button type="button" class="team-toggle t${p.team}">${teamName(p.team)}</button>` : ""}
+      <p class="skin-name">${preset ? escapeHtml(presetName(preset)) : t("players.skinCustom")}</p>`;
     card.querySelector(".avatar-btn").addEventListener("click", () => openAvatarDialog(i));
     card.querySelector("input").addEventListener("input", (e) => {
       p.nick = e.target.value;

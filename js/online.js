@@ -6,7 +6,7 @@
 // ou recarrega a página volta para a partida.
 
 const ROOM_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-const PROFILE_SYNC_KEYS = ["stats", "recordes", "diaria", "custom", "aprendidas", "players"];
+const PROFILE_SYNC_KEYS = ["stats", "recordes", "diaria", "custom", "aprendidas", "players", "lang", "vidas"];
 const SUPABASE_CDN = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
 
 let sb = null;
@@ -38,7 +38,7 @@ function loadSupabase() {
     const s = document.createElement("script");
     s.src = SUPABASE_CDN;
     s.onload = ok;
-    s.onerror = () => fail(new Error("Não deu para conectar. Confira a internet."));
+    s.onerror = () => fail(new Error(t("on.errNet")));
     document.head.appendChild(s);
   });
 }
@@ -54,7 +54,7 @@ function setMe(session) {
 let onlineReady = null;
 
 function ensureOnline() {
-  if (!onlineConfigured()) return Promise.reject(new Error("O modo online ainda não foi configurado (veja supabase/LEIAME.md)."));
+  if (!onlineConfigured()) return Promise.reject(new Error(t("on.errSetup")));
   if (!onlineReady) onlineReady = connectOnline().catch((err) => { onlineReady = null; throw err; });
   return onlineReady;
 }
@@ -81,7 +81,7 @@ async function connectOnline() {
   let session = data.session;
   if (!session) {
     const res = await sb.auth.signInAnonymously();
-    if (res.error) throw new Error("Não deu para entrar. Ative o login anônimo no Supabase (veja supabase/LEIAME.md).");
+    if (res.error) throw new Error(t("on.errAnon"));
     session = res.data.session;
   }
   setMe(session);
@@ -148,6 +148,8 @@ async function saveProfileNow() {
       diaria: store("diaria"),
       custom: store("custom"),
       aprendidas: store("aprendidas"),
+      lang: store("lang"),
+      vidas: store("vidas"),
     },
   });
 }
@@ -188,6 +190,10 @@ function mergeProfile(remote) {
     Object.entries(items).forEach(([i, keys]) => (target[i] = [...new Set([...(target[i] || []), ...keys])]));
   });
   store("aprendidas", learned);
+
+  store("vidas", { ...(d.vidas || {}), ...(store("vidas") || {}) });
+  // Idioma: vale o escolhido neste aparelho; se nunca escolheu aqui, usa o da conta.
+  if (!store("lang") && LANGS.includes(d.lang) && d.lang !== lang) setLang(d.lang);
 }
 
 async function loadProfile() {
@@ -208,16 +214,16 @@ store.onWrite = (key) => {
 // ───────────── conta (e-mail) ─────────────
 
 function accountLine() {
-  if (!onlineConfigured()) return "Para salvar o perfil numa conta, o modo online precisa estar configurado.";
-  if (me && !me.anon) return `Conta conectada: <b>${escapeHtml(me.email)}</b>. Perfil, estatísticas e recordes ficam salvos.`;
-  return "Entre com seu e-mail para salvar perfil, estatísticas e recordes, e jogar em qualquer celular.";
+  if (!onlineConfigured()) return t("account.needSetup");
+  if (me && !me.anon) return t("account.connected", { email: `<b>${escapeHtml(me.email)}</b>` });
+  return t("account.pitch");
 }
 
 function renderAccount() {
   document.querySelectorAll(".account-line").forEach((el) => (el.innerHTML = accountLine()));
   document.querySelectorAll(".account-btn").forEach((b) => {
     b.hidden = !onlineConfigured();
-    b.textContent = me && !me.anon ? "Minha conta" : b.dataset.label || "Conectar conta";
+    b.textContent = t(me && !me.anon ? "account.mine" : b.dataset.label || "account.connect");
   });
   document.querySelectorAll(".home-account").forEach((el) => (el.hidden = !onlineConfigured()));
 }
@@ -242,7 +248,7 @@ async function accountSave(e) {
   const email = $("account-email").value.trim();
   const msg = $("account-msg");
   if (!/^\S+@\S+\.\S+$/.test(email)) {
-    msg.textContent = "Digite um e-mail válido.";
+    msg.textContent = t("account.errEmail");
     return;
   }
   const login = e.submitter && e.submitter.value === "entrar";
@@ -254,14 +260,12 @@ async function accountSave(e) {
       : await sb.auth.updateUser({ email }, { emailRedirectTo: redirect });
     if (res.error) {
       const taken = /already|registered|exists/i.test(res.error.message);
-      msg.textContent = taken ? "Esse e-mail já tem conta. Use \"Já tenho conta\" para entrar." : res.error.message;
+      msg.textContent = taken ? t("account.errTaken") : res.error.message;
       return;
     }
     await saveProfileNow();
     msg.className = "feedback good";
-    msg.textContent = login
-      ? `Enviamos um link para ${email}. Abra neste aparelho para entrar e trazer seu perfil.`
-      : `Enviamos um link para ${email}. Abra para confirmar: seu perfil fica salvo na conta.`;
+    msg.textContent = t(login ? "account.sentLogin" : "account.sentCreate", { email });
   } catch (err) {
     msg.textContent = err.message;
   }
@@ -284,7 +288,7 @@ function renderOnline() {
   const p = players[0];
   $("online-setup").hidden = onlineConfigured();
   $("online-main").hidden = !onlineConfigured();
-  $("online-avatar").innerHTML = renderAvatar(p.avatar) + '<span class="avatar-edit">Trocar skin</span>';
+  $("online-avatar").innerHTML = renderAvatar(p.avatar) + `<span class="avatar-edit">${t("skin.change")}</span>`;
   $("online-nick").value = p.nick;
   $("online-error").textContent = "";
   renderAccount();
@@ -299,7 +303,7 @@ function openOnline() {
 function onlineNick() {
   const nick = players[0].nick.trim();
   if (!nick) {
-    $("online-error").textContent = "Escolha um nickname antes de entrar.";
+    $("online-error").textContent = t("on.errNick");
     $("online-nick").focus();
     return null;
   }
@@ -313,7 +317,7 @@ function randomCode() {
 async function createRoom() {
   const nick = onlineNick();
   if (!nick) return;
-  await busyButton($("create-room-btn"), "Criando sala…", async () => {
+  await busyButton($("create-room-btn"), t("on.creating"), async () => {
     const t0 = performance.now();
     await ensureOnline();
     const settings = { mode: modeId, timer: turnTime, lives: livesOn(modeId), list: null };
@@ -324,7 +328,7 @@ async function createRoom() {
       if (!error) code = tryCode;
       else if (error.code !== "23505") throw error;
     }
-    if (!code) throw new Error("Não deu para criar a sala. Tente de novo.");
+    if (!code) throw new Error(t("on.errCreate"));
     const row = { room_code: code, user_id: me.id, nick, avatar: players[0].avatar, team: 0, joined_at: new Date().toISOString() };
     const { error } = await sb.from("room_players").insert(row);
     if (error) throw error;
@@ -337,10 +341,10 @@ async function createRoom() {
 async function joinRoom(raw, quiet = false) {
   const code = String(raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
   if (code.length !== 5) {
-    if (!quiet) $("online-error").textContent = "O código da sala tem 5 letras.";
+    if (!quiet) $("online-error").textContent = t("on.errCode");
     return;
   }
-  const nick = quiet ? players[0].nick.trim() || "Jogador" : onlineNick();
+  const nick = quiet ? players[0].nick.trim() || t("players.player", { n: "" }).trim() : onlineNick();
   if (!nick) return;
   const task = async () => {
     const t0 = performance.now();
@@ -348,15 +352,15 @@ async function joinRoom(raw, quiet = false) {
     // Sala e jogadores ao mesmo tempo (uma ida ao servidor só).
     const [{ data: r, error }, list] = await Promise.all([sb.from("rooms").select("*").eq("code", code).maybeSingle(), fetchRoomPlayers(code)]);
     if (error) throw error;
-    if (!r) throw new Error("Sala não encontrada. Confira o código.");
+    if (!r) throw new Error(t("on.errNotFound"));
     const mine = list.find((p) => p.user_id === me.id);
     if (!mine) {
-      if (r.status === "playing") throw new Error("A partida dessa sala já começou. Espere ela acabar.");
-      if (list.length >= MAX_PLAYERS) throw new Error("A sala está cheia (máximo de 8).");
+      if (r.status === "playing") throw new Error(t("on.errStarted"));
+      if (list.length >= MAX_PLAYERS) throw new Error(t("on.errFull"));
       const team = list.filter((p) => p.team === 0).length > list.filter((p) => p.team === 1).length ? 1 : 0;
       const row = { room_code: code, user_id: me.id, nick: nick.slice(0, 16), avatar: players[0].avatar, team, joined_at: new Date().toISOString() };
       const { error: e2 } = await sb.from("room_players").insert(row);
-      if (e2) throw new Error(/cheia/.test(e2.message) ? "A sala está cheia (máximo de 8)." : e2.message);
+      if (e2) throw new Error(/cheia/.test(e2.message) ? t("on.errFull") : e2.message);
       list.push(row);
     } else {
       mine.nick = nick.slice(0, 16);
@@ -367,7 +371,7 @@ async function joinRoom(raw, quiet = false) {
     console.info(`[online] entrou na sala em ${Math.round(performance.now() - t0)} ms`);
   };
   if (quiet) return task();
-  await busyButton($("join-form").querySelector("button"), "Entrando…", task);
+  await busyButton($("join-form").querySelector("button"), t("on.joining"), task);
 }
 
 // Entra na sala com os dados que já tem; o resto atualiza quando o tempo real conectar.
@@ -390,10 +394,10 @@ async function fetchRoomPlayers(code) {
 async function refreshRoom(code = room && room.code) {
   if (!code) return;
   const [{ data: r }, list] = await Promise.all([sb.from("rooms").select("*").eq("code", code).maybeSingle(), fetchRoomPlayers(code)]);
-  if (!r) return roomClosed("A sala foi fechada.");
+  if (!r) return roomClosed(t("on.closed"));
   room = r;
   roomPlayers = list;
-  if (!list.some((p) => p.user_id === me.id)) return roomClosed("Você saiu da sala.");
+  if (!list.some((p) => p.user_id === me.id)) return roomClosed(t("on.left"));
   if (document.body.dataset.screen === "lobby") renderLobby();
 }
 
@@ -418,7 +422,7 @@ function connectChannel(code) {
   channel = sb.channel("sala-" + code, { config: { broadcast: { self: false }, presence: { key: me.id } } });
   channel
     .on("broadcast", { event: "lobby" }, () => refreshRoom())
-    .on("broadcast", { event: "closed" }, () => roomClosed("O anfitrião fechou a sala."))
+    .on("broadcast", { event: "closed" }, () => roomClosed(t("on.hostClosed")))
     .on("broadcast", { event: "state" }, ({ payload }) => applyState(payload))
     .on("broadcast", { event: "action" }, ({ payload }) => hostAction(payload))
     .on("broadcast", { event: "hello" }, () => {
@@ -482,10 +486,10 @@ function renderLobby() {
     row.className = "lobby-player" + (m.teams ? ` t${p.team}` : "") + (presentIds.has(p.user_id) ? " here" : "");
     row.innerHTML = `
       <div class="mini">${renderAvatar(p.avatar || DEFAULT_AVATAR)}</div>
-      <b>${escapeHtml(p.nick)}${mine ? " <small>(você)</small>" : ""}</b>
-      ${p.user_id === room.host_id ? `<span class="host-tag">${uiIcon("crown")}anfitrião</span>` : ""}
-      ${m.teams ? `<button type="button" class="team-toggle t${p.team}"${mine ? "" : " disabled"}>${TEAM_NAMES[p.team]}</button>` : ""}
-      ${host && !mine ? '<button type="button" class="kick" aria-label="Remover da sala">×</button>' : ""}`;
+      <b>${escapeHtml(p.nick)}${mine ? ` <small>(${t("lobby.you")})</small>` : ""}</b>
+      ${p.user_id === room.host_id ? `<span class="host-tag">${uiIcon("crown")}${t("lobby.host")}</span>` : ""}
+      ${m.teams ? `<button type="button" class="team-toggle t${p.team}"${mine ? "" : " disabled"}>${teamName(p.team)}</button>` : ""}
+      ${host && !mine ? `<button type="button" class="kick" aria-label="${t("lobby.kick")}">×</button>` : ""}`;
     const toggle = row.querySelector(".team-toggle");
     if (toggle && mine) toggle.addEventListener("click", () => setMyTeam(1 - p.team));
     const kick = row.querySelector(".kick");
@@ -494,17 +498,17 @@ function renderLobby() {
   });
 
   const listLine = st.list
-    ? `<b>${escapeHtml(st.list.title)}</b> <span class="muted small">· ${st.list.items.length} itens</span>`
-    : '<span class="muted">nenhuma lista escolhida</span>';
-  const timerLabel = st.timer ? `${st.timer} segundos por vez` : "sem limite de tempo";
+    ? `<b>${escapeHtml(st.list.title)}</b> <span class="muted small">· ${t("game.items", { n: st.list.items.length })}</span>`
+    : `<span class="muted">${t("lobby.noList")}</span>`;
+  const timerLabel = st.timer ? t("lobby.timer", { n: st.timer }) : t("lobby.noTimer");
   const roomLives = st.lives === undefined ? !!m.team : !!st.lives;
   const box = $("lobby-settings");
   if (!host) {
     box.innerHTML = `
-      <p class="lobby-summary"><span class="mode-pill">${modeIcon(m)}${m.name}</span> ${timerLabel} · ${roomLives ? "com vidas" : "sem vidas"}</p>
+      <p class="lobby-summary"><span class="mode-pill">${modeIcon(m)}${m.name}</span> ${timerLabel} · ${t(roomLives ? "opt.withLives" : "opt.noLives").toLowerCase()}</p>
       <p>Lista: ${listLine}</p>
-      <div class="lobby-list"><p class="muted small">Quem escolhe é o anfitrião, mas você pode sugerir.</p>
-        <button type="button" class="btn ghost small" id="lobby-suggest">${mySuggestion ? "Trocar sugestão" : "Ver listas e sugerir"}</button></div>`;
+      <div class="lobby-list"><p class="muted small">${t("lobby.hostPicks")}</p>
+        <button type="button" class="btn ghost small" id="lobby-suggest">${t(mySuggestion ? "lobby.changeSuggestion" : "lobby.seeLists")}</button></div>`;
     $("lobby-suggest").addEventListener("click", () => {
       pickingForRoom = "suggest";
       modeId = st.mode;
@@ -513,16 +517,16 @@ function renderLobby() {
     });
   } else {
     box.innerHTML = `
-      <p class="ctrl-label">Modo</p><div class="chips" id="lobby-modes"></div>
-      <p class="ctrl-label">Tempo por vez</p><div class="chips" id="lobby-timer"></div>
-      <p class="ctrl-label">Vidas</p><div class="chips" id="lobby-lives"></div>
-      <p class="ctrl-label">Lista</p>
+      <p class="ctrl-label">${t("lobby.mode")}</p><div class="chips" id="lobby-modes"></div>
+      <p class="ctrl-label">${t("opt.timer")}</p><div class="chips" id="lobby-timer"></div>
+      <p class="ctrl-label">${t("opt.lives")}</p><div class="chips" id="lobby-lives"></div>
+      <p class="ctrl-label">${t("game.list")}</p>
       <div class="lobby-list"><p>${listLine}</p>
-        <div class="head-actions"><button type="button" class="btn ghost small" id="lobby-pick">Escolher lista</button><button type="button" class="btn ghost small" id="lobby-random">Sortear</button></div>
+        <div class="head-actions"><button type="button" class="btn ghost small" id="lobby-pick">${t("btn.chooseList")}</button><button type="button" class="btn ghost small" id="lobby-random">${t("btn.random")}</button></div>
       </div>`;
     Object.entries(MODES).forEach(([id, mm]) => $("lobby-modes").appendChild(chipButton(mm.name, null, id === st.mode, () => updateSettings({ mode: id }))));
-    TIMER_OPTIONS.forEach((s) => $("lobby-timer").appendChild(chipButton(s ? `${s}s` : "Sem limite", null, s === (st.timer || 0), () => updateSettings({ timer: s }))));
-    [[false, "Sem vidas"], [true, "Com vidas"]].forEach(([on, label]) => $("lobby-lives").appendChild(chipButton(label, null, on === roomLives, () => updateSettings({ lives: on }))));
+    TIMER_OPTIONS.forEach((s) => $("lobby-timer").appendChild(chipButton(s ? `${s}s` : t("opt.noLimit"), null, s === (st.timer || 0), () => updateSettings({ timer: s }))));
+    [[false, t("opt.noLives")], [true, t("opt.withLives")]].forEach(([on, label]) => $("lobby-lives").appendChild(chipButton(label, null, on === roomLives, () => updateSettings({ lives: on }))));
     $("lobby-pick").addEventListener("click", () => {
       pickingForRoom = "pick";
       modeId = st.mode;
@@ -542,18 +546,18 @@ function renderLobby() {
   $("lobby-start").hidden = !host;
   $("lobby-start").disabled = !!problem;
   $("lobby-status").textContent = host
-    ? problem || "Tudo pronto. Quando a turma estiver na sala, é só começar."
-    : "Esperando o anfitrião começar a partida…";
+    ? problem || t("lobby.ready")
+    : t("lobby.waiting");
 }
 
 function lobbyProblem() {
   const st = room.settings || {};
   const m = MODES[st.mode] || MODES.top10;
-  if (!st.list) return "Escolha a lista da partida.";
-  if (m.size && st.list.items.length !== m.size) return `No ${m.name} a lista precisa ter ${m.size} itens.`;
+  if (!st.list) return t("lobby.pickList");
+  if (m.size && st.list.items.length !== m.size) return t("lobby.wrongSize", { mode: m.name, n: m.size });
   if (m.teams) {
-    if (roomPlayers.length < 2) return "O modo Times precisa de pelo menos 2 jogadores.";
-    if (!roomPlayers.some((p) => p.team === 0) || !roomPlayers.some((p) => p.team === 1)) return "Cada time precisa de pelo menos um jogador.";
+    if (roomPlayers.length < 2) return t("lobby.teams2");
+    if (!roomPlayers.some((p) => p.team === 0) || !roomPlayers.some((p) => p.team === 1)) return t("lobby.teamsEach");
   }
   return "";
 }
@@ -584,11 +588,11 @@ function pickRoomList(list) {
 function suggestList(list) {
   pickingForRoom = false;
   const { id, cat, title, source, items } = list;
-  mySuggestion = { uid: me.id, nick: players[0].nick.trim() || "Jogador", list: { id, cat, title, source, items } };
+  mySuggestion = { uid: me.id, nick: players[0].nick.trim() || "?", list: { id, cat, title, source, items } };
   suggestions.set(me.id, mySuggestion);
   send("suggest", mySuggestion);
   showLobby();
-  $("lobby-status").textContent = `Sugestão enviada: ${title}.`;
+  $("lobby-status").textContent = t("lobby.sent", { title });
 }
 
 function receiveSuggestion(s) {
@@ -615,16 +619,16 @@ function renderSuggestions() {
   if (!groups.size) return;
   const chosen = room.settings && room.settings.list && room.settings.list.id;
   const sorted = [...groups.values()].sort((a, b) => b.who.length - a.who.length);
-  box.innerHTML = '<p class="ctrl-label">Sugestões da turma</p>';
+  box.innerHTML = `<p class="ctrl-label">${t("lobby.suggestions")}</p>`;
   sorted.forEach((g) => {
     const row = document.createElement("div");
     row.className = "suggestion" + (g.list.id === chosen ? " chosen" : "");
     const cat = categoryOf(g.list);
     row.innerHTML = `
-      <div><p class="list-cat">${icon(cat.id)}${escapeHtml(cat.label)} · ${g.list.items.length} itens</p>
+      <div><p class="list-cat">${icon(cat.id)}${escapeHtml(catLabel(cat))} · ${t("game.items", { n: g.list.items.length })}</p>
         <b>${escapeHtml(g.list.title)}</b>
-        <p class="muted small">sugerida por ${g.who.map(escapeHtml).join(", ")}${g.who.length > 1 ? ` · ${g.who.length} votos` : ""}</p></div>
-      ${g.list.id === chosen ? `<span class="suggestion-ok">${uiIcon("check")}escolhida</span>` : isHost() ? '<button type="button" class="btn small">Usar</button>' : ""}`;
+        <p class="muted small">${t("lobby.suggestedBy", { nomes: g.who.map(escapeHtml).join(", ") })}${g.who.length > 1 ? ` · ${t("lobby.votes", { n: g.who.length })}` : ""}</p></div>
+      ${g.list.id === chosen ? `<span class="suggestion-ok">${uiIcon("check")}${t("lobby.chosen")}</span>` : isHost() ? `<button type="button" class="btn small">${t("lobby.use")}</button>` : ""}`;
     const use = row.querySelector("button");
     if (use) use.addEventListener("click", () => pickRoomList(g.list));
     box.appendChild(row);
@@ -640,7 +644,7 @@ async function setMyTeam(team) {
 }
 
 async function kickPlayer(p) {
-  if (!confirm(`Remover ${p.nick} da sala?`)) return;
+  if (!confirm(t("lobby.kickConfirm", { nome: p.nick }))) return;
   await sb.from("room_players").delete().eq("room_code", room.code).eq("user_id", p.user_id);
   send("lobby");
   refreshRoom();
@@ -669,7 +673,7 @@ async function leaveRoom() {
 }
 
 async function shareRoom(btn) {
-  shareText(`Bora jogar Topzi! Entra na minha sala: ${room.code}\n${roomUrl()}`, btn, "Convidar");
+  shareText(`${t("lobby.inviteText", { code: room.code })}\n${roomUrl()}`, btn, t("lobby.invite"));
 }
 
 // ───────────── partida online ─────────────
@@ -798,7 +802,7 @@ function applyState(s) {
     if (game.over) return showResults();
     game.busy = false;
     renderGame();
-    if (game.feedback) paintFeedback(game.feedback.text, game.feedback.kind);
+    if (game.feedback) paintFeedback(game.feedback.msg, game.feedback.kind);
     startTurnTimer();
     return;
   }
@@ -828,7 +832,7 @@ function applyState(s) {
   }
 
   renderGame();
-  if (game.feedback) paintFeedback(game.feedback.text, game.feedback.kind);
+  if (game.feedback) paintFeedback(game.feedback.msg, game.feedback.kind);
   if (before) {
     [...game.found.keys()].filter((i) => !before.found.has(i)).forEach((i) => hitEffects(i, game.found.get(i)));
     game.players.forEach((p, i) => {
@@ -895,7 +899,7 @@ function hostAction(a) {
 function sendAction(action) {
   if (!game || !myTurn() || game.over || game.busy) return;
   send("action", { ...action, uid: me.id });
-  if (action.type === "guess") paintFeedback(`Enviando "${action.text}"…`, "info");
+  if (action.type === "guess") paintFeedback([["on.sending", { text: action.text }]], "info");
 }
 
 // Quem sumiu na própria vez perde a vez; se o anfitrião sumir, os outros ficam sabendo.
@@ -904,7 +908,7 @@ let absentSince = null;
 function watchHost() {
   if (!game || !game.online || game.over || !room) return;
   if (!game.isHost && !presentIds.has(room.host_id)) {
-    paintFeedback("O anfitrião caiu. Esperando ele voltar…", "info");
+    paintFeedback([["on.hostDown"]], "info");
   }
 }
 
@@ -923,7 +927,7 @@ setInterval(() => {
     absentSince = null;
     cur.passes += 1;
     cur.streak = 0;
-    setFeedback(`${cur.name} saiu da sala e perdeu a vez.`, "info");
+    setFeedback([["on.playerLeft", { nome: cur.name }]], "info");
     nextTurn();
   }
 }, 2000);
@@ -942,7 +946,7 @@ function onlineGameFinished() {
 }
 
 async function backToRoom() {
-  if (!room) return roomClosed("A sala foi fechada.");
+  if (!room) return roomClosed(t("on.closed"));
   if (isHost()) {
     await sb.from("rooms").update({ status: "lobby", state: null }).eq("code", room.code);
     send("lobby");
@@ -957,12 +961,12 @@ async function backToRoom() {
 async function renderOnlineHistory() {
   const box = $("stats-online");
   if (!sb || !me) {
-    box.innerHTML = '<p class="muted small">Jogue online para ver o histórico aqui.</p>';
+    box.innerHTML = `<p class="muted small">${t("on.historyEmpty")}</p>`;
     return;
   }
   const { data } = await sb.from("matches").select("*").order("created_at", { ascending: false }).limit(10);
   if (!data || !data.length) {
-    box.innerHTML = '<p class="muted small">Nenhuma partida online ainda.</p>';
+    box.innerHTML = `<p class="muted small">${t("on.historyNone")}</p>`;
     return;
   }
   box.innerHTML = data.map((m) => {
@@ -970,7 +974,7 @@ async function renderOnlineHistory() {
     const pos = ranked.findIndex((p) => p.uid === me.id) + 1;
     const mine = ranked[pos - 1] || { score: 0 };
     return `<div class="record-row"><span class="record-pts">${pos ? medal(pos) : "—"}</span>
-      <div><b>${escapeHtml(m.list_title || "Lista")}</b><p class="muted small">${mine.score} pts · ${ranked.map((p) => escapeHtml(p.nick)).join(", ")}</p></div></div>`;
+      <div><b>${escapeHtml(m.list_title || t("game.list"))}</b><p class="muted small">${mine.score} pts · ${ranked.map((p) => escapeHtml(p.nick)).join(", ")}</p></div></div>`;
   }).join("");
 }
 
