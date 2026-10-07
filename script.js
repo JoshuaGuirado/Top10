@@ -1,12 +1,14 @@
 // Top Ten — fluxo do jogo.
-// Telas: início → jogadores → lista (ou criar lista) → partida → pódio.
+// Telas: início → modo → jogadores → lista (ou criar lista) → partida → pódio.
 
 const MAX_PLAYERS = 8;
 const TURN_DELAY = 950;
 const LIST_SIZES = [10, 30, 50];
+// Vidas da equipe no modo "Equipe contra a lista": cada chute errado custa uma.
+const TEAM_LIVES = { 10: 3, 30: 6, 50: 10 };
 
 const $ = (id) => document.getElementById(id);
-const screens = ["home", "players", "lists", "editor", "game", "results"];
+const screens = ["home", "modes", "players", "lists", "editor", "game", "results"];
 
 // ───────────── utilidades ─────────────
 
@@ -157,6 +159,7 @@ const sfx = {
   wrong: () => beep([196, 147], "sawtooth", 0.18, 0.12, 0.08),
   tick: () => beep([880], "sine", 0.05, 0, 0.05),
   win: () => beep([523, 659, 784, 1047, 784, 1047, 1319], "triangle", 0.2, 0.11),
+  lose: () => beep([392, 330, 262, 196], "triangle", 0.28, 0.2, 0.14),
 };
 
 function renderSoundBtn() {
@@ -258,6 +261,72 @@ function show(name) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+// ───────────── modos de jogo ─────────────
+
+const TEAM_ICON = '<svg class="mode-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2.5 20c.5-3.4 2.7-5.5 5.5-5.5s5 2.1 5.5 5.5M13.2 15.3c.8-.5 1.8-.8 2.8-.8 2.8 0 5 2.1 5.5 5.5"/></svg>';
+
+const MODES = {
+  top10: { size: 10, name: "Top 10", badge: "10", desc: "Listas de 10 itens. O nº 10 vale 10 pontos. Rápido e clássico.", who: "Solo, 1v1 ou todos contra todos" },
+  top30: { size: 30, name: "Top 30", badge: "30", desc: "Listas de 30 itens. Pede quem conhece o assunto a fundo.", who: "Solo, 1v1 ou todos contra todos" },
+  top50: { size: 50, name: "Top 50", badge: "50", desc: "Listas de 50 itens. Partida longa, e o nº 50 vale 50 pontos.", who: "Solo, 1v1 ou todos contra todos" },
+  equipe: { team: true, name: "Equipe contra a lista", badge: TEAM_ICON, desc: "Todos jogam juntos. O que a equipe não achar vira ponto da lista. Cada erro custa uma vida.", who: "1 a 8 jogadores · 3, 6 ou 10 vidas" },
+};
+
+let modeId = MODES[store("mode")] ? store("mode") : "top10";
+const mode = () => MODES[modeId];
+
+function setMode(id) {
+  modeId = id;
+  store("mode", id);
+}
+
+// Modo de disputa que combina com o tamanho da lista (a equipe aceita qualquer um).
+function fitModeToSize(size) {
+  if (!mode().team && mode().size !== size) setMode("top" + size);
+}
+
+function renderModes() {
+  const grid = $("mode-grid");
+  grid.innerHTML = "";
+  Object.entries(MODES).forEach(([id, m]) => {
+    const count = allLists().filter((l) => !m.size || l.items.length === m.size).length;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "mode-card" + (m.team ? " team" : "") + (id === modeId ? " active" : "");
+    b.innerHTML = `
+      <span class="mode-badge">${m.badge}</span>
+      <span class="mode-name">${m.name}</span>
+      <span class="mode-desc">${m.desc}</span>
+      <span class="mode-meta">${m.who} · ${count} listas</span>`;
+    b.addEventListener("click", () => {
+      setMode(id);
+      activeCat = "all";
+      activeSize = "all";
+      $("list-search").value = "";
+      renderPlayersScreen();
+      show("players");
+    });
+    grid.appendChild(b);
+  });
+}
+
+function openModes() {
+  renderModes();
+  show("modes");
+}
+
+function renderModeBars() {
+  document.querySelectorAll(".mode-bar").forEach((bar) => {
+    bar.innerHTML = `<span class="mode-pill">${mode().team ? TEAM_ICON : ""}${mode().name}</span>`;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "link-btn";
+    b.textContent = "Trocar modo";
+    b.addEventListener("click", openModes);
+    bar.appendChild(b);
+  });
+}
+
 // ───────────── jogadores ─────────────
 
 let playerCount = store("count") || 2;
@@ -277,6 +346,12 @@ function playerName(p, i) {
 }
 
 function modeLabel(n) {
+  if (mode().team) {
+    const lives = Object.entries(TEAM_LIVES).map(([size, v]) => `${v} no Top ${size}`).join(", ");
+    return n === 1
+      ? `Só você contra a lista. Vidas: ${lives}.`
+      : `Equipe de ${n}: todos juntos contra a lista, revezando a vez. Vidas: ${lives}.`;
+  }
   if (n === 1) return "Modo solo: tente fazer o máximo de pontos.";
   if (n === 2) return "Modo 1v1: um contra o outro.";
   return `Todos contra todos: ${n} jogadores.`;
@@ -302,6 +377,8 @@ function renderCountPicker() {
 
 function renderPlayersScreen() {
   ensurePlayers();
+  renderModeBars();
+  $("players-title").textContent = mode().team ? "Quem joga na equipe?" : "Quantos jogadores?";
   renderCountPicker();
   const grid = $("player-grid");
   grid.innerHTML = "";
@@ -514,11 +591,17 @@ let activeCat = "all";
 let activeSize = "all";
 let lastListIds = store("recent") || [];
 
+// Nos modos Top 10/30/50 o tamanho é fixo; na equipe, o jogador escolhe.
+function sizeOk(list) {
+  const size = mode().size || activeSize;
+  return size === "all" || list.items.length === size;
+}
+
 function filteredLists() {
   const q = normalize($("list-search").value);
   return allLists().filter((l) => {
     if (activeCat !== "all" && l.cat !== activeCat) return false;
-    if (activeSize !== "all" && l.items.length !== activeSize) return false;
+    if (!sizeOk(l)) return false;
     if (!q) return true;
     return normalize(l.title + " " + categoryOf(l).label).includes(q);
   });
@@ -534,10 +617,10 @@ function chipButton(label, count, active, onClick, iconHtml = "") {
 }
 
 function renderChips() {
-  const lists = allLists();
+  const lists = allLists().filter(sizeOk);
   const cats = $("category-chips");
   cats.innerHTML = "";
-  const all = [{ id: "all", label: "Todas" }, ...(customLists.length ? [MY_CAT] : []), ...CATEGORIES];
+  const all = [{ id: "all", label: "Todas" }, MY_CAT, ...CATEGORIES];
   all.forEach((cat) => {
     const count = cat.id === "all" ? lists.length : lists.filter((l) => l.cat === cat.id).length;
     if (!count) return;
@@ -550,8 +633,9 @@ function renderChips() {
 
   const sizes = $("size-chips");
   sizes.innerHTML = "";
+  sizes.hidden = !mode().team;
   ["all", ...LIST_SIZES].forEach((size) => {
-    const label = size === "all" ? "Qualquer tamanho" : `${size} itens`;
+    const label = size === "all" ? "Qualquer tamanho" : `Top ${size} · ${TEAM_LIVES[size]} vidas`;
     sizes.appendChild(chipButton(label, null, activeSize === size, () => {
       activeSize = size;
       renderChips();
@@ -566,7 +650,7 @@ function renderListGrid() {
   const grid = $("list-grid");
   grid.innerHTML = "";
   if (!lists.length) {
-    grid.innerHTML = `<p class="muted">Nenhuma lista encontrada. Tente outra palavra ou crie a sua.</p>`;
+    grid.innerHTML = `<p class="muted">Nenhuma lista encontrada${mode().size ? ` no ${mode().name}` : ""}. Tente outra palavra ou crie a sua.</p>`;
     return;
   }
   lists.forEach((l) => {
@@ -598,6 +682,8 @@ function renderListGrid() {
 }
 
 function openLists() {
+  if (activeCat !== "all" && !allLists().some((l) => l.cat === activeCat && sizeOk(l))) activeCat = "all";
+  renderModeBars();
   renderChips();
   renderListGrid();
   show("lists");
@@ -610,7 +696,7 @@ let editorSize = 10;
 
 function openEditor(list = null) {
   editing = list;
-  editorSize = list ? list.items.length : 10;
+  editorSize = list ? list.items.length : mode().size || (activeSize !== "all" ? activeSize : 10);
   $("editor-title").textContent = list ? "Editar lista" : "Criar lista";
   $("editor-name").value = list ? list.title : "";
   $("editor-error").textContent = "";
@@ -673,6 +759,7 @@ function saveEditor() {
   const list = { id: editing ? editing.id : "minha-" + Date.now(), cat: MY_CAT.id, title, source: "Lista criada por você", items, custom: true };
   customLists = editing ? customLists.map((l) => (l.id === list.id ? list : l)) : [list, ...customLists];
   saveCustomLists();
+  fitModeToSize(items.length);
   activeCat = MY_CAT.id;
   activeSize = "all";
   $("list-search").value = "";
@@ -716,7 +803,9 @@ function importFromHash() {
   if (!confirm(`Adicionar a lista "${data.title}" (${data.items.length} itens) às suas listas?`)) return false;
   customLists = [{ id: "minha-" + Date.now(), cat: MY_CAT.id, title: data.title, source: "Lista compartilhada", items: data.items, custom: true }, ...customLists];
   saveCustomLists();
+  fitModeToSize(data.items.length);
   activeCat = MY_CAT.id;
+  activeSize = "all";
   openLists();
   return true;
 }
@@ -728,8 +817,14 @@ let game = null;
 function startGame(list) {
   lastListIds = [list.id, ...lastListIds.filter((id) => id !== list.id)].slice(0, 40);
   store("recent", lastListIds);
+  const n = list.items.length;
+  const team = !!mode().team;
+  const lives = TEAM_LIVES[n] || Math.max(3, Math.round(n / 5));
   game = {
     list,
+    team,
+    lives,
+    maxLives: lives,
     items: parseList(list),
     found: new Map(),
     tried: new Set(),
@@ -742,7 +837,7 @@ function startGame(list) {
     busy: false,
     over: false,
   };
-  $("game-cat").innerHTML = `${icon(categoryOf(list).id)}${escapeHtml(categoryOf(list).label)} · ${list.items.length} itens`;
+  $("game-cat").innerHTML = `${icon(categoryOf(list).id)}${escapeHtml(categoryOf(list).label)} · ${list.items.length} itens${team ? " · Equipe contra a lista" : ""}`;
   $("game-title").textContent = list.title;
   $("source").textContent = `Fonte: ${list.source}`;
   $("pass-btn").hidden = playerCount === 1;
@@ -752,8 +847,36 @@ function startGame(list) {
   focusGuess();
 }
 
+// Pontos da equipe e da lista: o que ninguém achou fica com a lista.
+function teamTally() {
+  const n = game.items.length;
+  const total = (n * (n + 1)) / 2;
+  const team = game.players.reduce((sum, p) => sum + p.score, 0);
+  return { total, team, list: total - team, goal: Math.floor(total / 2) + 1 };
+}
+
+const HEART = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.4C1.4 7.6 3.6 4 7.2 4c2 0 3.6 1.1 4.8 2.8C13.2 5.1 14.8 4 16.8 4c3.6 0 5.8 3.6 4.5 7.1-1.8 4.8-9.3 9.4-9.3 9.4z"/></svg>';
+
+function renderVersus() {
+  const vs = $("versus");
+  vs.hidden = !game.team;
+  if (!game.team) return;
+  const t = teamTally();
+  const left = t.goal - t.team;
+  const hearts = Array.from({ length: game.maxLives }, (_, i) => `<span class="heart${i < game.lives ? "" : " lost"}">${HEART}</span>`).join("");
+  vs.innerHTML = `
+    <div class="vs-side"><span class="vs-label">Equipe</span><b class="vs-pts">${t.team}</b></div>
+    <div class="vs-mid">
+      <div class="vs-bar"><span style="width:${(t.team / t.total) * 100}%"></span><i></i></div>
+      <p class="vs-goal">${left > 0 ? `Faltam ${left} pts para vencer a lista` : "A equipe já passou a lista!"}</p>
+    </div>
+    <div class="vs-side list"><span class="vs-label">Lista</span><b class="vs-pts">${t.list}</b></div>
+    <div class="lives" role="img" aria-label="${game.lives} de ${game.maxLives} vidas">${hearts}<span class="lives-label">${game.lives} ${game.lives === 1 ? "vida" : "vidas"}</span></div>`;
+}
+
 function renderGame() {
   const n = game.items.length;
+  renderVersus();
 
   const sb = $("scoreboard");
   sb.innerHTML = "";
@@ -850,6 +973,15 @@ function handleGuess(raw) {
     shake($("guess-form"));
     const chip = $("scoreboard").querySelector(`[data-player="${game.turn}"]`);
     if (chip) { shake(chip); floatText(chip, "errou", "bad"); }
+    if (game.team) {
+      game.lives -= 1;
+      renderVersus();
+      shake($("versus"));
+      floatText($("versus").querySelector(".lives"), "-1 vida", "bad");
+      if (game.lives <= 0) return endGame(`"${text}" não está na lista. Acabaram as vidas da equipe!`);
+      setFeedback(`"${text}" não está na lista. ${game.lives === 1 ? "Resta 1 vida!" : `Restam ${game.lives} vidas.`}${game.players.length > 1 ? " Passa a vez." : ""}`, "bad");
+      return nextTurn();
+    }
     setFeedback(`"${text}" não está na lista.${game.players.length > 1 ? " Passa a vez." : ""}`, "bad");
     return nextTurn();
   }
@@ -901,7 +1033,7 @@ function passTurn() {
   const p = game.players[game.turn];
   p.passes += 1;
   game.passStreak += 1;
-  if (game.passStreak >= game.players.length) return endGame("Todo mundo passou a vez. Ninguém lembra de mais nenhum!");
+  if (game.passStreak >= game.players.length) return endGame(game.team ? "A equipe toda passou a vez. A lista fica com o resto!" : "Todo mundo passou a vez. Ninguém lembra de mais nenhum!");
   setFeedback(`${p.name} passou a vez.`, "info");
   nextTurn();
 }
@@ -927,6 +1059,16 @@ const PHRASES = {
   tie: ["Empate técnico. Ninguém dorme hoje.", "Dois cérebros, uma pontuação."],
 };
 
+const TEAM_PHRASES = {
+  win: ["Time entrosado é outra coisa.", "A lista não teve a menor chance.", "Cérebros conectados no mesmo Wi-Fi.", "Trabalho em equipe: funciona!"],
+  perfect: ["Gabaritaram! A lista pediu música no Fantástico.", "Nenhum item escapou. Que equipe!"],
+  lose: ["A lista mandou nessa. Revanche?", "Faltou energia na tomada da equipe.", "A lista ganhou, mas foi por pouco… ou não.", "Hoje a lista saiu de cabeça erguida."],
+  tie: ["Empate com a lista. Ninguém dorme hoje."],
+  mvp: ["Carregou a equipe nas costas.", "Craque da rodada.", "Cérebro da equipe.", "Se fosse futebol, era a camisa 10."],
+  help: ["Fez a parte e ajudou a equipe.", "Cada ponto conta. Valeu!", "Peça importante do time.", "Ponto dado, ponto ganho."],
+  zero: ["Torcida organizada: apoiou muito.", "Veio pelo lanche, né?", "Estava aquecendo pra próxima."],
+};
+
 function soloVerdict(score, n) {
   const ratio = score / ((n * (n + 1)) / 2);
   if (ratio === 1) return "Gabaritou! Você é a própria usina elétrica.";
@@ -949,6 +1091,8 @@ function showResults() {
     prev = p.score;
   });
 
+  if (game.team) return showTeamResults(ranked, n);
+
   const solo = ranked.length === 1;
   const lastPlace = ranked[ranked.length - 1].place;
   const maxHits = Math.max(...ranked.map((p) => p.hits.length));
@@ -965,7 +1109,7 @@ function showResults() {
     p.badges = [];
     if (p.hits.includes(n)) p.badges.push(`Achou o nº ${n}`);
     if (!solo && p.hits.length === maxHits && maxHits > 0) p.badges.push("Mais acertos");
-    if (!solo && p.misses === maxMiss && maxMiss > 0) p.badges.push("Mais chutes errados");
+    if (!solo && p.misses === maxMiss && maxMiss > 0 && ranked.some((q) => q.misses < maxMiss)) p.badges.push("Mais chutes errados");
     if (p.hits.length && p.hits.every((h) => h <= obvious)) p.badges.push("Só o óbvio");
   });
 
@@ -975,6 +1119,7 @@ function showResults() {
     : winners.length > 1 ? "Empate no topo!" : `${winners[0].name} venceu!`;
 
   const podium = $("podium");
+  podium.className = "podium";
   podium.innerHTML = "";
   (solo ? [1] : [2, 1, 3]).forEach((pl) => {
     const group = ranked.filter((p) => p.place === pl);
@@ -987,6 +1132,73 @@ function showResults() {
     podium.appendChild(col);
   });
 
+  renderResultsTable(ranked);
+  renderFinalBoard(n);
+  show("results");
+  sfx.win();
+  setTimeout(() => fx.rain(), 250);
+}
+
+function showTeamResults(ranked, n) {
+  const t = teamTally();
+  const perfect = game.found.size === n;
+  const outcome = perfect ? "perfect" : t.team > t.list ? "win" : t.team < t.list ? "lose" : "tie";
+  const won = outcome === "perfect" || outcome === "win";
+  const solo = ranked.length === 1;
+  const maxMiss = Math.max(...ranked.map((p) => p.misses));
+  const obvious = Math.ceil(n * 0.3);
+
+  ranked.forEach((p) => {
+    const mvp = !solo && p.place === 1 && p.score > 0;
+    if (solo) p.phrase = pick(TEAM_PHRASES[outcome]);
+    else if (p.score === 0) p.phrase = pick(TEAM_PHRASES.zero);
+    else if (mvp) p.phrase = pick(TEAM_PHRASES.mvp);
+    else p.phrase = pick(TEAM_PHRASES.help);
+    p.badges = [];
+    if (mvp) p.badges.push("MVP");
+    if (p.hits.includes(n)) p.badges.push(`Achou o nº ${n}`);
+    if (t.team && p.score) p.badges.push(`${Math.round((p.score / t.team) * 100)}% dos pontos`);
+    if (!solo && p.misses === maxMiss && maxMiss > 0 && ranked.some((q) => q.misses < maxMiss)) p.badges.push("Mais vidas perdidas");
+    if (p.hits.length && p.hits.every((h) => h <= obvious)) p.badges.push("Só o óbvio");
+  });
+
+  $("results-title").textContent = {
+    perfect: "Gabaritaram a lista!",
+    win: solo ? "Você venceu a lista!" : "A equipe venceu a lista!",
+    lose: "A lista venceu.",
+    tie: "Empate com a lista!",
+  }[outcome];
+
+  const podium = $("podium");
+  podium.className = "podium vs-final " + (won ? "won" : "lost");
+  podium.innerHTML = `
+    <div class="vs-final-row">
+      <div class="vs-final-side${won ? " winner" : ""}">
+        <div class="vs-team">${ranked.slice(0, 4).map((p) => `<div class="podium-avatar">${renderAvatar(p.avatar)}</div>`).join("")}${ranked.length > 4 ? `<span class="vs-more">+${ranked.length - 4}</span>` : ""}</div>
+        <b>${solo ? escapeHtml(ranked[0].name) : "Equipe"}</b>
+        <span class="vs-final-pts">${t.team}</span>
+      </div>
+      <span class="vs-x">×</span>
+      <div class="vs-final-side list${won ? "" : " winner"}">
+        <div class="vs-list-icon">${icon(categoryOf(game.list).id, "ico big")}</div>
+        <b>Lista</b>
+        <span class="vs-final-pts">${t.list}</span>
+      </div>
+    </div>
+    <p class="vs-verdict">${solo ? `${game.found.size} de ${n} itens · ${game.maxLives - game.lives} ${game.maxLives - game.lives === 1 ? "vida perdida" : "vidas perdidas"}` : `“${escapeHtml(pick(TEAM_PHRASES[outcome]))}” · ${game.found.size} de ${n} itens`}</p>`;
+
+  renderResultsTable(ranked);
+  renderFinalBoard(n);
+  show("results");
+  if (won) {
+    sfx.win();
+    setTimeout(() => fx.rain(), 250);
+  } else {
+    sfx.lose();
+  }
+}
+
+function renderResultsTable(ranked) {
   $("results-table").innerHTML = ranked.map((p) => `
     <div class="result-row">
       <span class="result-place">${p.place}º</span>
@@ -998,18 +1210,16 @@ function showResults() {
         ${p.badges.length ? `<p class="badges">${p.badges.map((b) => `<span>${b}</span>`).join("")}</p>` : ""}
       </div>
     </div>`).join("");
+}
 
+function renderFinalBoard(n) {
   $("final-board").classList.toggle("big", n > 10);
   $("final-board").style.setProperty("--rows", Math.ceil(n / 2));
   $("final-board").innerHTML = game.items.map((item, i) => {
     const who = game.found.get(i);
     const p = who !== undefined ? game.players[who] : null;
-    return `<li class="slot ${p ? "found" : "missed"}"><span class="rank">${i + 1}</span><span class="slot-name">${escapeHtml(item.name)}</span>${p ? `<span class="slot-who" title="${escapeHtml(p.name)}">${renderAvatar(p.avatar)}</span>` : ""}<span class="pts">${p ? escapeHtml(p.name) : "ninguém"}</span></li>`;
+    return `<li class="slot ${p ? "found" : "missed"}"><span class="rank">${i + 1}</span><span class="slot-name">${escapeHtml(item.name)}</span>${p ? `<span class="slot-who" title="${escapeHtml(p.name)}">${renderAvatar(p.avatar)}</span>` : ""}<span class="pts">${p ? escapeHtml(p.name) : game.team ? `+${i + 1} lista` : "ninguém"}</span></li>`;
   }).join("");
-
-  show("results");
-  sfx.win();
-  setTimeout(() => fx.rain(), 250);
 }
 
 // ───────────── eventos ─────────────
@@ -1025,10 +1235,8 @@ $("sound-btn").addEventListener("click", () => {
   renderSoundBtn();
   sfx.tick();
 });
-$("start-btn").addEventListener("click", () => {
-  renderPlayersScreen();
-  show("players");
-});
+$("start-btn").addEventListener("click", openModes);
+$("change-mode-btn").addEventListener("click", openModes);
 $("to-lists-btn").addEventListener("click", () => {
   store("players", players);
   openLists();

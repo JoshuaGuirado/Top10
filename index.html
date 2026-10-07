@@ -32,20 +32,28 @@
     <section id="screen-home" class="screen">
       <div class="hero">
         <h1><span>O óbvio vale 1.</span><span class="accent">O difícil vale 10.</span></h1>
-        <p class="lead">Um jogo de listas para jogar sozinho ou com até 8 pessoas. São <span id="list-total">300</span> listas de 10, 30 e 50 itens: futebol, filmes, heróis, comida, frases de mãe. E você ainda pode criar as suas.</p>
+        <p class="lead">Um jogo de listas para jogar sozinho, contra os amigos ou em equipe contra a lista. São <span id="list-total">300</span> listas de 10, 30 e 50 itens: futebol, filmes, heróis, comida, frases de mãe. E você ainda pode criar as suas.</p>
         <button type="button" class="btn big" id="start-btn">Jogar</button>
       </div>
       <ol class="rules">
         <li><b class="n">1–8</b><p>Jogadores. Cada um com nickname e skin.</p></li>
         <li><b class="n">Nº 8</b><p>Acertou o 8º da lista? Ganhou 8 pontos.</p></li>
-        <li><b class="n">50</b><p>Nas listas grandes, o último item vale 50 pontos.</p></li>
-        <li><b class="n">1º</b><p>Quem somar mais pontos sobe no pódio.</p></li>
+        <li><b class="n">50</b><p>No Top 50, o último item da lista vale 50 pontos.</p></li>
+        <li><b class="n">VS</b><p>Ou joguem juntos: a equipe contra a lista.</p></li>
       </ol>
+    </section>
+
+    <!-- Modos de jogo -->
+    <section id="screen-modes" class="screen" hidden>
+      <h2>Escolha o modo</h2>
+      <p class="muted mode-intro">Três tamanhos de lista para disputar entre vocês, ou todo mundo junto contra a lista.</p>
+      <div class="mode-grid" id="mode-grid"></div>
     </section>
 
     <!-- Jogadores -->
     <section id="screen-players" class="screen" hidden>
-      <h2>Quantos jogadores?</h2>
+      <div class="mode-bar"></div>
+      <h2 id="players-title">Quantos jogadores?</h2>
       <div class="count-picker" id="count-picker"></div>
       <p class="mode-label" id="mode-label"></p>
       <div class="player-grid" id="player-grid"></div>
@@ -56,6 +64,7 @@
 
     <!-- Listas -->
     <section id="screen-lists" class="screen" hidden>
+      <div class="mode-bar"></div>
       <div class="lists-head">
         <h2>Escolha a lista</h2>
         <div class="head-actions">
@@ -97,6 +106,7 @@
         <h2 id="game-title"></h2>
         <p class="progress" id="progress"></p>
       </div>
+      <div class="versus" id="versus" hidden></div>
       <div class="scoreboard" id="scoreboard"></div>
 
       <div class="turn" id="turn">
@@ -132,6 +142,7 @@
       <div class="actions center">
         <button type="button" class="btn" id="rematch-btn">Revanche (outra lista)</button>
         <button type="button" class="btn ghost" id="new-players-btn">Trocar jogadores</button>
+        <button type="button" class="btn ghost" id="change-mode-btn">Trocar modo</button>
       </div>
     </section>
   </main>

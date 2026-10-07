@@ -386,3 +386,79 @@ body.flash-bad .guess input { border-color: var(--red); }
 .ico { width: 1.15em; height: 1.15em; vertical-align: -0.2em; margin-right: .35em; flex: none; }
 .chip .ico { width: 1.05em; height: 1.05em; }
 .list-cat, .tag { display: inline-flex; align-items: center; }
+
+/* ── modos de jogo ── */
+.mode-intro { margin: -6px 0 20px; }
+.mode-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+@media (max-width: 560px) { .mode-grid { grid-template-columns: 1fr; } }
+.mode-card {
+  display: grid; align-content: start; gap: 6px; text-align: left;
+  border: 2px solid transparent; background: var(--surface); border-radius: var(--r);
+  padding: 20px; transition: border-color .12s, transform .08s;
+}
+.mode-card:hover { border-color: var(--blue); }
+.mode-card:active { transform: scale(.98); }
+.mode-card.active { border-color: var(--fg); }
+.mode-badge { font-stretch: 75%; font-weight: 800; font-size: 3.4rem; line-height: .9; color: var(--blue); }
+.mode-name { font-stretch: 75%; font-weight: 800; font-size: 1.6rem; line-height: 1.05; }
+.mode-desc { font-size: .92rem; }
+.mode-meta { font-size: .75rem; font-weight: 700; color: var(--muted); margin-top: 4px; }
+.mode-card.team { background: var(--blue); color: var(--on-blue); }
+.mode-card.team .mode-badge, .mode-card.team .mode-meta { color: var(--on-blue); }
+.mode-card.team .mode-meta { opacity: .8; }
+.mode-card.team.active { border-color: var(--fg); }
+.mode-ico { width: 1em; height: 1em; vertical-align: -0.12em; }
+.mode-badge .mode-ico { width: 3.4rem; height: 3.4rem; stroke-width: 1.6; }
+.mode-bar { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.mode-bar .link-btn { font-size: .85rem; }
+.mode-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--blue-soft); color: var(--blue); font-weight: 800; font-size: .85rem;
+  padding: 6px 14px; border-radius: 999px;
+}
+.mode-bar + h2, .mode-bar + .lists-head h2 { margin-top: 14px; }
+
+/* ── equipe contra a lista ── */
+.versus {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 6px 14px;
+  background: var(--surface); border-radius: var(--r); padding: 12px 16px; margin-bottom: 8px;
+}
+.vs-side { display: grid; justify-items: start; line-height: 1; }
+.vs-side.list { justify-items: end; }
+.vs-label { font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.vs-pts { font-stretch: 75%; font-weight: 800; font-size: 2.4rem; }
+.vs-side:first-child .vs-pts { color: var(--blue); }
+.vs-mid { min-width: 0; }
+.vs-bar { position: relative; height: 12px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.vs-bar span { position: absolute; inset: 0 auto 0 0; background: var(--blue); border-radius: 99px; transition: width .5s cubic-bezier(.2, .9, .3, 1.1); }
+.vs-bar i { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: var(--fg); opacity: .5; }
+.vs-goal { margin: 6px 0 0; font-size: .75rem; font-weight: 700; color: var(--muted); text-align: center; }
+.lives { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 3px; flex-wrap: wrap; }
+.heart { width: 20px; height: 20px; line-height: 0; }
+.heart svg { width: 100%; height: 100%; fill: var(--red); }
+.heart.lost svg { fill: none; stroke: var(--line); stroke-width: 2; }
+.lives-label { font-size: .75rem; font-weight: 700; color: var(--muted); margin-left: 6px; }
+
+.vs-final { display: block; text-align: center; }
+.vs-final-row { display: flex; justify-content: center; align-items: center; gap: 16px; }
+.vs-final-side {
+  flex: 1; max-width: 260px; display: grid; justify-items: center; gap: 2px;
+  background: var(--surface); border-radius: var(--r); padding: 16px 12px; animation: rise .5s ease-out both;
+}
+.vs-final-side.winner { background: var(--blue); color: var(--on-blue); }
+.vs-final-side.list { animation-delay: .2s; }
+.vs-final-side b { font-size: .95rem; }
+.vs-final-pts { font-stretch: 75%; font-weight: 800; font-size: 3rem; line-height: 1; }
+.vs-team { display: flex; justify-content: center; align-items: flex-end; min-height: 72px; }
+.vs-team .podium-avatar { width: 58px; margin: 0 -8px; }
+.vs-more { font-weight: 800; font-size: .85rem; margin-left: 12px; }
+.vs-list-icon { min-height: 72px; display: grid; place-items: center; }
+.ico.big { width: 56px; height: 56px; margin: 0; }
+.vs-x { font-stretch: 75%; font-weight: 800; font-size: 2rem; color: var(--muted); }
+.vs-verdict { margin: 14px 0 0; font-weight: 700; color: var(--muted); }
+@media (max-width: 480px) {
+  .vs-pts { font-size: 1.9rem; }
+  .vs-final-row { gap: 8px; }
+  .vs-team .podium-avatar { width: 44px; }
+  .vs-final-pts { font-size: 2.3rem; }
+}
