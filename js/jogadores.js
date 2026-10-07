@@ -125,6 +125,12 @@ function renderPlayersScreen() {
   });
 }
 
+// Depois de trocar skin: atualiza a tela de jogadores e a do modo online.
+function refreshAfterAvatar() {
+  renderPlayersScreen();
+  if (document.body.dataset.screen === "online") renderOnline();
+}
+
 // Antes de escolher a lista: no modo Times, os dois times precisam de gente.
 function playersReady() {
   if (!mode().teams) return true;

@@ -24,6 +24,8 @@ const FILES = [
   "js/resultado.js",
   "js/estatisticas.js",
   "js/diaria.js",
+  "js/config.js",
+  "js/online.js",
   "js/app.js",
   "brand/logo.svg",
   "brand/logo-dark.svg",

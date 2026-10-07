@@ -2,7 +2,10 @@
 // Telas: início → modo → jogadores → lista (ou criar lista) → partida → resultado.
 
 function goHome() {
-  if (game && !game.over && !confirm("Sair da partida atual?")) return;
+  if (game && game.online && !game.over) {
+    if (!confirm("Sair da partida online? Você sai da sala.")) return;
+    leaveRoom();
+  } else if (game && !game.over && !confirm("Sair da partida atual?")) return;
   stopTurnTimer();
   game = null;
   renderDailyCard();
@@ -38,30 +41,48 @@ $("editor-form").addEventListener("submit", (e) => {
 $("guess-form").addEventListener("submit", (e) => {
   e.preventDefault();
   const input = $("guess");
+  if (game && game.online && !game.isHost) {
+    if (input.value.trim()) sendAction({ type: "guess", text: input.value.trim() });
+    input.value = "";
+    return;
+  }
   handleGuess(input.value);
   if (game && !game.busy) {
     input.value = "";
     focusGuess();
   }
 });
-$("pass-btn").addEventListener("click", passTurn);
+$("pass-btn").addEventListener("click", () => (game && game.online && !game.isHost ? sendAction({ type: "pass" }) : passTurn()));
 $("hint-btn").addEventListener("click", toggleHintMode);
+function pickHint(i) {
+  if (game && game.online && !game.isHost) {
+    sendAction({ type: "hint", index: i });
+    game.hintMode = false;
+    renderGame();
+  } else {
+    useHint(i);
+  }
+}
 $("board").addEventListener("click", (e) => {
   const li = e.target.closest("li.pickable");
-  if (li) useHint(Number(li.dataset.index));
+  if (li) pickHint(Number(li.dataset.index));
 });
 $("board").addEventListener("keydown", (e) => {
   const li = e.target.closest("li.pickable");
   if (li && (e.key === "Enter" || e.key === " ")) {
     e.preventDefault();
-    useHint(Number(li.dataset.index));
+    pickHint(Number(li.dataset.index));
   }
 });
 $("end-btn").addEventListener("click", () => {
   if (confirm("Encerrar a partida e ver o resultado?")) endGame("Partida encerrada.");
 });
 
-$("rematch-btn").addEventListener("click", () => (game && game.daily ? openModes() : openLists()));
+$("rematch-btn").addEventListener("click", () => {
+  if (game && game.online) backToRoom();
+  else if (game && game.daily) openModes();
+  else openLists();
+});
 $("share-btn").addEventListener("click", (e) => {
   if (game && game.daily) shareText(dailyShareText(game.daily, dailyResultOf(game)), e.currentTarget, "Compartilhar resultado");
 });
@@ -75,8 +96,30 @@ $("builder-save").addEventListener("click", () => {
   players[dialogPlayer].presetId = null;
   savePlayers();
   $("avatar-dialog").close();
-  renderPlayersScreen();
+  refreshAfterAvatar();
 });
+
+// Modo online e conta.
+$("online-btn").addEventListener("click", openOnline);
+$("online-avatar").addEventListener("click", () => openAvatarDialog(0));
+$("online-nick").addEventListener("input", (e) => {
+  ensurePlayers();
+  players[0].nick = e.target.value;
+  savePlayers();
+});
+$("create-room-btn").addEventListener("click", createRoom);
+$("join-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  joinRoom($("join-code").value);
+});
+$("lobby-start").addEventListener("click", startOnlineGame);
+$("lobby-leave").addEventListener("click", () => {
+  if (confirm(isHost() ? "Fechar a sala para todo mundo?" : "Sair da sala?")) leaveRoom();
+});
+$("room-share").addEventListener("click", (e) => shareRoom(e.currentTarget));
+document.querySelectorAll(".account-btn").forEach((b) => b.addEventListener("click", openAccount));
+$("account-form").addEventListener("submit", accountSave);
+$("account-logout").addEventListener("click", accountLogout);
 
 // Modo claro/escuro: começa seguindo o aparelho; o botão fixa a escolha.
 function currentTheme() {
@@ -103,3 +146,4 @@ ensurePlayers();
 renderDailyCard();
 $("list-total").textContent = allLists().length;
 if (!importFromHash()) show("home");
+initOnline();

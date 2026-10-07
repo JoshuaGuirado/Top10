@@ -1,6 +1,11 @@
 // Estatísticas e recordes, salvos só neste navegador.
 
-const MODE_LABELS = { top10: "Top 10", top30: "Top 30", top50: "Top 50", equipe: "Equipe contra a lista", times: "Times", diaria: "Lista do dia" };
+const MODE_LABELS = { top10: "Top 10", top30: "Top 30", top50: "Top 50", equipe: "Equipe contra a lista", times: "Times", diaria: "Lista do dia", online: "Online" };
+
+// Online, cada aparelho guarda só os números do próprio jogador.
+function countedPlayers(g) {
+  return g.online ? g.players.filter((_, i) => i === g.me) : g.players;
+}
 
 function loadStats() {
   return { games: 0, points: 0, hits: 0, misses: 0, byMode: {}, vsGames: 0, vsWins: 0, perfect: 0, best: null, ...(store("stats") || {}) };
@@ -20,10 +25,10 @@ function recordGame(g, outcome) {
   if (!played) return null;
   const n = g.items.length;
   const s = loadStats();
-  const key = g.daily ? "diaria" : modeId;
+  const key = g.daily ? "diaria" : g.online ? "online" : modeId;
   s.games += 1;
   s.byMode[key] = (s.byMode[key] || 0) + 1;
-  g.players.forEach((p) => {
+  countedPlayers(g).forEach((p) => {
     s.points += p.score;
     s.hits += p.hits.length;
     s.misses += p.misses;
@@ -34,6 +39,7 @@ function recordGame(g, outcome) {
   }
   if (g.found.size === n) s.perfect += 1;
   g.found.forEach((who, i) => {
+    if (g.online && who !== g.me) return;
     if (!s.best || i + 1 > s.best.pos) s.best = { pos: i + 1, item: g.items[i].name, list: g.list.title, name: g.players[who].name };
   });
   store("stats", s);
@@ -73,7 +79,7 @@ function updateRecord(g) {
       record = { score };
     }
   } else {
-    const top = g.players.reduce((a, b) => (b.score > a.score ? b : a));
+    const top = countedPlayers(g).reduce((a, b) => (b.score > a.score ? b : a), { score: 0 });
     if (top.score > 0 && (!r.individual || top.score > r.individual.score)) {
       r.individual = { score: top.score, name: top.name, total: (n * (n + 1)) / 2 };
       record = { score: top.score };
@@ -131,6 +137,8 @@ function renderStats() {
 
 function openStats() {
   renderStats();
+  renderAccount();
+  renderOnlineHistory();
   show("stats");
 }
 

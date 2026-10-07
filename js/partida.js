@@ -4,8 +4,10 @@ const TURN_DELAY = 950;
 let game = null;
 
 // opts.daily: número da lista do dia (joga só o jogador 1, contra a lista).
+// opts.online: { roster, timer } quando este aparelho é o anfitrião de uma sala online.
 function startGame(list, opts = {}) {
   const daily = opts.daily || null;
+  const online = opts.online || null;
   if (!daily) {
     lastListIds = [list.id, ...lastListIds.filter((id) => id !== list.id)].slice(0, 40);
     store("recent", lastListIds);
@@ -14,11 +16,11 @@ function startGame(list, opts = {}) {
   const n = list.items.length;
   const vsList = !!daily || !!mode().team;
   const teams = !daily && !!mode().teams;
-  const roster = daily ? [players[0]] : players.slice(0, playerCount);
+  const roster = daily ? [players[0]] : online ? online.roster : players.slice(0, playerCount);
   const lives = daily ? 3 : TEAM_LIVES[n] || Math.max(3, Math.round(n / 5));
   const gamePlayers = roster.map((p, i) => ({
-    name: playerName(p, i), avatar: p.avatar, team: p.team, score: 0, hits: [], misses: 0, passes: 0, timeouts: 0,
-    streak: 0, bestStreak: 0, clutch: 0,
+    name: online ? p.name : playerName(p, i), avatar: p.avatar, team: p.team, uid: online ? p.uid : null,
+    score: 0, hits: [], misses: 0, passes: 0, timeouts: 0, streak: 0, bestStreak: 0, clutch: 0,
   }));
   game = {
     list,
@@ -42,22 +44,38 @@ function startGame(list, opts = {}) {
     dailyCounts: !!opts.counts,
     lives,
     maxLives: lives,
-    timeLimit: daily ? 0 : turnTime,
+    timeLimit: daily ? 0 : online ? online.timer : turnTime,
     timeLeft: 0,
+    turnSeq: 0,
     endTimer: null,
+    online: !!online,
+    isHost: !!online,
+    gid: online ? Math.random().toString(36).slice(2, 10) : null,
+    me: 0,
   };
+  if (online) game.me = gamePlayers.findIndex((p) => p.uid === myId());
   if (teams) game.turn = takeNext(0);
 
-  const cat = categoryOf(list);
-  const tag = daily ? ` · Lista do dia #${daily}` : vsList ? " · Equipe contra a lista" : teams ? " · Times" : "";
-  $("game-cat").innerHTML = `${icon(cat.id)}${escapeHtml(cat.label)} · ${n} itens${tag}`;
-  $("game-title").textContent = list.title;
-  $("source").textContent = `Fonte: ${list.source}`;
+  setupGameScreen();
   setFeedback("", "");
   show("game");
   renderGame();
   startTurnTimer();
   focusGuess();
+}
+
+function setupGameScreen() {
+  const list = game.list;
+  const cat = categoryOf(list);
+  const tag = (game.daily ? ` · Lista do dia #${game.daily}` : game.vsList ? " · Equipe contra a lista" : game.teams ? " · Times" : "") + (game.online ? " · Online" : "");
+  $("game-cat").innerHTML = `${icon(cat.id)}${escapeHtml(cat.label)} · ${list.items.length} itens${tag}`;
+  $("game-title").textContent = list.title;
+  $("source").textContent = `Fonte: ${list.source}`;
+}
+
+// Online, cada aparelho só joga na vez do próprio jogador.
+function myTurn() {
+  return !game.online || game.turn === game.me;
 }
 
 function takeNext(team) {
@@ -177,17 +195,26 @@ function renderGame() {
 
   $("wrong-guesses").textContent = game.wrongLog.length ? "Chutes errados: " + game.wrongLog.map((w) => w.text).join(", ") : "";
 
-  const disabled = game.busy || game.over;
+  const disabled = game.busy || game.over || !myTurn();
   $("guess").disabled = disabled;
+  $("guess").placeholder = myTurn() || game.over ? "Seu palpite" : `Vez de ${cur.name}…`;
   $("guess-form").querySelector("button").disabled = disabled;
   $("pass-btn").hidden = game.players.length === 1;
   $("pass-btn").disabled = disabled;
   $("hint-btn").hidden = !game.vsList;
-  $("hint-btn").disabled = !game.hintMode && !canHint();
+  $("hint-btn").disabled = !myTurn() || (!game.hintMode && !canHint());
   $("hint-btn").textContent = game.hintMode ? "Cancelar dica" : "Dica (−1 vida)";
+  $("end-btn").hidden = game.online && !game.isHost;
+  if (game.online) onlineAfterRender();
 }
 
 function setFeedback(text, kind) {
+  if (game) game.feedback = { text, kind };
+  paintFeedback(text, kind);
+}
+
+// Só pinta a mensagem neste aparelho (sem mandar para os outros jogadores online).
+function paintFeedback(text, kind) {
   const f = $("feedback");
   f.className = "feedback " + kind;
   f.textContent = text;
@@ -251,24 +278,43 @@ function scoreHit(i, who) {
   p.bestStreak = Math.max(p.bestStreak, p.streak);
   if (game.vsList && game.lives === 1) p.clutch += 1;
   game.passStreak = 0;
+  const tier = ratio >= 0.7 ? "high" : ratio >= 0.35 ? "mid" : "low";
+  const forWho = game.teams ? `${p.name} (${TEAM_NAMES[p.team]})` : p.name;
+  let text = `${pick(HYPE[tier])} ${game.items[i].name} é o nº ${pts}: +${pts} para ${forWho}.`;
+  if (p.streak >= 3) text += " " + pick(STREAK_LINES).replace("{nome}", p.name).replace("{n}", p.streak);
+  setFeedback(text, tier === "high" || p.streak >= 3 ? "epic" : "good");
   renderGame();
+  hitEffects(i, who);
+}
 
+// Animação e som de um acerto (online, os outros aparelhos repetem ao receber o lance).
+function hitEffects(i, who) {
+  const pts = i + 1;
+  const ratio = pts / game.items.length;
   const slot = $("board").querySelector(`[data-index="${i}"]`);
+  if (!slot) return;
   slot.classList.add("reveal");
   slot.scrollIntoView({ block: "nearest", behavior: "smooth" });
   const r = slot.getBoundingClientRect();
   fx.burst(r.left + r.width / 2, r.top + r.height / 2, Math.round(20 + ratio * 80));
   floatText(slot, `+${pts}`, ratio >= 0.7 ? "epic" : "");
   sfx.right(ratio);
-  const tier = ratio >= 0.7 ? "high" : ratio >= 0.35 ? "mid" : "low";
-  if (tier === "high") flash("flash-epic");
-  const forWho = game.teams ? `${p.name} (${TEAM_NAMES[p.team]})` : p.name;
-  let text = `${pick(HYPE[tier])} ${game.items[i].name} é o nº ${pts}: +${pts} para ${forWho}.`;
-  if (p.streak >= 3) {
-    text += " " + pick(STREAK_LINES).replace("{nome}", p.name).replace("{n}", p.streak);
-    floatText($("scoreboard").querySelector(`[data-player="${who}"]`), "🔥", "epic");
-  }
-  setFeedback(text, tier === "high" || p.streak >= 3 ? "epic" : "good");
+  if (ratio >= 0.7) flash("flash-epic");
+  if (game.players[who].streak >= 3) floatText($("scoreboard").querySelector(`[data-player="${who}"]`), "🔥", "epic");
+}
+
+function missEffects(who, timeout) {
+  sfx.wrong();
+  flash("flash-bad");
+  shake($("guess-form"));
+  const chip = $("scoreboard").querySelector(`[data-player="${who}"]`);
+  shake(chip);
+  floatText(chip, timeout ? "tempo!" : "errou", "bad");
+}
+
+function lifeEffects() {
+  shake($("versus"));
+  floatText($("versus").querySelector(".lives"), "-1 vida", "bad");
 }
 
 // Erro (palpite fora da lista) ou tempo esgotado (wrong = null).
@@ -283,19 +329,13 @@ function registerMiss(message, wrong) {
   p.misses += 1;
   p.streak = 0;
   game.passStreak = 0;
-  sfx.wrong();
-  flash("flash-bad");
-  shake($("guess-form"));
-  const chip = $("scoreboard").querySelector(`[data-player="${who}"]`);
-  shake(chip);
-  floatText(chip, wrong ? "errou" : "tempo!", "bad");
+  missEffects(who, !wrong);
   let tail = game.players.length > 1 ? " Passa a vez." : "";
 
   if (game.vsList) {
     game.lives -= 1;
     renderVersus();
-    shake($("versus"));
-    floatText($("versus").querySelector(".lives"), "-1 vida", "bad");
+    lifeEffects();
     if (game.lives <= 0) return endGame(`${message} Acabaram as vidas${game.players.length > 1 ? " da equipe" : ""}!`);
     tail = ` ${game.lives === 1 ? "Resta 1 vida!" : `Restam ${game.lives} vidas.`}${tail}`;
   }
@@ -312,6 +352,7 @@ function nextTurn() {
   setTimeout(() => {
     if (game !== g || g.over) return;
     g.turn = nextPlayerIndex();
+    g.turnSeq += 1;
     g.busy = false;
     $("guess").value = "";
     renderGame();
@@ -410,12 +451,12 @@ function timeUp() {
 // ───────────── dicas (equipe contra a lista) ─────────────
 
 function toggleHintMode() {
-  if (!game || game.over || game.busy) return;
+  if (!game || game.over || game.busy || !myTurn()) return;
   if (!game.hintMode && !canHint()) return;
   game.hintMode = !game.hintMode;
   renderGame();
-  if (game.hintMode) setFeedback("Toque num item escondido para ver a primeira letra. Custa 1 vida.", "info");
-  else setFeedback("", "");
+  if (game.hintMode) paintFeedback("Toque num item escondido para ver a primeira letra. Custa 1 vida.", "info");
+  else paintFeedback((game.feedback || {}).text || "", (game.feedback || {}).kind || "");
 }
 
 function useHint(i) {
@@ -424,8 +465,8 @@ function useHint(i) {
   game.hints.add(i);
   game.lives -= 1;
   sfx.hint();
-  renderGame();
   setFeedback(`Dica do nº ${i + 1}: ${hintFor(game.items[i].name)}. ${game.lives === 1 ? "Resta 1 vida." : `Restam ${game.lives} vidas.`}`, "info");
+  renderGame();
   floatText($("versus").querySelector(".lives"), "-1 vida", "bad");
   focusGuess();
 }

@@ -636,3 +636,59 @@ body.flash-bad .guess input { border-color: var(--red); }
   .contest-guess { grid-column: 1 / -1; }
 }
 .podium:not(.vs-final) { margin-top: 48px; }
+
+/* ── modo online ── */
+.btn.dark { background: var(--fg); color: var(--bg); }
+.online-setup, .online-box, .online-me, .lobby-settings { background: var(--surface); border-radius: var(--r); padding: 16px; }
+.online-setup { border: 2px dashed var(--line); background: transparent; }
+.online-setup code { font-size: .9em; background: var(--surface); padding: 2px 6px; border-radius: 6px; }
+.online-me { display: grid; grid-template-columns: 130px 1fr; gap: 16px; align-items: center; margin: 16px 0 12px; }
+.online-me .avatar-btn { padding: 8px 14px 0; }
+.online-me-info { display: grid; gap: 8px; justify-items: start; }
+.online-me-info .nick { width: 100%; }
+.online-me-info p { margin: 0; }
+.online-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.online-box { display: grid; gap: 10px; align-content: start; }
+.online-box h3 { margin: 0; font-size: 1.4rem; }
+.online-box p { margin: 0; }
+.code-input {
+  font: inherit; font-stretch: 75%; font-weight: 800; font-size: 1.8rem; letter-spacing: .2em; text-transform: uppercase; text-align: center;
+  width: 100%; padding: 8px 12px; border: 2px solid var(--line); border-radius: var(--r-sm); background: var(--bg); color: var(--fg);
+}
+.code-input:focus { outline: none; border-color: var(--blue); }
+@media (max-width: 560px) {
+  .online-grid { grid-template-columns: 1fr; }
+  .online-me { grid-template-columns: 96px 1fr; }
+}
+.lobby-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+.lobby-top .ctrl-label { margin: 0; }
+.room-code { margin: 0; font-stretch: 75%; font-weight: 800; font-size: clamp(3rem, 16vw, 5rem); letter-spacing: .12em; line-height: 1; color: var(--blue); }
+.lobby-players { display: grid; gap: 6px; margin-bottom: 16px; }
+.lobby-player { display: flex; align-items: center; gap: 10px; background: var(--surface); border-radius: var(--r); padding: 6px 12px 6px 6px; }
+.lobby-player b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lobby-player b small { color: var(--muted); font-weight: 600; }
+.lobby-player .mini { position: relative; overflow: visible; }
+.lobby-player .mini svg { border-radius: 9px; }
+.lobby-player.here .mini::after { content: ""; position: absolute; right: -3px; bottom: -3px; width: 12px; height: 12px; border-radius: 50%; background: #2BA84A; border: 2px solid var(--surface); }
+.lobby-player.t0 { box-shadow: inset 4px 0 0 var(--blue); }
+.lobby-player.t1 { box-shadow: inset 4px 0 0 var(--red); }
+.lobby-player .team-toggle:disabled { opacity: .85; cursor: default; }
+.host-tag { font-size: .75rem; font-weight: 800; color: var(--muted); white-space: nowrap; }
+.kick { border: 0; background: var(--bg); border-radius: 50%; width: 30px; height: 30px; font-size: 1.1rem; line-height: 1; color: var(--muted); }
+.kick:hover { background: var(--red); color: #fff; }
+.lobby-settings { display: grid; gap: 8px; }
+.lobby-settings .ctrl-label { margin: 6px 0 0; }
+.lobby-settings p { margin: 0; }
+.lobby-settings .chip { background: var(--bg); }
+.lobby-settings .chip.active { background: var(--fg); color: var(--bg); }
+.lobby-summary { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.lobby-list { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.stats-account { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: var(--surface); border-radius: var(--r); padding: 12px 16px; }
+.stats-account p { margin: 0; flex: 1 1 240px; }
+.account-dialog { width: min(480px, calc(100vw - 24px)); }
+.account-form { display: grid; gap: 10px; }
+.account-form .actions { margin-top: 4px; }
+.account-form p { margin: 0; }
+.account-dialog .feedback.good { color: #2BA84A; }
+.lobby-settings .btn.ghost { background: var(--bg); }
+.online-me .btn.ghost, .stats-account .btn.ghost { background: var(--bg); }

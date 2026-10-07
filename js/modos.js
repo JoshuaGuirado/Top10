@@ -63,12 +63,12 @@ function openModes() {
 
 function renderModeBars() {
   document.querySelectorAll(".mode-bar").forEach((bar) => {
-    bar.innerHTML = `<span class="mode-pill">${modeIcon(mode())}${mode().name}</span>`;
+    bar.innerHTML = `<span class="mode-pill">${modeIcon(mode())}${mode().name}${pickingForRoom ? " · sala online" : ""}</span>`;
     const b = document.createElement("button");
     b.type = "button";
     b.className = "link-btn";
-    b.textContent = "Trocar modo";
-    b.addEventListener("click", openModes);
+    b.textContent = pickingForRoom ? "Voltar à sala" : "Trocar modo";
+    b.addEventListener("click", pickingForRoom ? showLobby : openModes);
     bar.appendChild(b);
   });
 }

@@ -2,10 +2,12 @@
 
 const $ = (id) => document.getElementById(id);
 
+// Guarda no navegador. store.onWrite (do modo online) leva as mudanças para a conta.
 function store(key, value) {
   try {
     if (value === undefined) return JSON.parse(localStorage.getItem("tt:" + key));
     localStorage.setItem("tt:" + key, JSON.stringify(value));
+    if (store.onWrite) store.onWrite(key);
   } catch (e) {
     return null;
   }
@@ -40,7 +42,7 @@ function shareText(text, btn, label) {
 
 // ───────────── navegação ─────────────
 
-const screens = ["home", "modes", "players", "lists", "editor", "game", "results", "stats"];
+const screens = ["home", "modes", "players", "lists", "editor", "game", "results", "stats", "online", "lobby"];
 
 function show(name) {
   screens.forEach((s) => ($("screen-" + s).hidden = s !== name));

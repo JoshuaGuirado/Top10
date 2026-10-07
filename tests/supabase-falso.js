@@ -1,0 +1,130 @@
+// Supabase de mentira para testar o modo online no navegador, sem internet.
+// Banco: localStorage (compartilhado entre abas). Tempo real: BroadcastChannel.
+// Cada aba tem o próprio usuário (sessionStorage). Usado só pelos testes com Playwright.
+(() => {
+  const DB_KEY = "__fakedb";
+  const PK = { rooms: ["code"], room_players: ["room_code", "user_id"], profiles: ["id"], matches: ["id"] };
+  const empty = () => ({ rooms: [], room_players: [], profiles: [], matches: [] });
+  const load = () => JSON.parse(localStorage.getItem(DB_KEY) || "null") || empty();
+  const save = (db) => localStorage.setItem(DB_KEY, JSON.stringify(db));
+  const now = () => new Date().toISOString();
+
+  class Query {
+    constructor(table) { this.t = table; this.op = "select"; this.filters = []; this.sort = null; this.max = null; this.one = false; }
+    select() { return this; }
+    insert(row) { this.op = "insert"; this.payload = row; return this; }
+    upsert(row) { this.op = "upsert"; this.payload = row; return this; }
+    update(obj) { this.op = "update"; this.payload = obj; return this; }
+    delete() { this.op = "delete"; return this; }
+    eq(c, v) { this.filters.push([c, v]); return this; }
+    order(c, o = {}) { this.sort = [c, o.ascending !== false]; return this; }
+    limit(n) { this.max = n; return this; }
+    maybeSingle() { this.one = true; return this; }
+    then(ok, fail) { return new Promise((r) => setTimeout(r, 15)).then(() => this.run()).then(ok, fail); }
+    run() {
+      const db = load();
+      const rows = db[this.t];
+      const key = (r) => PK[this.t].map((k) => r[k]).join("|");
+      const hit = (r) => this.filters.every(([c, v]) => r[c] === v);
+      if (this.op === "insert" || this.op === "upsert") {
+        const r = { created_at: now(), joined_at: now(), updated_at: now(), ...this.payload };
+        if (this.t === "matches") r.id = rows.length + 1;
+        const old = rows.find((x) => key(x) === key(r));
+        if (old && this.op === "insert") return { data: null, error: { code: "23505", message: "duplicate key" } };
+        if (old) Object.assign(old, this.payload, { updated_at: now() });
+        else {
+          if (this.t === "room_players" && rows.filter((x) => x.room_code === r.room_code).length >= 8) return { data: null, error: { message: "A sala está cheia" } };
+          rows.push(r);
+        }
+        save(db);
+        return { data: r, error: null };
+      }
+      if (this.op === "update") {
+        rows.filter(hit).forEach((r) => Object.assign(r, this.payload, { updated_at: now() }));
+        save(db);
+        return { data: null, error: null };
+      }
+      if (this.op === "delete") {
+        const gone = rows.filter(hit);
+        db[this.t] = rows.filter((r) => !hit(r));
+        if (this.t === "rooms") gone.forEach((g) => (db.room_players = db.room_players.filter((p) => p.room_code !== g.code)));
+        save(db);
+        return { data: null, error: null };
+      }
+      let out = rows.filter(hit);
+      if (this.sort) {
+        const [c, asc] = this.sort;
+        out = out.slice().sort((a, b) => (a[c] > b[c] ? 1 : a[c] < b[c] ? -1 : 0) * (asc ? 1 : -1));
+      }
+      if (this.max) out = out.slice(0, this.max);
+      return { data: this.one ? out[0] || null : out, error: null };
+    }
+  }
+
+  class Channel {
+    constructor(name, opts) {
+      this.key = opts && opts.config && opts.config.presence && opts.config.presence.key;
+      this.handlers = [];
+      this.seen = {};
+      this.bc = new BroadcastChannel("fake-" + name);
+      this.bc.onmessage = (e) => this.receive(e.data);
+    }
+    on(type, filter, cb) { this.handlers.push({ type, filter, cb }); return this; }
+    subscribe(cb) {
+      setTimeout(() => cb && cb("SUBSCRIBED"), 40);
+      this.beat = setInterval(() => {
+        if (this.tracked) this.post({ kind: "here", key: this.key });
+        this.firePresence();
+      }, 1000);
+      return this;
+    }
+    async track() {
+      this.tracked = true;
+      this.seen[this.key] = Date.now();
+      this.post({ kind: "here", key: this.key });
+      this.post({ kind: "ask" });
+      this.firePresence();
+    }
+    presenceState() {
+      const out = {};
+      Object.entries(this.seen).forEach(([k, t]) => { if (Date.now() - t < 3500) out[k] = [{}]; });
+      return out;
+    }
+    send({ event, payload }) { this.post({ kind: "broadcast", event, payload }); return Promise.resolve("ok"); }
+    post(m) { this.bc.postMessage(JSON.parse(JSON.stringify(m))); }
+    receive(m) {
+      if (m.kind === "broadcast") this.handlers.filter((h) => h.type === "broadcast" && h.filter.event === m.event).forEach((h) => h.cb({ payload: m.payload }));
+      if (m.kind === "here") { this.seen[m.key] = Date.now(); this.firePresence(); }
+      if (m.kind === "ask" && this.tracked) this.post({ kind: "here", key: this.key });
+      if (m.kind === "bye") { delete this.seen[m.key]; this.firePresence(); }
+    }
+    firePresence() { this.handlers.filter((h) => h.type === "presence").forEach((h) => h.cb()); }
+    close() { this.post({ kind: "bye", key: this.key }); clearInterval(this.beat); this.bc.close(); }
+  }
+
+  const listeners = [];
+  const session = (id) => ({ user: { id, email: null, is_anonymous: true } });
+  const client = {
+    from: (t) => new Query(t),
+    rpc: () => Promise.resolve({ data: null, error: null }),
+    channel: (name, opts) => new Channel(name, opts),
+    removeChannel: (ch) => ch.close(),
+    auth: {
+      async getSession() {
+        const id = sessionStorage.getItem("__fakeuid");
+        return { data: { session: id ? session(id) : null } };
+      },
+      async signInAnonymously() {
+        const id = crypto.randomUUID();
+        sessionStorage.setItem("__fakeuid", id);
+        setTimeout(() => listeners.forEach((l) => l("SIGNED_IN", session(id))), 0);
+        return { data: { session: session(id) }, error: null };
+      },
+      onAuthStateChange(cb) { listeners.push(cb); return { data: { subscription: { unsubscribe() {} } } }; },
+      async updateUser() { return { data: {}, error: null }; },
+      async signInWithOtp() { return { data: {}, error: null }; },
+      async signOut() { sessionStorage.removeItem("__fakeuid"); return { error: null }; },
+    },
+  };
+  window.supabase = { createClient: () => client };
+})();

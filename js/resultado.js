@@ -281,6 +281,7 @@ function showResults() {
   game.phrases = {};
   const record = recordGame(game, game.vsList ? vsOutcome() : null);
   if (game.daily) recordDaily(game);
+  if (game.online) onlineGameFinished();
   renderResults(record ? `🏆 Novo recorde da lista: ${record.score} pts!` : "");
   show("results");
   playReveal(game.view);
@@ -301,7 +302,10 @@ function renderResults(note) {
   renderLateContest();
   renderFinalBoard(n);
   $("share-btn").hidden = !game.daily;
-  $("rematch-btn").textContent = game.daily ? "Jogar outra lista" : "Revanche (outra lista)";
+  $("rematch-btn").textContent = game.online ? "Voltar à sala" : game.daily ? "Jogar outra lista" : "Revanche (outra lista)";
+  $("new-players-btn").hidden = game.online;
+  $("change-mode-btn").hidden = game.online;
+  game.resultsNote = note;
 }
 
 // Números que sobem de 0 até o valor final.
@@ -416,6 +420,8 @@ function renderFinalBoard(n) {
 // jogadores (a turma decide junto) e nunca na lista do dia.
 
 function canContest() {
+  // Online, quem aceita é o anfitrião (depois de a turma combinar).
+  if (game.online && !game.isHost) return false;
   return !game.daily && game.players.length > 1 && game.wrongLog.length > 0 && game.found.size < game.items.length;
 }
 
@@ -455,7 +461,7 @@ function acceptLate(k, i) {
   p.hits.push(i + 1);
   p.misses -= 1;
   learnAnswer(game.list.id, i, normalize(w.text));
-  const record = recordAccepted(game, i, w.player, game.vsList ? vsOutcome() : null);
+  const record = !game.online || w.player === game.me ? recordAccepted(game, i, w.player, game.vsList ? vsOutcome() : null) : null;
   const notes = [`✅ Aceito! “${w.text}” valeu o nº ${i + 1}: +${i + 1} para ${p.name}.`];
   if (record) notes.push(`🏆 Novo recorde da lista: ${record.score} pts!`);
   renderResults(notes.join(" "));
@@ -466,4 +472,5 @@ function acceptLate(k, i) {
   countUp(screen);
   sfx.right((i + 1) / n);
   floatText($("results-sub"), `+${i + 1}`, "epic");
+  if (game.online) onlineSync();
 }

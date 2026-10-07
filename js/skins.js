@@ -47,7 +47,7 @@ function renderAvatarDialog() {
       players[dialogPlayer].avatar = { ...preset.cfg };
       store("players", players);
       $("avatar-dialog").close();
-      renderPlayersScreen();
+      refreshAfterAvatar();
     });
     card.querySelector(".preset-edit").addEventListener("click", () => {
       draft = { ...DEFAULT_AVATAR, ...JSON.parse(JSON.stringify(preset.cfg)) };

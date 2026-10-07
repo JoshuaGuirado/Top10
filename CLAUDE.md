@@ -8,3 +8,5 @@
 - Script novo em `js/` ou `data/`: incluir no `index.html` **e** na lista `FILES` do `sw.js`
   (o teste `tests/arquivos.test.js` acusa se faltar).
 - Antes de enviar: `npm test` e testar o fluxo no navegador (Playwright com o Chromium do ambiente).
+- Mexeu no online (`js/online.js`, partida ou resultado)? Rode também `npm run test:online` (duas abas com o
+  Supabase falso de `tests/supabase-falso.js`). Mudou o banco? Atualize `supabase/schema.sql` (precisa poder rodar de novo).

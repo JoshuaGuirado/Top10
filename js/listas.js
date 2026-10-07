@@ -117,7 +117,7 @@ function renderListGrid() {
         ${played ? '<span class="list-played">jogada recentemente</span>' : ""}
       </button>
       ${l.custom ? `<div class="list-tools"><button type="button" data-act="edit">Editar</button><button type="button" data-act="share">Compartilhar</button><button type="button" data-act="delete">Apagar</button></div>` : ""}`;
-    card.querySelector(".list-play").addEventListener("click", () => startGame(l));
+    card.querySelector(".list-play").addEventListener("click", () => chooseList(l));
     card.querySelectorAll(".list-tools button").forEach((b) => b.addEventListener("click", () => {
       if (b.dataset.act === "edit") openEditor(l);
       if (b.dataset.act === "share") shareList(l, b);
@@ -144,7 +144,13 @@ function openLists() {
 function randomList() {
   const pool = filteredLists();
   const fresh = pool.filter((l) => !lastListIds.includes(l.id));
-  startGame(pick(fresh.length ? fresh : pool.length ? pool : allLists().filter(sizeOk)));
+  chooseList(pick(fresh.length ? fresh : pool.length ? pool : allLists().filter(sizeOk)));
+}
+
+// Escolher a lista começa a partida, ou define a lista da sala online.
+function chooseList(list) {
+  if (pickingForRoom) pickRoomList(list);
+  else startGame(list);
 }
 
 // ───────────── criar a própria lista ─────────────
