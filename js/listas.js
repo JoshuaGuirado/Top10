@@ -149,7 +149,8 @@ function randomList() {
 
 // Escolher a lista começa a partida, ou define a lista da sala online.
 function chooseList(list) {
-  if (pickingForRoom) pickRoomList(list);
+  if (pickingForRoom === "suggest") suggestList(list);
+  else if (pickingForRoom) pickRoomList(list);
   else startGame(list);
 }
 

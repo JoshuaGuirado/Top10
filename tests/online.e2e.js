@@ -30,6 +30,7 @@ const server = http.createServer((req, res) => {
   const page = async () => {
     const p = await ctx.newPage();
     p.on("pageerror", (e) => errors.push(e.message));
+    p.on("console", (m) => { if (m.text().startsWith("[online]")) console.log("   ", m.text()); });
     p.on("dialog", (d) => d.accept());
     return p;
   };
@@ -54,10 +55,22 @@ const server = http.createServer((req, res) => {
   await A.waitForFunction(() => document.querySelectorAll(".lobby-player").length === 2, null, { timeout: 5000 });
   step("convidada entra pelo link e aparece na sala");
 
-  await A.click("#lobby-random");
-  await A.waitForTimeout(400);
+  // Lara vê as listas e sugere uma; Arthur usa a sugestão.
+  await B.click("#lobby-suggest");
+  await B.waitForSelector("#screen-lists:not([hidden])");
+  const suggested = await B.textContent(".list-card:nth-child(2) .list-title");
+  await B.click(".list-card:nth-child(2) .list-play");
+  await B.waitForSelector("#screen-lobby:not([hidden])");
+  await A.waitForSelector(".suggestion button", { timeout: 5000 });
+  assert.match(await A.textContent(".suggestion"), /sugerida por Lara/);
+  assert.equal(await B.$(".suggestion button"), null, "convidada não tem o botão Usar");
+  await A.click(".suggestion button");
+  await B.waitForFunction((t) => document.querySelector("#lobby-settings").textContent.includes(t), suggested, { timeout: 5000 });
+  step("convidada sugere uma lista e o anfitrião usa a sugestão");
+
   await A.click("#lobby-start");
   await B.waitForSelector("#screen-game:not([hidden])", { timeout: 5000 });
+  assert.equal(await B.textContent("#game-title"), suggested);
   assert.equal(await B.isDisabled("#guess"), true, "convidada não joga na vez do anfitrião");
   step("partida começa nos dois aparelhos");
 

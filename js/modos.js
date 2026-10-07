@@ -63,7 +63,8 @@ function openModes() {
 
 function renderModeBars() {
   document.querySelectorAll(".mode-bar").forEach((bar) => {
-    bar.innerHTML = `<span class="mode-pill">${modeIcon(mode())}${mode().name}${pickingForRoom ? " · sala online" : ""}</span>`;
+    const extra = pickingForRoom === "suggest" ? " · toque numa lista para sugerir" : pickingForRoom ? " · sala online" : "";
+    bar.innerHTML = `<span class="mode-pill">${modeIcon(mode())}${mode().name}${extra}</span>`;
     const b = document.createElement("button");
     b.type = "button";
     b.className = "link-btn";

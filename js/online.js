@@ -15,7 +15,10 @@ let room = null; // linha de rooms
 let roomPlayers = [];
 let channel = null;
 let presentIds = new Set();
-let pickingForRoom = false;
+let pickingForRoom = false; // "pick" (anfitrião escolhe) ou "suggest" (convidado sugere)
+let suggestions = new Map(); // id do jogador → { nick, list }
+let mySuggestion = null;
+let profileLoadedFor = null;
 
 function onlineConfigured() {
   return typeof SUPABASE_URL === "string" && !!SUPABASE_URL && !!SUPABASE_ANON_KEY;
@@ -47,20 +50,33 @@ function setMe(session) {
 }
 
 // Conecta ao Supabase e garante um login (anônimo, se a pessoa não conectou conta).
-async function ensureOnline() {
-  if (!onlineConfigured()) throw new Error("O modo online ainda não foi configurado (veja supabase/LEIAME.md).");
+// Chamadas ao mesmo tempo esperam a mesma conexão (nada de login duplicado).
+let onlineReady = null;
+
+function ensureOnline() {
+  if (!onlineConfigured()) return Promise.reject(new Error("O modo online ainda não foi configurado (veja supabase/LEIAME.md)."));
+  if (!onlineReady) onlineReady = connectOnline().catch((err) => { onlineReady = null; throw err; });
+  return onlineReady;
+}
+
+async function connectOnline() {
   if (!sb) {
     await loadSupabase();
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
     });
     sb.auth.onAuthStateChange((event, session) => {
-      const before = me && me.id;
       setMe(session);
-      if (me && (event === "SIGNED_IN" || event === "USER_UPDATED") && (!before || before !== me.id || !me.anon)) loadProfile();
       renderAccount();
+      // O Supabase pede para não chamar o banco dentro deste aviso (pode travar o login):
+      // o perfil é carregado logo depois, e só para quem conectou conta.
+      if (me && !me.anon && (event === "SIGNED_IN" || event === "USER_UPDATED") && profileLoadedFor !== me.id) {
+        profileLoadedFor = me.id;
+        setTimeout(loadProfile, 0);
+      }
     });
   }
+  const t0 = performance.now();
   let { data } = await sb.auth.getSession();
   let session = data.session;
   if (!session) {
@@ -69,7 +85,36 @@ async function ensureOnline() {
     session = res.data.session;
   }
   setMe(session);
+  console.info(`[online] conectado em ${Math.round(performance.now() - t0)} ms`);
   return me;
+}
+
+// Adianta a conexão (biblioteca e login) enquanto a pessoa digita o nickname.
+function warmUpOnline() {
+  if (onlineConfigured()) ensureOnline().catch(() => {});
+}
+
+// Botão mostra que está trabalhando e não aceita um segundo clique.
+let onlineBusy = false;
+
+async function busyButton(btn, label, task) {
+  if (onlineBusy) return;
+  onlineBusy = true;
+  const old = btn.textContent;
+  btn.disabled = true;
+  btn.classList.add("loading");
+  btn.textContent = label;
+  $("online-error").textContent = "";
+  try {
+    await task();
+  } catch (err) {
+    onlineError(err);
+  } finally {
+    onlineBusy = false;
+    btn.disabled = false;
+    btn.classList.remove("loading");
+    btn.textContent = old;
+  }
 }
 
 function onlineError(err) {
@@ -83,13 +128,13 @@ function onlineError(err) {
 let profileTimer = null;
 
 function scheduleProfileSave() {
-  if (!sb || !me) return;
+  if (!sb || !me || me.anon) return;
   clearTimeout(profileTimer);
   profileTimer = setTimeout(saveProfileNow, 1500);
 }
 
 async function saveProfileNow() {
-  if (!sb || !me) return;
+  if (!sb || !me || me.anon) return;
   ensurePlayers();
   const p = players[0];
   await sb.from("profiles").upsert({
@@ -146,7 +191,7 @@ function mergeProfile(remote) {
 }
 
 async function loadProfile() {
-  if (!sb || !me) return;
+  if (!sb || !me || me.anon) return;
   const { data } = await sb.from("profiles").select("*").eq("id", me.id).maybeSingle();
   if (data) mergeProfile(data);
   await saveProfileNow();
@@ -246,6 +291,7 @@ function renderOnline() {
 function openOnline() {
   renderOnline();
   show("online");
+  warmUpOnline();
 }
 
 function onlineNick() {
@@ -265,26 +311,25 @@ function randomCode() {
 async function createRoom() {
   const nick = onlineNick();
   if (!nick) return;
-  try {
+  await busyButton($("create-room-btn"), "Criando sala…", async () => {
+    const t0 = performance.now();
     await ensureOnline();
-    sb.rpc("limpar_salas_antigas").then(() => {}, () => {});
+    const settings = { mode: modeId, timer: turnTime, list: null };
     let code = null;
     for (let attempt = 0; attempt < 6 && !code; attempt++) {
       const tryCode = randomCode();
-      const { error } = await sb.from("rooms").insert({
-        code: tryCode, host_id: me.id, status: "lobby",
-        settings: { mode: modeId, timer: turnTime, list: null },
-      });
+      const { error } = await sb.from("rooms").insert({ code: tryCode, host_id: me.id, status: "lobby", settings });
       if (!error) code = tryCode;
       else if (error.code !== "23505") throw error;
     }
     if (!code) throw new Error("Não deu para criar a sala. Tente de novo.");
-    const { error } = await sb.from("room_players").upsert({ room_code: code, user_id: me.id, nick, avatar: players[0].avatar, team: 0 });
+    const row = { room_code: code, user_id: me.id, nick, avatar: players[0].avatar, team: 0, joined_at: new Date().toISOString() };
+    const { error } = await sb.from("room_players").insert(row);
     if (error) throw error;
-    await enterRoom(code);
-  } catch (err) {
-    onlineError(err);
-  }
+    enterRoom({ code, host_id: me.id, status: "lobby", settings, state: null }, [row]);
+    console.info(`[online] sala criada em ${Math.round(performance.now() - t0)} ms`);
+    sb.rpc("limpar_salas_antigas").then(() => {}, () => {});
+  });
 }
 
 async function joinRoom(raw, quiet = false) {
@@ -295,33 +340,42 @@ async function joinRoom(raw, quiet = false) {
   }
   const nick = quiet ? players[0].nick.trim() || "Jogador" : onlineNick();
   if (!nick) return;
-  try {
+  const task = async () => {
+    const t0 = performance.now();
     await ensureOnline();
-    const { data: r, error } = await sb.from("rooms").select("*").eq("code", code).maybeSingle();
+    // Sala e jogadores ao mesmo tempo (uma ida ao servidor só).
+    const [{ data: r, error }, list] = await Promise.all([sb.from("rooms").select("*").eq("code", code).maybeSingle(), fetchRoomPlayers(code)]);
     if (error) throw error;
     if (!r) throw new Error("Sala não encontrada. Confira o código.");
-    const list = await fetchRoomPlayers(code);
     const mine = list.find((p) => p.user_id === me.id);
     if (!mine) {
       if (r.status === "playing") throw new Error("A partida dessa sala já começou. Espere ela acabar.");
       if (list.length >= MAX_PLAYERS) throw new Error("A sala está cheia (máximo de 8).");
       const team = list.filter((p) => p.team === 0).length > list.filter((p) => p.team === 1).length ? 1 : 0;
-      const { error: e2 } = await sb.from("room_players").insert({ room_code: code, user_id: me.id, nick: nick.slice(0, 16), avatar: players[0].avatar, team });
+      const row = { room_code: code, user_id: me.id, nick: nick.slice(0, 16), avatar: players[0].avatar, team, joined_at: new Date().toISOString() };
+      const { error: e2 } = await sb.from("room_players").insert(row);
       if (e2) throw new Error(/cheia/.test(e2.message) ? "A sala está cheia (máximo de 8)." : e2.message);
+      list.push(row);
     } else {
-      await sb.from("room_players").update({ nick: nick.slice(0, 16), avatar: players[0].avatar }).eq("room_code", code).eq("user_id", me.id);
+      mine.nick = nick.slice(0, 16);
+      mine.avatar = players[0].avatar;
+      sb.from("room_players").update({ nick: mine.nick, avatar: mine.avatar }).eq("room_code", code).eq("user_id", me.id).then(() => {}, () => {});
     }
-    await enterRoom(code);
-  } catch (err) {
-    if (quiet) throw err;
-    onlineError(err);
-  }
+    enterRoom(r, list);
+    console.info(`[online] entrou na sala em ${Math.round(performance.now() - t0)} ms`);
+  };
+  if (quiet) return task();
+  await busyButton($("join-form").querySelector("button"), "Entrando…", task);
 }
 
-async function enterRoom(code) {
-  store("sala", code);
-  await refreshRoom(code);
-  connectChannel(code);
+// Entra na sala com os dados que já tem; o resto atualiza quando o tempo real conectar.
+function enterRoom(r, list) {
+  store("sala", r.code);
+  room = r;
+  roomPlayers = list;
+  suggestions = new Map();
+  mySuggestion = null;
+  connectChannel(r.code);
   if (room.status === "playing" && room.state) applyState(room.state);
   else showLobby();
 }
@@ -367,7 +421,9 @@ function connectChannel(code) {
     .on("broadcast", { event: "action" }, ({ payload }) => hostAction(payload))
     .on("broadcast", { event: "hello" }, () => {
       if (isHost() && game && game.online) onlineSync();
+      if (mySuggestion) send("suggest", mySuggestion);
     })
+    .on("broadcast", { event: "suggest" }, ({ payload }) => receiveSuggestion(payload))
     .on("presence", { event: "sync" }, () => {
       presentIds = new Set(Object.keys(channel.presenceState()));
       if (document.body.dataset.screen === "lobby") renderLobby();
@@ -440,7 +496,15 @@ function renderLobby() {
   if (!host) {
     box.innerHTML = `
       <p class="lobby-summary"><span class="mode-pill">${modeIcon(m)}${m.name}</span> ${timerLabel}</p>
-      <p>Lista: ${listLine}</p>`;
+      <p>Lista: ${listLine}</p>
+      <div class="lobby-list"><p class="muted small">Quem escolhe é o anfitrião, mas você pode sugerir.</p>
+        <button type="button" class="btn ghost small" id="lobby-suggest">${mySuggestion ? "Trocar sugestão" : "Ver listas e sugerir"}</button></div>`;
+    $("lobby-suggest").addEventListener("click", () => {
+      pickingForRoom = "suggest";
+      modeId = st.mode;
+      activeSize = "all";
+      openLists();
+    });
   } else {
     box.innerHTML = `
       <p class="ctrl-label">Modo</p><div class="chips" id="lobby-modes"></div>
@@ -452,7 +516,7 @@ function renderLobby() {
     Object.entries(MODES).forEach(([id, mm]) => $("lobby-modes").appendChild(chipButton(mm.name, null, id === st.mode, () => updateSettings({ mode: id }))));
     TIMER_OPTIONS.forEach((s) => $("lobby-timer").appendChild(chipButton(s ? `${s}s` : "Sem limite", null, s === (st.timer || 0), () => updateSettings({ timer: s }))));
     $("lobby-pick").addEventListener("click", () => {
-      pickingForRoom = true;
+      pickingForRoom = "pick";
       modeId = st.mode;
       activeSize = "all";
       openLists();
@@ -463,6 +527,8 @@ function renderLobby() {
       pickRoomList(pick(pool));
     });
   }
+
+  renderSuggestions();
 
   const problem = lobbyProblem();
   $("lobby-start").hidden = !host;
@@ -502,6 +568,58 @@ function pickRoomList(list) {
   const { id, cat, title, source, items } = list;
   updateSettings({ list: { id, cat, title, source, items } });
   show("lobby");
+}
+
+// ───────────── sugestões de lista ─────────────
+
+function suggestList(list) {
+  pickingForRoom = false;
+  const { id, cat, title, source, items } = list;
+  mySuggestion = { uid: me.id, nick: players[0].nick.trim() || "Jogador", list: { id, cat, title, source, items } };
+  suggestions.set(me.id, mySuggestion);
+  send("suggest", mySuggestion);
+  showLobby();
+  $("lobby-status").textContent = `Sugestão enviada: ${title}.`;
+}
+
+function receiveSuggestion(s) {
+  if (!s || !s.uid || !s.list || !Array.isArray(s.list.items)) return;
+  suggestions.set(s.uid, s);
+  if (document.body.dataset.screen === "lobby") {
+    renderLobby();
+    if (isHost()) sfx.tick();
+  }
+}
+
+// Sugestões agrupadas por lista: "Os 10 … · Lara e João" e, para o anfitrião, o botão Usar.
+function renderSuggestions() {
+  const box = $("lobby-suggestions");
+  const inRoom = new Map(roomPlayers.map((p) => [p.user_id, p.nick]));
+  const groups = new Map();
+  suggestions.forEach((s, uid) => {
+    if (!inRoom.has(uid)) return;
+    const g = groups.get(s.list.id) || { list: s.list, who: [] };
+    g.who.push(inRoom.get(uid));
+    groups.set(s.list.id, g);
+  });
+  box.hidden = !groups.size;
+  if (!groups.size) return;
+  const chosen = room.settings && room.settings.list && room.settings.list.id;
+  const sorted = [...groups.values()].sort((a, b) => b.who.length - a.who.length);
+  box.innerHTML = '<p class="ctrl-label">Sugestões da turma</p>';
+  sorted.forEach((g) => {
+    const row = document.createElement("div");
+    row.className = "suggestion" + (g.list.id === chosen ? " chosen" : "");
+    const cat = categoryOf(g.list);
+    row.innerHTML = `
+      <div><p class="list-cat">${icon(cat.id)}${escapeHtml(cat.label)} · ${g.list.items.length} itens</p>
+        <b>${escapeHtml(g.list.title)}</b>
+        <p class="muted small">sugerida por ${g.who.map(escapeHtml).join(", ")}${g.who.length > 1 ? ` · ${g.who.length} votos` : ""}</p></div>
+      ${g.list.id === chosen ? '<span class="suggestion-ok">✓ escolhida</span>' : isHost() ? '<button type="button" class="btn small">Usar</button>' : ""}`;
+    const use = row.querySelector("button");
+    if (use) use.addEventListener("click", () => pickRoomList(g.list));
+    box.appendChild(row);
+  });
 }
 
 async function setMyTeam(team) {
@@ -553,6 +671,7 @@ async function startOnlineGame() {
   const st = room.settings;
   modeId = st.mode;
   const roster = roomPlayers.map((p) => ({ uid: p.user_id, name: p.nick, avatar: p.avatar || DEFAULT_AVATAR, team: p.team }));
+  suggestions = new Map();
   startGame(st.list, { online: { roster, timer: st.timer || 0 } });
   sb.from("rooms").update({ status: "playing" }).eq("code", room.code).then(() => {}, () => {});
 }
@@ -653,6 +772,11 @@ function applyState(s) {
   g.me = g.players.findIndex((p) => p.uid === me.id);
   if (s.mode && MODES[s.mode]) modeId = s.mode;
   game = g;
+
+  if (!same) {
+    suggestions = new Map();
+    mySuggestion = null;
+  }
 
   // O anfitrião voltando (recarregou a página): retoma o comando da partida.
   if (host && !same) {
@@ -841,6 +965,12 @@ async function renderOnlineHistory() {
 function initOnline() {
   renderAccount();
   if (!onlineConfigured()) return;
+  // Já deixa a biblioteca baixada e a conexão aberta com o servidor (sem fazer login).
+  const pre = document.createElement("link");
+  pre.rel = "preconnect";
+  pre.href = SUPABASE_URL;
+  document.head.appendChild(pre);
+  (window.requestIdleCallback || setTimeout)(() => loadSupabase().catch(() => {}));
   const params = new URLSearchParams(location.search);
   const sala = params.get("sala");
   const authReturn = /access_token|error_description/.test(location.hash) || params.has("code");
