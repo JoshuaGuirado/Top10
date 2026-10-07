@@ -9,6 +9,7 @@
   <link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="brand/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
   <script>try { var t = localStorage.getItem("tt:theme"); if (t) document.documentElement.dataset.theme = JSON.parse(t); } catch (e) {}</script>
   <meta property="og:title" content="Top Ten">
   <meta property="og:description" content="Jogo de listas: o óbvio vale 1, o difícil vale 10. De 1 a 8 jogadores.">
@@ -33,8 +34,12 @@
       <div class="hero">
         <h1><span>O óbvio vale 1.</span><span class="accent">O difícil vale 10.</span></h1>
         <p class="lead">Um jogo de listas para jogar sozinho, contra os amigos ou em equipe contra a lista. São <span id="list-total">300</span> listas de 10, 30 e 50 itens: futebol, filmes, heróis, comida, frases de mãe. E você ainda pode criar as suas.</p>
-        <button type="button" class="btn big" id="start-btn">Jogar</button>
+        <div class="hero-actions">
+          <button type="button" class="btn big" id="start-btn">Jogar</button>
+          <button type="button" class="btn ghost" id="stats-btn">Estatísticas</button>
+        </div>
       </div>
+      <div class="daily" id="daily-card" hidden></div>
       <ol class="rules">
         <li><b class="n">1–8</b><p>Jogadores. Cada um com nickname e skin.</p></li>
         <li><b class="n">Nº 8</b><p>Acertou o 8º da lista? Ganhou 8 pontos.</p></li>
@@ -46,7 +51,7 @@
     <!-- Modos de jogo -->
     <section id="screen-modes" class="screen" hidden>
       <h2>Escolha o modo</h2>
-      <p class="muted mode-intro">Três tamanhos de lista para disputar entre vocês, ou todo mundo junto contra a lista.</p>
+      <p class="muted mode-intro">Três tamanhos de lista para disputar entre vocês, todo mundo junto contra a lista ou dois times frente a frente.</p>
       <div class="mode-grid" id="mode-grid"></div>
     </section>
 
@@ -57,6 +62,11 @@
       <div class="count-picker" id="count-picker"></div>
       <p class="mode-label" id="mode-label"></p>
       <div class="player-grid" id="player-grid"></div>
+      <div class="match-options">
+        <p class="ctrl-label">Tempo por vez</p>
+        <div class="chips" id="timer-chips"></div>
+        <p class="muted small" id="timer-help"></p>
+      </div>
       <div class="actions end">
         <button type="button" class="btn" id="to-lists-btn">Escolher a lista</button>
       </div>
@@ -112,9 +122,10 @@
       <div class="turn" id="turn">
         <div class="turn-avatar" id="turn-avatar"></div>
         <div class="turn-info">
-          <p class="turn-label">Vez de</p>
+          <p class="turn-label" id="turn-label">Vez de</p>
           <p class="turn-name" id="turn-name"></p>
         </div>
+        <div class="turn-timer" id="turn-timer" hidden><span></span><b></b></div>
       </div>
 
       <form id="guess-form" class="guess" autocomplete="off">
@@ -123,6 +134,7 @@
       </form>
       <div class="guess-actions">
         <button type="button" class="link-btn" id="pass-btn">Passar a vez</button>
+        <button type="button" class="link-btn" id="hint-btn" hidden>Dica (−1 vida)</button>
         <button type="button" class="link-btn" id="end-btn">Encerrar partida</button>
       </div>
       <p id="feedback" class="feedback" role="status"></p>
@@ -135,14 +147,32 @@
     <!-- Resultado -->
     <section id="screen-results" class="screen" hidden>
       <h2 class="center" id="results-title">Pódio</h2>
+      <p class="center results-sub" id="results-sub"></p>
       <div class="podium" id="podium"></div>
       <div class="results-table" id="results-table"></div>
       <h3>A lista completa</h3>
       <ol class="board final" id="final-board"></ol>
       <div class="actions center">
+        <button type="button" class="btn" id="share-btn" hidden>Compartilhar resultado</button>
         <button type="button" class="btn" id="rematch-btn">Revanche (outra lista)</button>
         <button type="button" class="btn ghost" id="new-players-btn">Trocar jogadores</button>
         <button type="button" class="btn ghost" id="change-mode-btn">Trocar modo</button>
+      </div>
+    </section>
+
+    <!-- Estatísticas -->
+    <section id="screen-stats" class="screen" hidden>
+      <h2>Estatísticas</h2>
+      <p class="muted small">Salvas só neste navegador.</p>
+      <div class="stats-tiles" id="stats-tiles"></div>
+      <p id="stats-best"></p>
+      <h3>Partidas por modo</h3>
+      <div class="chips" id="stats-modes"></div>
+      <h3>Recordes</h3>
+      <div class="records" id="stats-records"></div>
+      <div class="actions">
+        <button type="button" class="btn" id="stats-back">Voltar ao início</button>
+        <button type="button" class="btn ghost" id="stats-reset">Zerar estatísticas</button>
       </div>
     </section>
   </main>
@@ -170,13 +200,38 @@
     </form>
   </dialog>
 
+  <!-- Aceitar mesmo assim -->
+  <dialog id="contest-dialog" class="avatar-dialog contest-dialog">
+    <form method="dialog" class="dialog-inner">
+      <div class="dialog-head">
+        <h2>Aceitar o palpite?</h2>
+        <button type="submit" value="cancel" class="text-btn">Fechar</button>
+      </div>
+      <p class="muted" id="contest-text"></p>
+      <div class="contest-options" id="contest-options"></div>
+      <button type="button" class="link-btn" id="contest-all">Mostrar todos os itens escondidos</button>
+    </form>
+  </dialog>
+
   <canvas id="fx" aria-hidden="true"></canvas>
 
-  <script src="data.js"></script>
-  <script src="data-mais.js"></script>
-  <script src="data-grandes.js"></script>
-  <script src="icons.js"></script>
-  <script src="avatars.js"></script>
-  <script src="script.js"></script>
+  <script src="data/listas.js"></script>
+  <script src="data/listas-mais.js"></script>
+  <script src="data/listas-grandes.js"></script>
+  <script src="data/listas-grandes-2.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/avatars.js"></script>
+  <script src="js/util.js"></script>
+  <script src="js/match.js"></script>
+  <script src="js/efeitos.js"></script>
+  <script src="js/listas.js"></script>
+  <script src="js/modos.js"></script>
+  <script src="js/jogadores.js"></script>
+  <script src="js/skins.js"></script>
+  <script src="js/partida.js"></script>
+  <script src="js/resultado.js"></script>
+  <script src="js/estatisticas.js"></script>
+  <script src="js/diaria.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
