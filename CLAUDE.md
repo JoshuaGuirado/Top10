@@ -18,8 +18,11 @@
 - Lista oficial nova precisa do título em inglês e espanhol em `topzi/data/traducoes-titulos.js` (o teste
   `tests/traducoes.test.js` acusa). Itens com nome diferente em outro idioma vão em `topzi/data/traducoes-itens-*.js`;
   nome com dois sentidos (Lula, Peru, Natal…) usa a chave `"id-da-lista/Nome"`.
-- Links antigos na raiz (`?sala=`, `#lista=`, `#como-jogar`, retorno do login) são mandados para `topzi/` por um
-  script no `<head>` do `index.html` da raiz; não remova.
+- Links antigos na raiz (`?sala=`, `#lista=`, `#como-jogar`) são mandados para `topzi/` por um script no `<head>` do
+  `index.html` da raiz; o retorno do login (links do e-mail) vai para `conta.html`. Não remova.
+- A conta é do **Gamezi**, uma só para todos os jogos: entrar, criar conta, esqueci/trocar senha e sair ficam só em
+  `conta.html` (raiz). Os jogos não têm tela de login: leem a sessão com `gamezi-conta.js` e mandam para
+  `conta.html?volta=<jogo>`. Jogo novo: carregar `../gamezi-conta.js`, pôr a pasta em `GAMEZI_JOGOS` e em `JOGOS` da `conta.html`.
 - Patozi: scripts comuns como no Topzi (ordem no fim do `patozi/index.html`); script novo também vai no `FILES` do
   `sw.js` com o caminho `patozi/…` (o `tests/patozi.test.js` acusa). Regras e computador ficam em `patozi/js/jogo.js`, sem tela.
 - Cartas novas do Patozi: arquivo novo em `patozi/data/` carregado depois dos outros, pergunta em português, inglês e

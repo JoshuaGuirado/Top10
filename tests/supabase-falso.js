@@ -115,8 +115,12 @@
   };
   // Contas com e-mail e senha (sem confirmação de e-mail, como no projeto configurado).
   const users = () => JSON.parse(localStorage.getItem("__fakeusers") || "{}");
+  // Como o Supabase de verdade, guarda a sessão de quem tem conta no localStorage (sb-…-auth-token):
+  // é por ela que o portal e os jogos sabem que a conta do Gamezi está conectada.
+  const TOKEN = "sb-falso-auth-token";
   const signIn = (id) => {
     sessionStorage.setItem("__fakeuid", id);
+    localStorage.setItem(TOKEN, JSON.stringify({ user: session(id).user }));
     setTimeout(() => listeners.forEach((l) => l("SIGNED_IN", session(id))), 0);
     return { data: { session: session(id), user: session(id).user }, error: null };
   };
@@ -157,7 +161,7 @@
         if (password && email) { all[email].password = password; localStorage.setItem("__fakeusers", JSON.stringify(all)); }
         return { data: { user: session(id).user }, error: null };
       },
-      async signOut() { sessionStorage.removeItem("__fakeuid"); return { error: null }; },
+      async signOut() { sessionStorage.removeItem("__fakeuid"); localStorage.removeItem(TOKEN); return { error: null }; },
     },
   };
   window.supabase = { createClient: () => client };

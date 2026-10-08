@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conta Gamezi</title>
+  <meta name="description" content="Sua conta Gamezi: uma conta só para o Topzi, o Patozi e os próximos jogos.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#FFF4DE" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#171717" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="brand/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <script>
+    try { var t = localStorage.getItem("tt:theme"); if (t) document.documentElement.dataset.theme = JSON.parse(t); } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&display=swap">
+  <link rel="stylesheet" href="gamezi.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <a href="./" aria-label="Gamezi">
+        <img class="logo logo-light" src="brand/gamezi-logo.svg" alt="Gamezi">
+        <img class="logo logo-dark" src="brand/gamezi-logo-dark.svg" alt="" aria-hidden="true">
+      </a>
+      <div class="top-actions">
+        <label><span class="sr-only" data-t="lang">Idioma</span>
+          <select id="lang" class="lang-select"><option value="pt">PT</option><option value="en">EN</option><option value="es">ES</option></select>
+        </label>
+        <button type="button" class="icon-btn" id="theme"></button>
+      </div>
+    </header>
+
+    <main class="account-page">
+      <a class="back-link" id="back" href="./" data-t="back">Voltar para o Gamezi</a>
+
+      <section class="panel">
+        <h1 data-t="title">Conta Gamezi</h1>
+        <p class="muted" id="status"></p>
+
+        <form id="login-form" class="account-form" novalidate hidden>
+          <label class="field"><span data-t="email">E-mail</span>
+            <input type="email" id="email" autocomplete="email" data-ph="emailPh" placeholder="voce@email.com">
+          </label>
+          <label class="field"><span data-t="password">Senha</span>
+            <span class="pass-wrap"><input type="password" id="password" minlength="6" autocomplete="current-password" data-ph="passwordPh" placeholder="Pelo menos 6 caracteres"><button type="button" class="pass-toggle" data-t="show">Mostrar</button></span>
+          </label>
+          <div class="btns">
+            <button type="submit" class="btn" value="entrar" data-t="login">Entrar</button>
+            <button type="submit" class="btn ghost" value="criar" data-t="create">Criar conta</button>
+          </div>
+          <button type="button" class="link-btn" id="forgot" data-t="forgot">Esqueci a senha</button>
+        </form>
+
+        <form id="password-form" class="account-form" novalidate hidden>
+          <label class="field"><span data-t="newPassword">Nova senha</span>
+            <span class="pass-wrap"><input type="password" id="new-password" minlength="6" autocomplete="new-password" data-ph="passwordPh" placeholder="Pelo menos 6 caracteres"><button type="button" class="pass-toggle" data-t="show">Mostrar</button></span>
+          </label>
+          <div class="btns"><button type="submit" class="btn" data-t="savePassword">Salvar senha</button></div>
+        </form>
+
+        <div id="logged" hidden>
+          <div class="my-games" id="my-games"></div>
+          <div class="btns">
+            <button type="button" class="btn ghost" id="change-pass" data-t="changePassword">Trocar senha</button>
+            <button type="button" class="btn ghost" id="logout" data-t="logout">Sair da conta</button>
+          </div>
+        </div>
+
+        <p class="feedback" id="msg" role="status"></p>
+      </section>
+
+      <ul class="points">
+        <li><b data-t="p1t">Uma conta só</b><p data-t="p1">A mesma conta vale no Topzi, no Patozi e nos próximos jogos do Gamezi.</p></li>
+        <li><b data-t="p2t">Tudo salvo</b><p data-t="p2">Perfil, estatísticas, recordes, listas criadas e o desafio do dia ficam guardados na conta.</p></li>
+        <li><b data-t="p3t">Qualquer celular</b><p data-t="p3">Entre com e-mail e senha em outro aparelho e continue de onde parou.</p></li>
+      </ul>
+    </main>
+
+    <footer class="foot">
+      <a href="termos.html" data-t="terms">Termos de uso</a>
+      <a href="privacidade.html" data-t="privacy">Privacidade</a>
+      <span>© 2026 Gamezi</span>
+    </footer>
+  </div>
+
+  <script src="topzi/js/config.js"></script>
+  <script src="gamezi-conta.js"></script>
+  <script>
+    // Página da conta do Gamezi: entrar, criar conta, esqueci a senha, trocar senha e sair.
+    // Textos em [português, inglês, espanhol]; o idioma é o mesmo escolhido no portal e nos jogos (tt:lang).
+    var T = {
+      lang: ["Idioma", "Language", "Idioma"],
+      back: ["Voltar para o Gamezi", "Back to Gamezi", "Volver a Gamezi"],
+      backTo: ["Voltar para o {jogo}", "Back to {jogo}", "Volver a {jogo}"],
+      title: ["Conta Gamezi", "Gamezi account", "Cuenta Gamezi"],
+      pitch: ["Uma conta só para todos os jogos do Gamezi. Entre com e-mail e senha para salvar seu perfil e jogar em qualquer celular.", "One account for every Gamezi game. Sign in with email and password to save your profile and play on any phone.", "Una sola cuenta para todos los juegos de Gamezi. Entra con correo y contraseña para guardar tu perfil y jugar en cualquier celular."],
+      connected: ["Você está conectado como {email}.", "You're signed in as {email}.", "Estás conectado como {email}."],
+      needSetup: ["A conta precisa do banco (Supabase) configurado. Veja supabase/LEIAME.md.", "Accounts need the database (Supabase) set up. See supabase/LEIAME.md.", "La cuenta necesita la base de datos (Supabase) configurada. Mira supabase/LEIAME.md."],
+      loading: ["Carregando…", "Loading…", "Cargando…"],
+      email: ["E-mail", "Email", "Correo"],
+      emailPh: ["voce@email.com", "you@email.com", "tu@correo.com"],
+      password: ["Senha", "Password", "Contraseña"],
+      passwordPh: ["Pelo menos 6 caracteres", "At least 6 characters", "Al menos 6 caracteres"],
+      show: ["Mostrar", "Show", "Mostrar"],
+      hide: ["Esconder", "Hide", "Ocultar"],
+      login: ["Entrar", "Sign in", "Entrar"],
+      create: ["Criar conta", "Create account", "Crear cuenta"],
+      forgot: ["Esqueci a senha", "Forgot my password", "Olvidé mi contraseña"],
+      newPassword: ["Nova senha", "New password", "Nueva contraseña"],
+      savePassword: ["Salvar senha", "Save password", "Guardar contraseña"],
+      changePassword: ["Trocar senha", "Change password", "Cambiar contraseña"],
+      logout: ["Sair da conta", "Sign out", "Cerrar sesión"],
+      recovery: ["Crie uma nova senha para a sua conta.", "Create a new password for your account.", "Crea una nueva contraseña para tu cuenta."],
+      errEmail: ["Digite um e-mail válido.", "Enter a valid email.", "Escribe un correo válido."],
+      errPassword: ["A senha precisa ter pelo menos 6 caracteres.", "The password needs at least 6 characters.", "La contraseña necesita al menos 6 caracteres."],
+      errTaken: ["Esse e-mail já tem conta. Digite a senha e toque em Entrar.", "This email already has an account. Enter your password and tap Sign in.", "Este correo ya tiene cuenta. Escribe la contraseña y toca Entrar."],
+      errLogin: ["E-mail ou senha errados. Se a conta foi criada pelo link do e-mail, use \"Esqueci a senha\" para criar uma.", "Wrong email or password. If the account was created with the email link, use \"Forgot my password\" to create one.", "Correo o contraseña incorrectos. Si la cuenta se creó con el enlace del correo, usa \"Olvidé mi contraseña\" para crear una."],
+      errConfirm: ["Essa conta ainda não foi confirmada. Abra o link que mandamos para o seu e-mail.", "This account isn't confirmed yet. Open the link we sent to your email.", "Esta cuenta aún no está confirmada. Abre el enlace que enviamos a tu correo."],
+      errNet: ["Sem conexão com o servidor. Confira a internet e tente de novo.", "Can't reach the server. Check your connection and try again.", "Sin conexión con el servidor. Revisa internet e inténtalo de nuevo."],
+      loggedIn: ["Pronto, você entrou.", "Done, you're signed in.", "Listo, entraste."],
+      created: ["Conta criada! Ela já vale em todos os jogos.", "Account created! It already works in every game.", "¡Cuenta creada! Ya sirve en todos los juegos."],
+      needConfirm: ["Conta criada. Falta confirmar: abra o link que mandamos para {email}.", "Account created. One more step: open the link we sent to {email}.", "Cuenta creada. Falta confirmar: abre el enlace que enviamos a {email}."],
+      sentReset: ["Enviamos um link para {email}. Abra neste aparelho para criar a nova senha.", "We sent a link to {email}. Open it on this device to create your new password.", "Enviamos un enlace a {email}. Ábrelo en este dispositivo para crear la nueva contraseña."],
+      passwordSaved: ["Senha salva. Da próxima vez, é só entrar com e-mail e senha.", "Password saved. Next time, just sign in with email and password.", "Contraseña guardada. La próxima vez, entra con correo y contraseña."],
+      loggedOut: ["Você saiu da conta.", "You signed out.", "Cerraste sesión."],
+      topziStats: ["{n} partidas · {pts} pontos", "{n} games · {pts} points", "{n} partidas · {pts} puntos"],
+      patoziStats: ["{n} partidas · escapou {e} vezes", "{n} games · escaped {e} times", "{n} partidas · se salvó {e} veces"],
+      notYet: ["Ainda não jogou com esta conta", "Not played with this account yet", "Aún no jugaste con esta cuenta"],
+      play: ["Jogar", "Play", "Jugar"],
+      p1t: ["Uma conta só", "One account", "Una sola cuenta"],
+      p1: ["A mesma conta vale no Topzi, no Patozi e nos próximos jogos do Gamezi.", "The same account works in Topzi, Patozi and the next Gamezi games.", "La misma cuenta sirve en Topzi, Patozi y los próximos juegos de Gamezi."],
+      p2t: ["Tudo salvo", "Everything saved", "Todo guardado"],
+      p2: ["Perfil, estatísticas, recordes, listas criadas e o desafio do dia ficam guardados na conta.", "Profile, stats, records, created lists and the daily challenge are saved to your account.", "Perfil, estadísticas, récords, listas creadas y el desafío del día quedan guardados en la cuenta."],
+      p3t: ["Qualquer celular", "Any phone", "Cualquier celular"],
+      p3: ["Entre com e-mail e senha em outro aparelho e continue de onde parou.", "Sign in with email and password on another device and pick up where you left off.", "Entra con correo y contraseña en otro dispositivo y sigue donde lo dejaste."],
+      terms: ["Termos de uso", "Terms of use", "Términos de uso"],
+      privacy: ["Privacidade", "Privacy", "Privacidad"],
+      dark: ["Usar modo escuro", "Switch to dark mode", "Usar modo oscuro"],
+      light: ["Usar modo claro", "Switch to light mode", "Usar modo claro"],
+    };
+    var JOGOS = {
+      topzi: { nome: "Topzi", icone: "brand/simbolo.svg", iconeEscuro: "brand/simbolo-escuro.svg" },
+      patozi: { nome: "Patozi", icone: "brand/patozi-simbolo.svg", iconeEscuro: "brand/patozi-simbolo-escuro.svg" },
+    };
+    var SUPABASE_CDN = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
+    var LANGS = ["pt", "en", "es"];
+    function $(id) { return document.getElementById(id); }
+    function load(k) { try { return JSON.parse(localStorage.getItem("tt:" + k)); } catch (e) { return null; } }
+    function save(k, v) { try { localStorage.setItem("tt:" + k, JSON.stringify(v)); } catch (e) {} }
+    var lang = load("lang");
+    if (LANGS.indexOf(lang) < 0) lang = LANGS.indexOf((navigator.language || "pt").slice(0, 2)) >= 0 ? navigator.language.slice(0, 2) : "pt";
+    function t(k, vars) {
+      var s = T[k][LANGS.indexOf(lang)];
+      Object.keys(vars || {}).forEach(function (v) { s = s.split("{" + v + "}").join(vars[v]); });
+      return s;
+    }
+    function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+    // Para onde voltar depois de entrar (só os jogos do Gamezi, nunca um endereço de fora).
+    var volta = new URLSearchParams(location.search).get("volta");
+    if (GAMEZI_JOGOS.indexOf(volta) < 0) volta = null;
+
+    var sb = null;
+    var me = null; // { id, email } de quem entrou com e-mail e senha
+    var modo = "loading"; // loading, setup, form, password, logged
+
+    function configurado() {
+      return typeof SUPABASE_URL === "string" && !!SUPABASE_URL && typeof SUPABASE_ANON_KEY === "string" && !!SUPABASE_ANON_KEY;
+    }
+
+    function setMe(session) {
+      var u = session && session.user;
+      me = u && u.email && !u.is_anonymous ? { id: u.id, email: u.email } : null;
+    }
+
+    function carregarBiblioteca() {
+      if (window.supabase) return Promise.resolve();
+      return new Promise(function (ok, fail) {
+        var s = document.createElement("script");
+        s.src = SUPABASE_CDN;
+        s.onload = ok;
+        s.onerror = function () { fail(new Error(t("errNet"))); };
+        document.head.appendChild(s);
+      });
+    }
+
+    // ───────────── tela ─────────────
+
+    var ICONS = {
+      moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>',
+      sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>',
+    };
+    function isDark() { return (document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark"; }
+
+    var resumo = {}; // jogo → { nick, texto }
+
+    function renderJogos() {
+      $("my-games").innerHTML = Object.keys(JOGOS).map(function (id) {
+        var j = JOGOS[id];
+        var r = resumo[id];
+        return '<a class="my-game" href="' + id + '/">' +
+          '<span class="game-icon"><img class="logo-light" src="' + j.icone + '" alt="" aria-hidden="true"><img class="logo-dark" src="' + j.iconeEscuro + '" alt="" aria-hidden="true"></span>' +
+          '<span><b>' + esc(j.nome) + (r && r.nick ? ' · ' + esc(r.nick) : "") + '</b><small>' + esc(r ? r.texto : t("loading")) + '</small></span>' +
+          '<span class="my-game-play">' + esc(t("play")) + '</span></a>';
+      }).join("");
+    }
+
+    function render() {
+      document.documentElement.lang = { pt: "pt-BR", en: "en", es: "es" }[lang];
+      document.querySelectorAll("[data-t]").forEach(function (el) {
+        if (!el.classList.contains("pass-toggle")) el.textContent = t(el.dataset.t);
+      });
+      document.querySelectorAll(".pass-toggle").forEach(function (b) {
+        var input = b.previousElementSibling;
+        b.textContent = t(input.type === "text" ? "hide" : "show");
+      });
+      document.querySelectorAll("[data-ph]").forEach(function (el) { el.placeholder = t(el.dataset.ph); });
+      $("lang").value = lang;
+      var b = $("theme");
+      b.innerHTML = ICONS[isDark() ? "sun" : "moon"];
+      b.title = t(isDark() ? "light" : "dark");
+      b.setAttribute("aria-label", b.title);
+
+      var back = $("back");
+      back.href = volta ? volta + "/" : "./";
+      back.textContent = volta ? t("backTo", { jogo: JOGOS[volta].nome }) : t("back");
+
+      var status = $("status");
+      if (modo === "setup") status.textContent = t("needSetup");
+      else if (modo === "loading") status.textContent = t("loading");
+      else if (modo === "password") status.textContent = t("recovery");
+      else if (modo === "logged") status.innerHTML = t("connected", { email: "<b>" + esc(me.email) + "</b>" });
+      else status.textContent = t("pitch");
+      $("login-form").hidden = modo !== "form";
+      $("password-form").hidden = modo !== "password";
+      $("logged").hidden = modo !== "logged";
+      if (modo === "logged") renderJogos();
+    }
+
+    function msg(texto, bom) {
+      var m = $("msg");
+      m.className = "feedback" + (texto ? (bom ? " good" : " bad") : "");
+      m.textContent = texto || "";
+    }
+
+    // O que cada jogo guardou nesta conta (perfil do Topzi e do Patozi).
+    function carregarResumo() {
+      if (!me) return;
+      var id = me.id;
+      resumo = {};
+      function pegar(tabela) {
+        return sb.from(tabela).select("nick, data").eq("id", id).maybeSingle().then(function (r) { return r.data; }, function () { return null; });
+      }
+      Promise.all([pegar("profiles"), pegar("patozi_perfis")]).then(function (linhas) {
+        if (!me || me.id !== id) return;
+        var tz = linhas[0] && linhas[0].data && linhas[0].data.stats;
+        var pz = linhas[1] && linhas[1].data && linhas[1].data.stats;
+        resumo.topzi = { nick: linhas[0] && linhas[0].nick, texto: tz && tz.games ? t("topziStats", { n: tz.games, pts: tz.points || 0 }) : t("notYet") };
+        resumo.patozi = { nick: linhas[1] && linhas[1].nick, texto: pz && pz.partidas ? t("patoziStats", { n: pz.partidas, e: pz.escapou || 0 }) : t("notYet") };
+        if (modo === "logged") renderJogos();
+      });
+    }
+
+    // ───────────── ações ─────────────
+
+    function lerForm() {
+      var email = $("email").value.trim();
+      var password = $("password").value;
+      if (!/^\S+@\S+\.\S+$/.test(email)) return msg(t("errEmail"));
+      if (password.length < 6) return msg(t("errPassword"));
+      return { email: email, password: password };
+    }
+
+    function erroDoServidor(m) {
+      m = m || "";
+      if (/already|registered|exists/i.test(m)) return t("errTaken");
+      if (/invalid login|credentials/i.test(m)) return t("errLogin");
+      if (/not confirmed/i.test(m)) return t("errConfirm");
+      if (/password/i.test(m) && /least|short|weak/i.test(m)) return t("errPassword");
+      if (/fetch|network/i.test(m)) return t("errNet");
+      return m;
+    }
+
+    function ocupado(form, sim) {
+      form.querySelectorAll("button").forEach(function (b) { b.disabled = sim; });
+    }
+
+    async function entrar(e) {
+      e.preventDefault();
+      var form = lerForm();
+      if (!form || !sb) return;
+      var criar = e.submitter && e.submitter.value === "criar";
+      ocupado($("login-form"), true);
+      try {
+        var res = criar ? await sb.auth.signUp(form) : await sb.auth.signInWithPassword(form);
+        if (res.error) return msg(erroDoServidor(res.error.message));
+        if (!res.data.session) return msg(t("needConfirm", { email: form.email }), true);
+        setMe(res.data.session);
+        $("password").value = "";
+        // Veio de um jogo: volta para ele, que já abre com a conta (e junta o que estava no aparelho).
+        if (volta) return location.assign(volta + "/");
+        modo = "logged";
+        render();
+        carregarResumo();
+        msg(t(criar ? "created" : "loggedIn"), true);
+      } catch (err) {
+        msg(erroDoServidor(err.message));
+      } finally {
+        ocupado($("login-form"), false);
+      }
+    }
+
+    async function esqueci() {
+      var email = $("email").value.trim();
+      if (!/^\S+@\S+\.\S+$/.test(email)) return msg(t("errEmail"));
+      try {
+        var res = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
+        if (res.error) return msg(erroDoServidor(res.error.message));
+        msg(t("sentReset", { email: email }), true);
+      } catch (err) {
+        msg(erroDoServidor(err.message));
+      }
+    }
+
+    async function novaSenha(e) {
+      e.preventDefault();
+      var password = $("new-password").value;
+      if (password.length < 6) return msg(t("errPassword"));
+      ocupado($("password-form"), true);
+      try {
+        var res = await sb.auth.updateUser({ password: password });
+        if (res.error) return msg(erroDoServidor(res.error.message));
+        $("new-password").value = "";
+        modo = me ? "logged" : "form";
+        render();
+        if (me) carregarResumo();
+        msg(t("passwordSaved"), true);
+      } catch (err) {
+        msg(erroDoServidor(err.message));
+      } finally {
+        ocupado($("password-form"), false);
+      }
+    }
+
+    async function sair() {
+      if (!sb) return;
+      await sb.auth.signOut();
+      try { localStorage.removeItem("tt:conta"); } catch (e) {}
+      me = null;
+      modo = "form";
+      render();
+      msg(t("loggedOut"), true);
+    }
+
+    async function iniciar() {
+      render();
+      if (!configurado()) { modo = "setup"; return render(); }
+      try {
+        await carregarBiblioteca();
+        sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+          auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+        });
+        // Voltou pelo link de "Esqueci a senha": pede a nova senha.
+        var recuperando = /type=recovery/.test(location.hash);
+        sb.auth.onAuthStateChange(function (event, session) {
+          if (event === "PASSWORD_RECOVERY") {
+            setMe(session);
+            modo = "password";
+            setTimeout(render, 0);
+          }
+        });
+        var r = await sb.auth.getSession();
+        setMe(r.data.session);
+        if (recuperando && r.data.session) modo = "password";
+        else modo = me ? "logged" : "form";
+        if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+        render();
+        if (modo === "logged") carregarResumo();
+      } catch (err) {
+        modo = "form";
+        render();
+        msg(err.message);
+      }
+    }
+
+    $("lang").addEventListener("change", function (e) { lang = e.target.value; save("lang", lang); render(); });
+    $("theme").addEventListener("click", function () {
+      var next = isDark() ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      save("theme", next);
+      render();
+    });
+    $("login-form").addEventListener("submit", entrar);
+    $("forgot").addEventListener("click", esqueci);
+    $("password-form").addEventListener("submit", novaSenha);
+    $("change-pass").addEventListener("click", function () { msg(""); modo = "password"; render(); $("new-password").focus(); });
+    $("logout").addEventListener("click", sair);
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest(".pass-toggle");
+      if (!b) return;
+      var input = b.previousElementSibling;
+      input.type = input.type === "password" ? "text" : "password";
+      render();
+    });
+    iniciar();
+
+    if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+      addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+    }
+  </script>
+</body>
+</html>

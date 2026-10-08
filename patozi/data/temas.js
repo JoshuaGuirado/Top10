@@ -24,6 +24,12 @@ const PZ_TEMAS = [
   { id: "tecnologia", nome: ["Tecnologia", "Technology", "Tecnología"] },
   { id: "biblia", nome: ["Bíblia", "Bible", "Biblia"] },
   { id: "curiosidades", nome: ["Curiosidades", "Fun facts", "Curiosidades"] },
+  { id: "transporte", nome: ["Carros e transportes", "Cars and transport", "Autos y transporte"] },
+  { id: "natureza", nome: ["Natureza e planeta", "Nature and Earth", "Naturaleza y planeta"] },
+  { id: "arte", nome: ["Arte e livros", "Art and books", "Arte y libros"] },
+  { id: "desenhos", nome: ["Desenhos e animes", "Cartoons and anime", "Dibujos animados y anime"] },
+  { id: "palavras", nome: ["Palavras e idiomas", "Words and languages", "Palabras e idiomas"] },
+  { id: "dinheiro", nome: ["Dinheiro e trabalho", "Money and work", "Dinero y trabajo"] },
 ];
 
 const PZ_CARTAS = [];

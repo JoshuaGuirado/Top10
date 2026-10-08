@@ -119,29 +119,49 @@ const server = http.createServer((req, res) => {
   assert.equal(await A.evaluate(() => game.lives), await B.evaluate(() => game.lives));
   step("equipe contra a lista: erro e dica da convidada valem para todos");
 
-  // Conta com senha: cria, sai e entra de novo em outro "celular" sem abrir o e-mail.
+  // Conta do Gamezi: uma só para todos os jogos, com login em conta.html (na raiz).
   const C = await page();
   await C.goto(base);
   await C.click(".home-account .account-btn");
-  await C.fill("#account-email", "lara@exemplo.com");
-  await C.fill("#account-password", "123");
-  await C.click('#account-form button[value="criar"]');
-  assert.match(await C.textContent("#account-msg"), /6 caracteres/);
-  await C.fill("#account-password", "segredo1");
-  await C.click('#account-form button[value="criar"]');
-  await C.waitForFunction(() => /criada/.test(document.getElementById("account-msg").textContent), null, { timeout: 5000 });
-  assert.match(await C.textContent("#account-status"), /lara@exemplo\.com/);
-  await C.click("#account-logout");
-  await C.click(".home-account .account-btn");
-  await C.fill("#account-email", "lara@exemplo.com");
-  await C.fill("#account-password", "errada1");
-  await C.click('#account-form button[value="entrar"]');
-  await C.waitForFunction(() => /errados/.test(document.getElementById("account-msg").textContent), null, { timeout: 5000 });
-  await C.fill("#account-password", "segredo1");
-  await C.click('#account-form button[value="entrar"]');
-  await C.waitForFunction(() => /entrou/.test(document.getElementById("account-msg").textContent), null, { timeout: 5000 });
-  assert.equal(await C.isVisible("#account-logout"), true);
-  step("conta com senha: cria, sai e entra de novo sem abrir o e-mail");
+  await C.waitForURL(/conta\.html\?volta=topzi$/);
+  assert.match(await C.textContent("#back"), /Topzi/);
+  await C.fill("#email", "lara@exemplo.com");
+  await C.fill("#password", "123");
+  await C.click('#login-form button[value="criar"]');
+  assert.match(await C.textContent("#msg"), /6 caracteres/);
+  await C.fill("#password", "segredo1");
+  await C.click('#login-form button[value="criar"]');
+  await C.waitForURL(/\/topzi\/$/, { timeout: 5000 });
+  await C.waitForFunction(() => /lara@exemplo\.com/.test(document.querySelector(".home-account .account-line").textContent), null, { timeout: 5000 });
+  await C.waitForFunction(() => JSON.parse(localStorage.getItem("__fakedb")).profiles.length === 1, null, { timeout: 5000 });
+  step("conta Gamezi: cria na conta.html e volta para o Topzi já conectada, com o perfil salvo");
+
+  await C.goto(base.replace("topzi/", "patozi/"));
+  await C.click("#profile-btn");
+  await C.waitForFunction(() => /lara@exemplo\.com/.test(document.querySelector("#screen-profile .account-line").textContent), null, { timeout: 5000 });
+  await C.waitForFunction(() => JSON.parse(localStorage.getItem("__fakedb")).patozi_perfis.length === 1, null, { timeout: 5000 });
+  step("a mesma conta já vale no Patozi, sem entrar de novo");
+
+  await C.click("#screen-profile .account-btn");
+  await C.waitForURL(/conta\.html\?volta=patozi$/);
+  await C.waitForSelector("#logged:not([hidden])");
+  assert.match(await C.textContent("#status"), /lara@exemplo\.com/);
+  await C.waitForFunction(() => /Topzi/.test(document.getElementById("my-games").textContent) && !/Carregando/.test(document.getElementById("my-games").textContent), null, { timeout: 5000 });
+  await C.click("#logout");
+  await C.waitForSelector("#login-form:not([hidden])");
+  assert.equal(await C.evaluate(() => gameziLogado()), false);
+  await C.fill("#email", "lara@exemplo.com");
+  await C.fill("#password", "errada1");
+  await C.click('#login-form button[value="entrar"]');
+  await C.waitForFunction(() => /errados/.test(document.getElementById("msg").textContent), null, { timeout: 5000 });
+  await C.fill("#password", "segredo1");
+  await C.click('#login-form button[value="entrar"]');
+  await C.waitForURL(/\/patozi\/$/, { timeout: 5000 });
+  step("conta.html: resumo dos jogos, sai e entra de novo, e volta para o jogo de onde veio");
+
+  await C.goto(base.replace("topzi/index.html", ""));
+  assert.equal(await C.textContent("#account span"), "Minha conta");
+  step("portal do Gamezi mostra a conta conectada");
 
   assert.deepEqual(errors, []);
   console.log("\nTudo certo no modo online.");

@@ -19,6 +19,7 @@ const PZ_DIARIO_INICIO = Date.UTC(2026, 9, 8);
 const PZ_DIARIO_QTD = 5;
 const PZ_DIARIO_POOLS = [
   { desde: 1, cartas: 437 },
+  { desde: 2, cartas: 573 }, // 9/10/2026: carros, natureza, arte, desenhos, palavras e dinheiro
 ];
 
 // ───────────── sorte ─────────────

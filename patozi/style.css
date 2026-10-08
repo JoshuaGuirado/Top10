@@ -142,10 +142,10 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .player-list { display: grid; gap: 8px; margin-top: 16px; }
 .player-row { display: flex; align-items: center; gap: 10px; background: var(--surface); border-radius: var(--r); padding: 6px 10px 6px 6px; }
 .player-row .duck-btn { background: var(--bg); }
-.player-row input, .nick input, .suggest input, .account-form input, .answer-input {
+.player-row input, .nick input, .suggest input, .suggest select, .answer-input {
   font: inherit; width: 100%; min-width: 0; padding: 10px 14px; border: 2px solid var(--line); border-radius: var(--r-sm); background: var(--bg); color: var(--fg);
 }
-.player-row input:focus, .nick input:focus, .suggest input:focus, .account-form input:focus, .answer-input:focus { outline: none; border-color: var(--accent); }
+.player-row input:focus, .nick input:focus, .suggest input:focus, .suggest select:focus, .answer-input:focus { outline: none; border-color: var(--accent); }
 .player-row .tag { font-size: .72rem; font-weight: 800; color: var(--muted); white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
 .player-row .tag .ui-ico { width: 16px; height: 16px; }
 .remove { border: 0; background: var(--bg); border-radius: 50%; width: 32px; height: 32px; flex: none; font-size: 1.2rem; line-height: 1; color: var(--muted); }
@@ -330,9 +330,6 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .help-steps li { counter-increment: s; position: relative; background: var(--surface); border-radius: var(--r); padding: 10px 12px 10px 48px; }
 .help-steps li::before { content: counter(s); position: absolute; left: 12px; top: 9px; width: 26px; font-stretch: 75%; font-weight: 800; font-size: 1.6rem; line-height: 1; color: var(--accent-ink); text-align: center; }
 .help-example { background: var(--accent-soft); border-radius: var(--r); padding: 12px 14px; }
-.account-dialog { width: min(480px, calc(100vw - 24px)); }
-.account-form { display: grid; gap: 10px; }
-.account-form .actions { margin-top: 4px; }
 
 #fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
 

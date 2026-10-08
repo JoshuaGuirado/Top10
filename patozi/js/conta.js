@@ -1,5 +1,6 @@
-// Banco (Supabase): login, conta com e-mail e senha, perfil do Patozi, ranking do Pato do dia e cartas enviadas.
-// É o mesmo projeto e a mesma conta do Topzi (as chaves vêm de topzi/js/config.js). Tabelas do Patozi:
+// Banco (Supabase): login anônimo para o online, perfil do Patozi, ranking do Pato do dia e cartas enviadas.
+// A conta (e-mail e senha) é a do Gamezi, a mesma de todos os jogos: fica em conta.html, na raiz.
+// O projeto é o mesmo do Topzi (as chaves vêm de topzi/js/config.js). Tabelas do Patozi:
 // patozi_perfis, patozi_diario, patozi_sugestoes, patozi_salas, patozi_sala_jogadores e patozi_partidas
 // (ver supabase/schema.sql).
 
@@ -52,7 +53,6 @@ async function conectar() {
     sb.auth.onAuthStateChange((event, session) => {
       setMe(session);
       renderConta();
-      if (event === "PASSWORD_RECOVERY") setTimeout(() => abrirConta("password"), 0);
       if (me && !me.anon && (event === "SIGNED_IN" || event === "USER_UPDATED") && perfilCarregadoPara !== me.id) {
         perfilCarregadoPara = me.id;
         setTimeout(carregarPerfil, 0);
@@ -110,31 +110,47 @@ async function carregarPerfil() {
 
 // ───────────── Pato do dia e cartas enviadas ─────────────
 
+// Erro do banco em texto para a pessoa. Tabela que não existe: o schema.sql ainda não rodou no Supabase.
+function erroDoBanco(error) {
+  const m = (error && error.message) || "";
+  if (error && (error.code === "42P01" || error.code === "PGRST205" || /does not exist|could not find the table/i.test(m))) return new Error(t("on.errDb"));
+  return new Error(m || t("on.errNet"));
+}
+
 async function enviarDiario(dia, reg) {
   await ensureOnline();
   const nick = (store("nick") || "").trim().slice(0, 16) || "Pato";
   const { error } = await sb.from("patozi_diario").insert({ dia, user_id: me.id, nick, pontos: diarioTotal(reg), chutes: reg.chutes });
-  if (error && error.code !== "23505") throw new Error(error.message);
+  if (error && error.code !== "23505") throw erroDoBanco(error);
 }
 
 async function buscarRanking(dia) {
   await ensureOnline();
   const { data, error } = await sb.from("patozi_diario").select("*").eq("dia", dia).order("pontos", { ascending: false }).limit(20);
-  if (error) throw new Error(t("on.errNet"));
+  if (error) throw erroDoBanco(error);
   return data || [];
 }
 
-async function enviarSugestao(pergunta, resposta, fonte) {
+async function enviarSugestao(pergunta, resposta, fonte, tema) {
   await ensureOnline();
-  const { error } = await sb.from("patozi_sugestoes").insert({ user_id: me.id, nick: (store("nick") || "").slice(0, 16), pergunta, resposta, fonte, idioma: lang });
-  if (error) throw new Error(error.message);
+  const { error } = await sb.from("patozi_sugestoes").insert({ user_id: me.id, nick: (store("nick") || "").slice(0, 16), pergunta, resposta, fonte, tema, idioma: lang });
+  if (error) throw erroDoBanco(error);
 }
 
-// ───────────── conta (e-mail e senha) ─────────────
+// ───────────── conta do Gamezi ─────────────
+// A conta é do Gamezi (uma só para todos os jogos): entrar, criar conta, trocar senha e sair ficam em
+// ../conta.html (ver gamezi-conta.js). Aqui o Patozi só mostra quem está conectado e leva para lá.
+
+function contaEmail() {
+  if (me) return me.anon ? null : me.email;
+  const s = gameziSessao();
+  return s && !s.anon ? s.email : null;
+}
 
 function linhaConta() {
   if (!onlineConfigured()) return escapeHtml(t("account.needSetup"));
-  if (me && !me.anon) return t("account.connected", { email: `<b>${escapeHtml(me.email)}</b>` });
+  const email = contaEmail();
+  if (email) return t("account.connected", { email: `<b>${escapeHtml(email)}</b>` });
   return escapeHtml(t("account.pitch"));
 }
 
@@ -142,109 +158,26 @@ function renderConta() {
   document.querySelectorAll(".account-line").forEach((el) => (el.innerHTML = linhaConta()));
   document.querySelectorAll(".account-btn").forEach((b) => {
     b.hidden = !onlineConfigured();
-    b.textContent = t(me && !me.anon ? "account.mine" : "account.enter");
+    b.textContent = t(contaEmail() ? "account.mine" : "account.enter");
   });
 }
 
-function contaMsg(texto, bom) {
-  const m = $("account-msg");
-  m.className = "feedback" + (bom ? " good" : " bad");
-  m.textContent = texto;
+// Vai para a conta do Gamezi, que volta para o Patozi depois do login. Antes, salva o perfil (sem demorar).
+async function abrirConta() {
+  clearTimeout(perfilTimer);
+  await Promise.race([salvarPerfil().catch(() => {}), new Promise((r) => setTimeout(r, 1500))]);
+  location.href = gameziContaUrl("../", "patozi");
 }
 
-async function abrirConta(modoConta) {
-  $("account-msg").textContent = "";
-  try {
-    await ensureOnline();
-  } catch (e) {
-    contaMsg(e.message);
-  }
-  const logado = me && !me.anon;
-  const novaSenha = modoConta === "password" && logado;
-  $("account-status").innerHTML = novaSenha ? escapeHtml(t("account.recovery")) : linhaConta();
-  $("account-form").hidden = logado;
-  $("password-form").hidden = !novaSenha;
-  $("account-logged").hidden = !logado || novaSenha;
-  if (!$("account-dialog").open) $("account-dialog").showModal();
-}
-
-function lerFormConta() {
-  const email = $("account-email").value.trim();
-  const password = $("account-password").value;
-  if (!/^\S+@\S+\.\S+$/.test(email)) return contaMsg(t("account.errEmail"));
-  if (password.length < 6) return contaMsg(t("account.errPassword"));
-  return { email, password };
-}
-
-async function contaEntrar(e) {
-  e.preventDefault();
-  const form = lerFormConta();
-  if (!form) return;
-  const criar = e.submitter && e.submitter.value === "criar";
-  try {
-    await ensureOnline();
-    const res = criar ? await sb.auth.signUp(form) : await sb.auth.signInWithPassword(form);
-    if (res.error) {
-      const m = res.error.message || "";
-      if (/already|registered|exists/i.test(m)) return contaMsg(t("account.errTaken"));
-      if (/invalid login|credentials/i.test(m)) return contaMsg(t("account.errLogin"));
-      if (/not confirmed/i.test(m)) return contaMsg(t("account.errConfirm"));
-      if (/password/i.test(m) && /least|short|weak/i.test(m)) return contaMsg(t("account.errPassword"));
-      return contaMsg(m);
-    }
-    if (!res.data.session) return contaMsg(t("account.needConfirm", { email: form.email }), true);
-    setMe(res.data.session);
-    perfilCarregadoPara = me.id;
-    await carregarPerfil();
-    renderConta();
-    $("account-password").value = "";
-    await abrirConta();
-    contaMsg(t(criar ? "account.created" : "account.loggedIn"), true);
-  } catch (err) {
-    contaMsg(err.message);
-  }
-}
-
-async function contaEsqueci() {
-  const email = $("account-email").value.trim();
-  if (!/^\S+@\S+\.\S+$/.test(email)) return contaMsg(t("account.errEmail"));
-  try {
-    await ensureOnline();
-    const res = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname });
-    if (res.error) return contaMsg(res.error.message);
-    contaMsg(t("account.sentReset", { email }), true);
-  } catch (err) {
-    contaMsg(err.message);
-  }
-}
-
-async function contaNovaSenha(e) {
-  e.preventDefault();
-  const password = $("new-password").value;
-  if (password.length < 6) return contaMsg(t("account.errPassword"));
-  const res = await sb.auth.updateUser({ password });
-  if (res.error) return contaMsg(res.error.message);
-  $("new-password").value = "";
-  await abrirConta();
-  contaMsg(t("account.passwordSaved"), true);
-}
-
-async function contaSair() {
-  if (!sb) return;
-  await salvarPerfil();
-  await sb.auth.signOut();
-  me = null;
-  onlineReady = null;
-  $("account-dialog").close();
-  renderConta();
-}
-
-// Quem já tem sessão (de uma conta ou do Topzi) conecta sozinho, sem esperar um clique.
+// Quem já entrou na conta do Gamezi (aqui ou em outro jogo) conecta sozinho e traz o perfil da conta.
+// Quem só tem o login anônimo do online também reconecta, para voltar para a sala.
 function conectarSeJaTemConta() {
-  if (!onlineConfigured()) return;
-  let temSessao = false;
-  try {
-    temSessao = Object.keys(localStorage).some((k) => /^sb-.*-auth-token$/.test(k)) || /access_token|type=recovery/.test(location.hash);
-  } catch (e) { /* sem armazenamento */ }
-  if (temSessao) ensureOnline().then(renderConta, () => {});
+  if (!onlineConfigured() || !gameziSessao()) return;
+  ensureOnline().then(() => {
+    renderConta();
+    if (me && !me.anon && perfilCarregadoPara !== me.id) {
+      perfilCarregadoPara = me.id;
+      return carregarPerfil();
+    }
+  }).catch(() => {});
 }

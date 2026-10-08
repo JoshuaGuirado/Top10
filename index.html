@@ -15,13 +15,12 @@
   <meta property="og:description" content="Jogos rápidos, direto no navegador: Topzi, o jogo de listas, e Patozi, o do Nem a pato!">
   <meta property="og:image" content="https://top10-bay.vercel.app/brand/gamezi-og.png">
   <script>
-    // Links antigos do Topzi apontavam para a raiz (convite de sala, lista compartilhada, login da conta):
-    // manda para o jogo com tudo o que veio no endereço.
+    // Links antigos do Topzi apontavam para a raiz (convite de sala, lista compartilhada): manda para o jogo
+    // com tudo o que veio no endereço. O retorno do login (links do e-mail) vai para a conta do Gamezi.
     (function () {
       var s = location.search, h = location.hash;
-      if (/[?&](sala|code)=/.test(s) || /^#(lista=|como-jogar)/.test(h) || /access_token|error_description|type=recovery/.test(h)) {
-        location.replace("topzi/" + s + h);
-      }
+      if (/access_token|error_description|type=recovery/.test(h)) location.replace("conta.html" + h);
+      else if (/[?&](sala|code)=/.test(s) || /^#(lista=|como-jogar)/.test(h)) location.replace("topzi/" + s + h);
     })();
     try { var t = localStorage.getItem("tt:theme"); if (t) document.documentElement.dataset.theme = JSON.parse(t); } catch (e) {}
   </script>
@@ -42,6 +41,7 @@
           <select id="lang" class="lang-select"><option value="pt">PT</option><option value="en">EN</option><option value="es">ES</option></select>
         </label>
         <button type="button" class="icon-btn" id="theme"></button>
+        <a class="account-chip" id="account" href="conta.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c.9-3.8 3.9-6 7.5-6s6.6 2.2 7.5 6"/></svg><span></span></a>
       </div>
     </header>
 
@@ -86,7 +86,7 @@
               <p data-t="patoziKind">Jogo de chutar números</p>
             </div>
           </div>
-          <p class="game-desc" data-t="patoziDesc">Cada um sobe o chute até alguém gritar "Nem a pato!". Quem errar fica com os patos. Mais de 400 cartas de 17 temas.</p>
+          <p class="game-desc" data-t="patoziDesc">Cada um sobe o chute até alguém gritar "Nem a pato!". Quem errar fica com os patos. Mais de 550 cartas de 23 temas.</p>
           <div class="tags">
             <span class="tag red" id="pato-tag"></span>
             <span class="tag" data-t="ptag1">2 a 10 jogadores</span>
@@ -117,6 +117,7 @@
     </footer>
   </div>
 
+  <script src="gamezi-conta.js"></script>
   <script>
     // Textos do portal em [português, inglês, espanhol]. O idioma é o mesmo escolhido nos jogos (tt:lang).
     var T = {
@@ -133,7 +134,7 @@
       tag3: ["+600 listas", "600+ lists", "+600 listas"],
       play: ["Jogar Topzi", "Play Topzi", "Jugar Topzi"],
       patoziKind: ["Jogo de chutar números", "Number guessing game", "Juego de adivinar números"],
-      patoziDesc: ["Cada um sobe o chute até alguém gritar \"Nem a pato!\". Quem errar fica com os patos. Mais de 400 cartas de 17 temas.", "Everyone raises the guess until someone shouts \"No way, duck!\". Whoever is wrong takes the ducks. 400+ cards in 17 themes.", "Cada uno sube el número hasta que alguien grita \"¡Ni de pato!\". Quien se equivoque se queda los patos. Más de 400 cartas de 17 temas."],
+      patoziDesc: ["Cada um sobe o chute até alguém gritar \"Nem a pato!\". Quem errar fica com os patos. Mais de 550 cartas de 23 temas.", "Everyone raises the guess until someone shouts \"No way, duck!\". Whoever is wrong takes the ducks. 550+ cards in 23 themes.", "Cada uno sube el número hasta que alguien grita \"¡Ni de pato!\". Quien se equivoque se queda los patos. Más de 550 cartas de 23 temas."],
       patoDaily: ["Pato do dia #{n}", "Daily duck #{n}", "Pato del día #{n}"],
       ptag1: ["2 a 10 jogadores", "2 to 10 players", "2 a 10 jugadores"],
       ptag3: ["Contra o computador", "Against the computer", "Contra la computadora"],
@@ -149,6 +150,9 @@
       p3: ["Sem anúncios e sem compras dentro do jogo.", "No ads and no in-game purchases.", "Sin anuncios y sin compras dentro del juego."],
       terms: ["Termos de uso", "Terms of use", "Términos de uso"],
       privacy: ["Privacidade", "Privacy", "Privacidad"],
+      enter: ["Entrar", "Sign in", "Entrar"],
+      mine: ["Minha conta", "My account", "Mi cuenta"],
+      accountTitle: ["Conta Gamezi: uma conta só para todos os jogos", "Gamezi account: one account for every game", "Cuenta Gamezi: una sola cuenta para todos los juegos"],
       dark: ["Usar modo escuro", "Switch to dark mode", "Usar modo oscuro"],
       light: ["Usar modo claro", "Switch to light mode", "Usar modo claro"],
     };
@@ -189,6 +193,13 @@
       var ptag = document.getElementById("pato-tag");
       ptag.hidden = pn < 1;
       ptag.textContent = t("patoDaily").replace("{n}", pn);
+      // Conta do Gamezi (a mesma em todos os jogos): só lê a sessão salva, sem carregar o Supabase.
+      var logado = gameziLogado();
+      var conta = document.getElementById("account");
+      conta.classList.toggle("on", logado);
+      conta.querySelector("span").textContent = t(logado ? "mine" : "enter");
+      conta.title = logado ? gameziSessao().email : t("accountTitle");
+      conta.setAttribute("aria-label", t(logado ? "mine" : "enter"));
       var b = document.getElementById("theme");
       b.innerHTML = ICONS[isDark() ? "sun" : "moon"];
       b.title = t(isDark() ? "light" : "dark");

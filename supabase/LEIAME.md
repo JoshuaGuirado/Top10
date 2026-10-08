@@ -2,6 +2,8 @@
 
 Leva uns 10 minutos e é gratuito. Os nomes dos menus podem mudar um pouco no painel do Supabase, mas os passos são estes.
 
+> **Já configurou antes e só quer ativar o online do Patozi (ou atualizar o banco)?** Abra **SQL Editor → New query**, cole o [`schema.sql`](schema.sql) inteiro e clique em **Run**. Ele só cria o que falta (tabelas `patozi_*`, coluna nova etc.) e não apaga nada. Não precisa mexer em chave nem em login: o Patozi usa o mesmo projeto e a mesma conta Gamezi.
+
 ## 1. Criar o projeto
 1. Entre em [supabase.com](https://supabase.com) e crie um projeto (plano Free).
 2. Região: **South America (São Paulo)**, para o jogo ficar rápido no Brasil.
@@ -16,7 +18,7 @@ Isso cria `profiles` (perfis), `rooms` (salas), `room_players` (quem está em ca
 
 Já tinha rodado antes? Rode de novo o arquivo inteiro: ele só cria o que falta e não apaga nada.
 
-As cartas que os jogadores mandam ficam em **Table Editor → patozi_sugestoes**.
+As cartas que os jogadores mandam ficam em **Table Editor → patozi_sugestoes** (com o tema escolhido na coluna `tema`).
 
 ## 3. Ligar o login
 1. **Authentication → Sign In / Providers**: ative **Allow anonymous sign-ins**. É o que deixa todo mundo jogar sem criar conta.
@@ -41,7 +43,7 @@ Abra o site publicado em dois celulares (ou numa aba normal e numa anônima), to
 ## Como o online funciona
 - Cada um joga no próprio celular. Quem cria a sala é o anfitrião: o celular dele roda a partida e manda o placar ao vivo para os outros (Realtime do Supabase).
 - Quem cai ou recarrega a página volta sozinho para a sala. Se o anfitrião cair, a partida espera ele voltar; quem some na própria vez perde a vez depois de alguns segundos.
-- Ninguém precisa de conta para jogar (login anônimo). **Conectar conta** (com e-mail e senha) guarda nickname, skin, estatísticas, recordes, lista do dia e listas criadas, e permite entrar em outro celular com o mesmo perfil.
+- Ninguém precisa de conta para jogar (login anônimo). A **conta Gamezi** (e-mail e senha, em `conta.html`) é uma só para todos os jogos e guarda nickname, skin, estatísticas, recordes, lista do dia e listas criadas, e permite entrar em outro celular com o mesmo perfil.
 
 ## Limites do plano grátis (para ficar de olho)
 - Realtime: algumas centenas de pessoas conectadas ao mesmo tempo. Sobra para turma, família e escola.

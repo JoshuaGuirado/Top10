@@ -46,7 +46,6 @@ function loadSupabase() {
 function setMe(session) {
   const u = session && session.user;
   me = u ? { id: u.id, email: u.email || null, anon: !!u.is_anonymous || !u.email } : null;
-  if (me && !me.anon) store("conta", true);
 }
 
 // Conecta ao Supabase e garante um login (anônimo, se a pessoa não conectou conta).
@@ -68,8 +67,6 @@ async function connectOnline() {
     sb.auth.onAuthStateChange((event, session) => {
       setMe(session);
       renderAccount();
-      // Voltou pelo link de "Esqueci a senha": abre a conta pedindo a nova senha.
-      if (event === "PASSWORD_RECOVERY") setTimeout(() => openAccount("password"), 0);
       // O Supabase pede para não chamar o banco dentro deste aviso (pode travar o login):
       // o perfil é carregado logo depois, e só para quem conectou conta.
       if (me && !me.anon && (event === "SIGNED_IN" || event === "USER_UPDATED") && profileLoadedFor !== me.id) {
@@ -213,11 +210,20 @@ store.onWrite = (key) => {
   if (PROFILE_SYNC_KEYS.includes(key)) scheduleProfileSave();
 };
 
-// ───────────── conta (e-mail e senha) ─────────────
+// ───────────── conta do Gamezi ─────────────
+// A conta é do Gamezi (uma só para todos os jogos): entrar, criar conta, trocar senha e sair ficam em
+// ../conta.html (ver gamezi-conta.js). Aqui o Topzi só mostra quem está conectado e leva para lá.
+
+function accountEmail() {
+  if (me) return me.anon ? null : me.email;
+  const s = gameziSessao();
+  return s && !s.anon ? s.email : null;
+}
 
 function accountLine() {
   if (!onlineConfigured()) return t("account.needSetup");
-  if (me && !me.anon) return t("account.connected", { email: `<b>${escapeHtml(me.email)}</b>` });
+  const email = accountEmail();
+  if (email) return t("account.connected", { email: `<b>${escapeHtml(email)}</b>` });
   return t("account.pitch");
 }
 
@@ -225,122 +231,16 @@ function renderAccount() {
   document.querySelectorAll(".account-line").forEach((el) => (el.innerHTML = accountLine()));
   document.querySelectorAll(".account-btn").forEach((b) => {
     b.hidden = !onlineConfigured();
-    b.textContent = t(me && !me.anon ? "account.mine" : b.dataset.label || "account.connect");
+    b.textContent = t(accountEmail() ? "account.mine" : b.dataset.label || "account.connect");
   });
   document.querySelectorAll(".home-account").forEach((el) => (el.hidden = !onlineConfigured()));
 }
 
-// Janela da conta. mode: "form" (entrar/criar), "password" (nova senha) ou automático.
-async function openAccount(mode) {
-  const msg = $("account-msg");
-  msg.textContent = "";
-  msg.className = "feedback";
-  try {
-    await ensureOnline();
-  } catch (e) {
-    msg.textContent = e.message;
-  }
-  const logged = me && !me.anon;
-  const newPassword = mode === "password" && logged;
-  $("account-status").innerHTML = newPassword ? t("account.recovery") : accountLine();
-  $("account-form").hidden = logged;
-  $("password-form").hidden = !newPassword;
-  $("account-logged").hidden = !logged || newPassword;
-  if (!$("account-dialog").open) $("account-dialog").showModal();
-  if (newPassword) $("new-password").focus();
-}
-
-function accountMessage(text, good) {
-  const msg = $("account-msg");
-  msg.className = "feedback" + (good ? " good" : " bad");
-  msg.textContent = text;
-}
-
-function readAccountForm() {
-  const email = $("account-email").value.trim();
-  const password = $("account-password").value;
-  if (!/^\S+@\S+\.\S+$/.test(email)) return accountMessage(t("account.errEmail"));
-  if (password.length < 6) return accountMessage(t("account.errPassword"));
-  return { email, password };
-}
-
-// Entrar ou criar conta com e-mail e senha. Criar a conta leva junto o que já está neste aparelho.
-async function accountSave(e) {
-  e.preventDefault();
-  const form = readAccountForm();
-  if (!form) return;
-  const create = e.submitter && e.submitter.value === "criar";
-  try {
-    await ensureOnline();
-    const res = create ? await sb.auth.signUp(form) : await sb.auth.signInWithPassword(form);
-    if (res.error) {
-      const m = res.error.message || "";
-      if (/already|registered|exists/i.test(m)) return accountMessage(t("account.errTaken"));
-      if (/invalid login|credentials/i.test(m)) return accountMessage(t("account.errLogin"));
-      if (/not confirmed/i.test(m)) return accountMessage(t("account.errConfirm"));
-      if (/password/i.test(m) && /least|short|weak/i.test(m)) return accountMessage(t("account.errPassword"));
-      return accountMessage(m);
-    }
-    if (!res.data.session) return accountMessage(t("account.needConfirm", { email: form.email }), true);
-    setMe(res.data.session);
-    profileLoadedFor = me.id;
-    await loadProfile();
-    renderAccount();
-    $("account-password").value = "";
-    await openAccount();
-    accountMessage(t(create ? "account.created" : "account.loggedIn"), true);
-  } catch (err) {
-    accountMessage(err.message);
-  }
-}
-
-// Esqueci a senha: o link do e-mail volta para o site já pedindo a nova senha.
-async function accountForgot() {
-  const email = $("account-email").value.trim();
-  if (!/^\S+@\S+\.\S+$/.test(email)) return accountMessage(t("account.errEmail"));
-  try {
-    await ensureOnline();
-    const res = await sb.auth.resetPasswordForEmail(email, { redirectTo: siteUrl() });
-    if (res.error) return accountMessage(res.error.message);
-    accountMessage(t("account.sentReset", { email }), true);
-  } catch (err) {
-    accountMessage(err.message);
-  }
-}
-
-async function accountNewPassword(e) {
-  e.preventDefault();
-  const password = $("new-password").value;
-  if (password.length < 6) return accountMessage(t("account.errPassword"));
-  try {
-    const res = await sb.auth.updateUser({ password });
-    if (res.error) return accountMessage(res.error.message);
-    $("new-password").value = "";
-    await openAccount();
-    accountMessage(t("account.passwordSaved"), true);
-  } catch (err) {
-    accountMessage(err.message);
-  }
-}
-
-function togglePassword(e) {
-  const btn = e.target.closest(".pass-toggle");
-  if (!btn) return;
-  const input = btn.previousElementSibling;
-  const show = input.type === "password";
-  input.type = show ? "text" : "password";
-  btn.dataset.i18n = show ? "account.hide" : "account.show";
-  btn.textContent = t(btn.dataset.i18n);
-}
-
-async function accountLogout() {
-  if (!sb) return;
-  await saveProfileNow();
-  await sb.auth.signOut();
-  me = null;
-  store("conta", false);
-  $("account-dialog").close();
-  renderAccount();
+// Vai para a conta do Gamezi, que volta para o Topzi depois do login. Antes, salva o perfil (sem demorar).
+async function openAccount() {
+  clearTimeout(profileTimer);
+  await Promise.race([saveProfileNow().catch(() => {}), new Promise((r) => setTimeout(r, 1500))]);
+  location.href = gameziContaUrl("../", "topzi");
 }
 
 // ───────────── tela "Jogar online" ─────────────
@@ -1048,6 +948,8 @@ async function renderOnlineHistory() {
 
 // Abre a conta em segundo plano quando a pessoa já conectou (para trazer o perfil).
 function initOnline() {
+  // Link do e-mail (nova senha) que caiu no Topzi: a conta do Gamezi cuida disso.
+  if (gameziRetornoDoLogin("../")) return;
   renderAccount();
   if (!onlineConfigured()) return;
   // Já deixa a biblioteca baixada e a conexão aberta com o servidor (sem fazer login).
@@ -1058,8 +960,8 @@ function initOnline() {
   (window.requestIdleCallback || setTimeout)(() => loadSupabase().catch(() => {}));
   const params = new URLSearchParams(location.search);
   const sala = params.get("sala");
-  const authReturn = /access_token|error_description/.test(location.hash) || params.has("code");
-  if (store("conta") || authReturn) ensureOnline().then(loadProfile).catch(() => {});
+  // Quem entrou na conta do Gamezi (aqui ou em outro jogo) já abre com o perfil da conta.
+  if (gameziLogado()) ensureOnline().then(loadProfile).catch(() => {});
   if (sala) {
     // Chegou por um link de convite.
     history.replaceState(null, "", location.pathname + location.hash);

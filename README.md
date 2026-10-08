@@ -1,6 +1,6 @@
 # Gamezi
 
-Plataforma de jogos rápidos para jogar no navegador, sozinho ou com a turma. A raiz do site (`index.html`) é o portal do Gamezi, com a lista de jogos; cada jogo fica na própria pasta: o **Topzi** (jogo de listas) em `topzi/` e o **Patozi** (jogo de chutar números, o do "Nem a pato!") em `patozi/`. Os dois usam o mesmo banco e a mesma conta.
+Plataforma de jogos rápidos para jogar no navegador, sozinho ou com a turma. A raiz do site (`index.html`) é o portal do Gamezi, com a lista de jogos; cada jogo fica na própria pasta: o **Topzi** (jogo de listas) em `topzi/` e o **Patozi** (jogo de chutar números, o do "Nem a pato!") em `patozi/`. Os dois usam o mesmo banco e a mesma **conta Gamezi**: o login (entrar, criar conta, esqueci a senha, trocar senha e sair) fica em `conta.html`, na raiz, e vale para a plataforma e todos os jogos. Os jogos só leem a sessão (`gamezi-conta.js`) e mandam para `conta.html?volta=<jogo>` quando a pessoa toca em "Entrar"; depois do login ela volta para o jogo.
 
 Para adicionar um jogo novo: crie a pasta dele (`nomezi/`), ponha um cartão no `index.html` da raiz (e o texto nos três idiomas, no objeto `T`), inclua os arquivos no `sw.js` com o caminho da pasta e use as mesmas cores, fonte e o Z vermelho (ver `brand.html`).
 
@@ -18,7 +18,7 @@ Jogo de adivinhar listas para jogar sozinho ou com até 8 pessoas. Cada lista te
 | **Equipe contra a lista** | 10, 30 ou 50 | Todos somam juntos; o que ninguém achar vira ponto da lista. A equipe vence se fizer mais da metade dos pontos. Cada chute errado custa uma vida (3 no Top 10, 6 no Top 30, 10 no Top 50), e dá para trocar uma vida por uma dica (primeira letra e tamanho de um item). |
 | **Times** | 10, 30 ou 50 | Time Vermelho × Time Preto (1v1 a 4v4). A vez alterna entre os times e cada ponto vai para o time de quem acertou. |
 
-**Jogar online**: cada um no próprio celular. Um cria a sala, manda o código ou o link, escolhe o modo, o tempo e a lista, e começa. Funciona em todos os modos (Top 10/30/50, Equipe contra a lista e Times). Usa o Supabase (gratuito): o passo a passo está em [`supabase/LEIAME.md`](supabase/LEIAME.md) e as tabelas em [`supabase/schema.sql`](supabase/schema.sql). Quem quiser pode **conectar a conta** com e-mail e senha para guardar perfil, skin, estatísticas e recordes (tem "Esqueci a senha" e "Trocar senha").
+**Jogar online**: cada um no próprio celular. Um cria a sala, manda o código ou o link, escolhe o modo, o tempo e a lista, e começa. Funciona em todos os modos (Top 10/30/50, Equipe contra a lista e Times). Usa o Supabase (gratuito): o passo a passo está em [`supabase/LEIAME.md`](supabase/LEIAME.md) e as tabelas em [`supabase/schema.sql`](supabase/schema.sql). Quem quiser pode **entrar na conta Gamezi** com e-mail e senha para guardar perfil, skin, estatísticas e recordes (tem "Esqueci a senha" e "Trocar senha"); é a mesma conta do Patozi.
 
 O botão **?** no topo abre o **Como jogar**, com exemplos de peças do quadro (abre sozinho na primeira visita; o endereço `/#como-jogar` também abre).
 
@@ -50,7 +50,7 @@ Na tela de listas, "Criar lista" monta uma lista sua de 10, 30 ou 50 itens, do m
 
 ## Arquivos
 
-Na raiz ficam o portal do Gamezi (`index.html`, `gamezi.css`), as páginas de texto (`termos.html`, `privacidade.html`, `brand.html`, `404.html`, com `docs.css`), o `sw.js`, o `manifest.webmanifest`, a pasta `brand/` e os testes. O jogo fica em `topzi/`:
+Na raiz ficam o portal do Gamezi (`index.html`, `gamezi.css`), a conta Gamezi (`conta.html` e `gamezi-conta.js`), as páginas de texto (`termos.html`, `privacidade.html`, `brand.html`, `404.html`, com `docs.css`), o `sw.js`, o `manifest.webmanifest`, a pasta `brand/` e os testes. O jogo fica em `topzi/`:
 
 
 - `topzi/index.html` e `topzi/style.css`: telas e visual
@@ -60,7 +60,7 @@ Na raiz ficam o portal do Gamezi (`index.html`, `gamezi.css`), as páginas de te
   - `match.js`: comparação de palpites, dicas e sugestões do "Aceitar mesmo assim" (sem tela, por isso testado)
   - `partida.js`: vez, vidas, tempo e dicas · `resultado.js`: pódio e placares · `modos.js`, `jogadores.js`, `listas.js`, `diaria.js`, `estatisticas.js`
   - `util.js`, `efeitos.js` (som e confete), `skins.js`, `avatars.js`, `icons.js`, `app.js` (liga tudo)
-- `topzi/js/online.js` e `topzi/js/config.js`: modo online e conta (as chaves do Supabase vão no `config.js`)
+- `topzi/js/online.js` e `topzi/js/config.js`: modo online e perfil na conta (as chaves do Supabase vão no `config.js`)
 - `supabase/`: SQL do banco e passo a passo de configuração
 - `sw.js` e `manifest.webmanifest` (na raiz): instalar o Gamezi como app e jogar offline
 - `tests/`: testes automáticos (`npm test`), que também rodam no GitHub a cada push, e o teste do online com duas abas e um Supabase falso (`npm run test:online`)
@@ -99,14 +99,14 @@ Regras extras (ligadas por padrão, dá para desligar): **Dobrei** (chutar o dob
 
 **Online**: um cria a sala, manda o código ou o link (`patozi/?sala=CODIGO`), escolhe os temas, a duração e as regras, e começa. Quem recarrega a página volta para a partida; se alguém sai no meio, o computador joga por ele.
 
-**Perfil**: nome e cor do pato, estatísticas (partidas, vezes que escapou, vezes que foi o pato, "Nem a pato!" certeiros, patos recebidos, dobreis, Pato do dia), conta (a mesma do Topzi) e "Mande uma carta", que guarda sugestões de perguntas no banco.
+**Perfil**: nome e cor do pato, estatísticas (partidas, vezes que escapou, vezes que foi o pato, "Nem a pato!" certeiros, patos recebidos, dobreis, Pato do dia), conta Gamezi (a mesma do Topzi) e "Mande uma carta", que guarda sugestões de perguntas, com o tema, no banco.
 
 ## Arquivos do Patozi
 
 - `patozi/index.html` e `patozi/style.css`: telas e visual (mesmas cores, fonte e peças do Topzi)
-- `patozi/data/temas.js`: os 17 temas e a função que cadastra as cartas; `patozi/data/cartas-*.js`: as 437 cartas, em português, inglês e espanhol
+- `patozi/data/temas.js`: os 23 temas e a função que cadastra as cartas; `patozi/data/cartas-*.js`: as 573 cartas, em português, inglês e espanhol
 - `patozi/js/jogo.js`: regras, computador e Pato do dia, sem tela (testado em `tests/patozi.test.js`)
-- `patozi/js/partida.js` (partida na tela), `diario.js` (Pato do dia), `online.js` (salas), `conta.js` (banco, conta e perfil), `visual.js` (ícones, o pato, som e confete), `textos.js` (os três idiomas), `app.js` (liga tudo)
+- `patozi/js/partida.js` (partida na tela), `diario.js` (Pato do dia), `online.js` (salas), `conta.js` (banco e perfil na conta), `visual.js` (ícones, o pato, som e confete), `textos.js` (os três idiomas), `app.js` (liga tudo)
 - As chaves do Supabase vêm do `topzi/js/config.js` (é o mesmo projeto)
 - Banco: tabelas `patozi_*` no `supabase/schema.sql`
 - Marca: `brand/patozi-logo*.svg`, `brand/patozi-simbolo*.svg` e `brand/patozi-og.png` (ver `brand.html`)

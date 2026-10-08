@@ -191,6 +191,7 @@
       <form class="suggest" id="suggest-form">
         <p class="small muted" data-i18n="suggest.sub">Tem uma pergunta boa com resposta em número (ex.: "Quantos ossos tem o pé humano?")? Mande para a gente. As melhores entram no jogo.</p>
         <input id="suggest-q" maxlength="200" required data-i18n-ph="suggest.q" placeholder="Sua pergunta">
+        <select id="suggest-tema" class="suggest-tema" data-i18n-aria="suggest.theme" aria-label="Tema da carta"></select>
         <div class="suggest-row">
           <input id="suggest-a" inputmode="numeric" maxlength="15" required data-i18n-ph="suggest.a" placeholder="Resposta">
           <input id="suggest-src" maxlength="200" data-i18n-ph="suggest.src" placeholder="Fonte (opcional)">
@@ -210,41 +211,18 @@
     </div>
   </dialog>
 
-  <!-- Conta -->
-  <dialog class="dialog account-dialog" id="account-dialog">
-    <div class="dialog-inner">
-      <div class="dialog-head"><h2 data-i18n="account.title">Sua conta</h2><button type="button" class="text-btn" data-close data-i18n="btn.close">Fechar</button></div>
-      <p id="account-status"></p>
-      <form class="account-form" id="account-form">
-        <input type="email" id="account-email" autocomplete="email" data-i18n-ph="account.email" placeholder="E-mail">
-        <input type="password" id="account-password" autocomplete="current-password" data-i18n-ph="account.password" placeholder="Senha (mínimo 6)">
-        <div class="actions">
-          <button type="submit" class="btn" value="entrar" data-i18n="account.login">Entrar</button>
-          <button type="submit" class="btn ghost" value="criar" data-i18n="account.create">Criar conta</button>
-          <button type="button" class="link-btn" id="account-forgot" data-i18n="account.forgot">Esqueci a senha</button>
-        </div>
-      </form>
-      <form class="account-form" id="password-form" hidden>
-        <input type="password" id="new-password" autocomplete="new-password" data-i18n-ph="account.newPassword" placeholder="Nova senha">
-        <div class="actions"><button type="submit" class="btn" data-i18n="account.savePassword">Salvar senha</button></div>
-      </form>
-      <div class="actions" id="account-logged" hidden>
-        <button type="button" class="btn ghost" id="account-logout" data-i18n="account.logout">Sair da conta</button>
-      </div>
-      <p class="feedback" id="account-msg"></p>
-    </div>
-  </dialog>
-
   <canvas id="fx" aria-hidden="true"></canvas>
 
   <script src="data/temas.js"></script>
   <script src="data/cartas-1.js"></script>
   <script src="data/cartas-2.js"></script>
   <script src="data/cartas-3.js"></script>
+  <script src="data/cartas-4.js"></script>
   <script src="js/jogo.js"></script>
   <script src="js/textos.js"></script>
   <script src="js/visual.js"></script>
   <script src="../topzi/js/config.js"></script>
+  <script src="../gamezi-conta.js"></script>
   <script src="js/conta.js"></script>
   <script src="js/diario.js"></script>
   <script src="js/partida.js"></script>

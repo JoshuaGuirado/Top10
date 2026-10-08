@@ -86,11 +86,11 @@ async function criarSala() {
     const tentativa = codigoNovo();
     const { error } = await sb.from("patozi_salas").insert({ code: tentativa, host_id: me.id, status: "lobby", settings: config });
     if (!error) codigo = tentativa;
-    else if (error.code !== "23505") throw new Error(error.message || t("on.errNet"));
+    else if (error.code !== "23505") throw erroDoBanco(error);
   }
   if (!codigo) throw new Error(t("on.errNet"));
   const { error } = await sb.from("patozi_sala_jogadores").insert(minhaLinha(codigo, nick));
-  if (error) throw new Error(error.message);
+  if (error) throw erroDoBanco(error);
   sb.rpc("patozi_limpar_salas").then(() => {}, () => {});
   await entrarNaSala(codigo);
 }

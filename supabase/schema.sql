@@ -1,6 +1,9 @@
 -- Gamezi (Topzi e Patozi): banco do modo online, dos perfis e do Pato do dia.
 -- Como usar: Supabase → SQL Editor → New query → cole tudo → Run. Pode rodar de novo sem problema.
 --
+-- A conta é do Gamezi: uma só (auth.users) para a plataforma e todos os jogos, com login em conta.html.
+-- Cada jogo guarda o próprio perfil numa tabela dele (profiles no Topzi, patozi_perfis no Patozi).
+--
 -- Tabelas:
 --   profiles      perfil de cada jogador (nick, skin, estatísticas, recordes, lista do dia, listas criadas)
 --   rooms         salas online (código de 5 letras, anfitrião, configurações e estado da partida)
@@ -203,6 +206,9 @@ create table if not exists public.patozi_sugestoes (
   idioma text not null default 'pt' check (idioma in ('pt', 'en', 'es')),
   created_at timestamptz not null default now()
 );
+
+-- Tema da carta enviada (um dos temas do jogo, "outro" ou vazio). Entrou depois: add column if not exists.
+alter table public.patozi_sugestoes add column if not exists tema text not null default '' check (char_length(tema) <= 20);
 
 create table if not exists public.patozi_salas (
   code text primary key check (code ~ '^[A-Z0-9]{5}$'),

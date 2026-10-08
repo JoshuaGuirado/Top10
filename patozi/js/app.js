@@ -62,6 +62,11 @@ function abrirPerfil() {
     [st.melhorDiario, "stats.best"],
   ];
   $("stats").innerHTML = tiles.map(([v, k]) => `<div class="stat"><b>${v}</b><span>${escapeHtml(t(k))}</span></div>`).join("");
+  const tema = $("suggest-tema").value;
+  $("suggest-tema").innerHTML = `<option value="">${escapeHtml(t("suggest.theme"))}</option>` +
+    PZ_TEMAS.map((x) => `<option value="${x.id}">${escapeHtml(tr(x.nome))}</option>`).join("") +
+    `<option value="outro">${escapeHtml(t("suggest.otherTheme"))}</option>`;
+  $("suggest-tema").value = tema;
   renderConta();
 }
 
@@ -107,7 +112,7 @@ async function mandarSugestao(e) {
     return;
   }
   try {
-    await enviarSugestao(q.slice(0, 200), a, $("suggest-src").value.trim().slice(0, 200));
+    await enviarSugestao(q.slice(0, 200), a, $("suggest-src").value.trim().slice(0, 200), $("suggest-tema").value);
     msg.className = "feedback good";
     msg.textContent = t("suggest.ok");
     e.target.reset();
@@ -174,14 +179,12 @@ function ligar() {
   $("profile-duck").onclick = trocarMinhaCor;
   $("profile-nick").oninput = (e) => mudarMeuNome(e.target.value);
   $("suggest-form").onsubmit = mandarSugestao;
-  document.querySelectorAll(".account-btn").forEach((b) => (b.onclick = () => abrirConta()));
-  $("account-form").onsubmit = contaEntrar;
-  $("account-forgot").onclick = contaEsqueci;
-  $("password-form").onsubmit = contaNovaSenha;
-  $("account-logout").onclick = contaSair;
+  document.querySelectorAll(".account-btn").forEach((b) => (b.onclick = abrirConta));
 }
 
 function iniciar() {
+  // Link do e-mail (nova senha) que caiu no Patozi: a conta do Gamezi cuida disso.
+  if (gameziRetornoDoLogin("../")) return;
   applyI18n();
   renderTopo();
   ligar();

@@ -15,7 +15,20 @@ test("os scripts da página existem", () => {
 });
 
 test("o modo offline guarda todos os scripts", () => {
-  for (const s of scripts) assert.ok(sw.includes(`"topzi/${s}"`), `sw.js não guarda topzi/${s}`);
+  for (const s of scripts) {
+    const noSite = path.posix.normalize("topzi/" + s);
+    assert.ok(sw.includes(`"${noSite}"`), `sw.js não guarda ${noSite}`);
+  }
+});
+
+test("conta do Gamezi: a página e o script existem e estão no modo offline", () => {
+  const conta = fs.readFileSync(path.join(SITE, "conta.html"), "utf8");
+  for (const s of [...conta.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1])) {
+    assert.ok(fs.existsSync(path.join(SITE, s)), `conta.html usa ${s}, que não existe`);
+  }
+  for (const f of ["conta.html", "gamezi-conta.js"]) assert.ok(sw.includes(`"${f}"`), `sw.js não guarda ${f}`);
+  const portal = fs.readFileSync(path.join(SITE, "index.html"), "utf8");
+  assert.ok(portal.includes('src="gamezi-conta.js"'), "o portal lê a conta do Gamezi");
 });
 
 test("os arquivos guardados pelo modo offline existem", () => {
