@@ -28,7 +28,7 @@
 - Cartas do Patozi precisam ser **difíceis**: recorde, peso, altura, distância, quantidade que ninguém sabe de cabeça
   (nada de "quantas patas tem a aranha" ou "quantas estrelas tem a bandeira"). As óbvias antigas ficam em
   `patozi/data/aposentadas.js` (fora do sorteio; não apague linhas dos `cartas-*.js`, os ids mudariam).
-- Cartas novas do Patozi: arquivo novo em `patozi/data/` carregado depois dos outros, pergunta em português, inglês e
+- Cartas novas do Patozi (a última é `cartas-6.js`): arquivo novo em `patozi/data/` carregado depois dos outros, pergunta em português, inglês e
   espanhol, resposta inteira (ano com `"ano"` no fim) e uma linha nova em `PZ_DIARIO_POOLS` valendo a partir de amanhã.
   Número que muda com o tempo leva a data na pergunta ("até 2022").
 - Mudou carta do Patozi (nova ou resposta)? Rode `node supabase/gerar-respostas.js` e mande o `supabase/patozi-respostas.sql`

@@ -1,4 +1,4 @@
--- Respostas das cartas do Patozi (685), para o banco calcular os pontos do Pato do dia.
+-- Respostas das cartas do Patozi (831), para o banco calcular os pontos do Pato do dia.
 -- Gerado por supabase/gerar-respostas.js. Pode rodar de novo: atualiza o que mudou.
 insert into public.patozi_respostas (carta, resposta) values
   ('corpo-1',206),('corpo-2',32),('corpo-3',20),('corpo-4',46),('corpo-5',24),('corpo-6',27),('corpo-7',26),('corpo-8',4),
@@ -86,5 +86,23 @@ insert into public.patozi_respostas (carta, resposta) values
   ('numeros-35',1852),('numeros-36',28),('numeros-37',3785),('tecnologia-24',27),('tecnologia-25',17468),('tecnologia-26',2300),('tecnologia-27',128),('biblia-27',31102),
   ('biblia-28',930),('biblia-29',950),('biblia-30',300),('biblia-31',700),('biblia-32',175),('biblia-33',100),('biblia-34',14),('curiosidades-22',68),
   ('curiosidades-23',132),('curiosidades-24',93),('curiosidades-25',7300),('curiosidades-26',330),('curiosidades-27',20000),('curiosidades-28',4491863),('curiosidades-29',28800),('curiosidades-30',915103765),
-  ('curiosidades-31',129000),('curiosidades-32',215),('curiosidades-33',13700),('curiosidades-34',6514),('curiosidades-35',102)
+  ('curiosidades-31',129000),('curiosidades-32',215),('curiosidades-33',13700),('curiosidades-34',6514),('curiosidades-35',102),('espaco-32',12756),('espaco-33',3474),('espaco-34',1392700),
+  ('espaco-35',142984),('espaco-36',2377),('espaco-37',243),('espaco-38',165),('espaco-39',9461),('espaco-40',382),('espaco-41',107000),('espaco-42',22),
+  ('mundo-35',6650),('mundo-36',82),('mundo-37',193),('mundo-38',10994),('mundo-39',8611),('mundo-40',2166),('mundo-41',164),('mundo-42',57),
+  ('mundo-43',30000),('mundo-44',117),('mundo-45',2850),('mundo-46',371000),('mundo-47',6400),('natureza-17',1487),('natureza-18',11000),('natureza-19',2700),
+  ('natureza-20',3812),('natureza-21',16000),('natureza-22',3040),('natureza-23',3688),('brasil-45',16886),('brasil-46',150000),('brasil-47',11451),('brasil-48',40100),
+  ('brasil-49',635),('brasil-50',5760),('historia-36',872),('historia-37',8000),('historia-38',2224),('historia-39',2300000),('historia-40',102),('historia-41',44),
+  ('historia-42',632),('historia-43',303),('curiosidades-36',10000000),('curiosidades-37',2500000),('curiosidades-38',225),('curiosidades-39',775),('curiosidades-40',760),('curiosidades-41',2300),
+  ('curiosidades-42',357),('curiosidades-43',1350),('curiosidades-44',312),('curiosidades-45',96),('curiosidades-46',1576),('ciencia-32',86),('ciencia-33',5730),('ciencia-34',12262),
+  ('ciencia-35',1538),('ciencia-36',1480),('ciencia-37',30000),('corpo-35',10000),('corpo-36',11000),('corpo-37',7000),('corpo-38',100000),('corpo-39',600),
+  ('corpo-40',1400),('corpo-41',865),('corpo-42',215),('animais-42',617),('animais-43',495),('animais-44',767),('animais-45',392),('animais-46',2992),
+  ('animais-47',2700),('animais-48',25000),('animais-49',2000),('animais-50',14000),('esporte-40',9848),('esporte-41',8674),('esporte-42',226),('esporte-43',44),
+  ('esporte-44',4309),('esporte-45',7004),('esporte-46',78),('esporte-47',200),('esporte-48',2428),('esporte-49',34),('futebol-41',78838),('futebol-42',222),
+  ('futebol-43',1279),('transporte-19',9289),('transporte-20',574),('transporte-21',640),('transporte-22',80),('transporte-23',458),('transporte-24',365),('transporte-25',7600),
+  ('transporte-26',2180),('transporte-27',1228),('transporte-28',490),('transporte-29',402),('transporte-30',472),('transporte-31',1280),('transporte-32',50),('transporte-33',1574),
+  ('transporte-34',21529464),('transporte-35',15000000),('transporte-36',30000),('comida-26',1261),('comida-27',1164),('comida-28',4000),('comida-29',2693000),('comida-30',159),
+  ('musica-33',3500000),('musica-34',1380000),('musica-35',70),('musica-36',639),('musica-37',33114),('cinema-34',300000),('tecnologia-28',16),('tecnologia-29',790),
+  ('tecnologia-30',72),('numeros-38',43),('numeros-39',604800),('numeros-40',255168),('numeros-41',2598960),('numeros-42',168),('numeros-43',41024320),('dinheiro-17',50063860),
+  ('dinheiro-18',450),('dinheiro-19',150),('dinheiro-20',7200000),('dinheiro-21',15000000),('jogos-34',60000),('jogos-35',3333360),('desenhos-18',220),('arte-17',77),
+  ('arte-18',2100),('arte-19',8900000),('arte-20',776),('palavras-18',228500),('palavras-19',600000),('palavras-20',7168),('palavras-21',85568)
 on conflict (carta) do update set resposta = excluded.resposta;
