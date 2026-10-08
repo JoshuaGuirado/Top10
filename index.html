@@ -32,6 +32,7 @@
           <option value="pt">PT</option><option value="en">EN</option><option value="es">ES</option>
         </select>
       </label>
+      <button type="button" class="icon-btn" id="help-btn" data-i18n-aria="help.title" aria-label="Como jogar" title="Como jogar"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.4-2.7 4"/><circle cx="12" cy="17.6" r=".6" fill="currentColor"/></svg></button>
       <button type="button" class="icon-btn" id="theme-btn"></button>
       <button type="button" class="icon-btn" id="sound-btn"></button>
       <button type="button" class="profile-btn" id="profile-btn" data-i18n-aria="nav.profileOpen" aria-label="Abrir perfil"><span class="profile-btn-avatar" id="profile-btn-avatar"></span><span class="profile-btn-label" data-i18n="nav.profile">Perfil</span></button>
@@ -64,6 +65,12 @@
         <li><b class="n">50</b><p data-i18n="rules.3">No Top 50, o último item da lista vale 50 pontos.</p></li>
         <li><b class="n">VS</b><p data-i18n="rules.4">Ou joguem juntos: a equipe contra a lista.</p></li>
       </ol>
+      <footer class="site-foot">
+        <button type="button" class="link-btn" id="help-link" data-i18n="help.title">Como jogar</button>
+        <a href="termos.html" data-i18n="foot.terms">Termos de uso</a>
+        <a href="privacidade.html" data-i18n="foot.privacy">Privacidade</a>
+        <span>© 2026 Topzi</span>
+      </footer>
     </section>
 
     <!-- Modos de jogo -->
@@ -312,6 +319,52 @@
       </form>
       <button type="button" class="btn ghost" id="account-logout" hidden data-i18n="account.logout">Sair da conta</button>
       <p class="feedback" id="account-msg" role="status"></p>
+    </div>
+  </dialog>
+
+  <!-- Como jogar (abre sozinho na primeira visita; sem barra de rolagem à vista) -->
+  <dialog id="help-dialog" class="avatar-dialog help-dialog" aria-labelledby="help-title">
+    <div class="dialog-inner" tabindex="-1" autofocus>
+      <div class="dialog-head">
+        <h2 id="help-title" data-i18n="help.title">Como jogar</h2>
+        <form method="dialog"><button type="submit" class="text-btn" data-i18n="btn.close">Fechar</button></form>
+      </div>
+      <p data-i18n="help.intro">Descubra os itens de uma lista que está em ordem, do mais óbvio ao mais difícil. O número de cada item é a pontuação dele.</p>
+      <p class="help-list"><span class="tag" data-i18n="help.exCat">Geografia</span><b data-i18n="help.exTitle">Os 10 países mais populosos do mundo</b></p>
+
+      <ol class="board help-board"><li class="slot found"><span class="rank">1</span><span class="slot-name" data-i18n="help.exItem1">Índia</span><span class="pts">+1</span></li></ol>
+      <p data-i18n-html="help.ex1">Acertou o <b>nº 1</b>? Ganhou <b>1 ponto</b>. É o óbvio: quase todo mundo lembra.</p>
+
+      <ol class="board help-board" start="10"><li class="slot found"><span class="rank">10</span><span class="slot-name" data-i18n="help.exItem10">México</span><span class="pts">+10</span></li></ol>
+      <p data-i18n-html="help.ex10">O último é o mais difícil e vale mais: o <b>nº 10</b> vale <b>10 pontos</b>. No Top 50, o nº 50 vale 50.</p>
+
+      <ol class="board help-board" start="7"><li class="slot"><span class="rank">7</span><span class="slot-name"><span class="hidden-name"></span></span><span class="pts">7 pts</span></li></ol>
+      <p data-i18n-html="help.exHidden">Os itens que ninguém achou ficam <b>escondidos</b> até alguém acertar ou a partida acabar.</p>
+
+      <div class="help-guess"><span data-i18n="help.exWrong">Japão</span><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+      <p data-i18n-html="help.exMiss">Chutou algo que <b>não está na lista</b>? Passa a vez sem pontos. Jogando com vidas, ainda perde uma.</p>
+
+      <ol class="board help-board" start="8"><li class="slot"><span class="rank">8</span><span class="slot-name"><span class="hint" data-i18n="help.exHint">B… · 10 letras</span></span><span class="pts">8 pts</span></li></ol>
+      <p data-i18n-html="help.exHintText">Com vidas, dá para trocar <b>uma vida por uma dica</b>: a primeira letra e o tamanho de um item.</p>
+
+      <ol class="board help-board" start="9"><li class="slot missed"><span class="rank">9</span><span class="slot-name" data-i18n="help.exItem9">Rússia</span><span class="pts">9 pts</span></li></ol>
+      <p data-i18n-html="help.exMissed">No fim, o que ninguém achou aparece <b>tracejado</b>. Na Equipe contra a lista, esses pontos vão para a lista.</p>
+
+      <h3 data-i18n="help.guessTitle">Vale do seu jeito</h3>
+      <p data-i18n="help.guess">Maiúsculas e acentos não importam, singular e plural valem igual, siglas e apelidos também (“EUA”, “BH”) e um errinho de digitação passa. Nas listas de frases, basta acertar a ideia principal.</p>
+
+      <h3 data-i18n="help.modesTitle">Modos</h3>
+      <ul class="help-modes">
+        <li data-i18n-html="help.modeTop"><b>Top 10, 30 e 50:</b> sozinho, 1v1 ou todos contra todos. Quem somar mais pontos vence.</li>
+        <li data-i18n-html="help.modeTeam"><b>Equipe contra a lista:</b> todos jogam juntos. A equipe vence se fizer mais da metade dos pontos.</li>
+        <li data-i18n-html="help.modeTimes"><b>Times:</b> Time Vermelho contra Time Preto. A vez alterna entre os times.</li>
+      </ul>
+      <p data-i18n="help.turn">Na sua vez, chute ou passe a vez. A partida acaba quando todos os itens aparecem, quando todo mundo passa seguido ou quando acabam as vidas.</p>
+
+      <h3 data-i18n="help.dailyTitle">Lista do dia e online</h3>
+      <p data-i18n="help.daily">Todo dia tem uma lista nova, igual para todo mundo, com 3 vidas e resultado para compartilhar. No “Jogar online”, cada um usa o próprio celular: crie uma sala e mande o código para a turma.</p>
+
+      <p class="help-foot"><a href="termos.html" data-i18n="foot.terms">Termos de uso</a><a href="privacidade.html" data-i18n="foot.privacy">Privacidade</a></p>
     </div>
   </dialog>
 

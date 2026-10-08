@@ -156,6 +156,31 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 }
 
+// Como jogar: botão "?" no topo, link no rodapé e endereço #como-jogar (usado pelas páginas de termos).
+// Abre sozinho na primeira visita de quem ainda não jogou, menos quando chega por link de sala.
+function openHelp() {
+  store("ajuda", true);
+  const d = $("help-dialog");
+  if (!d.open) d.showModal();
+  d.scrollTop = 0;
+}
+function renderHelpBtn() {
+  $("help-btn").title = t("help.title");
+}
+$("help-btn").addEventListener("click", openHelp);
+$("help-link").addEventListener("click", openHelp);
+$("help-dialog").addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) e.currentTarget.close(); // toque fora da janela fecha
+});
+function maybeOpenHelp() {
+  if (location.hash === "#como-jogar") {
+    history.replaceState(null, "", location.pathname + location.search);
+    return openHelp();
+  }
+  const fromRoom = new URLSearchParams(location.search).has("sala") || store("sala");
+  if (!store("ajuda") && !store("stats") && !fromRoom && document.body.dataset.screen === "home") openHelp();
+}
+
 // Idioma: o seletor do topo troca tudo na hora, inclusive a tela aberta.
 function renderHeroLead() {
   $("hero-lead").textContent = t("hero.lead", { total: allLists().length });
@@ -166,6 +191,7 @@ function onLangChange() {
   $("lang-select").value = lang;
   renderSoundBtn();
   renderThemeBtn();
+  renderHelpBtn();
   renderHeroLead();
   renderDailyCard();
   renderAccount();
@@ -197,9 +223,11 @@ function onLangChange() {
 applyStaticTexts();
 renderSoundBtn();
 renderThemeBtn();
+renderHelpBtn();
 ensurePlayers();
 renderDailyCard();
 renderProfileButton();
 renderHeroLead();
 if (!importFromHash()) show("home");
+maybeOpenHelp();
 initOnline();

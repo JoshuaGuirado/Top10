@@ -3,84 +3,450 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Topzi · Identidade visual</title>
+  <title>Identidade visual · Topzi</title>
+  <meta name="description" content="Manual de identidade visual do Topzi: logo, símbolo, cores, tipografia, componentes, ícones e tom de voz.">
+  <meta name="robots" content="noindex">
   <link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
+  <script>try { var t = localStorage.getItem("tt:theme"); if (t) document.documentElement.dataset.theme = JSON.parse(t); } catch (e) {}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&display=swap">
+  <link rel="stylesheet" href="docs.css">
   <style>
-    :root { --red: #FF4D3D; --ink: #171717; --cream: #FFF4DE; }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: var(--cream); color: var(--ink); font-family: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif; line-height: 1.5; }
-    main { max-width: 920px; margin: 0 auto; padding: 40px 16px 80px; }
-    h1, h2 { font-stretch: 75%; font-weight: 800; line-height: .95; letter-spacing: -0.02em; text-transform: uppercase; }
-    h1 { font-size: clamp(3rem, 10vw, 5.5rem); margin: 28px 0 16px; }
-    h1 span { color: var(--red); }
-    h2 { font-size: 2rem; margin: 64px 0 16px; padding-top: 16px; border-top: 2px solid var(--ink); }
-    p { max-width: 62ch; }
-    .muted { color: #6B6151; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); border: 2px solid var(--ink); border-radius: 18px; overflow: hidden; }
-    .panel { padding: 40px; display: grid; place-items: center; min-height: 220px; }
-    .panel.dark { background: var(--ink); }
+    /* Peças da marca. Os componentes copiam o style.css do jogo para mostrar o visual real. */
+    .doc.wide, .doc-top.wide, .doc-foot.wide { max-width: 960px; }
+    .eyebrow { font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--accent-ink); margin: 0; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin: 16px 0; }
+    .grid.three { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+    .panel { border-radius: var(--r); padding: 36px 24px; display: grid; place-items: center; min-height: 200px; border: 2px solid var(--line); }
+    .panel.cream { background: #FFF4DE; border-color: #E8D5B0; }
+    .panel.ink { background: #171717; border-color: #171717; }
+    .panel.red { background: #FF4D3D; border-color: #FF4D3D; }
     .panel img { max-width: 100%; height: auto; }
-    .swatches { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-    .swatch div:first-child { height: 130px; border: 2px solid var(--ink); border-radius: 16px; }
-    .swatch p { margin: 8px 0 0; font-size: .95rem; }
-    .swatch b { display: block; font-size: 1.1rem; }
-    code { font-family: ui-monospace, Menlo, monospace; font-size: .85em; }
-    .type { font-stretch: 75%; font-weight: 800; font-size: 3.4rem; line-height: 1; text-transform: uppercase; margin: 0; }
-    ul { padding-left: 20px; }
-    li { margin-bottom: 6px; }
-    .sizes { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+    .caption { font-size: .85rem; color: var(--muted); margin: 6px 2px 0; }
+    .card { background: var(--surface); border-radius: var(--r); padding: 18px 20px; }
+    .card h3 { margin-top: 0; }
+    .card p:last-child, .card ul:last-child { margin-bottom: 0; }
+
+    /* área de proteção */
+    .clear { position: relative; display: inline-block; padding: 34px; border: 2px dashed var(--accent); border-radius: 12px; background: #FFF4DE; }
+    .clear img { display: block; width: 260px; max-width: 60vw; height: auto; }
+    .clear i { position: absolute; font-style: normal; font-size: .7rem; font-weight: 800; color: #D93A2B; }
+    .clear i.t { top: 8px; left: 50%; transform: translateX(-50%); }
+    .clear i.l { left: 6px; top: 50%; transform: translateY(-50%); }
+
+    /* usos incorretos */
+    .dont { position: relative; }
+    .dont .panel { min-height: 150px; padding: 24px; overflow: hidden; }
+    .dont .panel img.stretch { width: 130px; }
+    .dont .panel img { width: 180px; }
+    .dont .x { position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; border-radius: 50%; background: #B8261A; color: #fff; display: grid; place-items: center; font-weight: 800; }
+    .stretch { transform: scaleX(1.5); }
+    .shadow { filter: drop-shadow(6px 6px 0 #FF4D3D) drop-shadow(10px 10px 8px rgba(0,0,0,.4)); }
+    .recolor { filter: hue-rotate(160deg) saturate(1.4); }
+    .panel.busy { background: repeating-linear-gradient(45deg, #FF4D3D 0 14px, #2B6CFF 14px 28px); border-color: transparent; }
+
+    /* cores */
+    .swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 16px 0; }
+    .sw { border-radius: var(--r); overflow: hidden; border: 2px solid var(--line); background: var(--bg); }
+    .sw .chip-color { height: 120px; display: flex; align-items: flex-end; padding: 12px; font-stretch: 75%; font-weight: 800; font-size: 1.6rem; line-height: 1; }
+    .sw .meta { padding: 12px 14px; font-size: .9rem; }
+    .sw .meta b { display: block; font-size: 1.05rem; }
+    .sw .meta code { background: none; padding: 0; }
+    .tokens td:first-child { white-space: nowrap; }
+    .dot { display: inline-block; width: 18px; height: 18px; border-radius: 6px; vertical-align: -4px; margin-right: 6px; border: 1.5px solid rgba(128,128,128,.4); }
+    .ratio { display: inline-block; font-size: .75rem; font-weight: 800; padding: 2px 8px; border-radius: 999px; background: var(--surface); }
+    .ratio.ok { color: #2BA84A; }
+    .ratio.big { color: #B07A00; }
+
+    /* tipografia */
+    .type-row { display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: baseline; padding: 14px 0; border-bottom: 1.5px solid var(--line); }
+    .type-row .spec { font-size: .8rem; color: var(--muted); }
+    .type-row .spec b { display: block; color: var(--fg); font-size: .9rem; }
+    .t-display { font-stretch: 75%; font-weight: 800; font-size: clamp(2.6rem, 9vw, 4.6rem); line-height: .95; letter-spacing: -0.02em; text-transform: uppercase; margin: 0; }
+    .t-display span { color: var(--accent); }
+    .t-h2 { font-stretch: 75%; font-weight: 800; font-size: 2.2rem; line-height: 1; margin: 0; }
+    .t-h3 { font-stretch: 75%; font-weight: 800; font-size: 1.5rem; line-height: 1; margin: 0; }
+    .t-body { font-size: 1rem; margin: 0; }
+    .t-lead { font-size: 1.1rem; color: var(--muted); margin: 0; }
+    .t-small { font-size: .85rem; margin: 0; }
+    .t-label { font-size: .75rem; font-weight: 700; color: var(--muted); margin: 0; }
+    @media (max-width: 560px) { .type-row { grid-template-columns: 1fr; gap: 4px; } }
+    .alphabet { font-size: 1.6rem; line-height: 1.3; overflow-wrap: anywhere; }
+    .alphabet.cond { font-stretch: 75%; font-weight: 800; }
+
+    /* componentes (iguais ao style.css) */
+    .demo { background: var(--bg); border: 2px solid var(--line); border-radius: var(--r); padding: 20px; display: grid; gap: 14px; margin: 16px 0; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .btn { font: inherit; border: 0; border-radius: 999px; padding: 12px 24px; font-weight: 700; background: var(--accent); color: var(--on-accent); cursor: pointer; }
+    .btn.big { font-size: 1.1rem; padding: 16px 44px; }
+    .btn.dark { background: var(--fg); color: var(--bg); }
+    .btn.ghost { background: var(--surface); color: var(--fg); }
+    .btn.small { padding: 8px 16px; font-size: .88rem; }
+    .chip { font: inherit; border: 0; background: var(--surface); color: var(--fg); border-radius: 999px; padding: 6px 12px; font-size: .84rem; font-weight: 600; }
+    .chip.active { background: var(--fg); color: var(--bg); }
+    .chip.red { background: var(--accent); color: var(--on-accent); }
+    .icon-btn { display: inline-grid; place-items: center; width: 40px; height: 40px; color: var(--fg); background: var(--surface); border: 1.5px solid var(--line); border-radius: 999px; }
+    .ui-ico { width: 20px; height: 20px; }
+    .field { font: inherit; width: 100%; max-width: 360px; padding: 10px 14px; border: 2px solid var(--line); border-radius: var(--r-sm); background: var(--bg); color: var(--fg); }
+    .field.focus { border-color: var(--accent); }
+    .board { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-width: 520px; }
+    .slot { display: flex; align-items: center; gap: 12px; min-height: 52px; background: var(--surface); border-radius: var(--r); padding: 6px 14px 6px 6px; }
+    .rank { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--bg); font-stretch: 75%; font-weight: 800; font-size: 1.3rem; line-height: 1; color: var(--muted); }
+    .slot-name { flex: 1; font-weight: 700; }
+    .hidden-name { display: block; height: 8px; max-width: 140px; border-radius: 99px; background: var(--line); }
+    .pts { font-size: .78rem; font-weight: 700; color: var(--muted); }
+    .slot.found { background: var(--fg); color: var(--bg); }
+    .slot.found .rank { background: var(--accent); color: var(--on-accent); }
+    .slot.found .pts { color: var(--bg); opacity: .75; }
+    .slot.t0 { background: var(--accent); color: var(--on-accent); }
+    .slot.t0 .rank { background: var(--on-accent); color: var(--accent); }
+    .slot.t0 .pts { color: var(--on-accent); opacity: 1; }
+    .slot.missed { background: transparent; border: 2px dashed var(--line); }
+    .slot.missed .slot-name { color: var(--muted); }
+    .hint { font-weight: 800; color: var(--accent-ink); }
+    .list-card { background: var(--surface); border-radius: var(--r); border: 2px solid transparent; padding: 14px 16px; display: grid; gap: 4px; max-width: 280px; }
+    .list-card.hover { border-color: var(--accent); }
+    .list-cat { font-size: .72rem; color: var(--accent-ink); font-weight: 700; }
+    .medal { display: inline-grid; place-items: center; min-width: 44px; height: 44px; padding: 0 6px; border-radius: 999px; font-stretch: 75%; font-weight: 800; font-size: 1.15rem; border: 2.5px solid var(--fg); color: var(--fg); }
+    .medal.m1 { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+    .medal.m2 { background: var(--fg); color: var(--bg); }
+    .medal.m4 { border: 2px dashed var(--line); color: var(--muted); }
+    .rules-demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+    .rules-demo div { padding: 18px; background: var(--surface); border-radius: var(--r); }
+    .rules-demo b { display: block; font-stretch: 75%; font-weight: 800; font-size: 2.2rem; line-height: 1; margin-bottom: 8px; color: var(--accent-ink); }
+    .rules-demo p { margin: 0; font-size: .92rem; }
+
+    /* espaçamento */
+    .scale { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+    .scale div { display: grid; gap: 6px; justify-items: center; font-size: .75rem; color: var(--muted); font-weight: 700; }
+    .scale span { display: block; background: var(--accent); border-radius: 4px; }
+    .radii { display: flex; flex-wrap: wrap; gap: 16px; }
+    .radii div { width: 110px; height: 80px; background: var(--surface); border: 2px solid var(--fg); display: grid; place-items: center; font-size: .8rem; font-weight: 700; }
+
+    /* tom de voz */
+    .voice { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+    .voice > div { border-radius: var(--r); padding: 16px 18px; }
+    .voice .yes { background: var(--surface); border-left: 6px solid #2BA84A; }
+    .voice .no { background: var(--surface); border-left: 6px solid #B8261A; }
+    .voice p { margin: 0 0 8px; }
+    .voice p:last-child { margin: 0; }
+    .voice .tag { font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+    .voice .yes .tag { color: #2BA84A; }
+    .voice .no .tag { color: #B8261A; }
+    @media (max-width: 600px) { .voice { grid-template-columns: 1fr; } }
+
+    .og { width: 100%; height: auto; border-radius: var(--r); border: 2px solid var(--line); display: block; }
+    .icons-row { display: flex; gap: 18px; align-items: flex-end; flex-wrap: wrap; }
+    .icons-row figure { margin: 0; display: grid; gap: 6px; justify-items: center; font-size: .75rem; color: var(--muted); font-weight: 700; }
+    .icons-row svg { width: 28px; height: 28px; color: var(--fg); }
   </style>
 </head>
 <body>
-<main>
-  <img src="brand/logo.svg" alt="Topzi" width="200">
-  <h1>Identidade <span>visual</span></h1>
-  <p class="muted"><b>Topzi</b> é o jogo de listas em que o óbvio vale 1 e o difícil vale 10. A marca tem duas peças: a <b>logo</b> com o nome, que apresenta o jogo, e o <b>símbolo 10</b>, que aparece onde falta espaço (ícone do app, aba do navegador, avatar de rede social).</p>
+  <header class="doc-top wide">
+    <a href="./" aria-label="Topzi, voltar ao jogo">
+      <img class="logo logo-light" src="brand/logo.svg" alt="Topzi">
+      <img class="logo logo-dark" src="brand/logo-dark.svg" alt="" aria-hidden="true">
+    </a>
+    <a class="back" href="./">Voltar ao jogo</a>
+  </header>
 
-  <h2>Logo</h2>
-  <p>"TOPZI" em letras grossas, com o "O" mais baixo (dá ritmo e personalidade) e o <b>Z em vermelho</b>. É a assinatura principal: topo do site, imagem de compartilhamento, materiais.</p>
-  <div class="grid">
-    <div class="panel"><img src="brand/logo.svg" alt="Logo Topzi no fundo creme" width="320"></div>
-    <div class="panel dark"><img src="brand/logo-dark.svg" alt="Logo Topzi no fundo preto" width="320"></div>
-  </div>
+  <main class="doc wide">
+    <p class="eyebrow">Manual da marca · versão 1.0</p>
+    <h1>Identidade <span>visual</span></h1>
+    <p class="updated">Atualizado em 8 de outubro de 2026</p>
+    <p class="lead"><b>Topzi</b> é o jogo de listas em que o óbvio vale 1 e o difícil vale 10. Este guia junta tudo o que dá a cara do Topzi: logo, símbolo, cores, letras, peças da interface, ícones e o jeito de escrever. Use como referência para o site, redes sociais, apresentações e qualquer material novo.</p>
 
-  <h2>Símbolo 10</h2>
-  <p>O "10" é a pontuação máxima de uma lista: o item mais difícil. O pedaço vermelho no topo do zero é o <b>topo da lista</b>, o lugar que todo mundo quer alcançar. Funciona sozinho e em tamanhos pequenos.</p>
-  <div class="grid">
-    <div class="panel"><img src="brand/simbolo.svg" alt="Símbolo 10 no fundo creme" width="180"></div>
-    <div class="panel dark"><img src="brand/simbolo-escuro.svg" alt="Símbolo 10 no fundo preto" width="180"></div>
-    <div class="panel"><div class="sizes"><img src="brand/icon-192.png" alt="Ícone do app" width="96" style="border-radius:22px;border:2px solid #171717"><img src="brand/favicon.svg" alt="Ícone da aba" width="32"><img src="brand/favicon.svg" alt="" width="16"></div></div>
-  </div>
+    <nav class="toc" aria-label="Nesta página">
+      <p>Nesta página</p>
+      <ol>
+        <li><a href="#essencia">Essência da marca</a></li>
+        <li><a href="#logo">Logo</a></li>
+        <li><a href="#simbolo">Símbolo 10</a></li>
+        <li><a href="#cores">Cores</a></li>
+        <li><a href="#tipografia">Tipografia</a></li>
+        <li><a href="#formas">Formas e espaçamento</a></li>
+        <li><a href="#componentes">Componentes</a></li>
+        <li><a href="#icones">Ícones</a></li>
+        <li><a href="#movimento">Movimento e som</a></li>
+        <li><a href="#voz">Tom de voz</a></li>
+        <li><a href="#aplicacoes">Aplicações</a></li>
+        <li><a href="#arquivos">Arquivos</a></li>
+      </ol>
+    </nav>
 
-  <h2>Cores</h2>
-  <div class="swatches">
-    <div class="swatch"><div style="background:#FF4D3D"></div><p><b>Vermelho</b><code>#FF4D3D</code> · cor principal: botões, destaques, o Z e o topo do 10. Para texto pequeno sobre o creme, use <code>#D93A2B</code>.</p></div>
-    <div class="swatch"><div style="background:#171717"></div><p><b>Preto</b><code>#171717</code> · texto, contraste e fundo do modo escuro.</p></div>
-    <div class="swatch"><div style="background:#FFF4DE"></div><p><b>Creme</b><code>#FFF4DE</code> · fundo do modo claro e texto do modo escuro.</p></div>
-  </div>
+    <!-- 1 -->
+    <h2 id="essencia">1. Essência da marca</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>O conceito</h3>
+        <p>Toda lista vai do <b>óbvio</b> ao <b>difícil</b>. O número do item é a pontuação: lembrar do 1º é fácil e vale pouco, lembrar do 10º é o que separa quem sabe de quem chuta. A marca inteira gira em torno dessa ideia: <b>chegar no topo da lista</b>.</p>
+      </div>
+      <div class="card">
+        <h3>Assinatura</h3>
+        <p class="t-h3" style="margin:6px 0 10px">O óbvio vale 1.<br><span style="color:var(--accent)">O difícil vale 10.</span></p>
+        <p class="t-small muted">Usada no topo do site, no compartilhamento e em materiais. Sempre em duas linhas, a segunda em vermelho.</p>
+      </div>
+      <div class="card">
+        <h3>Personalidade</h3>
+        <ul>
+          <li><b>Competitivo</b>, mas sem humilhar: a graça é a disputa.</li>
+          <li><b>Jogo de turma</b>: feito para sala, churrasco, grupo do WhatsApp.</li>
+          <li><b>Direto</b>: regra que se explica em uma frase.</li>
+          <li><b>Brasileiro</b>: futebol, novela, comida e frase de mãe.</li>
+        </ul>
+      </div>
+    </div>
 
-  <h2>Tipografia</h2>
-  <p class="type">O difícil vale 10</p>
-  <p><b>Bricolage Grotesque</b> (Google Fonts, gratuita): títulos em peso 800 e largura condensada (<code>font-stretch: 75%</code>), texto corrido em peso 400 a 600.</p>
+    <!-- 2 -->
+    <h2 id="logo">2. Logo</h2>
+    <p>"TOPZI" em letras grossas e geométricas, com o <b>O mais baixo</b> (dá ritmo, como uma lista que sobe e desce) e o <b>Z em vermelho</b>. É a assinatura principal: topo do site, imagem de compartilhamento e materiais.</p>
+    <div class="grid">
+      <div><div class="panel cream"><img src="brand/logo.svg" alt="Logo Topzi em preto com Z vermelho, no fundo creme" width="320"></div><p class="caption">Versão principal · fundo creme · <code>brand/logo.svg</code></p></div>
+      <div><div class="panel ink"><img src="brand/logo-dark.svg" alt="Logo Topzi em creme com Z vermelho, no fundo preto" width="320"></div><p class="caption">Versão negativa · fundo preto · <code>brand/logo-dark.svg</code></p></div>
+    </div>
 
-  <h2>Regras rápidas</h2>
-  <ul>
-    <li>Fundo sempre creme ou preto. O vermelho é destaque, não fundo de página inteira (exceto a tela de vitória).</li>
-    <li>Não mude as cores da logo, não estique e não coloque sombra ou degradê.</li>
-    <li>Na logo, só o Z é vermelho. No símbolo, só o topo do zero.</li>
-    <li>Deixe em volta da logo um espaço livre de pelo menos a altura do "O".</li>
-  </ul>
+    <h3>Área de proteção e tamanho mínimo</h3>
+    <div class="grid">
+      <div class="panel cream" style="min-height:0">
+        <div class="clear"><i class="t">x</i><i class="l">x</i><img src="brand/logo.svg" alt="Logo com a área de proteção marcada"></div>
+      </div>
+      <div class="card">
+        <p>Deixe em volta da logo um espaço livre igual à <b>altura do "O"</b> (marcado como <b>x</b>). Nada de texto, borda ou outro elemento dentro dessa área.</p>
+        <p><b>Tamanho mínimo:</b> 96 px de largura na tela (no site ela aparece com 26 a 34 px de altura) e 25 mm no impresso. Abaixo disso, use o <a href="#simbolo">símbolo 10</a>.</p>
+      </div>
+    </div>
 
-  <h2>Arquivos</h2>
-  <ul>
-    <li><code>brand/logo.svg</code> e <code>brand/logo-dark.svg</code>: logo para fundo creme e fundo preto</li>
-    <li><code>brand/simbolo.svg</code> e <code>brand/simbolo-escuro.svg</code>: símbolo 10</li>
-    <li><code>brand/favicon.svg</code>, <code>favicon-32.png</code>, <code>apple-touch-icon.png</code>, <code>icon-192.png</code>, <code>icon-512.png</code>, <code>icon-maskable-512.png</code>: ícones</li>
-    <li><code>brand/og-image.png</code>: imagem de compartilhamento (1200 × 630)</li>
-  </ul>
-</main>
+    <h3>Não faça</h3>
+    <div class="grid three">
+      <div class="dont"><div class="panel cream"><img class="stretch" src="brand/logo.svg" alt="Logo esticada"></div><span class="x">✕</span><p class="caption">Esticar ou achatar</p></div>
+      <div class="dont"><div class="panel cream"><img class="recolor" src="brand/logo.svg" alt="Logo com cores trocadas"></div><span class="x">✕</span><p class="caption">Trocar as cores</p></div>
+      <div class="dont"><div class="panel cream"><img class="shadow" src="brand/logo.svg" alt="Logo com sombra"></div><span class="x">✕</span><p class="caption">Sombra, brilho ou degradê</p></div>
+      <div class="dont"><div class="panel busy"><img src="brand/logo.svg" alt="Logo sobre fundo poluído"></div><span class="x">✕</span><p class="caption">Fundo colorido ou poluído</p></div>
+      <div class="dont"><div class="panel red"><img src="brand/logo.svg" alt="Logo sobre o vermelho"></div><span class="x">✕</span><p class="caption">Logo sobre o vermelho (o Z some)</p></div>
+      <div class="dont"><div class="panel cream"><img src="brand/logo.svg" alt="Logo girada" style="transform:rotate(-12deg)"></div><span class="x">✕</span><p class="caption">Girar ou inclinar</p></div>
+    </div>
+
+    <!-- 3 -->
+    <h2 id="simbolo">3. Símbolo 10</h2>
+    <p>O "10" é a pontuação máxima de uma lista de 10: o item mais difícil. O <b>pedaço vermelho no topo do zero</b> é o topo da lista, o lugar que todo mundo quer alcançar. Ele aparece onde falta espaço: ícone do app, aba do navegador, avatar de rede social e na tela inicial, acima do título.</p>
+    <div class="grid three">
+      <div><div class="panel cream"><img src="brand/simbolo.svg" alt="Símbolo 10 no fundo creme" width="150"></div><p class="caption">Fundo creme · <code>simbolo.svg</code></p></div>
+      <div><div class="panel ink"><img src="brand/simbolo-escuro.svg" alt="Símbolo 10 no fundo preto" width="150"></div><p class="caption">Fundo preto · <code>simbolo-escuro.svg</code></p></div>
+      <div><div class="panel cream"><div class="icons-row"><figure><img src="brand/icon-192.png" alt="Ícone do app" width="96" style="border-radius:22px;border:2px solid #171717"><figcaption>App</figcaption></figure><figure><img src="brand/favicon.svg" alt="Ícone da aba" width="32"><figcaption>32 px</figcaption></figure><figure><img src="brand/favicon.svg" alt="" width="16"><figcaption>16 px</figcaption></figure></div></div><p class="caption">Ícones · mínimo de 16 px</p></div>
+    </div>
+    <p>Regra de cor: no símbolo, <b>só o topo do zero é vermelho</b>. Na logo, <b>só o Z</b>. O vermelho nunca aparece em mais de um ponto da mesma peça.</p>
+
+    <!-- 4 -->
+    <h2 id="cores">4. Cores</h2>
+    <p>Três cores fazem a marca. O <b>creme</b> e o <b>preto</b> são os fundos; o <b>vermelho</b> é o destaque: o que é importante, o que se clica, o que vale ponto.</p>
+    <div class="swatches">
+      <div class="sw"><div class="chip-color" style="background:#FF4D3D;color:#171717">Vermelho</div><div class="meta"><b>Vermelho Topzi</b><code>#FF4D3D</code> · RGB 255 77 61<br>Botões principais, o Z, o topo do 10, itens achados.</div></div>
+      <div class="sw"><div class="chip-color" style="background:#171717;color:#FFF4DE">Preto</div><div class="meta"><b>Preto</b><code>#171717</code> · RGB 23 23 23<br>Texto, contraste, fundo do modo escuro, Time Preto.</div></div>
+      <div class="sw"><div class="chip-color" style="background:#FFF4DE;color:#171717">Creme</div><div class="meta"><b>Creme</b><code>#FFF4DE</code> · RGB 255 244 222<br>Fundo do modo claro e texto do modo escuro.</div></div>
+    </div>
+    <p><b>Proporção sugerida:</b> 60% fundo (creme ou preto), 30% superfícies e texto, 10% vermelho. O vermelho não vira fundo de página inteira (a exceção é a tela de vitória).</p>
+
+    <h3>Cores da interface</h3>
+    <p>No código, as cores são variáveis em <code>style.css</code>. O modo escuro troca só os valores; os nomes continuam os mesmos.</p>
+    <div class="table-wrap">
+      <table class="data-table tokens">
+        <thead><tr><th>Variável</th><th>Claro</th><th>Escuro</th><th>Uso</th></tr></thead>
+        <tbody>
+          <tr><td><code>--bg</code></td><td><span class="dot" style="background:#FFF4DE"></span>#FFF4DE</td><td><span class="dot" style="background:#171717"></span>#171717</td><td>Fundo da página</td></tr>
+          <tr><td><code>--surface</code></td><td><span class="dot" style="background:#F7E7C8"></span>#F7E7C8</td><td><span class="dot" style="background:#232120"></span>#232120</td><td>Cartões, chips, itens escondidos</td></tr>
+          <tr><td><code>--line</code></td><td><span class="dot" style="background:#E8D5B0"></span>#E8D5B0</td><td><span class="dot" style="background:#38342F"></span>#38342F</td><td>Bordas, divisórias, campos</td></tr>
+          <tr><td><code>--fg</code></td><td><span class="dot" style="background:#171717"></span>#171717</td><td><span class="dot" style="background:#FFF4DE"></span>#FFF4DE</td><td>Texto principal</td></tr>
+          <tr><td><code>--muted</code></td><td><span class="dot" style="background:#6B6151"></span>#6B6151</td><td><span class="dot" style="background:#B5AA93"></span>#B5AA93</td><td>Texto de apoio, legendas</td></tr>
+          <tr><td><code>--accent</code></td><td><span class="dot" style="background:#FF4D3D"></span>#FF4D3D</td><td><span class="dot" style="background:#FF4D3D"></span>#FF4D3D</td><td>Botões, destaques, Time Vermelho</td></tr>
+          <tr><td><code>--accent-ink</code></td><td><span class="dot" style="background:#D93A2B"></span>#D93A2B</td><td><span class="dot" style="background:#FF6B5D"></span>#FF6B5D</td><td>Vermelho para texto pequeno</td></tr>
+          <tr><td><code>--accent-soft</code></td><td><span class="dot" style="background:#FFE1D4"></span>#FFE1D4</td><td><span class="dot" style="background:#3B1F1A"></span>#3B1F1A</td><td>Fundo de aviso e de item escolhido</td></tr>
+          <tr><td><code>--on-accent</code></td><td><span class="dot" style="background:#171717"></span>#171717</td><td><span class="dot" style="background:#171717"></span>#171717</td><td>Texto sobre o vermelho (sempre preto)</td></tr>
+          <tr><td><code>--bad</code></td><td><span class="dot" style="background:#B8261A"></span>#B8261A</td><td><span class="dot" style="background:#FF8A7F"></span>#FF8A7F</td><td>Erros e chute errado</td></tr>
+          <tr><td><code>--team1</code></td><td><span class="dot" style="background:#171717"></span>#171717</td><td><span class="dot" style="background:#4A4540"></span>#4A4540</td><td>Time Preto</td></tr>
+          <tr><td>sucesso</td><td><span class="dot" style="background:#2BA84A"></span>#2BA84A</td><td><span class="dot" style="background:#2BA84A"></span>#2BA84A</td><td>Online, mensagem de "deu certo"</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Contraste</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Combinação</th><th>Contraste</th><th>Pode usar em</th></tr></thead>
+        <tbody>
+          <tr><td>Preto sobre creme</td><td><span class="ratio ok">16,4 : 1</span></td><td>Qualquer texto</td></tr>
+          <tr><td>Preto sobre vermelho (botão)</td><td><span class="ratio ok">5,5 : 1</span></td><td>Qualquer texto</td></tr>
+          <tr><td><code>--muted</code> sobre creme</td><td><span class="ratio ok">5,6 : 1</span></td><td>Texto de apoio</td></tr>
+          <tr><td><code>--accent-ink</code> sobre creme</td><td><span class="ratio big">4,2 : 1</span></td><td>Rótulos curtos em negrito (categoria, dica)</td></tr>
+          <tr><td>Vermelho <code>#FF4D3D</code> sobre creme</td><td><span class="ratio big">3,0 : 1</span></td><td>Só títulos grandes, números e formas</td></tr>
+          <tr><td>Vermelho sobre preto</td><td><span class="ratio ok">5,5 : 1</span></td><td>Qualquer texto</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note"><p><b>Texto sobre o vermelho é sempre preto</b>, nunca branco nem creme: o branco no vermelho fica com contraste baixo (3,3 : 1) e foge da marca.</p></div>
+
+    <!-- 5 -->
+    <h2 id="tipografia">5. Tipografia</h2>
+    <p>Uma família só: <b>Bricolage Grotesque</b> (Google Fonts, gratuita). Ela tem eixo de largura, então a mesma fonte faz os títulos condensados e pesados e o texto corrido confortável. Reserva: Helvetica Neue, Arial.</p>
+    <div class="grid">
+      <div class="card"><p class="t-label">Títulos · peso 800 · largura 75%</p><p class="alphabet cond">AaBbCc 0123456789<br>ÓBVIO DIFÍCIL</p></div>
+      <div class="card"><p class="t-label">Texto · peso 400 a 700 · largura 100%</p><p class="alphabet">AaBbCc 0123456789<br>óbvio difícil</p></div>
+    </div>
+    <h3>Escala</h3>
+    <div>
+      <div class="type-row"><p class="spec"><b>Display</b>2,6 a 5,8 rem · 800 · 75% · maiúsculas · entrelinha 0,95</p><p class="t-display">O difícil <span>vale 10</span></p></div>
+      <div class="type-row"><p class="spec"><b>Título de tela</b>2,2 rem · 800 · 75%</p><p class="t-h2">Escolha a lista</p></div>
+      <div class="type-row"><p class="spec"><b>Subtítulo</b>1,5 rem · 800 · 75%</p><p class="t-h3">A lista completa</p></div>
+      <div class="type-row"><p class="spec"><b>Destaque</b>1,1 rem · 400 · cor de apoio</p><p class="t-lead">Um jogo de listas para jogar sozinho, contra os amigos ou em equipe.</p></div>
+      <div class="type-row"><p class="spec"><b>Texto</b>1 rem · 400 · entrelinha 1,45</p><p class="t-body">Na sua vez, dê um palpite. Acertou o nº 8, ganhou 8 pontos.</p></div>
+      <div class="type-row"><p class="spec"><b>Pequeno</b>0,85 rem · 400 a 600</p><p class="t-small">Salvas neste aparelho e, com a conta conectada, também na conta.</p></div>
+      <div class="type-row"><p class="spec"><b>Rótulo</b>0,75 rem · 700 · cor de apoio</p><p class="t-label">Tempo por vez</p></div>
+    </div>
+    <ul>
+      <li>Maiúsculas só no display (título da tela inicial, revelação do vencedor). No resto, frase normal.</li>
+      <li>Números de pontuação e de posição usam sempre a versão condensada e pesada.</li>
+      <li>Texto corrido com no máximo uns 65 caracteres por linha.</li>
+    </ul>
+
+    <!-- 6 -->
+    <h2 id="formas">6. Formas e espaçamento</h2>
+    <p>Tudo é arredondado, sem sombra pesada e sem borda grossa: as peças se separam pela cor de fundo (<code>--surface</code> sobre <code>--bg</code>).</p>
+    <div class="radii">
+      <div style="border-radius:999px">999 px · botão</div>
+      <div style="border-radius:22px">22 px · janela</div>
+      <div style="border-radius:16px">16 px · cartão</div>
+      <div style="border-radius:11px">11 px · campo</div>
+    </div>
+    <h3>Espaços</h3>
+    <div class="scale">
+      <div><span style="width:6px;height:6px"></span>6</div>
+      <div><span style="width:10px;height:10px"></span>10</div>
+      <div><span style="width:16px;height:16px"></span>16</div>
+      <div><span style="width:24px;height:24px"></span>24</div>
+      <div><span style="width:40px;height:40px"></span>40</div>
+    </div>
+    <ul>
+      <li><b>6 px</b> entre chips e itens da lista · <b>10 px</b> entre cartões · <b>16 px</b> de margem lateral no celular e dentro de cartões · <b>24 a 40 px</b> entre blocos.</li>
+      <li>Largura máxima do conteúdo: <b>800 px</b>, centralizado. Tudo precisa funcionar a partir de 320 px de largura.</li>
+      <li>Área de toque mínima: <b>40 × 40 px</b>.</li>
+    </ul>
+
+    <!-- 7 -->
+    <h2 id="componentes">7. Componentes</h2>
+    <p>As peças abaixo usam as mesmas regras do jogo. Troque o tema do aparelho (claro ou escuro) para ver as duas versões.</p>
+
+    <h3>Botões</h3>
+    <div class="demo">
+      <div class="row"><button class="btn big" type="button">Jogar</button><button class="btn big dark" type="button">Jogar online</button><button class="btn ghost" type="button">Perfil</button></div>
+      <div class="row"><button class="btn" type="button">Chutar</button><button class="btn small" type="button">Entrar ou criar conta</button><button class="btn ghost small" type="button">Cancelar</button>
+        <span class="icon-btn"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.4-2.7 4"/><circle cx="12" cy="17.6" r=".6" fill="currentColor"/></svg></span>
+        <span class="icon-btn"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg></span></div>
+      <p class="t-small muted"><b>Vermelho</b> = ação principal (uma por tela). <b>Preto</b> = segunda ação forte. <b>Superfície</b> = ações secundárias. Botões são sempre pílulas, texto em peso 700.</p>
+    </div>
+
+    <h3>Chips, campos e cartões</h3>
+    <div class="demo">
+      <div class="row"><span class="chip active">Todas</span><span class="chip">Futebol</span><span class="chip">Filmes</span><span class="chip">Brasil</span><span class="chip red">Top 10</span></div>
+      <input class="field" type="text" placeholder="Seu palpite" aria-label="Exemplo de campo">
+      <input class="field focus" type="text" value="Bangladesh" aria-label="Exemplo de campo com foco">
+      <div class="row"><div class="list-card"><span class="list-cat">Geografia</span><b>Os 10 países mais populosos do mundo</b></div><div class="list-card hover"><span class="list-cat">Futebol</span><b>Clubes brasileiros campeões da Libertadores</b></div></div>
+      <p class="t-small muted">Chip escolhido fica preto; tamanho de lista escolhido fica vermelho. Campo com foco ganha borda vermelha. Cartão em foco ou com o mouse em cima ganha borda vermelha.</p>
+    </div>
+
+    <h3>Quadro da lista</h3>
+    <p>É a peça mais importante do jogo. Cada item tem o número (que é a pontuação), o nome e os pontos.</p>
+    <div class="demo">
+      <ol class="board">
+        <li class="slot found"><span class="rank">1</span><span class="slot-name">Índia</span><span class="pts">+1</span></li>
+        <li class="slot t0"><span class="rank">2</span><span class="slot-name">China</span><span class="pts">+2</span></li>
+        <li class="slot"><span class="rank">7</span><span class="slot-name"><span class="hidden-name"></span></span><span class="pts">7 pts</span></li>
+        <li class="slot"><span class="rank">8</span><span class="slot-name"><span class="hint">B… · 10 letras</span></span><span class="pts">8 pts</span></li>
+        <li class="slot missed"><span class="rank">9</span><span class="slot-name">Rússia</span><span class="pts">9 pts</span></li>
+      </ol>
+      <p class="t-small muted"><b>Achado</b>: fundo preto com número vermelho (no modo Times, a cor do time). <b>Escondido</b>: barra no lugar do nome. <b>Dica</b>: primeira letra e tamanho em vermelho. <b>Ninguém achou</b>: borda tracejada, sem fundo.</p>
+    </div>
+
+    <h3>Colocação e regras</h3>
+    <div class="demo">
+      <div class="row"><span class="medal m1">1º</span><span class="medal m2">2º</span><span class="medal">3º</span><span class="medal m4">4º</span></div>
+      <div class="rules-demo"><div><b>1–8</b><p>Jogadores. Cada um com nickname e skin.</p></div><div><b>Nº 8</b><p>Acertou o 8º da lista? Ganhou 8 pontos.</p></div><div><b>VS</b><p>Ou joguem juntos: a equipe contra a lista.</p></div></div>
+      <p class="t-small muted">Sem medalha de ouro, prata e bronze: 1º vermelho, 2º preto, 3º contorno, do 4º em diante tracejado.</p>
+    </div>
+
+    <!-- 8 -->
+    <h2 id="icones">8. Ícones</h2>
+    <p>Ícones de traço, desenhados numa grade de 24 × 24, traço de <b>1,9</b>, pontas e cantos arredondados, cor herdada do texto (<code>currentColor</code>). O Topzi <b>não usa emoji</b> na interface: tudo que seria emoji vira ícone de traço ou número.</p>
+    <div class="demo">
+      <div class="icons-row">
+        <figure><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.4-2.7 4"/><circle cx="12" cy="17.6" r=".6" fill="currentColor"/></svg><figcaption>Ajuda</figcaption></figure>
+        <figure><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg><figcaption>Escuro</figcaption></figure>
+        <figure><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg><figcaption>Claro</figcaption></figure>
+        <figure><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c.9-3.8 3.9-6 7.5-6s6.6 2.2 7.5 6"/></svg><figcaption>Conta</figcaption></figure>
+        <figure><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><figcaption>Errou</figcaption></figure>
+      </div>
+      <p class="t-small muted">Os ícones das categorias e dos destaques do resultado ficam em <code>js/icons.js</code>; os de interface, direto no HTML e em <code>js/app.js</code>.</p>
+    </div>
+
+    <!-- 9 -->
+    <h2 id="movimento">9. Movimento e som</h2>
+    <ul>
+      <li><b>Rápido nos toques</b>: botões e cores mudam em 0,12 s; o tema troca em 0,25 s.</li>
+      <li><b>Com peso nas conquistas</b>: item achado "estoura" (0,5 s, com leve passada do ponto), pódio sobe, coroa e confete no vencedor, rufar de tambor antes do resultado.</li>
+      <li><b>Erro balança</b>: o campo treme rápido (0,35 s) quando o chute está errado.</li>
+      <li>Quem pede menos movimento no aparelho (<code>prefers-reduced-motion</code>) recebe tudo parado.</li>
+      <li>Som é curto e pode ser desligado no topo da tela; a escolha fica salva.</li>
+    </ul>
+
+    <!-- 10 -->
+    <h2 id="voz">10. Tom de voz</h2>
+    <p>O Topzi fala como um amigo explicando o jogo na mesa: <b>português do dia a dia, frases curtas, sem jargão</b>. Trata por "você" e chama o grupo de "a turma". É animado na vitória, leve na derrota e nunca debocha de quem errou.</p>
+    <div class="voice">
+      <div class="yes"><p class="tag">Assim</p><p>Acertou o 8º da lista? Ganhou 8 pontos.</p><p>Cada um no seu celular. Crie uma sala e mande o código para a turma.</p><p>Sem senha: a gente manda um link para o seu e-mail.</p></div>
+      <div class="no"><p class="tag">Assim não</p><p>Parabéns!!! Você obteve 8 pontos na rodada atual 🎉🎉</p><p>Inicialize uma sessão multiplayer e compartilhe o identificador.</p><p>Autentique-se via magic link para persistir seus dados.</p></div>
+    </div>
+    <ul>
+      <li><b>Verbos no começo</b> dos botões: Jogar, Chutar, Criar sala, Escolher a lista.</li>
+      <li><b>Sem exclamação em excesso</b> e sem emoji. Uma exclamação basta, e só em momento de festa.</li>
+      <li><b>Números em algarismo</b> quando falam de pontos e posições: "nº 8", "10 pontos", "Top 50".</li>
+      <li>O jogo existe em português, inglês e espanhol: escreva frases que se traduzem bem, sem gíria muito local nos textos fixos.</li>
+    </ul>
+
+    <!-- 11 -->
+    <h2 id="aplicacoes">11. Aplicações</h2>
+    <h3>Imagem de compartilhamento</h3>
+    <img class="og" src="brand/og-image.png" alt="Imagem de compartilhamento do Topzi, 1200 por 630" width="1200" height="630" loading="lazy">
+    <p class="caption">1200 × 630 px · aparece quando o link é mandado no WhatsApp e nas redes · <code>brand/og-image.png</code></p>
+    <h3>Redes sociais</h3>
+    <div class="grid">
+      <div class="card"><p><b>Avatar:</b> símbolo 10 no fundo creme, centralizado, com margem de 20%.</p><p><b>Posts:</b> fundo creme ou preto, título no display em maiúsculas, um único destaque em vermelho. Mostre o quadro da lista como peça principal (itens achados em preto, escondidos com barra).</p></div>
+      <div class="card"><p><b>Lista do dia:</b> o resultado compartilhado usa quadradinhos de texto, para funcionar em qualquer aplicativo de conversa.</p><p><b>Vídeos:</b> abertura com o símbolo, corte seco, fecho com a logo e "topzi" no fundo creme.</p></div>
+    </div>
+
+    <!-- 12 -->
+    <h2 id="arquivos">12. Arquivos</h2>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr><th>Arquivo</th><th>O que é</th></tr></thead>
+        <tbody>
+          <tr><td><a href="brand/logo.svg" download><code>brand/logo.svg</code></a></td><td>Logo para fundo creme (claro)</td></tr>
+          <tr><td><a href="brand/logo-dark.svg" download><code>brand/logo-dark.svg</code></a></td><td>Logo para fundo preto (escuro)</td></tr>
+          <tr><td><a href="brand/simbolo.svg" download><code>brand/simbolo.svg</code></a></td><td>Símbolo 10 para fundo creme</td></tr>
+          <tr><td><a href="brand/simbolo-escuro.svg" download><code>brand/simbolo-escuro.svg</code></a></td><td>Símbolo 10 para fundo preto</td></tr>
+          <tr><td><code>brand/favicon.svg</code>, <code>favicon-32.png</code></td><td>Ícone da aba do navegador</td></tr>
+          <tr><td><code>brand/apple-touch-icon.png</code>, <code>icon-192.png</code>, <code>icon-512.png</code>, <code>icon-maskable-512.png</code></td><td>Ícones do app instalado</td></tr>
+          <tr><td><a href="brand/og-image.png" download><code>brand/og-image.png</code></a></td><td>Imagem de compartilhamento (1200 × 630)</td></tr>
+          <tr><td><code>style.css</code> (início do arquivo)</td><td>Cores, raios e fonte em variáveis, claro e escuro</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="doc-foot wide">
+    <a href="./">Jogar</a>
+    <a href="./#como-jogar">Como jogar</a>
+    <a href="termos.html">Termos de uso</a>
+    <a href="privacidade.html">Privacidade</a>
+    <span>© 2026 Topzi</span>
+  </footer>
 </body>
 </html>

@@ -14,6 +14,8 @@ Jogo de adivinhar listas para jogar sozinho ou com até 8 pessoas. Cada lista te
 
 **Jogar online**: cada um no próprio celular. Um cria a sala, manda o código ou o link, escolhe o modo, o tempo e a lista, e começa. Funciona em todos os modos (Top 10/30/50, Equipe contra a lista e Times). Usa o Supabase (gratuito): o passo a passo está em [`supabase/LEIAME.md`](supabase/LEIAME.md) e as tabelas em [`supabase/schema.sql`](supabase/schema.sql). Quem quiser pode **conectar a conta** com o e-mail para guardar perfil, skin, estatísticas e recordes.
 
+O botão **?** no topo abre o **Como jogar**, com exemplos de peças do quadro (abre sozinho na primeira visita; o endereço `/#como-jogar` também abre).
+
 Na tela inicial também tem a **Lista do dia**: a mesma lista de 10 para todo mundo, com 3 vidas, e o resultado vira um texto com quadradinhos para compartilhar no WhatsApp.
 
 ## Como jogar
@@ -52,7 +54,9 @@ Na tela de listas, "Criar lista" monta uma lista sua de 10, 30 ou 50 itens, do m
 - `supabase/`: SQL do banco e passo a passo de configuração
 - `sw.js` e `manifest.webmanifest`: instalar como app e jogar offline
 - `tests/`: testes automáticos (`npm test`), que também rodam no GitHub a cada push, e o teste do online com duas abas e um Supabase falso (`npm run test:online`)
-- `brand/` e `brand.html`: logo TOPZI, símbolo 10, ícones e guia de identidade visual (vermelho `#FF4D3D`, preto `#171717`, creme `#FFF4DE`)
+- `brand/` e `brand.html`: logo TOPZI, símbolo 10, ícones e manual de identidade visual (logo, cores, tipografia, componentes, ícones e tom de voz) (vermelho `#FF4D3D`, preto `#171717`, creme `#FFF4DE`)
+- `termos.html` e `privacidade.html`: Termos de uso e Política de privacidade (LGPD), com o visual de `docs.css`
+- `404.html`, `robots.txt` e `sitemap.xml`: página de erro e arquivos para buscadores
 
 Listas sem dado oficial (rankings de opinião e de popularidade) indicam "Curadoria Topzi" como fonte.
 

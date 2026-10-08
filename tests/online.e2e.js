@@ -25,6 +25,7 @@ const server = http.createServer((req, res) => {
   const browser = await playwright.chromium.launch(fs.existsSync("/opt/pw-browsers/chromium") ? { executablePath: "/opt/pw-browsers/chromium" } : {});
   const ctx = await browser.newContext({ viewport: { width: 420, height: 900 }, serviceWorkers: "block", locale: "pt-BR" });
   await ctx.addInitScript(fs.readFileSync(path.join(__dirname, "supabase-falso.js"), "utf8"));
+  await ctx.addInitScript(() => localStorage.setItem("tt:ajuda", "true")); // sem o "Como jogar" da primeira visita
   await ctx.route("**/js/config.js", (r) => r.fulfill({ contentType: "application/javascript", body: 'const SUPABASE_URL = "https://falso.supabase.co"; const SUPABASE_ANON_KEY = "x";' }));
   const errors = [];
   const page = async () => {

@@ -799,3 +799,40 @@ body[data-screen="game"] .profile-btn, body[data-screen="profile"] .profile-btn 
 .icon-btn .ui-ico { width: 20px; height: 20px; }
 .lang-select:hover, .icon-btn:hover { border-color: var(--fg); }
 .lang-select:focus-visible, .icon-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ── janelas sem barra de rolagem à vista (continuam rolando com dedo, roda e teclado) ── */
+.avatar-dialog { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; }
+.avatar-dialog::-webkit-scrollbar { display: none; }
+
+/* ── como jogar ── */
+.help-dialog { width: min(560px, calc(100vw - 24px)); }
+.help-dialog .dialog-inner { gap: 12px; padding-top: 0; }
+.help-dialog .dialog-head {
+  position: sticky; top: 0; z-index: 1; background: var(--bg);
+  margin: 0 -20px; padding: 18px 20px 12px; border-bottom: 1.5px solid var(--line);
+}
+.help-dialog p { margin: 0; }
+.help-dialog h3 { margin: 18px 0 0; font-size: 1.35rem; }
+.help-dialog .dialog-inner > p:first-of-type { margin-top: 6px; }
+.help-list { display: grid; gap: 2px; padding: 12px 14px; background: var(--surface); border-radius: var(--r); margin-top: 4px !important; }
+.help-list b { font-stretch: 85%; font-size: 1.1rem; line-height: 1.15; }
+.help-board { margin-top: 10px; }
+.help-board .slot { min-height: 48px; }
+.help-guess {
+  margin-top: 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px 14px; border: 2px solid var(--bad); border-radius: var(--r-sm);
+  font-weight: 700; color: var(--bad);
+}
+.help-guess span { text-decoration: line-through; text-decoration-thickness: 2px; }
+.help-guess .ui-ico { width: 20px; height: 20px; }
+.help-modes { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.help-foot { display: flex; gap: 18px; padding-top: 14px; margin-top: 8px !important; border-top: 1.5px solid var(--line); font-size: .85rem; }
+.help-foot a, .site-foot a { color: var(--muted); font-weight: 600; text-underline-offset: 3px; }
+.help-foot a:hover, .site-foot a:hover { color: var(--fg); }
+
+/* ── rodapé da tela inicial ── */
+.site-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 20px; margin-top: 36px; padding-top: 16px; border-top: 1.5px solid var(--line); font-size: .85rem; }
+.site-foot .link-btn { padding: 0; font-size: inherit; }
+.site-foot span { margin-left: auto; color: var(--muted); }
+@media (max-width: 480px) { .site-foot span { margin-left: 0; width: 100%; } }
+.help-dialog .dialog-inner:focus { outline: none; }

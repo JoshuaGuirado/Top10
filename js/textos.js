@@ -631,3 +631,85 @@ Object.assign(TEXTS, {
   "lobby.chosen": ["escolhida", "chosen", "elegida"],
   "lobby.use": ["Usar", "Use", "Usar"],
 });
+
+// ───────────── como jogar e rodapé ─────────────
+Object.assign(TEXTS, {
+  "help.title": ["Como jogar", "How to play", "Cómo jugar"],
+  "help.intro": [
+    "Descubra os itens de uma lista que está em ordem, do mais óbvio ao mais difícil. O número de cada item é a pontuação dele.",
+    "Find the items of a ranked list, from the most obvious to the hardest. Each item's number is how many points it's worth.",
+    "Descubre los ítems de una lista ordenada, del más obvio al más difícil. El número de cada ítem es su puntuación.",
+  ],
+  "help.exCat": ["Geografia", "Geography", "Geografía"],
+  "help.exTitle": ["Os 10 países mais populosos do mundo", "The 10 most populous countries in the world", "Los 10 países más poblados del mundo"],
+  "help.exItem1": ["Índia", "India", "India"],
+  "help.exItem10": ["México", "Mexico", "México"],
+  "help.exItem9": ["Rússia", "Russia", "Rusia"],
+  "help.exWrong": ["Japão", "Japan", "Japón"],
+  "help.exHint": ["B… · 10 letras", "B… · 10 letters", "B… · 10 letras"],
+  "help.ex1": [
+    "Acertou o <b>nº 1</b>? Ganhou <b>1 ponto</b>. É o óbvio: quase todo mundo lembra.",
+    "Got <b>No. 1</b>? That's <b>1 point</b>. It's the obvious one: almost everyone gets it.",
+    "¿Acertaste el <b>n.º 1</b>? Ganas <b>1 punto</b>. Es lo obvio: casi todo el mundo lo recuerda.",
+  ],
+  "help.ex10": [
+    "O último é o mais difícil e vale mais: o <b>nº 10</b> vale <b>10 pontos</b>. No Top 50, o nº 50 vale 50.",
+    "The last one is the hardest and worth the most: <b>No. 10</b> is worth <b>10 points</b>. In Top 50, No. 50 is worth 50.",
+    "El último es el más difícil y vale más: el <b>n.º 10</b> vale <b>10 puntos</b>. En el Top 50, el n.º 50 vale 50.",
+  ],
+  "help.exHidden": [
+    "Os itens que ninguém achou ficam <b>escondidos</b> até alguém acertar ou a partida acabar.",
+    "Items nobody has found stay <b>hidden</b> until someone gets them or the game ends.",
+    "Los ítems que nadie encontró quedan <b>ocultos</b> hasta que alguien acierte o termine la partida.",
+  ],
+  "help.exMiss": [
+    "Chutou algo que <b>não está na lista</b>? Passa a vez sem pontos. Jogando com vidas, ainda perde uma.",
+    "Guessed something that's <b>not on the list</b>? Your turn passes with no points. Playing with lives, you also lose one.",
+    "¿Dijiste algo que <b>no está en la lista</b>? Pasa el turno sin puntos. Jugando con vidas, además pierdes una.",
+  ],
+  "help.exHintText": [
+    "Com vidas, dá para trocar <b>uma vida por uma dica</b>: a primeira letra e o tamanho de um item.",
+    "With lives on, you can trade <b>a life for a hint</b>: the first letter and length of an item.",
+    "Con vidas, puedes cambiar <b>una vida por una pista</b>: la primera letra y el largo de un ítem.",
+  ],
+  "help.exMissed": [
+    "No fim, o que ninguém achou aparece <b>tracejado</b>. Na Equipe contra a lista, esses pontos vão para a lista.",
+    "At the end, whatever nobody found shows up <b>dashed</b>. In Team vs. the list, those points go to the list.",
+    "Al final, lo que nadie encontró aparece <b>punteado</b>. En Equipo contra la lista, esos puntos son para la lista.",
+  ],
+  "help.guessTitle": ["Vale do seu jeito", "Say it your way", "Vale a tu manera"],
+  "help.guess": [
+    "Maiúsculas e acentos não importam, singular e plural valem igual, siglas e apelidos também (“EUA”, “BH”) e um errinho de digitação passa. Nas listas de frases, basta acertar a ideia principal.",
+    "Capitals and accents don't matter, singular and plural count the same, so do abbreviations and nicknames (“USA”, “NYC”), and a small typo is fine. In lists of sayings, the main idea is enough.",
+    "Mayúsculas y tildes no importan, singular y plural valen igual, siglas y apodos también (“EE. UU.”, “CDMX”) y un error de tipeo pasa. En las listas de frases, basta con acertar la idea principal.",
+  ],
+  "help.modesTitle": ["Modos", "Modes", "Modos"],
+  "help.modeTop": [
+    "<b>Top 10, 30 e 50:</b> sozinho, 1v1 ou todos contra todos. Quem somar mais pontos vence.",
+    "<b>Top 10, 30 and 50:</b> solo, 1v1 or free-for-all. Most points wins.",
+    "<b>Top 10, 30 y 50:</b> solo, 1v1 o todos contra todos. Gana quien sume más puntos.",
+  ],
+  "help.modeTeam": [
+    "<b>Equipe contra a lista:</b> todos jogam juntos. A equipe vence se fizer mais da metade dos pontos.",
+    "<b>Team vs. the list:</b> everyone plays together. The team wins with more than half the points.",
+    "<b>Equipo contra la lista:</b> todos juegan juntos. El equipo gana si hace más de la mitad de los puntos.",
+  ],
+  "help.modeTimes": [
+    "<b>Times:</b> Time Vermelho contra Time Preto. A vez alterna entre os times.",
+    "<b>Teams:</b> Red Team against Black Team. Turns alternate between the teams.",
+    "<b>Equipos:</b> Equipo Rojo contra Equipo Negro. El turno se alterna entre los equipos.",
+  ],
+  "help.turn": [
+    "Na sua vez, chute ou passe a vez. A partida acaba quando todos os itens aparecem, quando todo mundo passa seguido ou quando acabam as vidas.",
+    "On your turn, guess or pass. The game ends when every item is found, when everyone passes in a row or when lives run out.",
+    "En tu turno, adivina o pasa. La partida termina cuando aparecen todos los ítems, cuando todos pasan seguidos o cuando se acaban las vidas.",
+  ],
+  "help.dailyTitle": ["Lista do dia e online", "Daily list and online", "Lista del día y online"],
+  "help.daily": [
+    "Todo dia tem uma lista nova, igual para todo mundo, com 3 vidas e resultado para compartilhar. No “Jogar online”, cada um usa o próprio celular: crie uma sala e mande o código para a turma.",
+    "Every day there's a new list, the same for everyone, with 3 lives and a result to share. In “Play online”, everyone uses their own phone: create a room and send the code to your friends.",
+    "Cada día hay una lista nueva, igual para todos, con 3 vidas y un resultado para compartir. En “Jugar online”, cada uno usa su propio celular: crea una sala y manda el código al grupo.",
+  ],
+  "foot.terms": ["Termos de uso", "Terms of use", "Términos de uso"],
+  "foot.privacy": ["Privacidade", "Privacy", "Privacidad"],
+});
