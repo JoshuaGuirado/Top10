@@ -560,7 +560,7 @@ function renderLobby() {
   });
 
   const listLine = st.list
-    ? `<b>${escapeHtml(st.list.title)}</b> <span class="muted small">· ${t("game.items", { n: st.list.items.length })}</span>`
+    ? `<b>${escapeHtml(listTitle(st.list))}</b> <span class="muted small">· ${t("game.items", { n: st.list.items.length })}</span>`
     : `<span class="muted">${t("lobby.noList")}</span>`;
   const timerLabel = st.timer ? t("lobby.timer", { n: st.timer }) : t("lobby.noTimer");
   const roomLives = st.lives === undefined ? !!m.team : !!st.lives;
@@ -688,7 +688,7 @@ function renderSuggestions() {
     const cat = categoryOf(g.list);
     row.innerHTML = `
       <div><p class="list-cat">${icon(cat.id)}${escapeHtml(catLabel(cat))} · ${t("game.items", { n: g.list.items.length })}</p>
-        <b>${escapeHtml(g.list.title)}</b>
+        <b>${escapeHtml(listTitle(g.list))}</b>
         <p class="muted small">${t("lobby.suggestedBy", { nomes: g.who.map(escapeHtml).join(", ") })}${g.who.length > 1 ? ` · ${t("lobby.votes", { n: g.who.length })}` : ""}</p></div>
       ${g.list.id === chosen ? `<span class="suggestion-ok">${uiIcon("check")}${t("lobby.chosen")}</span>` : isHost() ? `<button type="button" class="btn small">${t("lobby.use")}</button>` : ""}`;
     const use = row.querySelector("button");
@@ -1020,6 +1020,12 @@ async function backToRoom() {
 }
 
 // Histórico online na tela de estatísticas.
+// Título da partida do histórico no idioma atual (a lista oficial é achada pelo id).
+function onlineHistoryTitle(m) {
+  const list = m.list_id && LISTS.find((l) => l.id === m.list_id);
+  return list ? listTitle(list) : m.list_title || t("game.list");
+}
+
 async function renderOnlineHistory() {
   const box = $("stats-online");
   if (!sb || !me) {
@@ -1036,7 +1042,7 @@ async function renderOnlineHistory() {
     const pos = ranked.findIndex((p) => p.uid === me.id) + 1;
     const mine = ranked[pos - 1] || { score: 0 };
     return `<div class="record-row"><span class="record-pts">${pos ? medal(pos) : "—"}</span>
-      <div><b>${escapeHtml(m.list_title || t("game.list"))}</b><p class="muted small">${mine.score} pts · ${ranked.map((p) => escapeHtml(p.nick)).join(", ")}</p></div></div>`;
+      <div><b>${escapeHtml(onlineHistoryTitle(m))}</b><p class="muted small">${mine.score} pts · ${ranked.map((p) => escapeHtml(p.nick)).join(", ")}</p></div></div>`;
   }).join("");
 }
 

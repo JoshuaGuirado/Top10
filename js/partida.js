@@ -75,8 +75,8 @@ function setupGameScreen() {
   const cat = categoryOf(list);
   const tag = (game.daily ? ` · ${t("daily.tag", { n: game.daily })}` : game.vsList ? ` · ${t("mode.equipe.name")}` : game.teams ? ` · ${t("mode.times.name")}` : "") + (game.online ? " · Online" : "");
   $("game-cat").innerHTML = `${icon(cat.id)}${escapeHtml(catLabel(cat))} · ${t("game.items", { n: list.items.length })}${tag}`;
-  $("game-title").textContent = list.title;
-  $("source").textContent = t("game.source", { src: list.source });
+  $("game-title").textContent = listTitle(list);
+  $("source").textContent = t("game.source", { src: listSource(list) });
 }
 
 // Online, cada aparelho só joga na vez do próprio jogador.
@@ -257,7 +257,7 @@ function handleGuess(raw) {
 
   if (result && result.dup !== undefined) {
     const who = game.players[game.found.get(result.dup)];
-    setFeedback([["fb.dup", { item: game.items[result.dup].name, nome: who.name }]], "info");
+    setFeedback([["fb.dup", { item: ["@item", result.dup], nome: who.name }]], "info");
     shake($("guess-form"));
     renderGame();
     return;
@@ -291,7 +291,7 @@ function scoreHit(i, who) {
   game.passStreak = 0;
   const tier = ratio >= 0.7 ? "high" : ratio >= 0.35 ? "mid" : "low";
   const msg = [["hype." + tier, {}, randomIndex("hype." + tier)]];
-  const vars = { item: game.items[i].name, n: pts, nome: p.name };
+  const vars = { item: ["@item", i], n: pts, nome: p.name };
   msg.push(game.teams ? ["fb.hitTeam", { ...vars, team: ["team." + p.team] }] : ["fb.hit", vars]);
   if (p.streak >= 3) msg.push(["streak", { nome: p.name, n: p.streak }, randomIndex("streak")]);
   setFeedback(msg, tier === "high" || p.streak >= 3 ? "epic" : "good");
@@ -487,7 +487,7 @@ function useHint(i) {
   game.hints.add(i);
   game.lives -= 1;
   sfx.hint();
-  setFeedback([["fb.hint", { n: i + 1, hint: ["@hint", game.items[i].name] }], ["fb.livesLeft", { n: game.lives }]], "info");
+  setFeedback([["fb.hint", { n: i + 1, hint: ["@hint", i] }], ["fb.livesLeft", { n: game.lives }]], "info");
   renderGame();
   floatText($("versus").querySelector(".lives"), t("fx.life"), "bad");
   focusGuess();

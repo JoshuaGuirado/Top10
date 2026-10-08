@@ -259,6 +259,7 @@ Object.assign(TEXTS, {
   "cat.comida": ["Comida e bebida", "Food & drink", "Comida y bebida"],
   "cat.diaadia": ["Dia a dia", "Everyday life", "Día a día"],
   "cat.casais": ["Casais", "Couples", "Parejas"],
+  "cat.biblia": ["Bíblia", "Bible", "Biblia"],
 });
 
 // ───────────── partida ─────────────

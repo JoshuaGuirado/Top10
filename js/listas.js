@@ -46,7 +46,7 @@ function filteredLists() {
     if (activeCat !== "all" && l.cat !== activeCat) return false;
     if (!sizeOk(l)) return false;
     if (!q) return true;
-    return normalize(l.title + " " + categoryOf(l).label + " " + catLabel(categoryOf(l))).includes(q);
+    return normalize(l.title + " " + listTitle(l) + " " + categoryOf(l).label + " " + catLabel(categoryOf(l))).includes(q);
   });
 }
 
@@ -112,7 +112,7 @@ function renderListGrid() {
     card.innerHTML = `
       <button type="button" class="list-play">
         <span class="list-cat">${icon(cat.id)}${escapeHtml(catLabel(cat))} · ${t("game.items", { n: l.items.length })}</span>
-        <span class="list-title">${escapeHtml(l.title)}</span>
+        <span class="list-title">${escapeHtml(listTitle(l))}</span>
         ${recordLine(l)}
         ${played ? `<span class="list-played">${t("lists.recent")}</span>` : ""}
       </button>

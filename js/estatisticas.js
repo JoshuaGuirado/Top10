@@ -43,7 +43,7 @@ function recordGame(g, outcome) {
   if (g.found.size === n) s.perfect += 1;
   g.found.forEach((who, i) => {
     if (g.online && who !== g.me) return;
-    if (!s.best || i + 1 > s.best.pos) s.best = { pos: i + 1, item: g.items[i].name, list: g.list.title, name: g.players[who].name };
+    if (!s.best || i + 1 > s.best.pos) s.best = { pos: i + 1, item: g.items[i].name, list: g.list.title, listId: g.list.id, name: g.players[who].name };
   });
   store("stats", s);
   g.saved = { outcome, perfect: g.found.size === n };
@@ -64,7 +64,7 @@ function recordAccepted(g, i, who, outcome) {
     s.perfect += 1;
     g.saved.perfect = true;
   }
-  if (!s.best || i + 1 > s.best.pos) s.best = { pos: i + 1, item: g.items[i].name, list: g.list.title, name: g.players[who].name };
+  if (!s.best || i + 1 > s.best.pos) s.best = { pos: i + 1, item: g.items[i].name, list: g.list.title, listId: g.list.id, name: g.players[who].name };
   g.saved.outcome = outcome;
   store("stats", s);
   return updateRecord(g);
@@ -96,6 +96,16 @@ function statTile(value, label) {
   return `<div class="stat"><b>${value}</b><span>${label}</span></div>`;
 }
 
+// Melhor jogada no idioma atual (as antigas, sem o id da lista, ficam como foram salvas).
+function bestLabels(best) {
+  const list = best.listId && LISTS.find((l) => l.id === best.listId);
+  const raw = list && list.items[best.pos - 1];
+  return {
+    item: escapeHtml(raw ? itemLabel(list, raw) : best.item),
+    list: escapeHtml(list ? listTitle(list) : best.list),
+  };
+}
+
 function renderStats() {
   const s = loadStats();
   const daily = dailyStreaks();
@@ -112,7 +122,7 @@ function renderStats() {
   ].join("");
 
   $("stats-best").innerHTML = s.best
-    ? t("st.best", { n: `<b>${t("st.no", { n: s.best.pos })}</b>`, item: escapeHtml(s.best.item), list: escapeHtml(s.best.list), nome: escapeHtml(s.best.name) })
+    ? t("st.best", { n: `<b>${t("st.no", { n: s.best.pos })}</b>`, ...bestLabels(s.best), nome: escapeHtml(s.best.name) })
     : t("st.empty");
 
   const modes = Object.entries(s.byMode).sort((a, b) => b[1] - a[1]);
@@ -133,7 +143,7 @@ function renderStats() {
     ? rows.slice(0, 20).map((r) => `
       <div class="record-row">
         <span class="record-pts">${r.score}<small>/${r.total}</small></span>
-        <div><b>${escapeHtml(r.list.title)}</b><p class="muted small">${r.kind} · ${escapeHtml(r.name)}</p></div>
+        <div><b>${escapeHtml(listTitle(r.list))}</b><p class="muted small">${r.kind} · ${escapeHtml(r.name)}</p></div>
       </div>`).join("")
     : `<p class="muted small">${t("st.noRecords")}</p>`;
 }

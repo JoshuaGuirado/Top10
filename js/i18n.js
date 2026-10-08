@@ -46,9 +46,11 @@ function tMsg(msg) {
   return msg.map((part) => {
     if (typeof part === "string") return part;
     const [key, raw = {}, index] = part;
-    // Variável que também precisa de tradução: ["chave", vars] ou ["@hint", nome do item].
+    // Variável que também precisa de tradução: ["chave", vars], ["@item", índice] ou ["@hint", índice].
     const vars = {};
-    Object.entries(raw).forEach(([k, v]) => (vars[k] = Array.isArray(v) ? (v[0] === "@hint" ? hintFor(v[1]) : t(v[0], v[1])) : v));
+    // ["@item", índice] e ["@hint", índice] usam o nome do item no idioma de quem está vendo.
+    const item = (x) => (typeof x === "number" && typeof game !== "undefined" && game && game.items[x] ? game.items[x].name : x);
+    Object.entries(raw).forEach(([k, v]) => (vars[k] = Array.isArray(v) ? (v[0] === "@hint" ? hintFor(item(v[1])) : v[0] === "@item" ? item(v[1]) : t(v[0], v[1])) : v));
     if (index !== undefined) return fill(tList(key)[index % tList(key).length], vars);
     return t(key, vars);
   }).join(" ");

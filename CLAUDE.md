@@ -12,3 +12,6 @@
   Supabase falso de `tests/supabase-falso.js`). Mudou o banco? Atualize `supabase/schema.sql` (precisa poder rodar de novo).
 - Listas novas de 10 itens: entram no fim (arquivo novo carregado depois dos outros) e precisam de uma linha
   nova em `DAILY_POOLS` (`js/diaria.js`) valendo a partir de amanhã, senão a lista do dia de hoje muda.
+- Lista oficial nova precisa do título em inglês e espanhol em `data/traducoes-titulos.js` (o teste
+  `tests/traducoes.test.js` acusa). Itens com nome diferente em outro idioma vão em `data/traducoes-itens-*.js`;
+  nome com dois sentidos (Lula, Peru, Natal…) usa a chave `"id-da-lista/Nome"`.

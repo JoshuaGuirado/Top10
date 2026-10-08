@@ -45,7 +45,8 @@ Na tela de listas, "Criar lista" monta uma lista sua de 10, 30 ou 50 itens, do m
 ## Arquivos
 
 - `index.html` e `style.css`: telas e visual
-- `data/`: categorias e as 560 listas (`listas-grandes*.js` têm as de 30 e 50)
+- `data/`: categorias e as 624 listas (`listas-grandes*.js` têm as de 30 e 50; `listas-populares.js` tem a Bíblia e as listas mais procuradas de cada categoria)
+- `data/traducoes*.js`: títulos, fontes e itens das listas em inglês e espanhol (a resposta vale em qualquer idioma)
 - `js/`: o jogo, dividido por assunto
   - `match.js`: comparação de palpites, dicas e sugestões do "Aceitar mesmo assim" (sem tela, por isso testado)
   - `partida.js`: vez, vidas, tempo e dicas · `resultado.js`: pódio e placares · `modos.js`, `jogadores.js`, `listas.js`, `diaria.js`, `estatisticas.js`
@@ -65,6 +66,8 @@ Listas sem dado oficial (rankings de opinião e de popularidade) indicam "Curado
 Em um dos arquivos de `data/`, acrescente um bloco com `id`, `cat` (uma das categorias), `title`, `source` e 10, 30 ou 50 `items` em ordem. Cada item é uma string `"Nome|apelido|apelido"`; valores começando com `~` são palavras-chave que valem se aparecerem no palpite.
 
 Depois rode `npm test`: ele confere tamanho, categoria, ids repetidos e se alguma resposta vale para dois itens da mesma lista.
+
+Para o jogo em inglês e espanhol, acrescente o título traduzido em `data/traducoes-titulos.js` e, se algum item tiver outro nome nesses idiomas, a tradução em `data/traducoes-itens-*.js` (`"Nome": ["English|outra grafia", "Español"]`). O `npm test` avisa se faltar título ou se uma resposta traduzida valer para dois itens.
 
 ## Publicar
 

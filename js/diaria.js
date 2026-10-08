@@ -13,6 +13,7 @@ function todayNumber(date = new Date()) {
 const DAILY_POOLS = [
   { from: 1, size: 294 },
   { from: 8, size: 490 },
+  { from: 9, size: 547 }, // listas populares e Bíblia (data/listas-populares.js)
 ];
 
 function dailyPool(num = todayNumber()) {
@@ -71,7 +72,7 @@ function dailyShareText(num, res) {
   const lives = t("daily.livesShare", { a: Math.max(0, res.lives), b: res.maxLives });
   return [
     `Topzi · ${t("daily.tag", { n: num })}`,
-    list ? list.title : "",
+    list ? listTitle(list) : "",
     squares,
     `${t("daily.ptsOf", { a: res.score, b: res.total })} · ${lives}${res.hints ? ` · ${t("rs.hints", { n: res.hints })}` : ""}`,
     won ? t("daily.iWon") : t("rs.lose.all"),
@@ -99,7 +100,7 @@ function renderDailyCard() {
   card.innerHTML = `
     <div class="daily-info">
       <p class="daily-kicker">${t("daily.tag", { n: num })} · ${icon(cat.id)}${escapeHtml(catLabel(cat))}</p>
-      <p class="daily-title">${res ? escapeHtml(list.title) : t("daily.pitch")}</p>
+      <p class="daily-title">${res ? escapeHtml(listTitle(list)) : t("daily.pitch")}</p>
       <p class="daily-status">${res
         ? t(res.score > res.total / 2 ? "daily.doneWon" : "daily.done", { a: res.score, b: res.total, next: num + 1 })
         : t("daily.same")}${current ? ` ${t("daily.streak", { n: current })}` : ""}</p>

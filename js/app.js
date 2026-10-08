@@ -210,6 +210,7 @@ function onLangChange() {
   if (screen === "profile") openProfile();
   if (screen === "online") renderOnline();
   if (screen === "lobby") renderLobby();
+  if (game) game.items.forEach((it, i) => (it.name = itemLabel(game.list, game.list.items[i])));
   if (game && (screen === "game" || screen === "results")) {
     setupGameScreen();
     if (screen === "results") renderResults(game.resultsNote || "");

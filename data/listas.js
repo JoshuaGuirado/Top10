@@ -142,7 +142,7 @@ const LISTS = [
   { id: "homem-aranha", cat: "herois", title: "Os 10 primeiros filmes do Homem-Aranha nos cinemas", source: "Sony Pictures",
     items: ["Homem-Aranha", "Homem-Aranha 2", "Homem-Aranha 3", "O Espetacular Homem-Aranha", "O Espetacular Homem-Aranha 2", "Homem-Aranha: De Volta ao Lar|De Volta ao Lar", "Homem-Aranha no Aranhaverso|No Aranhaverso", "Homem-Aranha: Longe de Casa|Longe de Casa", "Homem-Aranha: Sem Volta para Casa|Sem Volta para Casa", "Homem-Aranha: Através do Aranhaverso|Através do Aranhaverso"] },
   { id: "x-men", cat: "herois", title: "Os 10 primeiros filmes da saga X-Men", source: "20th Century Studios",
-    items: ["X-Men: O Filme|X-Men", "X-Men 2|X2", "X-Men: O Confronto Final|Confronto Final|X-Men 3", "X-Men Origens: Wolverine|Wolverine", "X-Men: Primeira Classe|Primeira Classe", "Wolverine: Imortal", "X-Men: Dias de um Futuro Esquecido|Dias de um Futuro Esquecido", "Deadpool", "X-Men: Apocalipse|Apocalipse", "Logan"] },
+    items: ["X-Men: O Filme|X-Men", "X-Men 2|X2", "X-Men: O Confronto Final|Confronto Final|X-Men 3", "X-Men Origens: Wolverine", "X-Men: Primeira Classe|Primeira Classe", "Wolverine: Imortal", "X-Men: Dias de um Futuro Esquecido|Dias de um Futuro Esquecido", "Deadpool", "X-Men: Apocalipse|Apocalipse", "Logan"] },
   { id: "dceu", cat: "herois", title: "Os 10 primeiros filmes do Universo DC (DCEU)", source: "Warner Bros. / DC",
     items: ["O Homem de Aço|Man of Steel", "Batman vs Superman: A Origem da Justiça|Batman vs Superman", "Esquadrão Suicida", "Mulher-Maravilha", "Liga da Justiça", "Aquaman", "Shazam!", "Aves de Rapina", "Mulher-Maravilha 1984|Mulher-Maravilha 2", "Liga da Justiça de Zack Snyder|Snyder Cut"] },
 

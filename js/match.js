@@ -32,16 +32,51 @@ function levenshtein(a, b) {
   return prev[b.length];
 }
 
+// ───────────── tradução das listas oficiais (data/traducoes*.js) ─────────────
+// LIST_I18N[id] = [título em inglês, título em espanhol]; SOURCE_I18N[fonte] = [en, es];
+// ITEM_I18N["Nome"] ou ITEM_I18N["id-da-lista/Nome"] = ["English|alt|~chave", "Español|alt"].
+// null numa posição = igual ao português. Listas criadas pelo jogador não são traduzidas.
+const langPos = () => (typeof langIndex === "function" ? langIndex() : 0);
+
+function listI18n(list) {
+  return (list && typeof LIST_I18N !== "undefined" && LIST_I18N[list.id]) || null;
+}
+
+function listTitle(list) {
+  const tr = listI18n(list);
+  return (tr && langPos() && tr[langPos() - 1]) || list.title;
+}
+
+function listSource(list) {
+  const tr = listI18n(list) && typeof SOURCE_I18N !== "undefined" && SOURCE_I18N[list.source];
+  return (tr && langPos() && tr[langPos() - 1]) || list.source;
+}
+
+function itemI18n(list, name) {
+  if (!listI18n(list) || typeof ITEM_I18N === "undefined") return null;
+  return ITEM_I18N[list.id + "/" + name] || ITEM_I18N[name] || null;
+}
+
+// Nome do item no idioma atual.
+function itemLabel(list, raw) {
+  const name = raw.split("|")[0];
+  const tr = itemI18n(list, name);
+  return (tr && langPos() && tr[langPos() - 1] && tr[langPos() - 1].split("|")[0]) || name;
+}
+
 // learned: respostas aceitas pelo grupo em partidas anteriores ({ índice: ["palpite", ...] }).
+// Vale a resposta em qualquer idioma: numa sala online cada um pode jogar no seu.
 function parseList(list, learned = {}) {
   return list.items.map((raw, i) => {
-    const parts = raw.split("|");
-    const exact = [...parts.filter((p) => !p.startsWith("~")).map(normalize), ...(learned[i] || [])];
+    const own = raw.split("|");
+    const tr = itemI18n(list, own[0]);
+    const parts = [...own, ...(tr ? tr.filter(Boolean).flatMap((x) => x.split("|")) : [])];
+    const exact = [...new Set(parts.filter((p) => !p.startsWith("~")).map(normalize)), ...(learned[i] || [])];
     return {
-      name: parts[0],
+      name: itemLabel(list, raw),
       exact,
       stems: exact.map(stem),
-      keys: parts.filter((p) => p.startsWith("~")).map((p) => normalize(p.slice(1))),
+      keys: [...new Set(parts.filter((p) => p.startsWith("~")).map((p) => normalize(p.slice(1))))],
     };
   });
 }
