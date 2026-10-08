@@ -46,6 +46,7 @@
 
     <main class="portal">
       <h1 class="portal-tag" data-t="tag">Jogos rápidos para jogar sozinho ou com a turma.</h1>
+      <a class="portal-level" id="portal-level" href="conta.html" hidden></a>
 
       <a class="game-row" href="topzi/">
         <span class="game-icon">
@@ -105,6 +106,7 @@
       terms: ["Termos de uso", "Terms of use", "Términos de uso"],
       privacy: ["Privacidade", "Privacy", "Privacidad"],
       enter: ["Entrar", "Sign in", "Entrar"],
+      level: ["Nível {n} · {a} de {b} conquistas", "Level {n} · {a} of {b} achievements", "Nivel {n} · {a} de {b} logros"],
       mine: ["Minha conta", "My account", "Mi cuenta"],
       accountTitle: ["Conta Gamezi: uma conta só para todos os jogos", "Gamezi account: one account for every game", "Cuenta Gamezi: una sola cuenta para todos los juegos"],
       dark: ["Tema escuro", "Dark theme", "Tema oscuro"],
@@ -147,6 +149,11 @@
       var ptag = document.getElementById("pato-tag");
       ptag.hidden = pn < 1;
       ptag.textContent = t("patoDaily").replace("{n}", pn);
+      // Nível do Gamezi (soma o que se joga em todos os jogos neste aparelho).
+      var prog = gameziProgresso();
+      var nivel = document.getElementById("portal-level");
+      nivel.hidden = !prog.xp;
+      nivel.textContent = t("level").replace("{n}", prog.nivel).replace("{a}", prog.conquistas.filter(function (c) { return c.feita; }).length).replace("{b}", prog.conquistas.length);
       // Conta do Gamezi (a mesma em todos os jogos): só lê a sessão salva, sem carregar o Supabase.
       var logado = gameziLogado();
       var conta = document.getElementById("account");

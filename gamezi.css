@@ -145,3 +145,22 @@ a { color: inherit; }
 .my-game b { display: block; line-height: 1.2; }
 .my-game small { color: var(--muted); font-size: .88rem; }
 .my-game-play { margin-left: auto; padding: 8px 16px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: .9rem; }
+
+/* nível e conquistas (portal e conta) */
+.portal-level { justify-self: center; margin: -4px 0 4px; padding: 6px 14px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-ink); font-weight: 700; font-size: .85rem; text-decoration: none; }
+.level-panel { display: grid; gap: 10px; }
+.level-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.level-head b { font-stretch: 75%; font-weight: 800; font-size: 2rem; line-height: 1; }
+.level-head span { color: var(--muted); font-size: .88rem; font-weight: 600; }
+.level-bar { height: 12px; border-radius: 999px; background: var(--bg); overflow: hidden; }
+.level-bar span { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.badges-title { margin: 8px 0 0; font-stretch: 75%; font-weight: 800; font-size: 1.4rem; }
+.badges-title small { color: var(--muted); font-size: .9rem; font-stretch: 100%; font-weight: 600; }
+.badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.badge { display: grid; gap: 2px; align-content: start; padding: 10px 12px; border-radius: 14px; background: var(--bg); opacity: .6; }
+.badge b { font-size: .92rem; line-height: 1.2; }
+.badge span { font-size: .78rem; color: var(--muted); line-height: 1.25; }
+.badge small { font-size: .7rem; font-weight: 700; color: var(--accent-ink); }
+.badge.done { opacity: 1; box-shadow: inset 0 0 0 2px var(--accent); }
+.badge.done b::before { content: "★ "; color: var(--accent); }
+

@@ -63,6 +63,7 @@ function show(name) {
 // ───────────── ícones ─────────────
 
 const UI_ICONS = {
+  lock: '<svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
   moon: '<svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>',
   sun: '<svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>',
   help: '<svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.4-2.7 4"/><circle cx="12" cy="17.6" r=".6" fill="currentColor"/></svg>',
@@ -127,6 +128,8 @@ const PZ_VISUAL = [
     { id: "touca", nome: ["Touca", "Beanie", "Gorro"], topo: `<path d="M42 26a18 17 0 0 1 36 0z" fill="#3D7BFF" ${PZ_TRACO}/><rect x="40" y="21" width="40" height="8" rx="4" fill="#3D7BFF" ${PZ_TRACO}/><circle cx="60" cy="7.5" r="4.5" fill="#FFF4DE" ${PZ_TRACO}/>` },
     { id: "cauboi", nome: ["Chapéu de caubói", "Cowboy hat", "Sombrero vaquero"], topo: `<path d="M47 20c0-9 3-15 7-15 2 0 4 2 6 2s4-2 6-2c4 0 7 6 7 15z" fill="#A0703C" ${PZ_TRACO}/><path d="M33 19c6 5 48 5 54 0 0 4-6 8-12 8H45c-6 0-12-4-12-8z" fill="#A0703C" ${PZ_TRACO}/><path d="M47.5 16.5h25" stroke="#171717" stroke-width="3"/>` },
     { id: "viking", nome: ["Capacete viking", "Viking helmet", "Casco vikingo"], topo: `<path d="M42 21c-6-1-10-7-9-14 3 5 7 7 12 7zM78 21c6-1 10-7 9-14-3 5-7 7-12 7z" fill="#FFF4DE" ${PZ_TRACO}/><path d="M41 27a19 17 0 0 1 38 0z" fill="#9AA3AE" ${PZ_TRACO}/><path d="M60 10v17" stroke="#171717" stroke-width="2.5"/>` },
+    { id: "aureola", nome: ["Auréola", "Halo", "Aureola"], topo: `<ellipse cx="60" cy="7" rx="15" ry="4.5" fill="none" stroke="#171717" stroke-width="6.5"/><ellipse cx="60" cy="7" rx="15" ry="4.5" fill="none" stroke="#FFC93C" stroke-width="3.2"/>` },
+    { id: "mago", nome: ["Chapéu de mago", "Wizard hat", "Sombrero de mago"], topo: `<path d="M43 21C49 14 52 6 61 1c1 6 5 13 17 20z" fill="#9B5DE5" ${PZ_TRACO}/><path d="M38 21.5h45" stroke="#171717" stroke-width="4.5" stroke-linecap="round"/><path d="M38 21.5h45" stroke="#9B5DE5" stroke-width="2" stroke-linecap="round"/><path d="m60 9 1.2 2.6 2.8.3-2.1 1.9.6 2.8-2.5-1.4-2.5 1.4.6-2.8-2.1-1.9 2.8-.3z" fill="#FFC93C"/>` },
     { id: "laco", nome: ["Laço", "Bow", "Moño"], topo: `<path d="M57 15 46 8v14zM57 15l11-7v14z" fill="#FF7EB6" ${PZ_TRACO}/><circle cx="57" cy="15" r="3.4" fill="#FF7EB6" ${PZ_TRACO}/>` },
   ] },
   { id: "rosto", nome: ["Rosto", "Face", "Cara"], itens: [
@@ -135,6 +138,7 @@ const PZ_VISUAL = [
     { id: "coracao", nome: ["Óculos de coração", "Heart glasses", "Lentes de corazón"], topo: `<path d="M66 38c-6-4-9.5-7.5-9.5-11a4.6 4.6 0 0 1 9.5-1.3 4.6 4.6 0 0 1 9.5 1.3c0 3.5-3.5 7-9.5 11z" fill="#FF4D3D" stroke="#171717" stroke-width="2.5" stroke-linejoin="round"/><path d="M57 27.5 42 26" stroke="#171717" stroke-width="3" stroke-linecap="round"/>` },
     { id: "monoculo", nome: ["Monóculo", "Monocle", "Monóculo"], topo: `<path d="M66 37q-1 9-9 14" stroke="#171717" stroke-width="1.6" fill="none"/><circle cx="66" cy="30" r="7.5" fill="rgba(255,255,255,.3)" stroke="#171717" stroke-width="3"/><circle cx="66" cy="30" r="5.6" fill="none" stroke="#FFC93C" stroke-width="1.6"/>` },
     { id: "mascara", nome: ["Máscara de herói", "Hero mask", "Antifaz de héroe"], topo: `<path fill-rule="evenodd" d="M42 24q18-6 35 0v11q-17-4-35 0zM60.5 30a5.5 4.6 0 1 0 11 0a5.5 4.6 0 1 0-11 0z" fill="#171717"/>` },
+    { id: "estrela", nome: ["Óculos de estrela", "Star glasses", "Lentes de estrella"], topo: `<path d="M57 27.5 42 25.5" stroke="#171717" stroke-width="3" stroke-linecap="round"/><path d="m66 20.5 2.8 5.6 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2-4.5-4.4 6.2-.9z" fill="#FFC93C" stroke="#171717" stroke-width="2.2" stroke-linejoin="round"/>` },
     { id: "bigode", nome: ["Bigode", "Mustache", "Bigote"], topo: `<path d="M71 42c3-4.5 7.5-4.5 10-1 2.5-3.5 7-3.5 10 1-3 3.5-7.5 3-10 .5-2.5 2.5-7 3-10-.5z" fill="#171717"/>` },
   ] },
   { id: "roupa", nome: ["Roupa", "Outfit", "Ropa"], itens: [
@@ -145,6 +149,7 @@ const PZ_VISUAL = [
     { id: "listrada", nome: ["Camiseta listrada", "Striped shirt", "Camiseta a rayas"], corpo: `<g clip-path="url(#CLIP)"><rect y="57" width="100" height="43" fill="#FFF4DE"/><path d="M0 63h100M0 71h100M0 79h100M0 87h100" stroke="#FF4D3D" stroke-width="4"/></g>` },
     { id: "camisa", nome: ["Camisa 10", "Number 10 shirt", "Camiseta 10"], corpo: `<g clip-path="url(#CLIP)"><rect y="57" width="100" height="43" fill="#2FBF71"/><path d="M0 59h100" stroke="#FFC93C" stroke-width="4"/><text x="22" y="84" font-family="Arial, sans-serif" font-size="17" font-weight="800" fill="#FFF4DE">10</text></g>` },
     { id: "smoking", nome: ["Smoking", "Tuxedo", "Esmoquin"], corpo: `<g clip-path="url(#CLIP)"><rect y="57" width="100" height="43" fill="#171717"/><path d="M51 56h18l-9 17z" fill="#FFF4DE"/></g>`, pescoco: `<path d="M60 56.5 52 52.5v8zM60 56.5l8-4v8z" fill="#171717"/>` },
+    { id: "dourada", nome: ["Capa dourada", "Golden cape", "Capa dorada"], corpo: `<path d="M50 53C36 55 20 56 9 53c-4 11-3 25 5 34 6-13 16-21 27-25 6-2 9-6 9-9z" fill="#FFC93C" ${PZ_TRACO}/><path d="M16 62l2 4 4 .6-3 2.8.8 4-3.8-2-3.8 2 .8-4-3-2.8 4-.6z" fill="#FFF4DE"/>` },
     { id: "capa", nome: ["Capa de herói", "Hero cape", "Capa de héroe"], corpo: `<path d="M50 53C36 55 20 56 9 53c-4 11-3 25 5 34 6-13 16-21 27-25 6-2 9-6 9-9z" fill="#FF4D3D" ${PZ_TRACO}/>` },
   ] },
   { id: "asa", nome: ["Na asa", "In the wing", "En el ala"], itens: [
@@ -152,6 +157,8 @@ const PZ_VISUAL = [
     { id: "bandeira", nome: ["Bandeira", "Flag", "Bandera"], asa: `<path d="M40 66 29 16" stroke="#171717" stroke-width="3" stroke-linecap="round"/><path d="M29.5 18 6 14l5 9-4 9 25.5 3z" fill="#2FBF71" ${PZ_TRACO}/><path d="M13 24l7-5 7 6-7 5z" fill="#FFC93C"/>` },
     { id: "pirulito", nome: ["Pirulito", "Lollipop", "Paleta"], asa: `<path d="M40 66 30 36" stroke="#FFF4DE" stroke-width="3.5" stroke-linecap="round"/><path d="M40 66 30 36" stroke="#171717" stroke-width="1" stroke-linecap="round" opacity=".4"/><circle cx="28" cy="27" r="10" fill="#FF7EB6" ${PZ_TRACO}/><path d="M28 27a3 3 0 1 1 3 3 6 6 0 1 1-6-6" stroke="#FFF4DE" stroke-width="2.2" fill="none" stroke-linecap="round"/>` },
     { id: "trofeu", nome: ["Troféu", "Trophy", "Trofeo"], asa: `<path d="M40 66 30 46" stroke="#171717" stroke-width="3" stroke-linecap="round"/><path d="M15 18h20v7c0 7-4.5 11-10 11s-10-4-10-11z" fill="#FFC93C" ${PZ_TRACO}/><path d="M15 21h-4c0 5 2 8 5 8M35 21h4c0 5-2 8-5 8" fill="none" ${PZ_TRACO}/><path d="M22 36h6v5h-6zM17 41h16v4H17z" fill="#FFC93C" ${PZ_TRACO}/>` },
+    { id: "foguete", nome: ["Foguete", "Rocket", "Cohete"], asa: `<path d="M40 65 32 46" stroke="#171717" stroke-width="3" stroke-linecap="round"/><g transform="rotate(-25 26 24)"><path d="M26 5c6 5 7 15 4 24h-8c-3-9-2-19 4-24z" fill="#FFF4DE" ${PZ_TRACO}/><circle cx="26" cy="16" r="2.8" fill="#3D7BFF" stroke="#171717" stroke-width="1.6"/><path d="M22 25l-5 7h6zM30 25l5 7h-6z" fill="#FF4D3D" ${PZ_TRACO}/><path d="M23.5 30l2.5 7 2.5-7z" fill="#FFC93C"/></g>` },
+    { id: "medalha", nome: ["Medalha", "Medal", "Medalla"], asa: `<path d="M40 66 30 47" stroke="#171717" stroke-width="3" stroke-linecap="round"/><path d="M18 8l6 13 6-13z" fill="#3D7BFF" ${PZ_TRACO}/><circle cx="24" cy="29" r="9.5" fill="#FFC93C" ${PZ_TRACO}/><path d="m24 24 1.5 3 3.3.5-2.4 2.3.6 3.3-3-1.6-3 1.6.6-3.3-2.4-2.3 3.3-.5z" fill="#FFF4DE"/>` },
     { id: "microfone", nome: ["Microfone", "Microphone", "Micrófono"], asa: `<path d="M40 65 31 41" stroke="#171717" stroke-width="5" stroke-linecap="round"/><circle cx="28.5" cy="34" r="8" fill="#9AA3AE" ${PZ_TRACO}/><path d="M23.5 31h10M23 35h11" stroke="#171717" stroke-width="1.4" opacity=".5"/>` },
   ] },
 ];
@@ -171,10 +178,18 @@ function patoLimpo(pato) {
   return out;
 }
 
+// Itens liberados neste aparelho (alguns só com conquistas do Gamezi, ver gamezi-conta.js).
+function itensLiberados(cat) {
+  if (typeof gameziProgresso !== "function") return cat.itens;
+  const prog = gameziProgresso();
+  return cat.itens.filter((it) => gameziItemLiberado(prog, cat.id, it.id));
+}
+
 function patoSorteado(rnd = Math.random) {
   const out = {};
   PZ_VISUAL.forEach((cat) => {
-    if (rnd() < 0.55) out[cat.id] = cat.itens[Math.floor(rnd() * cat.itens.length)].id;
+    const itens = itensLiberados(cat);
+    if (rnd() < 0.55 && itens.length) out[cat.id] = itens[Math.floor(rnd() * itens.length)].id;
   });
   return out;
 }

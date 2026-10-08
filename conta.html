@@ -77,6 +77,8 @@
         <p class="feedback" id="msg" role="status"></p>
       </section>
 
+      <section class="panel level-panel" id="nivel"></section>
+
       <ul class="points">
         <li><b data-t="p1t">Uma conta só</b><p data-t="p1">A mesma conta vale no Topzi, no Patozi e nos próximos jogos do Gamezi.</p></li>
         <li><b data-t="p2t">Tudo salvo</b><p data-t="p2">Perfil, estatísticas, recordes, listas criadas e o desafio do dia ficam guardados na conta.</p></li>
@@ -135,6 +137,12 @@
       patoziStats: ["{n} partidas · escapou {e} vezes", "{n} games · escaped {e} times", "{n} partidas · se salvó {e} veces"],
       notYet: ["Ainda não jogou com esta conta", "Not played with this account yet", "Aún no jugaste con esta cuenta"],
       play: ["Jogar", "Play", "Jugar"],
+      level: ["Nível {n}", "Level {n}", "Nivel {n}"],
+      xp: ["{a} de {b} XP para o nível {n}", "{a} of {b} XP to level {n}", "{a} de {b} XP para el nivel {n}"],
+      badges: ["Conquistas", "Achievements", "Logros"],
+      badgesCount: ["{a} de {b}", "{a} of {b}", "{a} de {b}"],
+      unlocks: ["libera um item do pato", "unlocks a duck item", "libera un ítem del pato"],
+      levelHint: ["Jogue qualquer jogo do Gamezi para subir de nível. Com a conta, o nível vale em todos os celulares.", "Play any Gamezi game to level up. With an account, your level follows you to any phone.", "Juega cualquier juego de Gamezi para subir de nivel. Con la cuenta, el nivel vale en todos los celulares."],
       p1t: ["Uma conta só", "One account", "Una sola cuenta"],
       p1: ["A mesma conta vale no Topzi, no Patozi e nos próximos jogos do Gamezi.", "The same account works in Topzi, Patozi and the next Gamezi games.", "La misma cuenta sirve en Topzi, Patozi y los próximos juegos de Gamezi."],
       p2t: ["Tudo salvo", "Everything saved", "Todo guardado"],
@@ -201,6 +209,28 @@
     function isDark() { return (document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark"; }
 
     var resumo = {}; // jogo → { nick, texto }
+    var dadosConta = null; // o que os jogos salvaram na conta (para o nível valer em qualquer aparelho)
+
+    // Nível e conquistas: do que está neste aparelho ou do que está na conta, o que tiver mais XP.
+    function renderNivel() {
+      var p = gameziProgresso();
+      if (dadosConta) {
+        var daConta = gameziProgresso(dadosConta);
+        if (daConta.xp > p.xp) p = daConta;
+      }
+      var li = LANGS.indexOf(lang);
+      var feitas = p.conquistas.filter(function (c) { return c.feita; }).length;
+      var pct = Math.round(((p.xp - p.xpNivel) / (p.xpProximo - p.xpNivel)) * 100);
+      $("nivel").innerHTML =
+        '<div class="level-head"><b>' + esc(t("level", { n: p.nivel })) + '</b><span>' + esc(t("xp", { a: p.xp, b: p.xpProximo, n: p.nivel + 1 })) + '</span></div>' +
+        '<div class="level-bar"><span style="width:' + pct + '%"></span></div>' +
+        (p.xp ? "" : '<p class="muted small">' + esc(t("levelHint")) + "</p>") +
+        '<h2 class="badges-title">' + esc(t("badges")) + " <small>" + esc(t("badgesCount", { a: feitas, b: p.conquistas.length })) + "</small></h2>" +
+        '<div class="badges">' + p.conquistas.map(function (c) {
+          return '<div class="badge' + (c.feita ? " done" : "") + '"><b>' + esc(c.nome[li]) + "</b><span>" + esc(c.como[li]) + "</span>" +
+            (c.item ? "<small>" + esc(t("unlocks")) + "</small>" : "") + "</div>";
+        }).join("") + "</div>";
+    }
 
     function renderJogos() {
       $("my-games").innerHTML = Object.keys(JOGOS).map(function (id) {
@@ -243,6 +273,7 @@
       $("password-form").hidden = modo !== "password";
       $("logged").hidden = modo !== "logged";
       if (modo === "logged") renderJogos();
+      renderNivel();
     }
 
     function msg(texto, bom) {
@@ -263,6 +294,11 @@
         if (!me || me.id !== id) return;
         var tz = linhas[0] && linhas[0].data && linhas[0].data.stats;
         var pz = linhas[1] && linhas[1].data && linhas[1].data.stats;
+        dadosConta = {
+          topzi: { stats: tz || {}, diaria: (linhas[0] && linhas[0].data && linhas[0].data.diaria) || {} },
+          patozi: { stats: pz || {}, diario: (linhas[1] && linhas[1].data && linhas[1].data.diario) || {} },
+        };
+        renderNivel();
         resumo.topzi = { nick: linhas[0] && linhas[0].nick, texto: tz && tz.games ? t("topziStats", { n: tz.games, pts: tz.points || 0 }) : t("notYet") };
         resumo.patozi = { nick: linhas[1] && linhas[1].nick, texto: pz && pz.partidas ? t("patoziStats", { n: pz.partidas, e: pz.escapou || 0 }) : t("notYet") };
         if (modo === "logged") renderJogos();

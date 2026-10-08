@@ -30,14 +30,23 @@ function renderCloset(id) {
     opcoes = PZ_CORES.map((_, i) => ({ valor: i, ativo: i === cor, nome: t("closet.colorN", { n: i + 1 }), svg: patoSvg(i, "", pato) }));
   } else {
     const cat = PZ_VISUAL.find((x) => x.id === c.aba);
-    opcoes = [{ id: "", nome: t("closet.none") }, ...cat.itens.map((it) => ({ id: it.id, nome: tr(it.nome) }))].map((o) => ({
-      valor: o.id,
-      nome: o.nome,
-      ativo: (pato[cat.id] || "") === o.id,
-      svg: patoSvg(cor, "", { ...pato, [cat.id]: o.id }),
-    }));
+    const prog = typeof gameziProgresso === "function" ? gameziProgresso() : null;
+    opcoes = [{ id: "", nome: t("closet.none") }, ...cat.itens.map((it) => ({ id: it.id, nome: tr(it.nome) }))].map((o) => {
+      // Item de conquista ainda não liberada: aparece com cadeado e diz como liberar.
+      const conquista = o.id && prog && !gameziItemLiberado(prog, cat.id, o.id) ? gameziConquistaDoItem(cat.id, o.id) : null;
+      return {
+        valor: o.id,
+        nome: o.nome,
+        ativo: (pato[cat.id] || "") === o.id,
+        trancado: conquista ? tr(conquista.como) : "",
+        svg: patoSvg(cor, "", { ...pato, [cat.id]: o.id }),
+      };
+    });
   }
-  root.querySelector(".closet-grid").innerHTML = opcoes.map((o) => `
+  root.querySelector(".closet-grid").innerHTML = opcoes.map((o) => o.trancado ? `
+    <button type="button" class="closet-item locked" disabled title="${escapeHtml(o.trancado)}">
+      ${o.svg}<span>${escapeHtml(o.nome)}</span><small>${UI_ICONS.lock || ""}${escapeHtml(o.trancado)}</small>
+    </button>` : `
     <button type="button" class="closet-item ${o.ativo ? "active" : ""}" data-valor="${o.valor}" aria-pressed="${o.ativo}">
       ${o.svg}<span>${escapeHtml(o.nome)}</span>
     </button>`).join("");

@@ -381,3 +381,8 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .gamezi-back { flex: none; text-decoration: none; }
 body[data-screen]:not([data-screen="home"]) .gamezi-back { display: none; }
 .lb-pos { margin: 0 0 10px; font-weight: 800; font-size: 1.1rem; color: var(--accent-ink); }
+.closet-item.locked { cursor: default; opacity: .9; }
+.closet-item.locked .pato { filter: grayscale(1); opacity: .45; }
+.closet-item.locked small { display: flex; gap: 3px; align-items: flex-start; justify-content: center; font-size: .64rem; font-weight: 600; color: var(--muted); line-height: 1.2; }
+.closet-item.locked small svg { width: 11px; height: 11px; flex: none; margin-top: 1px; }
+
