@@ -98,6 +98,7 @@ function renderTimerChips() {
     }));
   });
   $("timer-help").textContent = turnTime ? t(livesOn() ? "opt.timerHelpLives" : "opt.timerHelp", { n: turnTime }) : t("opt.timerOff");
+  renderOptsSummary();
 }
 
 function renderLivesChips() {
@@ -114,6 +115,12 @@ function renderLivesChips() {
   $("lives-help").textContent = livesOn()
     ? livesText(!!mode().team)
     : t(mode().team ? "opt.noLivesTeam" : "opt.noLivesDuel");
+  renderOptsSummary();
+}
+
+// Resumo do "Mais opções" fechado: tempo por vez e vidas.
+function renderOptsSummary() {
+  $("opts-summary").textContent = `${turnTime ? t("opt.seconds", { n: turnTime }) : t("opt.noLimit")} · ${t(livesOn() ? "opt.withLives" : "opt.noLives")}`;
 }
 
 function renderPlayersScreen() {

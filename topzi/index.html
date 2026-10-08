@@ -65,7 +65,6 @@
     <!-- Modos de jogo -->
     <section id="screen-modes" class="screen" hidden>
       <h2 data-i18n="modes.title">Escolha o modo</h2>
-      <p class="muted mode-intro" data-i18n="modes.intro">Três tamanhos de lista para disputar entre vocês, todo mundo junto contra a lista ou dois times frente a frente.</p>
       <div class="mode-grid" id="mode-grid"></div>
     </section>
 
@@ -76,6 +75,8 @@
       <div class="count-picker" id="count-picker"></div>
       <p class="mode-label" id="mode-label"></p>
       <div class="player-grid" id="player-grid"></div>
+      <details class="more-opts">
+        <summary><span data-i18n="opt.more">Mais opções</span><small id="opts-summary"></small></summary>
       <div class="match-options">
         <p class="ctrl-label" data-i18n="opt.timer">Tempo por vez</p>
         <div class="chips" id="timer-chips"></div>
@@ -84,6 +85,7 @@
         <div class="chips" id="lives-chips"></div>
         <p class="muted small" id="lives-help"></p>
       </div>
+      </details>
       <div class="actions end">
         <button type="button" class="btn" id="to-lists-btn" data-i18n="btn.chooseList">Escolher a lista</button>
       </div>

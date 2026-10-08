@@ -2,7 +2,7 @@
 
 Plataforma de jogos rápidos para jogar no navegador, sozinho ou com a turma. A raiz do site (`index.html`) é o portal do Gamezi, com a lista de jogos; cada jogo fica na própria pasta: o **Topzi** (jogo de listas) em `topzi/` e o **Patozi** (jogo de chutar números, o do "Nem a pato!") em `patozi/`. Os dois usam o mesmo banco e a mesma **conta Gamezi**: o login (entrar, criar conta, esqueci a senha, trocar senha e sair) fica em `conta.html`, na raiz, e vale para a plataforma e todos os jogos. Os jogos só leem a sessão (`gamezi-conta.js`) e mandam para `conta.html?volta=<jogo>` quando a pessoa toca em "Entrar"; depois do login ela volta para o jogo.
 
-Para adicionar um jogo novo: crie a pasta dele (`nomezi/`), ponha um cartão no `index.html` da raiz (e o texto nos três idiomas, no objeto `T`), inclua os arquivos no `sw.js` com o caminho da pasta e use as mesmas cores, fonte e o Z vermelho (ver `brand.html`).
+Para adicionar um jogo novo: crie a pasta dele (`nomezi/`), ponha uma linha (`game-row`) no `index.html` da raiz (e o texto nos três idiomas, no objeto `T`), inclua os arquivos no `sw.js` com o caminho da pasta e use as mesmas cores, fonte e o Z vermelho (ver `brand.html`).
 
 # Topzi
 

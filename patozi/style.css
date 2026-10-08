@@ -364,3 +364,14 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .closet-preview .pato { width: 100%; height: auto; display: block; }
 .lobby-player .duck-btn { width: 48px; height: 48px; background: var(--bg); }
 .lobby-player .duck-btn .pato { width: 100%; }
+
+/* ── temas e regras fechados, com resumo ── */
+.options { padding: 0; gap: 0; }
+.opts summary {
+  display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; list-style: none; font-weight: 700;
+}
+.opts summary::-webkit-details-marker { display: none; }
+.opts summary::after { content: "+"; margin-left: auto; font-size: 1.3rem; line-height: 1; color: var(--muted); }
+.opts[open] summary::after { content: "−"; }
+.opts summary small { color: var(--muted); font-weight: 600; font-size: .85rem; }
+.opts-body { display: grid; gap: 10px; padding: 0 16px 16px; }

@@ -121,7 +121,11 @@ function renderOptions(el, cfg, nJogadores, editavel, onChange) {
   const todos = !cfg.temas.length;
   const dis = editavel ? "" : "disabled";
   const nCartas = (id) => pzCartasDosTemas([id]).length;
-  trocarHtml(el, `
+  // Fechado por padrão, com um resumo (temas · duração); abre quem quiser mudar.
+  const temasTexto = todos ? t("opt.allThemes") : cfg.temas.length === 1 ? temaNome(cfg.temas[0]) : t("opt.nThemes", { n: cfg.temas.length });
+  trocarHtml(el, `<details class="opts" ${el.pzAberto ? "open" : ""}>
+    <summary><span>${escapeHtml(t("opt.title"))}</span><small>${escapeHtml(temasTexto)} · ${escapeHtml(t("opt." + cfg.duracao))}</small></summary>
+    <div class="opts-body">
     <p class="opt-label">${escapeHtml(t("opt.themes"))}</p>
     <div class="chips">
       <button type="button" class="chip plain ${todos ? "active" : ""}" data-tema="*" ${dis}>${escapeHtml(t("opt.all"))}</button>
@@ -134,7 +138,10 @@ function renderOptions(el, cfg, nJogadores, editavel, onChange) {
     <p class="small muted">${escapeHtml(t("opt.lengthHint", { n: pzMeta(Math.max(2, nJogadores), cfg.duracao) }))}</p>
     <p class="opt-label">${escapeHtml(t("opt.extras"))}</p>
     <label class="check"><input type="checkbox" data-regra="dobrei" ${cfg.dobrei ? "checked" : ""} ${dis}><span>${escapeHtml(t("opt.dobrei"))}</span></label>
-    <label class="check"><input type="checkbox" data-regra="mosca" ${cfg.mosca ? "checked" : ""} ${dis}><span>${escapeHtml(t("opt.mosca"))}</span></label>`);
+    <label class="check"><input type="checkbox" data-regra="mosca" ${cfg.mosca ? "checked" : ""} ${dis}><span>${escapeHtml(t("opt.mosca"))}</span></label>
+    </div>
+  </details>`);
+  el.querySelector("details").ontoggle = (e) => (el.pzAberto = e.target.open);
   if (!editavel) return;
   el.onclick = (e) => {
     const b = e.target.closest("button");

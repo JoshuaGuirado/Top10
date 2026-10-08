@@ -37,77 +37,47 @@
         <img class="logo logo-dark" src="brand/gamezi-logo-dark.svg" alt="" aria-hidden="true">
       </a>
       <div class="top-actions">
-        <label><span class="sr-only" data-t="lang">Idioma</span>
-          <select id="lang" class="lang-select"><option value="pt">PT</option><option value="en">EN</option><option value="es">ES</option></select>
-        </label>
-        <button type="button" class="icon-btn" id="theme"></button>
         <a class="account-chip" id="account" href="conta.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c.9-3.8 3.9-6 7.5-6s6.6 2.2 7.5 6"/></svg><span></span></a>
       </div>
     </header>
 
-    <main>
-      <section class="hero">
-        <h1><span data-t="h1a">Jogos para jogar</span><span class="accent" data-t="h1b">com a turma.</span></h1>
-        <p class="lead" data-t="lead">Partidas rápidas, direto no navegador. Sozinho, no mesmo celular com os amigos ou cada um no seu, online.</p>
-      </section>
+    <main class="portal">
+      <h1 class="portal-tag" data-t="tag">Jogos rápidos para jogar sozinho ou com a turma.</h1>
 
-      <h2 class="section-title" data-t="games">Jogos</h2>
-      <div class="games">
-        <a class="game" href="topzi/">
-          <div class="game-head">
-            <span class="game-icon">
-              <img class="logo-light" src="brand/simbolo.svg" alt="" aria-hidden="true">
-              <img class="logo-dark" src="brand/simbolo-escuro.svg" alt="" aria-hidden="true">
-            </span>
-            <div class="game-name">
-              <img class="logo-light" src="brand/logo.svg" alt="Topzi">
-              <img class="logo-dark" src="brand/logo-dark.svg" alt="" aria-hidden="true">
-              <p data-t="topziKind">Jogo de listas</p>
-            </div>
-          </div>
-          <p class="game-desc" data-t="topziDesc">O óbvio vale 1, o difícil vale 10. Adivinhe os itens de listas de futebol, filmes, Bíblia, comida e muito mais.</p>
-          <div class="tags">
-            <span class="tag red" id="daily-tag"></span>
-            <span class="tag" data-t="tag1">1 a 8 jogadores</span>
-            <span class="tag" data-t="tag2">Online</span>
-            <span class="tag" data-t="tag3">+600 listas</span>
-          </div>
-          <span class="play" data-t="play">Jogar Topzi</span>
-        </a>
-        <a class="game" href="patozi/">
-          <div class="game-head">
-            <span class="game-icon">
-              <img class="logo-light" src="brand/patozi-simbolo.svg" alt="" aria-hidden="true">
-              <img class="logo-dark" src="brand/patozi-simbolo-escuro.svg" alt="" aria-hidden="true">
-            </span>
-            <div class="game-name">
-              <img class="logo-light" src="brand/patozi-logo.svg" alt="Patozi">
-              <img class="logo-dark" src="brand/patozi-logo-dark.svg" alt="" aria-hidden="true">
-              <p data-t="patoziKind">Jogo de chutar números</p>
-            </div>
-          </div>
-          <p class="game-desc" data-t="patoziDesc">Cada um sobe o chute até alguém gritar "Nem a pato!". Quem errar fica com os patos. Mais de 400 cartas difíceis em 23 temas.</p>
-          <div class="tags">
-            <span class="tag red" id="pato-tag"></span>
-            <span class="tag" data-t="ptag1">2 a 10 jogadores</span>
-            <span class="tag" data-t="tag2">Online</span>
-            <span class="tag" data-t="ptag3">Contra o computador</span>
-          </div>
-          <span class="play" data-t="playPatozi">Jogar Patozi</span>
-        </a>
-        <div class="game soon">
-          <div class="game-head"><span class="game-icon" aria-hidden="true">?</span></div>
-          <h3 data-t="soonTitle">Novos jogos em breve</h3>
-          <p data-t="soonText">O Gamezi está crescendo. Os próximos jogos chegam aqui, com o mesmo jeito: rápido, para jogar junto e sem instalar nada.</p>
-        </div>
-      </div>
+      <a class="game-row" href="topzi/">
+        <span class="game-icon">
+          <img class="logo-light" src="brand/simbolo.svg" alt="" aria-hidden="true">
+          <img class="logo-dark" src="brand/simbolo-escuro.svg" alt="" aria-hidden="true">
+        </span>
+        <span class="game-text">
+          <b>Topzi</b>
+          <small data-t="topziKind">Adivinhe os itens da lista</small>
+          <small class="game-daily" id="daily-tag"></small>
+        </span>
+        <span class="play" data-t="play">Jogar</span>
+      </a>
 
-      <h2 class="section-title" data-t="howTitle">Como funciona</h2>
-      <ul class="points">
-        <li><b data-t="p1t">Sem instalar</b><p data-t="p1">Abre no navegador do celular ou do computador. Se quiser, dá para adicionar à tela inicial.</p></li>
-        <li><b data-t="p2t">Com a turma</b><p data-t="p2">Passe o celular de mão em mão ou crie uma sala online e mande o código.</p></li>
-        <li><b data-t="p3t">De graça</b><p data-t="p3">Sem anúncios e sem compras dentro do jogo.</p></li>
-      </ul>
+      <a class="game-row" href="patozi/">
+        <span class="game-icon">
+          <img class="logo-light" src="brand/patozi-simbolo.svg" alt="" aria-hidden="true">
+          <img class="logo-dark" src="brand/patozi-simbolo-escuro.svg" alt="" aria-hidden="true">
+        </span>
+        <span class="game-text">
+          <b>Patozi</b>
+          <small data-t="patoziKind">Chute o número sem passar da resposta</small>
+          <small class="game-daily" id="pato-tag"></small>
+        </span>
+        <span class="play" data-t="play">Jogar</span>
+      </a>
+
+      <p class="soon" data-t="soon">Mais jogos em breve.</p>
+
+      <nav class="portal-links">
+        <label><span data-t="lang">Idioma</span>
+          <select id="lang" class="lang-select"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select>
+        </label>
+        <button type="button" class="theme-link" id="theme"></button>
+      </nav>
     </main>
 
     <footer class="foot">
@@ -122,39 +92,20 @@
     // Textos do portal em [português, inglês, espanhol]. O idioma é o mesmo escolhido nos jogos (tt:lang).
     var T = {
       lang: ["Idioma", "Language", "Idioma"],
-      h1a: ["Jogos para jogar", "Games to play", "Juegos para jugar"],
-      h1b: ["com a turma.", "with your friends.", "con tus amigos."],
-      lead: ["Partidas rápidas, direto no navegador. Sozinho, no mesmo celular com os amigos ou cada um no seu, online.", "Quick games, right in your browser. Solo, passing one phone around, or everyone on their own phone, online.", "Partidas rápidas, directo en el navegador. Solo, en el mismo celular con amigos o cada uno en el suyo, online."],
-      games: ["Jogos", "Games", "Juegos"],
-      topziKind: ["Jogo de listas", "List game", "Juego de listas"],
-      topziDesc: ["O óbvio vale 1, o difícil vale 10. Adivinhe os itens de listas de futebol, filmes, Bíblia, comida e muito mais.", "The obvious is worth 1, the hard one is worth 10. Guess the items of lists about sports, movies, the Bible, food and much more.", "Lo obvio vale 1, lo difícil vale 10. Adivina los ítems de listas de fútbol, películas, la Biblia, comida y mucho más."],
+      tag: ["Jogos rápidos para jogar sozinho ou com a turma.", "Quick games to play solo or with your friends.", "Juegos rápidos para jugar solo o con amigos."],
+      topziKind: ["Adivinhe os itens da lista", "Guess the items on the list", "Adivina los ítems de la lista"],
+      patoziKind: ["Chute o número sem passar da resposta", "Guess the number without going over", "Di el número sin pasarte de la respuesta"],
       daily: ["Lista do dia #{n}", "Daily list #{n}", "Lista del día #{n}"],
-      tag1: ["1 a 8 jogadores", "1 to 8 players", "1 a 8 jugadores"],
-      tag2: ["Online", "Online", "Online"],
-      tag3: ["+600 listas", "600+ lists", "+600 listas"],
-      play: ["Jogar Topzi", "Play Topzi", "Jugar Topzi"],
-      patoziKind: ["Jogo de chutar números", "Number guessing game", "Juego de adivinar números"],
-      patoziDesc: ["Cada um sobe o chute até alguém gritar \"Nem a pato!\". Quem errar fica com os patos. Mais de 400 cartas difíceis em 23 temas.", "Everyone raises the guess until someone shouts \"No way, duck!\". Whoever is wrong takes the ducks. 400+ tough cards in 23 themes.", "Cada uno sube el número hasta que alguien grita \"¡Ni de pato!\". Quien se equivoque se queda los patos. Más de 400 cartas difíciles en 23 temas."],
       patoDaily: ["Pato do dia #{n}", "Daily duck #{n}", "Pato del día #{n}"],
-      ptag1: ["2 a 10 jogadores", "2 to 10 players", "2 a 10 jugadores"],
-      ptag3: ["Contra o computador", "Against the computer", "Contra la computadora"],
-      playPatozi: ["Jogar Patozi", "Play Patozi", "Jugar Patozi"],
-      soonTitle: ["Novos jogos em breve", "More games coming soon", "Nuevos juegos muy pronto"],
-      soonText: ["O Gamezi está crescendo. Os próximos jogos chegam aqui, com o mesmo jeito: rápido, para jogar junto e sem instalar nada.", "Gamezi is growing. New games will show up here, in the same spirit: quick, made to play together, nothing to install.", "Gamezi está creciendo. Los próximos juegos llegan aquí, con el mismo estilo: rápidos, para jugar juntos y sin instalar nada."],
-      howTitle: ["Como funciona", "How it works", "Cómo funciona"],
-      p1t: ["Sem instalar", "Nothing to install", "Sin instalar"],
-      p1: ["Abre no navegador do celular ou do computador. Se quiser, dá para adicionar à tela inicial.", "Opens in your phone or computer browser. You can add it to your home screen if you like.", "Se abre en el navegador del celular o de la computadora. Si quieres, puedes agregarlo a la pantalla de inicio."],
-      p2t: ["Com a turma", "With friends", "Con amigos"],
-      p2: ["Passe o celular de mão em mão ou crie uma sala online e mande o código.", "Pass one phone around, or create an online room and share the code.", "Pasa el celular de mano en mano o crea una sala online y comparte el código."],
-      p3t: ["De graça", "Free", "Gratis"],
-      p3: ["Sem anúncios e sem compras dentro do jogo.", "No ads and no in-game purchases.", "Sin anuncios y sin compras dentro del juego."],
+      play: ["Jogar", "Play", "Jugar"],
+      soon: ["Mais jogos em breve.", "More games coming soon.", "Más juegos muy pronto."],
       terms: ["Termos de uso", "Terms of use", "Términos de uso"],
       privacy: ["Privacidade", "Privacy", "Privacidad"],
       enter: ["Entrar", "Sign in", "Entrar"],
       mine: ["Minha conta", "My account", "Mi cuenta"],
       accountTitle: ["Conta Gamezi: uma conta só para todos os jogos", "Gamezi account: one account for every game", "Cuenta Gamezi: una sola cuenta para todos los juegos"],
-      dark: ["Usar modo escuro", "Switch to dark mode", "Usar modo oscuro"],
-      light: ["Usar modo claro", "Switch to light mode", "Usar modo claro"],
+      dark: ["Tema escuro", "Dark theme", "Tema oscuro"],
+      light: ["Tema claro", "Light theme", "Tema claro"],
     };
     var LANGS = ["pt", "en", "es"];
     function load(k) { try { return JSON.parse(localStorage.getItem("tt:" + k)); } catch (e) { return null; } }
@@ -201,9 +152,7 @@
       conta.title = logado ? gameziSessao().email : t("accountTitle");
       conta.setAttribute("aria-label", t(logado ? "mine" : "enter"));
       var b = document.getElementById("theme");
-      b.innerHTML = ICONS[isDark() ? "sun" : "moon"];
-      b.title = t(isDark() ? "light" : "dark");
-      b.setAttribute("aria-label", b.title);
+      b.innerHTML = ICONS[isDark() ? "sun" : "moon"] + "<span>" + t(isDark() ? "light" : "dark") + "</span>";
     }
     document.getElementById("lang").addEventListener("change", function (e) { lang = e.target.value; save("lang", lang); render(); });
     document.getElementById("theme").addEventListener("click", function () {

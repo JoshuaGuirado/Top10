@@ -74,6 +74,7 @@ const server = http.createServer((req, res) => {
   step("a convidada veste o pato na sala e o anfitrião vê na hora");
 
   // Anfitrião escolhe só o tema Brasil e a duração rápida; a convidada vê a mudança.
+  await A.click("#lobby-options summary");
   await A.click('#lobby-options [data-tema="brasil"]');
   await A.click('#lobby-options [data-dur="rapida"]');
   await B.waitForFunction(() => document.querySelector('#lobby-options [data-tema="brasil"]').classList.contains("active"), null, { timeout: 5000 });
