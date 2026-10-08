@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Patozi · nem a pato! | Gamezi</title>
+  <meta name="description" content="Patozi, o jogo de chutar números: cada um sobe o chute até alguém gritar &quot;Nem a pato!&quot;. Quem errar fica com os patos. Sozinho contra o computador, com amigos ou online.">
+  <meta name="theme-color" content="#FFF4DE" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#171717" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../brand/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="../brand/apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <script>try { var t = localStorage.getItem("tt:theme"); if (t) document.documentElement.dataset.theme = JSON.parse(t); } catch (e) {}</script>
+  <meta property="og:title" content="Patozi · nem a pato!">
+  <meta property="og:description" content="Chute um número. Duvidou? Grite &quot;Nem a pato!&quot;. Quem errar fica com os patos.">
+  <meta property="og:image" content="https://top10-bay.vercel.app/brand/patozi-og.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="topbar">
+    <button type="button" class="logo-btn" id="home-btn" data-i18n-aria="nav.home" aria-label="Início">
+      <img class="logo logo-light" src="../brand/patozi-logo.svg" alt="Patozi">
+      <img class="logo logo-dark" src="../brand/patozi-logo-dark.svg" alt="" aria-hidden="true">
+    </button>
+    <div class="topbar-actions">
+      <label><span class="sr-only" data-i18n="nav.lang">Idioma</span>
+        <select id="lang-select" class="lang-select">
+          <option value="pt">PT</option><option value="en">EN</option><option value="es">ES</option>
+        </select>
+      </label>
+      <button type="button" class="icon-btn" id="help-btn" data-i18n-aria="help.title" aria-label="Como jogar"></button>
+      <button type="button" class="icon-btn" id="theme-btn"></button>
+      <button type="button" class="icon-btn" id="sound-btn"></button>
+      <button type="button" class="icon-btn" id="profile-btn" data-i18n-aria="nav.profile" aria-label="Perfil"></button>
+    </div>
+  </div>
+
+  <main>
+    <!-- Início -->
+    <section id="screen-home" class="screen">
+      <div class="hero">
+        <a class="crumb" href="../" data-i18n="nav.gamezi">← Gamezi: todos os jogos</a>
+        <img class="hero-symbol logo-light" src="../brand/patozi-simbolo.svg" alt="" aria-hidden="true">
+        <img class="hero-symbol logo-dark" src="../brand/patozi-simbolo-escuro.svg" alt="" aria-hidden="true">
+        <h1><span data-i18n="hero.line1">Chute um número.</span><span class="accent" data-i18n="hero.line2">Nem a pato!</span></h1>
+        <p class="lead" data-i18n="hero.lead">Cada um sobe o chute até alguém duvidar. Quem errar fica com a carta e os patos dela. No fim, quem tiver mais patos perde.</p>
+        <div class="hero-actions">
+          <button type="button" class="btn big" id="start-btn" data-i18n="btn.play">Jogar</button>
+          <button type="button" class="btn big dark" id="online-btn" data-i18n="btn.online">Jogar online</button>
+        </div>
+      </div>
+      <div class="daily" id="daily-card"></div>
+      <ol class="rules">
+        <li><b class="n">2–10</b><p data-i18n="rules.1">Jogadores no mesmo celular, contra o computador ou online.</p></li>
+        <li><b class="n">+1</b><p data-i18n="rules.2">Na sua vez, chute um número maior que o último.</p></li>
+        <li><b class="n" data-i18n="rules.3n">Nem a pato!</b><p data-i18n="rules.3">Achou que passou da resposta? Duvide. Quem errar fica com a carta.</p></li>
+        <li><b class="n pato-n"><span class="pato-ico"></span>×3</b><p data-i18n="rules.4">Cada carta vale de 1 a 3 patos. Quem juntar mais perde.</p></li>
+      </ol>
+      <h3 data-i18n="home.themes">Temas</h3>
+      <div class="theme-cloud" id="home-themes"></div>
+      <footer class="site-foot">
+        <button type="button" class="link-btn" id="help-link" data-i18n="help.title">Como jogar</button>
+        <a href="../termos.html" data-i18n="foot.terms">Termos de uso</a>
+        <a href="../privacidade.html" data-i18n="foot.privacy">Privacidade</a>
+        <a href="../" data-i18n="foot.gamezi">Mais jogos no Gamezi</a>
+        <span>© 2026 Gamezi</span>
+      </footer>
+    </section>
+
+    <!-- Quem joga e opções -->
+    <section id="screen-setup" class="screen" hidden>
+      <h2 data-i18n="setup.title">Quem vai jogar?</h2>
+      <p class="muted" data-i18n="setup.sub">De 2 a 10 jogadores. O computador completa a mesa se faltar gente.</p>
+      <div class="player-list" id="player-list"></div>
+      <div class="actions add-row">
+        <button type="button" class="text-btn" id="add-human" data-i18n="setup.addHuman">+ Pessoa</button>
+        <button type="button" class="text-btn" id="add-bot" data-i18n="setup.addBot">+ Computador</button>
+      </div>
+      <div class="options" id="local-options"></div>
+      <p class="feedback bad" id="setup-error"></p>
+      <div class="actions end">
+        <button type="button" class="btn ghost" id="setup-back" data-i18n="btn.back">Voltar</button>
+        <button type="button" class="btn big" id="setup-go" data-i18n="btn.start">Começar</button>
+      </div>
+    </section>
+
+    <!-- Partida -->
+    <section id="screen-game" class="screen" hidden>
+      <div class="game-top">
+        <button type="button" class="link-btn" id="game-quit" data-i18n="game.quit">Sair da partida</button>
+        <span class="small muted" id="game-round"></span>
+      </div>
+      <div class="scoreboard" id="scoreboard"></div>
+      <article class="card" id="card">
+        <div class="card-head">
+          <span class="card-theme" id="card-theme"></span>
+          <span class="card-ducks" id="card-ducks"></span>
+        </div>
+        <p class="card-q" id="card-q"></p>
+        <div class="bid" id="bid"></div>
+        <ol class="bids" id="bids"></ol>
+      </article>
+      <div class="turn" id="turn"></div>
+      <div class="reveal-box" id="reveal" hidden></div>
+    </section>
+
+    <!-- Resultado -->
+    <section id="screen-results" class="screen" hidden>
+      <div class="loser" id="loser"></div>
+      <div class="ranking" id="ranking"></div>
+      <div class="actions center">
+        <button type="button" class="btn big" id="again-btn" data-i18n="btn.again">Jogar de novo</button>
+        <button type="button" class="btn ghost" id="results-home" data-i18n="btn.home">Início</button>
+      </div>
+    </section>
+
+    <!-- Pato do dia -->
+    <section id="screen-daily" class="screen" hidden>
+      <div class="daily-head">
+        <h2 id="daily-title"></h2>
+        <span class="daily-progress" id="daily-progress"></span>
+      </div>
+      <div id="daily-body"></div>
+      <div class="leaderboard" id="leaderboard" hidden></div>
+    </section>
+
+    <!-- Online: entrar ou criar sala -->
+    <section id="screen-online" class="screen" hidden>
+      <h2 data-i18n="on.title">Jogar online</h2>
+      <p class="muted" data-i18n="on.sub">Cada um no seu celular. Crie uma sala e mande o código, ou entre na sala de alguém.</p>
+      <div class="online-setup" id="online-setup" hidden></div>
+      <div id="online-main">
+        <label class="nick"><span data-i18n="on.nick">Seu nome</span>
+          <input id="online-nick" maxlength="16" autocomplete="nickname" data-i18n-ph="on.nickPh" placeholder="Como te chamam?">
+        </label>
+        <div class="online-grid">
+          <div class="online-box">
+            <h3 data-i18n="on.create">Criar sala</h3>
+            <p class="small muted" data-i18n="on.createSub">Você escolhe os temas e começa quando a turma chegar.</p>
+            <button type="button" class="btn" id="create-room-btn" data-i18n="on.createBtn">Criar sala</button>
+          </div>
+          <form class="online-box" id="join-form">
+            <h3 data-i18n="on.join">Entrar numa sala</h3>
+            <input class="code-input" id="join-code" maxlength="5" autocomplete="off" autocapitalize="characters" placeholder="ABCDE" aria-label="Código">
+            <button type="submit" class="btn dark" id="join-room-btn" data-i18n="on.joinBtn">Entrar</button>
+          </form>
+        </div>
+      </div>
+      <p class="feedback bad" id="online-error"></p>
+      <div class="actions"><button type="button" class="btn ghost" id="online-back" data-i18n="btn.back">Voltar</button></div>
+    </section>
+
+    <!-- Online: sala de espera -->
+    <section id="screen-lobby" class="screen" hidden>
+      <div class="lobby-top">
+        <div>
+          <p class="small muted" data-i18n="lobby.code">Código da sala</p>
+          <p class="room-code" id="room-code"></p>
+        </div>
+        <button type="button" class="btn dark" id="share-room" data-i18n="lobby.share">Convidar</button>
+      </div>
+      <h3 data-i18n="lobby.players">Na sala</h3>
+      <div class="lobby-players" id="lobby-players"></div>
+      <div class="options" id="lobby-options"></div>
+      <p class="small muted" id="lobby-status"></p>
+      <div class="actions end">
+        <button type="button" class="btn ghost" id="leave-room" data-i18n="lobby.leave">Sair da sala</button>
+        <button type="button" class="btn big" id="lobby-start" data-i18n="btn.start">Começar</button>
+      </div>
+    </section>
+
+    <!-- Perfil -->
+    <section id="screen-profile" class="screen" hidden>
+      <h2 data-i18n="profile.title">Perfil</h2>
+      <div class="profile-me">
+        <button type="button" class="duck-btn big" id="profile-duck" data-i18n-aria="setup.color" aria-label="Trocar cor"></button>
+        <label class="nick"><span data-i18n="on.nick">Seu nome</span>
+          <input id="profile-nick" maxlength="16" autocomplete="nickname" data-i18n-ph="on.nickPh" placeholder="Como te chamam?">
+        </label>
+      </div>
+      <div class="stats-tiles" id="stats"></div>
+      <div class="stats-account">
+        <p class="account-line"></p>
+        <button type="button" class="btn small account-btn" data-i18n="account.enter">Entrar ou criar conta</button>
+      </div>
+      <h3 data-i18n="suggest.title">Mande uma carta</h3>
+      <form class="suggest" id="suggest-form">
+        <p class="small muted" data-i18n="suggest.sub">Tem uma pergunta boa com resposta em número (ex.: "Quantos ossos tem o pé humano?")? Mande para a gente. As melhores entram no jogo.</p>
+        <input id="suggest-q" maxlength="200" required data-i18n-ph="suggest.q" placeholder="Sua pergunta">
+        <div class="suggest-row">
+          <input id="suggest-a" inputmode="numeric" maxlength="15" required data-i18n-ph="suggest.a" placeholder="Resposta">
+          <input id="suggest-src" maxlength="200" data-i18n-ph="suggest.src" placeholder="Fonte (opcional)">
+        </div>
+        <button type="submit" class="btn small" data-i18n="suggest.send">Enviar carta</button>
+        <p class="feedback" id="suggest-msg"></p>
+      </form>
+      <div class="actions"><button type="button" class="btn ghost" id="profile-back" data-i18n="btn.back">Voltar</button></div>
+    </section>
+  </main>
+
+  <!-- Como jogar -->
+  <dialog class="dialog" id="help-dialog">
+    <div class="dialog-inner">
+      <div class="dialog-head"><h2 data-i18n="help.title">Como jogar</h2><button type="button" class="text-btn" data-close data-i18n="btn.close">Fechar</button></div>
+      <div class="help-body" id="help-body"></div>
+    </div>
+  </dialog>
+
+  <!-- Conta -->
+  <dialog class="dialog account-dialog" id="account-dialog">
+    <div class="dialog-inner">
+      <div class="dialog-head"><h2 data-i18n="account.title">Sua conta</h2><button type="button" class="text-btn" data-close data-i18n="btn.close">Fechar</button></div>
+      <p id="account-status"></p>
+      <form class="account-form" id="account-form">
+        <input type="email" id="account-email" autocomplete="email" data-i18n-ph="account.email" placeholder="E-mail">
+        <input type="password" id="account-password" autocomplete="current-password" data-i18n-ph="account.password" placeholder="Senha (mínimo 6)">
+        <div class="actions">
+          <button type="submit" class="btn" value="entrar" data-i18n="account.login">Entrar</button>
+          <button type="submit" class="btn ghost" value="criar" data-i18n="account.create">Criar conta</button>
+          <button type="button" class="link-btn" id="account-forgot" data-i18n="account.forgot">Esqueci a senha</button>
+        </div>
+      </form>
+      <form class="account-form" id="password-form" hidden>
+        <input type="password" id="new-password" autocomplete="new-password" data-i18n-ph="account.newPassword" placeholder="Nova senha">
+        <div class="actions"><button type="submit" class="btn" data-i18n="account.savePassword">Salvar senha</button></div>
+      </form>
+      <div class="actions" id="account-logged" hidden>
+        <button type="button" class="btn ghost" id="account-logout" data-i18n="account.logout">Sair da conta</button>
+      </div>
+      <p class="feedback" id="account-msg"></p>
+    </div>
+  </dialog>
+
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <script src="data/temas.js"></script>
+  <script src="data/cartas-1.js"></script>
+  <script src="data/cartas-2.js"></script>
+  <script src="data/cartas-3.js"></script>
+  <script src="js/jogo.js"></script>
+  <script src="js/textos.js"></script>
+  <script src="js/visual.js"></script>
+  <script src="../topzi/js/config.js"></script>
+  <script src="js/conta.js"></script>
+  <script src="js/diario.js"></script>
+  <script src="js/partida.js"></script>
+  <script src="js/online.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

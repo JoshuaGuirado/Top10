@@ -1,8 +1,8 @@
 // Service worker do Gamezi (raiz do site): deixa a plataforma e os jogos instaláveis e jogáveis offline.
-// Cada jogo fica numa pasta (topzi/…); os arquivos dele entram na lista com o caminho da pasta.
+// Cada jogo fica numa pasta (topzi/…, patozi/…); os arquivos dele entram na lista com o caminho da pasta.
 // Online, busca sempre a versão nova (rede primeiro); sem internet, usa a cópia guardada.
 
-const CACHE = "gamezi-v1";
+const CACHE = "gamezi-v2";
 const FILES = [
   "./",
   "index.html",
@@ -60,6 +60,25 @@ const FILES = [
   "brand/icon-192.png",
   "brand/gamezi-logo.svg",
   "brand/gamezi-logo-dark.svg",
+  "patozi/",
+  "patozi/index.html",
+  "patozi/style.css",
+  "patozi/data/temas.js",
+  "patozi/data/cartas-1.js",
+  "patozi/data/cartas-2.js",
+  "patozi/data/cartas-3.js",
+  "patozi/js/jogo.js",
+  "patozi/js/textos.js",
+  "patozi/js/visual.js",
+  "patozi/js/conta.js",
+  "patozi/js/diario.js",
+  "patozi/js/partida.js",
+  "patozi/js/online.js",
+  "patozi/js/app.js",
+  "brand/patozi-logo.svg",
+  "brand/patozi-logo-dark.svg",
+  "brand/patozi-simbolo.svg",
+  "brand/patozi-simbolo-escuro.svg",
 ];
 
 self.addEventListener("install", (e) => {
@@ -92,7 +111,9 @@ self.addEventListener("fetch", (e) => {
       })
       .catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => {
         if (hit) return hit;
-        return req.mode === "navigate" ? caches.match(url.pathname.includes("/topzi/") ? "topzi/index.html" : "index.html") : Response.error();
+        if (req.mode !== "navigate") return Response.error();
+        const jogo = ["topzi", "patozi"].find((j) => url.pathname.includes(`/${j}/`));
+        return caches.match(jogo ? `${jogo}/index.html` : "index.html");
       })),
   );
 });

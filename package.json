@@ -4,6 +4,6 @@
   "description": "Jogo de listas: o óbvio vale 1, o difícil vale 10.",
   "scripts": {
     "test": "node --test tests/*.test.js",
-    "test:online": "node tests/online.e2e.js"
+    "test:online": "node tests/online.e2e.js && node tests/patozi-online.e2e.js"
   }
 }

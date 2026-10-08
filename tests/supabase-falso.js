@@ -3,9 +3,13 @@
 // Cada aba tem o próprio usuário (sessionStorage). Usado só pelos testes com Playwright.
 (() => {
   const DB_KEY = "__fakedb";
-  const PK = { rooms: ["code"], room_players: ["room_code", "user_id"], profiles: ["id"], matches: ["id"] };
-  const empty = () => ({ rooms: [], room_players: [], profiles: [], matches: [] });
-  const load = () => JSON.parse(localStorage.getItem(DB_KEY) || "null") || empty();
+  const PK = {
+    rooms: ["code"], room_players: ["room_code", "user_id"], profiles: ["id"], matches: ["id"],
+    patozi_salas: ["code"], patozi_sala_jogadores: ["sala_code", "user_id"], patozi_perfis: ["id"], patozi_partidas: ["id"],
+    patozi_diario: ["dia", "user_id"], patozi_sugestoes: ["id"],
+  };
+  const empty = () => Object.fromEntries(Object.keys(PK).map((k) => [k, []]));
+  const load = () => ({ ...empty(), ...(JSON.parse(localStorage.getItem(DB_KEY) || "null") || {}) });
   const save = (db) => localStorage.setItem(DB_KEY, JSON.stringify(db));
   const now = () => new Date().toISOString();
 
@@ -28,12 +32,13 @@
       const hit = (r) => this.filters.every(([c, v]) => r[c] === v);
       if (this.op === "insert" || this.op === "upsert") {
         const r = { created_at: now(), joined_at: now(), updated_at: now(), ...this.payload };
-        if (this.t === "matches") r.id = rows.length + 1;
+        if (this.t === "matches" || this.t === "patozi_partidas" || this.t === "patozi_sugestoes") r.id = rows.length + 1;
         const old = rows.find((x) => key(x) === key(r));
         if (old && this.op === "insert") return { data: null, error: { code: "23505", message: "duplicate key" } };
         if (old) Object.assign(old, this.payload, { updated_at: now() });
         else {
           if (this.t === "room_players" && rows.filter((x) => x.room_code === r.room_code).length >= 8) return { data: null, error: { message: "A sala está cheia" } };
+          if (this.t === "patozi_sala_jogadores" && rows.filter((x) => x.sala_code === r.sala_code).length >= 10) return { data: null, error: { message: "A sala está cheia" } };
           rows.push(r);
         }
         save(db);
@@ -48,6 +53,7 @@
         const gone = rows.filter(hit);
         db[this.t] = rows.filter((r) => !hit(r));
         if (this.t === "rooms") gone.forEach((g) => (db.room_players = db.room_players.filter((p) => p.room_code !== g.code)));
+        if (this.t === "patozi_salas") gone.forEach((g) => (db.patozi_sala_jogadores = db.patozi_sala_jogadores.filter((p) => p.sala_code !== g.code)));
         save(db);
         return { data: null, error: null };
       }

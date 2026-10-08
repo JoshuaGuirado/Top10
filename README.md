@@ -1,6 +1,6 @@
 # Gamezi
 
-Plataforma de jogos rápidos para jogar no navegador, sozinho ou com a turma. A raiz do site (`index.html`) é o portal do Gamezi, com a lista de jogos; cada jogo fica na própria pasta. O primeiro é o **Topzi**, em `topzi/`.
+Plataforma de jogos rápidos para jogar no navegador, sozinho ou com a turma. A raiz do site (`index.html`) é o portal do Gamezi, com a lista de jogos; cada jogo fica na própria pasta: o **Topzi** (jogo de listas) em `topzi/` e o **Patozi** (jogo de chutar números, o do "Nem a pato!") em `patozi/`. Os dois usam o mesmo banco e a mesma conta.
 
 Para adicionar um jogo novo: crie a pasta dele (`nomezi/`), ponha um cartão no `index.html` da raiz (e o texto nos três idiomas, no objeto `T`), inclua os arquivos no `sw.js` com o caminho da pasta e use as mesmas cores, fonte e o Z vermelho (ver `brand.html`).
 
@@ -81,3 +81,36 @@ Para o jogo em inglês e espanhol, acrescente o título traduzido em `topzi/data
 ## Publicar
 
 O site está em **https://top10-bay.vercel.app**. A Vercel publica sozinha a cada envio para a branch `main`. O jogo pode ser instalado no celular ("Adicionar à tela inicial") e funciona sem internet, menos o modo online. Abrindo o arquivo direto no computador, o modo offline não liga, mas o resto funciona.
+
+# Patozi
+
+Jogo de chutar números para 2 a 10 jogadores, no mesmo celular (dá para completar a mesa com o computador) ou online, cada um no seu.
+
+## Como jogar
+
+1. Uma carta é virada: uma pergunta com resposta em número ("Quantos ossos tem o corpo humano adulto?"). Cada carta vale de 1 a 3 patos.
+2. Na sua vez, chute um número **maior** que o último chute, ou grite **"Nem a pato!"** se achar que o último chute já passou da resposta.
+3. A resposta é revelada. Se o chute passou, quem chutou fica com a carta; se não passou, quem duvidou fica com ela. Quem ficou com a carta começa a próxima rodada.
+4. Quando alguém junta a meta de cartas (5 com até 4 jogadores, 4 com até 7, 3 com mais; a duração Rápida tira 2 e a Longa põe 2), o jogo acaba. **Quem tiver mais patos perde**; todo o resto ganha.
+
+Regras extras (ligadas por padrão, dá para desligar): **Dobrei** (chutar o dobro ou mais do chute anterior dá um escudo que tira 1 pato no fim) e **Na mosca** (duvidar de um chute exato custa a carta com patos em dobro).
+
+**Pato do dia**: 5 perguntas iguais para todo mundo, todo dia. Chegue o mais perto possível sem passar (até 100 pontos por pergunta; passou, zero). O resultado entra no ranking do dia e vira um texto para compartilhar.
+
+**Online**: um cria a sala, manda o código ou o link (`patozi/?sala=CODIGO`), escolhe os temas, a duração e as regras, e começa. Quem recarrega a página volta para a partida; se alguém sai no meio, o computador joga por ele.
+
+**Perfil**: nome e cor do pato, estatísticas (partidas, vezes que escapou, vezes que foi o pato, "Nem a pato!" certeiros, patos recebidos, dobreis, Pato do dia), conta (a mesma do Topzi) e "Mande uma carta", que guarda sugestões de perguntas no banco.
+
+## Arquivos do Patozi
+
+- `patozi/index.html` e `patozi/style.css`: telas e visual (mesmas cores, fonte e peças do Topzi)
+- `patozi/data/temas.js`: os 17 temas e a função que cadastra as cartas; `patozi/data/cartas-*.js`: as 437 cartas, em português, inglês e espanhol
+- `patozi/js/jogo.js`: regras, computador e Pato do dia, sem tela (testado em `tests/patozi.test.js`)
+- `patozi/js/partida.js` (partida na tela), `diario.js` (Pato do dia), `online.js` (salas), `conta.js` (banco, conta e perfil), `visual.js` (ícones, o pato, som e confete), `textos.js` (os três idiomas), `app.js` (liga tudo)
+- As chaves do Supabase vêm do `topzi/js/config.js` (é o mesmo projeto)
+- Banco: tabelas `patozi_*` no `supabase/schema.sql`
+- Marca: `brand/patozi-logo*.svg`, `brand/patozi-simbolo*.svg` e `brand/patozi-og.png` (ver `brand.html`)
+
+## Adicionar cartas
+
+Crie um arquivo novo em `patozi/data/` (por exemplo `cartas-4.js`), carregado no `patozi/index.html` depois dos outros e incluído no `FILES` do `sw.js` (`patozi/data/cartas-4.js`). Dentro, use `pzCartas("tema", [[patos, resposta, "pergunta", "question", "pregunta"], ...])`; quando a resposta for um ano, ponha `"ano"` no fim. Depois, acrescente uma linha em `PZ_DIARIO_POOLS` (`patozi/js/jogo.js`) valendo a partir de amanhã, com o novo total de cartas, para o Pato do dia de hoje não mudar. O `npm test` confere tudo isso.

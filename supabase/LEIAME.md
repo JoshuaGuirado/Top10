@@ -12,7 +12,11 @@ Leva uns 10 minutos e é gratuito. Os nomes dos menus podem mudar um pouco no pa
 2. Cole todo o conteúdo de [`schema.sql`](schema.sql) e clique em **Run**.
 3. Deve aparecer "Success". Pode rodar de novo sem problema se precisar.
 
-Isso cria `profiles` (perfis), `rooms` (salas), `room_players` (quem está em cada sala) e `matches` (histórico), já com as regras de segurança (RLS).
+Isso cria `profiles` (perfis), `rooms` (salas), `room_players` (quem está em cada sala) e `matches` (histórico) do Topzi, e as tabelas do Patozi: `patozi_perfis`, `patozi_diario` (ranking do Pato do dia), `patozi_sugestoes` (cartas enviadas), `patozi_salas`, `patozi_sala_jogadores` e `patozi_partidas`, já com as regras de segurança (RLS).
+
+Já tinha rodado antes? Rode de novo o arquivo inteiro: ele só cria o que falta e não apaga nada.
+
+As cartas que os jogadores mandam ficam em **Table Editor → patozi_sugestoes**.
 
 ## 3. Ligar o login
 1. **Authentication → Sign In / Providers**: ative **Allow anonymous sign-ins**. É o que deixa todo mundo jogar sem criar conta.

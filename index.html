@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gamezi · jogos para jogar com a turma</title>
-  <meta name="description" content="Gamezi: jogos rápidos para jogar sozinho, com amigos ou online, direto no navegador. Comece pelo Topzi, o jogo de listas.">
+  <meta name="description" content="Gamezi: jogos rápidos para jogar sozinho, com amigos ou online, direto no navegador. Topzi, o jogo de listas, e Patozi, o jogo de chutar números.">
   <meta name="theme-color" content="#FFF4DE" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#171717" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
   <meta property="og:title" content="Gamezi · jogos para jogar com a turma">
-  <meta property="og:description" content="Jogos rápidos, direto no navegador. Comece pelo Topzi: o óbvio vale 1, o difícil vale 10.">
+  <meta property="og:description" content="Jogos rápidos, direto no navegador: Topzi, o jogo de listas, e Patozi, o do Nem a pato!">
   <meta property="og:image" content="https://top10-bay.vercel.app/brand/gamezi-og.png">
   <script>
     // Links antigos do Topzi apontavam para a raiz (convite de sala, lista compartilhada, login da conta):
@@ -74,6 +74,27 @@
           </div>
           <span class="play" data-t="play">Jogar Topzi</span>
         </a>
+        <a class="game" href="patozi/">
+          <div class="game-head">
+            <span class="game-icon">
+              <img class="logo-light" src="brand/patozi-simbolo.svg" alt="" aria-hidden="true">
+              <img class="logo-dark" src="brand/patozi-simbolo-escuro.svg" alt="" aria-hidden="true">
+            </span>
+            <div class="game-name">
+              <img class="logo-light" src="brand/patozi-logo.svg" alt="Patozi">
+              <img class="logo-dark" src="brand/patozi-logo-dark.svg" alt="" aria-hidden="true">
+              <p data-t="patoziKind">Jogo de chutar números</p>
+            </div>
+          </div>
+          <p class="game-desc" data-t="patoziDesc">Cada um sobe o chute até alguém gritar "Nem a pato!". Quem errar fica com os patos. Mais de 400 cartas de 17 temas.</p>
+          <div class="tags">
+            <span class="tag red" id="pato-tag"></span>
+            <span class="tag" data-t="ptag1">2 a 10 jogadores</span>
+            <span class="tag" data-t="tag2">Online</span>
+            <span class="tag" data-t="ptag3">Contra o computador</span>
+          </div>
+          <span class="play" data-t="playPatozi">Jogar Patozi</span>
+        </a>
         <div class="game soon">
           <div class="game-head"><span class="game-icon" aria-hidden="true">?</span></div>
           <h3 data-t="soonTitle">Novos jogos em breve</h3>
@@ -111,6 +132,12 @@
       tag2: ["Online", "Online", "Online"],
       tag3: ["+600 listas", "600+ lists", "+600 listas"],
       play: ["Jogar Topzi", "Play Topzi", "Jugar Topzi"],
+      patoziKind: ["Jogo de chutar números", "Number guessing game", "Juego de adivinar números"],
+      patoziDesc: ["Cada um sobe o chute até alguém gritar \"Nem a pato!\". Quem errar fica com os patos. Mais de 400 cartas de 17 temas.", "Everyone raises the guess until someone shouts \"No way, duck!\". Whoever is wrong takes the ducks. 400+ cards in 17 themes.", "Cada uno sube el número hasta que alguien grita \"¡Ni de pato!\". Quien se equivoque se queda los patos. Más de 400 cartas de 17 temas."],
+      patoDaily: ["Pato do dia #{n}", "Daily duck #{n}", "Pato del día #{n}"],
+      ptag1: ["2 a 10 jogadores", "2 to 10 players", "2 a 10 jugadores"],
+      ptag3: ["Contra o computador", "Against the computer", "Contra la computadora"],
+      playPatozi: ["Jogar Patozi", "Play Patozi", "Jugar Patozi"],
       soonTitle: ["Novos jogos em breve", "More games coming soon", "Nuevos juegos muy pronto"],
       soonText: ["O Gamezi está crescendo. Os próximos jogos chegam aqui, com o mesmo jeito: rápido, para jogar junto e sem instalar nada.", "Gamezi is growing. New games will show up here, in the same spirit: quick, made to play together, nothing to install.", "Gamezi está creciendo. Los próximos juegos llegan aquí, con el mismo estilo: rápidos, para jugar juntos y sin instalar nada."],
       howTitle: ["Como funciona", "How it works", "Cómo funciona"],
@@ -138,6 +165,12 @@
       return Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(2026, 9, 1)) / 864e5) + 1;
     }
 
+    // Número do Pato do dia do Patozi (mesma conta de patozi/js/jogo.js).
+    function patoNumber() {
+      var d = new Date();
+      return Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(2026, 9, 8)) / 864e5) + 1;
+    }
+
     var ICONS = {
       moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>',
       sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>',
@@ -152,6 +185,10 @@
       var tag = document.getElementById("daily-tag");
       tag.hidden = n < 1;
       tag.textContent = t("daily").replace("{n}", n);
+      var pn = patoNumber();
+      var ptag = document.getElementById("pato-tag");
+      ptag.hidden = pn < 1;
+      ptag.textContent = t("patoDaily").replace("{n}", pn);
       var b = document.getElementById("theme");
       b.innerHTML = ICONS[isDark() ? "sun" : "moon"];
       b.title = t(isDark() ? "light" : "dark");
