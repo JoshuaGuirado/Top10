@@ -380,4 +380,4 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .topbar-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .gamezi-back { flex: none; text-decoration: none; }
 body[data-screen]:not([data-screen="home"]) .gamezi-back { display: none; }
-
+.lb-pos { margin: 0 0 10px; font-weight: 800; font-size: 1.1rem; color: var(--accent-ink); }

@@ -118,11 +118,25 @@ function erroDoBanco(error) {
   return new Error(m || t("on.errNet"));
 }
 
+// O banco calcula os pontos a partir dos chutes (patozi_registrar_diario). Banco sem a função (schema.sql
+// antigo): grava direto, como antes.
 async function enviarDiario(dia, reg) {
   await ensureOnline();
   const nick = (store("nick") || "").trim().slice(0, 16) || "Pato";
-  const { error } = await sb.from("patozi_diario").insert({ dia, user_id: me.id, nick, pontos: diarioTotal(reg), chutes: reg.chutes });
+  const chutes = pzDiarioCartas(dia).map((carta, k) => ({ carta, chute: reg.chutes[k] }));
+  let { error } = await sb.rpc("patozi_registrar_diario", { p_dia: dia, p_nick: nick, p_chutes: chutes });
+  if (error && (error.code === "PGRST202" || /could not find the function/i.test(error.message || ""))) {
+    ({ error } = await sb.from("patozi_diario").insert({ dia, user_id: me.id, nick, pontos: diarioTotal(reg), chutes: reg.chutes }));
+  }
   if (error && error.code !== "23505") throw erroDoBanco(error);
+}
+
+// Sua posição no ranking do dia: { posicao, total } ou null.
+async function buscarPosicao(dia) {
+  await ensureOnline();
+  const { data, error } = await sb.rpc("patozi_minha_posicao", { p_dia: dia });
+  if (error || !Array.isArray(data) || !data.length) return null;
+  return { posicao: Number(data[0].posicao), total: Number(data[0].total) };
 }
 
 async function buscarRanking(dia) {

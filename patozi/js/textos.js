@@ -57,6 +57,7 @@ const PZ_T = {
   "daily.streak": ["Sequência: {n} dias", "Streak: {n} days", "Racha: {n} días"],
   "daily.streak.1": ["Sequência: 1 dia", "Streak: 1 day", "Racha: 1 día"],
   "daily.shareText": ["Patozi · Pato do dia #{n}: {pts}/500\n{linha}\n{url}", "Patozi · Daily duck #{n}: {pts}/500\n{linha}\n{url}", "Patozi · Pato del día #{n}: {pts}/500\n{linha}\n{url}"],
+  "daily.position": ["Você ficou em {pos}º de {total} hoje", "You placed #{pos} of {total} today", "Quedaste {pos}.º de {total} hoy"],
   "daily.rankTitle": ["Ranking de hoje", "Today's ranking", "Ranking de hoy"],
   "daily.rankEmpty": ["Ninguém jogou ainda hoje. Seja o primeiro!", "Nobody has played today yet. Be the first!", "Nadie ha jugado hoy todavía. ¡Sé el primero!"],
   "daily.rankOff": ["O ranking aparece quando o modo online está ligado.", "The ranking shows up when online mode is on.", "El ranking aparece cuando el modo online está activo."],

@@ -63,6 +63,10 @@ function recordDaily(g) {
   all[g.daily] = dailyResultOf(g);
   store("diaria", all);
   g.dailyCounts = false;
+  // Só a lista de hoje entra no ranking (as dos dias que passaram dá para jogar, mas não contam).
+  if (g.daily === todayNumber() && typeof sendDailyScore === "function") {
+    g.rankSent = sendDailyScore(g.daily, all[g.daily]).catch(() => {});
+  }
 }
 
 function dailyShareText(num, res) {
@@ -120,6 +124,15 @@ function renderDailyCard() {
     </div>
     ${weekHtml()}
     ${res ? `<p class="daily-status">${escapeHtml(t("daily.ptsOf", { a: res.score, b: res.total }))}${current > 1 ? ` · ${escapeHtml(t("daily.streak", { n: current }))}` : ""}</p>` : ""}`;
+  if (res && typeof dailyPositionLine === "function") {
+    dailyPositionLine(num).then((pos) => {
+      const st = card.querySelector(".daily-status");
+      if (pos && st && !st.dataset.pos) {
+        st.dataset.pos = "1";
+        st.textContent += ` · ${t("rank.short", { pos: pos.posicao, total: pos.total })}`;
+      }
+    });
+  }
   $("daily-btn").onclick = (e) => (res ? shareText(dailyShareText(num, res), e.currentTarget, t("results.share")) : startDaily(num));
   card.querySelectorAll("[data-dia]").forEach((b) => (b.onclick = () => startDaily(Number(b.dataset.dia))));
 }

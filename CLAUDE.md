@@ -31,6 +31,9 @@
 - Cartas novas do Patozi: arquivo novo em `patozi/data/` carregado depois dos outros, pergunta em português, inglês e
   espanhol, resposta inteira (ano com `"ano"` no fim) e uma linha nova em `PZ_DIARIO_POOLS` valendo a partir de amanhã.
   Número que muda com o tempo leva a data na pergunta ("até 2022").
+- Mudou carta do Patozi (nova ou resposta)? Rode `node supabase/gerar-respostas.js` e mande o `supabase/patozi-respostas.sql`
+  para rodar no Supabase: o banco calcula os pontos do Pato do dia com essas respostas (o `tests/patozi.test.js` acusa).
+- Rankings do dia (`topzi_diario`, `patozi_diario`) só recebem resultado pelas funções `*_registrar_diario` do banco.
 - Tabelas do banco sempre com o nome do jogo na frente: `topzi_*` (perfis, salas, sala_jogadores, partidas) e `patozi_*`.
 - O Patozi usa o mesmo Supabase do Topzi (chaves em `topzi/js/config.js`) e tabelas próprias `patozi_*`. Nunca mexa no
   `topzi/` por causa do Patozi.

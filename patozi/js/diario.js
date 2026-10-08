@@ -156,7 +156,8 @@ function diarioTerminou(reg) {
   st.diarios += 1;
   st.melhorDiario = Math.max(st.melhorDiario || 0, diarioTotal(reg));
   store("stats", st);
-  if (typeof enviarDiario === "function") enviarDiario(diarioEstado.dia, reg).then(() => renderRanking(), () => {});
+  // Só o dia de hoje entra no ranking (os dias que passaram dá para jogar, mas não contam).
+  if (typeof enviarDiario === "function" && diarioEstado.dia === diarioHoje()) enviarDiario(diarioEstado.dia, reg).then(() => renderRanking(), () => {});
 }
 
 function renderDiarioFim(reg, dots) {
@@ -195,13 +196,15 @@ async function renderRanking() {
   }
   box.innerHTML = `<h3>${escapeHtml(t("daily.rankTitle"))}</h3><p class="small muted">${escapeHtml(t("daily.rankLoading"))}</p>`;
   let linhas = [];
+  let pos = null;
   try {
-    linhas = await buscarRanking(diarioEstado.dia);
+    [linhas, pos] = await Promise.all([buscarRanking(diarioEstado.dia), buscarPosicao(diarioEstado.dia).catch(() => null)]);
   } catch (e) {
     box.innerHTML = `<h3>${escapeHtml(t("daily.rankTitle"))}</h3><p class="small muted">${escapeHtml(e.message || t("on.errNet"))}</p>`;
     return;
   }
-  box.innerHTML = `<h3>${escapeHtml(t("daily.rankTitle"))}</h3>` + (linhas.length
+  box.innerHTML = `<h3>${escapeHtml(t("daily.rankTitle"))}</h3>` +
+    (pos ? `<p class="lb-pos">${escapeHtml(t("daily.position", { pos: pos.posicao, total: pos.total }))}</p>` : "") + (linhas.length
     ? linhas.map((l, k) => `<div class="lb-row ${l.user_id === myId() ? "me" : ""}"><span>${k + 1}</span><b>${escapeHtml(l.nick || "?")}${l.user_id === myId() ? ` <small class="muted">(${escapeHtml(t("daily.you"))})</small>` : ""}</b><em>${l.pontos}</em></div>`).join("")
     : `<p class="small muted">${escapeHtml(t("daily.rankEmpty"))}</p>`);
 }

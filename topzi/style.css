@@ -887,3 +887,14 @@ body[data-screen]:not([data-screen="home"]) .gamezi-back { display: none; }
 #screen-lists .search { margin-bottom: 10px; }
 #screen-lists .sizes { margin-bottom: 12px; }
 
+/* ── ranking da lista do dia ── */
+.leaderboard { max-width: 520px; margin: 18px auto; }
+.leaderboard h3 { margin: 0 0 10px; }
+.lb-pos { margin: 0 0 10px; font-weight: 800; font-size: 1.1rem; color: var(--accent-ink); }
+.lb-row { display: grid; grid-template-columns: 32px 1fr auto; gap: 10px; align-items: center; padding: 8px 12px; border-radius: 12px; }
+.lb-row:nth-child(odd) { background: var(--surface); }
+.lb-row.me { box-shadow: inset 0 0 0 2px var(--accent); }
+.lb-row span { font-stretch: 75%; font-weight: 800; font-size: 1.2rem; color: var(--muted); text-align: center; }
+.lb-row b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-row em { font-style: normal; font-stretch: 75%; font-weight: 800; font-size: 1.3rem; color: var(--accent-ink); }
+

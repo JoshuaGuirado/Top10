@@ -165,6 +165,17 @@ const server = http.createServer((req, res) => {
   assert.equal(await C.textContent("#account span"), "Minha conta");
   step("portal do Gamezi mostra a conta conectada");
 
+  // Lista do dia: o resultado vai para o ranking de hoje.
+  await C.goto(base);
+  await C.click("#daily-btn");
+  await C.waitForSelector("#screen-game:not([hidden])");
+  for (let i = 0; i < 3; i++) await guess(C, "palpiteerrado" + i);
+  await C.waitForSelector("#screen-results:not([hidden])", { timeout: 8000 });
+  await C.waitForSelector("#daily-ranking .lb-pos", { timeout: 5000 });
+  assert.match(await C.textContent("#daily-ranking .lb-pos"), /1º de 1/);
+  assert.equal(await C.evaluate(() => JSON.parse(localStorage.getItem("__fakedb")).topzi_diario.length), 1);
+  step("lista do dia entra no ranking de hoje, com a posição");
+
   assert.deepEqual(errors, []);
   console.log("\nTudo certo no modo online.");
   await browser.close();

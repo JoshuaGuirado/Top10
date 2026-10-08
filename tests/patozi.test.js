@@ -204,3 +204,9 @@ test("textos: toda chave tem português, inglês e espanhol", () => {
     v.forEach((s) => assert.ok(typeof s === "string" && s.length, k));
   }
 });
+
+test("o banco tem as respostas de todas as cartas (supabase/patozi-respostas.sql em dia)", () => {
+  const { gerarSql } = require("../supabase/gerar-respostas.js");
+  const arquivo = fs.readFileSync(path.join(SITE, "supabase", "patozi-respostas.sql"), "utf8");
+  assert.equal(arquivo, gerarSql(), "rode: node supabase/gerar-respostas.js (e o arquivo gerado no Supabase)");
+});

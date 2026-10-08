@@ -225,6 +225,11 @@ function showResults() {
   game.phrases = {};
   const record = recordGame(game, game.vsList ? vsOutcome() : null);
   if (game.daily) recordDaily(game);
+  $("daily-ranking").hidden = true;
+  if (game.daily && typeof renderDailyRanking === "function") {
+    const g = game;
+    Promise.resolve(g.rankSent).then(() => game === g && renderDailyRanking(g.daily, $("daily-ranking")));
+  }
   if (game.online) onlineGameFinished();
   renderResults(record ? [["rs.record", { n: record.score }]] : "");
   show("results");

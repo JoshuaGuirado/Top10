@@ -446,28 +446,183 @@ comment on view public.gamezi_jogadores_nas_salas is 'Gamezi: quem está em cada
 
 revoke all on public.gamezi_salas, public.gamezi_jogadores_nas_salas from anon, authenticated;
 
--- ───────────── atalhos com os nomes antigos do Topzi (temporários) ─────────────
--- Quem ainda está com o site antigo aberto continua jogando: profiles, rooms, room_players e matches viram
--- visões que apontam para as tabelas novas (com as mesmas regras de segurança). Podem ser apagados quando
--- todo mundo já estiver no site novo; o comando está em supabase/LEIAME.md.
+-- Atalhos com os nomes antigos do Topzi (profiles, rooms, room_players, matches): já não são usados.
 do $$
 declare
-  par text[];
+  nome text;
 begin
-  foreach par slice 1 in array array[
-    ['profiles', 'topzi_perfis'], ['rooms', 'topzi_salas'], ['room_players', 'topzi_sala_jogadores'], ['matches', 'topzi_partidas']
-  ] loop
-    if to_regclass('public.' || par[1]) is null then
-      execute format('create view public.%I with (security_invoker = true) as select * from public.%I', par[1], par[2]);
-      execute format('comment on view public.%I is %L', par[1], 'Atalho temporário para ' || par[2] || ' (nome antigo do Topzi)');
-      execute format('grant select, insert, update, delete on public.%I to authenticated', par[1]);
+  foreach nome in array array['profiles', 'rooms', 'room_players', 'matches'] loop
+    if exists (select 1 from pg_class c join pg_namespace n on n.oid = c.relnamespace
+               where n.nspname = 'public' and c.relname = nome and c.relkind = 'v') then
+      execute format('drop view public.%I', nome);
     end if;
   end loop;
 end $$;
+drop function if exists public.limpar_salas_antigas();
 
-create or replace function public.limpar_salas_antigas()
-returns void language sql security definer set search_path = public as $$
-  select public.topzi_limpar_salas();
+-- ═════════════════════════════ Gamezi: filtro de palavrões ═════════════════════════════
+-- Nick com palavrão vira "Jogador" (no ranking, nas salas e nos perfis); carta enviada com palavrão fica
+-- marcada como bloqueada. Compara palavra por palavra, sem acento e com 0→o, 1→i, 3→e, 4→a, 5→s, 7→t, @→a, $→s,
+-- para não pegar palavras inocentes (computador, cupom…).
+create or replace function public.gamezi_tem_palavrao(texto text)
+returns boolean language plpgsql immutable as $$
+declare
+  limpo text;
+  palavra text;
+  ruins text[] := array[
+    'puta', 'putas', 'puto', 'putos', 'porra', 'merda', 'merdas', 'caralho', 'cu', 'cuzao', 'buceta', 'xoxota', 'piroca',
+    'foda', 'fodase', 'foder', 'fuder', 'viado', 'viadao', 'arrombado', 'arrombada', 'corno', 'vagabunda', 'vadia',
+    'babaca', 'retardado', 'retardada', 'fdp', 'pqp', 'vsf', 'tnc', 'krl', 'crl', 'hitler', 'nazi', 'nazista',
+    'fuck', 'fucker', 'shit', 'bitch', 'cunt', 'dick', 'pussy', 'asshole', 'nigger', 'nigga', 'faggot', 'whore', 'slut',
+    'retard', 'mierda', 'pendejo', 'cabron', 'verga', 'chinga', 'culero', 'maricon', 'joder', 'gilipollas', 'hijueputa'];
+  raizes text[] := array[
+    'caralh', 'arromb', 'fodid', 'fudid', 'fodas', 'putinh', 'putari', 'viadinh', 'bucet', 'fuck', 'shit', 'bitch',
+    'nigg', 'fagg', 'pendej', 'cabron', 'chingad', 'gilipoll', 'maricon', 'hijueput', 'filhodaput', 'filhadaput',
+    'vagabund', 'retardad', 'merdinh'];
+begin
+  if texto is null or texto = '' then return false; end if;
+  limpo := translate(lower(texto), 'áàâãäéèêëíìîïóòôõöúùûüçñ013457@$', 'aaaaaeeeeiiiiooooouuuucnoieastas');
+  if regexp_replace(limpo, '[^a-z]', '', 'g') = any(ruins) then return true; end if;
+  foreach palavra in array regexp_split_to_array(limpo, '[^a-z]+') loop
+    if palavra = '' then continue; end if;
+    if palavra = any(ruins) then return true; end if;
+    if exists (select 1 from unnest(raizes) r where palavra like r || '%') then return true; end if;
+  end loop;
+  return false;
+end $$;
+
+create or replace function public.gamezi_limpar_nick()
+returns trigger language plpgsql as $$
+begin
+  if public.gamezi_tem_palavrao(new.nick) then new.nick := 'Jogador'; end if;
+  return new;
+end $$;
+
+do $$
+declare
+  tabela text;
+begin
+  foreach tabela in array array['topzi_perfis', 'topzi_sala_jogadores', 'patozi_perfis', 'patozi_sala_jogadores', 'patozi_diario'] loop
+    execute format('drop trigger if exists %I on public.%I', tabela || '_nick_limpo', tabela);
+    execute format('create trigger %I before insert or update of nick on public.%I for each row execute function public.gamezi_limpar_nick()', tabela || '_nick_limpo', tabela);
+  end loop;
+end $$;
+
+alter table public.patozi_sugestoes add column if not exists bloqueada boolean not null default false;
+
+create or replace function public.patozi_conferir_sugestao()
+returns trigger language plpgsql as $$
+begin
+  new.bloqueada := public.gamezi_tem_palavrao(new.pergunta) or public.gamezi_tem_palavrao(new.fonte);
+  if public.gamezi_tem_palavrao(new.nick) then new.nick := 'Jogador'; end if;
+  return new;
+end $$;
+
+drop trigger if exists patozi_sugestoes_conferir on public.patozi_sugestoes;
+create trigger patozi_sugestoes_conferir before insert on public.patozi_sugestoes
+  for each row execute function public.patozi_conferir_sugestao();
+
+-- ═════════════════════════════ Rankings do dia (à prova de trapaça simples) ═════════════════════════════
+-- O resultado do dia só entra pelo banco (funções abaixo), nunca direto na tabela: o banco confere o dia
+-- (hoje, com 1 dia de folga por causa do fuso) e, no Patozi, calcula os pontos a partir dos chutes e das
+-- respostas guardadas em patozi_respostas. Quem ler as respostas no código do jogo ainda consegue
+-- trapacear; isto barra o forjado simples (mandar "500 pontos" direto).
+
+-- Topzi: lista do dia (sempre 10 itens). Pontos possíveis com N acertos: de 1+…+N até (11-N)+…+10.
+create table if not exists public.topzi_diario (
+  dia integer not null check (dia >= 1),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  nick text not null default '' check (char_length(nick) <= 16),
+  lista text not null default '' check (char_length(lista) <= 80),
+  pontos smallint not null check (pontos between 0 and 55),
+  acertos smallint not null check (acertos between 0 and 10),
+  created_at timestamptz not null default now(),
+  primary key (dia, user_id)
+);
+
+create index if not exists topzi_diario_ranking_idx on public.topzi_diario (dia, pontos desc);
+comment on table public.topzi_diario is 'Topzi: resultado de cada um na lista do dia (ranking)';
+
+drop trigger if exists topzi_diario_nick_limpo on public.topzi_diario;
+create trigger topzi_diario_nick_limpo before insert or update of nick on public.topzi_diario
+  for each row execute function public.gamezi_limpar_nick();
+
+alter table public.topzi_diario enable row level security;
+
+drop policy if exists "topzi diário: ler" on public.topzi_diario;
+create policy "topzi diário: ler" on public.topzi_diario
+  for select to authenticated using (true);
+
+create or replace function public.topzi_registrar_diario(p_dia integer, p_lista text, p_nick text, p_pontos integer, p_acertos integer)
+returns void language plpgsql security definer set search_path = public as $$
+declare
+  hoje integer := ((now() at time zone 'utc')::date - date '2026-10-01') + 1;
+begin
+  if auth.uid() is null then raise exception 'Entre para registrar o resultado.'; end if;
+  if p_dia is null or p_dia not between hoje - 1 and hoje + 1 then raise exception 'Esse dia já passou.'; end if;
+  if p_acertos is null or p_acertos not between 0 and 10 then raise exception 'Resultado inválido.'; end if;
+  if p_pontos is null or p_pontos < p_acertos * (p_acertos + 1) / 2 or p_pontos > p_acertos * (21 - p_acertos) / 2 then
+    raise exception 'Resultado inválido.';
+  end if;
+  insert into public.topzi_diario (dia, user_id, nick, lista, pontos, acertos)
+  values (p_dia, auth.uid(), left(coalesce(p_nick, ''), 16), left(coalesce(p_lista, ''), 80), p_pontos, p_acertos)
+  on conflict (dia, user_id) do nothing;
+end $$;
+
+grant execute on function public.topzi_registrar_diario(integer, text, text, integer, integer) to authenticated;
+
+create or replace function public.topzi_minha_posicao(p_dia integer)
+returns table (posicao bigint, total bigint) language sql stable security definer set search_path = public as $$
+  select (select count(*) from public.topzi_diario d where d.dia = p_dia and d.pontos > m.pontos) + 1,
+         (select count(*) from public.topzi_diario d where d.dia = p_dia)
+    from public.topzi_diario m where m.dia = p_dia and m.user_id = auth.uid();
 $$;
 
-grant execute on function public.limpar_salas_antigas() to authenticated;
+grant execute on function public.topzi_minha_posicao(integer) to authenticated;
+
+-- Patozi: respostas das cartas (dados em supabase/patozi-respostas.sql, gerado a partir do jogo).
+create table if not exists public.patozi_respostas (
+  carta text primary key,
+  resposta bigint not null check (resposta >= 1)
+);
+alter table public.patozi_respostas enable row level security; -- sem regras: só as funções abaixo leem
+
+drop policy if exists "patozi diário: registrar o próprio" on public.patozi_diario;
+
+create or replace function public.patozi_registrar_diario(p_dia integer, p_nick text, p_chutes jsonb)
+returns integer language plpgsql security definer set search_path = public as $$
+declare
+  hoje integer := ((now() at time zone 'utc')::date - date '2026-10-08') + 1;
+  total integer := 0;
+  item jsonb;
+  resp bigint;
+  chute numeric;
+begin
+  if auth.uid() is null then raise exception 'Entre para registrar o resultado.'; end if;
+  if p_dia is null or p_dia not between hoje - 1 and hoje + 1 then raise exception 'Esse dia já passou.'; end if;
+  if jsonb_typeof(p_chutes) <> 'array' or jsonb_array_length(p_chutes) <> 5
+     or (select count(distinct x ->> 'carta') from jsonb_array_elements(p_chutes) x) <> 5 then
+    raise exception 'Resultado inválido.';
+  end if;
+  for item in select * from jsonb_array_elements(p_chutes) loop
+    select r.resposta into resp from public.patozi_respostas r where r.carta = item ->> 'carta';
+    if resp is null then raise exception 'Carta desconhecida.'; end if;
+    chute := nullif(item ->> 'chute', '')::numeric;
+    if chute is not null and chute >= 0 and chute <= resp then total := total + floor(100 * chute / resp); end if;
+  end loop;
+  insert into public.patozi_diario (dia, user_id, nick, pontos, chutes)
+  values (p_dia, auth.uid(), left(coalesce(p_nick, ''), 16), total, p_chutes)
+  on conflict (dia, user_id) do nothing;
+  return total;
+end $$;
+
+grant execute on function public.patozi_registrar_diario(integer, text, jsonb) to authenticated;
+
+create or replace function public.patozi_minha_posicao(p_dia integer)
+returns table (posicao bigint, total bigint) language sql stable security definer set search_path = public as $$
+  select (select count(*) from public.patozi_diario d where d.dia = p_dia and d.pontos > m.pontos) + 1,
+         (select count(*) from public.patozi_diario d where d.dia = p_dia)
+    from public.patozi_diario m where m.dia = p_dia and m.user_id = auth.uid();
+$$;
+
+grant execute on function public.patozi_minha_posicao(integer) to authenticated;

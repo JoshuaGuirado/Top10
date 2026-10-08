@@ -6,7 +6,7 @@
   const PK = {
     topzi_salas: ["code"], topzi_sala_jogadores: ["room_code", "user_id"], topzi_perfis: ["id"], topzi_partidas: ["id"],
     patozi_salas: ["code"], patozi_sala_jogadores: ["sala_code", "user_id"], patozi_perfis: ["id"], patozi_partidas: ["id"],
-    patozi_diario: ["dia", "user_id"], patozi_sugestoes: ["id"],
+    patozi_diario: ["dia", "user_id"], patozi_sugestoes: ["id"], topzi_diario: ["dia", "user_id"],
   };
   const empty = () => Object.fromEntries(Object.keys(PK).map((k) => [k, []]));
   const load = () => ({ ...empty(), ...(JSON.parse(localStorage.getItem(DB_KEY) || "null") || {}) });
@@ -126,7 +126,28 @@
   };
   const client = {
     from: (t) => new Query(t),
-    rpc: () => Promise.resolve({ data: null, error: null }),
+    // Funções do banco usadas pelos jogos (as outras não fazem nada).
+    rpc: (nome, a = {}) => new Promise((r) => setTimeout(r, 15)).then(() => {
+      const uid = sessionStorage.getItem("__fakeuid");
+      const db = load();
+      if (nome === "patozi_registrar_diario") {
+        const pontos = a.p_chutes.reduce((s, x) => s + window.pzDiarioPontos(x.chute, window.pzCarta(x.carta).resposta), 0);
+        if (!db.patozi_diario.some((x) => x.dia === a.p_dia && x.user_id === uid)) db.patozi_diario.push({ dia: a.p_dia, user_id: uid, nick: a.p_nick, pontos, chutes: a.p_chutes });
+        save(db);
+        return { data: pontos, error: null };
+      }
+      if (nome === "topzi_registrar_diario") {
+        if (!db.topzi_diario.some((x) => x.dia === a.p_dia && x.user_id === uid)) db.topzi_diario.push({ dia: a.p_dia, user_id: uid, nick: a.p_nick, lista: a.p_lista, pontos: a.p_pontos, acertos: a.p_acertos });
+        save(db);
+        return { data: null, error: null };
+      }
+      if (nome === "patozi_minha_posicao" || nome === "topzi_minha_posicao") {
+        const rows = db[nome.startsWith("patozi") ? "patozi_diario" : "topzi_diario"].filter((x) => x.dia === a.p_dia);
+        const eu = rows.find((x) => x.user_id === uid);
+        return { data: eu ? [{ posicao: rows.filter((x) => x.pontos > eu.pontos).length + 1, total: rows.length }] : [], error: null };
+      }
+      return { data: null, error: null };
+    }),
     channel: (name, opts) => new Channel(name, opts),
     removeChannel: (ch) => ch.close(),
     auth: {
