@@ -14,12 +14,13 @@ const PZ_MAX_JOGADORES = 10;
 const PZ_MAX_CHUTE = 1e12;
 
 // Pato do dia: o dia 1 é 8/10/2026. Cartas novas só entram no sorteio a partir do dia da linha nova,
-// para não mudar o desafio de quem já jogou hoje.
+// para não mudar o desafio de quem já jogou hoje. semAposentadas: a partir dessa linha, as cartas óbvias
+// de data/aposentadas.js ficam fora.
 const PZ_DIARIO_INICIO = Date.UTC(2026, 9, 8);
 const PZ_DIARIO_QTD = 5;
 const PZ_DIARIO_POOLS = [
   { desde: 1, cartas: 437 },
-  { desde: 2, cartas: 573 }, // 9/10/2026: carros, natureza, arte, desenhos, palavras e dinheiro
+  { desde: 2, cartas: 685, semAposentadas: true }, // 9/10/2026: 6 temas novos, só cartas difíceis
 ];
 
 // ───────────── sorte ─────────────
@@ -66,9 +67,10 @@ function pzCarta(id) {
   return pzIndice.get(id) || null;
 }
 
+// Cartas que entram nas partidas: as dos temas escolhidos, menos as óbvias demais (data/aposentadas.js).
 function pzCartasDosTemas(temas) {
   const ok = temas && temas.length ? new Set(temas) : null;
-  return PZ_CARTAS.filter((c) => !ok || ok.has(c.tema)).map((c) => c.id);
+  return PZ_CARTAS.filter((c) => (!ok || ok.has(c.tema)) && !PZ_APOSENTADAS.has(c.id)).map((c) => c.id);
 }
 
 // Quantas cartas alguém precisa juntar para o jogo acabar.
@@ -81,7 +83,7 @@ function pzMeta(nJogadores, duracao = "normal") {
 
 function pzNovaPartida(opts, rnd = Math.random) {
   const jogadores = opts.jogadores.slice(0, PZ_MAX_JOGADORES).map((j) => ({
-    id: j.id, nome: j.nome, cor: j.cor, bot: !!j.bot, cartas: [], dobreis: 0,
+    id: j.id, nome: j.nome, cor: j.cor, pato: j.pato || null, bot: !!j.bot, cartas: [], dobreis: 0,
   }));
   const temas = opts.temas || [];
   const duracao = opts.duracao || "normal";
@@ -180,7 +182,7 @@ function pzPatos(p) {
 
 // Do que se saiu melhor (menos patos) para o pato. Quem tiver mais patos perde (empate: perdem juntos).
 function pzPlacar(s) {
-  const linhas = s.jogadores.map((p, i) => ({ i, nome: p.nome, cor: p.cor, bot: p.bot, id: p.id, cartas: p.cartas.length, dobreis: p.dobreis, patos: pzPatos(p) }));
+  const linhas = s.jogadores.map((p, i) => ({ i, nome: p.nome, cor: p.cor, pato: p.pato, bot: p.bot, id: p.id, cartas: p.cartas.length, dobreis: p.dobreis, patos: pzPatos(p) }));
   const max = Math.max(...linhas.map((l) => l.patos));
   linhas.forEach((l) => (l.perdeu = l.patos === max));
   return linhas.sort((a, b) => a.patos - b.patos || a.cartas - b.cartas || a.i - b.i);
@@ -240,7 +242,9 @@ function pzDiaNumero(d = new Date()) {
 
 function pzDiarioCartas(dia) {
   const pool = PZ_DIARIO_POOLS.filter((p) => p.desde <= Math.max(dia, 1)).pop();
-  const candidatas = PZ_CARTAS.slice(0, pool.cartas).filter((c) => !c.ano && c.resposta >= 10).map((c) => c.id);
+  const candidatas = PZ_CARTAS.slice(0, pool.cartas)
+    .filter((c) => !c.ano && c.resposta >= 10 && !(pool.semAposentadas && PZ_APOSENTADAS.has(c.id)))
+    .map((c) => c.id);
   return pzEmbaralhar(candidatas, pzRng(dia * 7919 + 13)).slice(0, PZ_DIARIO_QTD);
 }
 

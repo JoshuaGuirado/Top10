@@ -38,6 +38,14 @@ const server = http.createServer((req, res) => {
 
   const A = await page();
   await A.goto(base);
+  // Arthur veste o pato no Perfil (coroa e óculos escuros); o visual vai junto para a sala.
+  await A.click("#profile-btn");
+  await A.click('[data-aba="chapeu"]');
+  await A.click('#closet-grid [data-valor="coroa"]');
+  await A.click('[data-aba="rosto"]');
+  await A.click('#closet-grid [data-valor="escuros"]');
+  assert.ok(await A.$('#profile-duck [data-item="coroa"]'), "pato do Perfil com a coroa");
+  await A.click("#home-btn");
   await A.click("#online-btn");
   await A.fill("#online-nick", "Arthur");
   await A.click("#create-room-btn");
@@ -54,6 +62,9 @@ const server = http.createServer((req, res) => {
   await A.waitForFunction(() => document.querySelectorAll(".lobby-player").length === 2, null, { timeout: 5000 });
   assert.equal(await B.isVisible("#lobby-start"), false, "convidada não tem o botão Começar");
   step("convidada entra pelo link e aparece na sala");
+  await B.waitForSelector('.lobby-player [data-item="coroa"]', { timeout: 5000 });
+  assert.ok(await B.$('.lobby-player [data-item="escuros"]'));
+  step("a convidada vê o pato do anfitrião com coroa e óculos escuros");
 
   // Anfitrião escolhe só o tema Brasil e a duração rápida; a convidada vê a mudança.
   await A.click('#lobby-options [data-tema="brasil"]');
@@ -67,6 +78,7 @@ const server = http.createServer((req, res) => {
   const cardA = await A.textContent("#card-q");
   assert.equal(await B.textContent("#card-q"), cardA, "mesma carta nos dois aparelhos");
   assert.match(await A.textContent("#card-theme"), /Brasil/);
+  assert.ok(await B.$('.score-row [data-item="coroa"], .players [data-item="coroa"], #screen-game [data-item="coroa"]'), "coroa também na partida");
   step("partida começa com a mesma carta nos dois aparelhos");
 
   // Joga a partida inteira pela tela: quem está na vez chuta o mínimo ou grita "Nem a pato!".

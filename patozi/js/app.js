@@ -9,7 +9,7 @@ function renderHome() {
   renderDailyCard();
   document.querySelector(".pato-n .pato-ico").innerHTML = patoSvg(0);
   $("home-themes").innerHTML = PZ_TEMAS.map((tema) => {
-    const n = PZ_CARTAS.filter((c) => c.tema === tema.id).length;
+    const n = pzCartasDosTemas([tema.id]).length;
     return `<span class="theme-pill">${themeIcon(tema.id)}${escapeHtml(tr(tema.nome))} <small>${n}</small></span>`;
   }).join("");
 }
@@ -49,7 +49,8 @@ function abrirAjuda() {
 function abrirPerfil() {
   show("profile");
   $("profile-nick").value = store("nick") || "";
-  $("profile-duck").innerHTML = patoSvg(minhaCor(), "happy");
+  $("profile-duck").innerHTML = patoSvg(minhaCor(), "happy", meuPato());
+  renderGuardaRoupa();
   const st = loadStats();
   const tiles = [
     [st.partidas, "stats.games"],
@@ -85,12 +86,7 @@ function aoMudarPerfil() {
 function trocarMinhaCor() {
   const cor = (minhaCor() + 1) % PZ_CORES.length;
   store("cor", cor);
-  if (jogadores[0] && !jogadores[0].bot) {
-    jogadores[0].cor = cor;
-    store("jogadores", jogadores);
-  }
-  $("profile-duck").innerHTML = patoSvg(cor, "happy");
-  sfx.tick();
+  aoMudarVisual();
 }
 
 function mudarMeuNome(nome) {
@@ -177,6 +173,9 @@ function ligar() {
 
   $("profile-back").onclick = irInicio;
   $("profile-duck").onclick = trocarMinhaCor;
+  $("closet").onclick = closetClick;
+  $("closet-random").onclick = sortearVisual;
+  $("closet-clear").onclick = tirarVisual;
   $("profile-nick").oninput = (e) => mudarMeuNome(e.target.value);
   $("suggest-form").onsubmit = mandarSugestao;
   document.querySelectorAll(".account-btn").forEach((b) => (b.onclick = abrirConta));

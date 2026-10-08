@@ -2,7 +2,7 @@
 //
 // Como funciona: o aparelho de quem cria a sala (anfitrião) roda a partida com as mesmas regras
 // do jogo local e manda o estado para os outros pelo Realtime. Os outros só mandam o próprio lance
-// (palpite, passar, dica) na sua vez. O estado também fica salvo em rooms.state, então quem cai
+// (palpite, passar, dica) na sua vez. O estado também fica salvo em topzi_salas.state, então quem cai
 // ou recarrega a página volta para a partida.
 
 const ROOM_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -11,7 +11,7 @@ const SUPABASE_CDN = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/
 
 let sb = null;
 let me = null; // { id, email, anon }
-let room = null; // linha de rooms
+let room = null; // linha de topzi_salas
 let roomPlayers = [];
 let channel = null;
 let presentIds = new Set();
@@ -136,7 +136,7 @@ async function saveProfileNow() {
   if (!sb || !me || me.anon) return;
   ensurePlayers();
   const p = players[0];
-  await sb.from("profiles").upsert({
+  await sb.from("topzi_perfis").upsert({
     id: me.id,
     nick: (p.nick || "").trim().slice(0, 16),
     avatar: p.avatar,
@@ -197,7 +197,7 @@ function mergeProfile(remote) {
 
 async function loadProfile() {
   if (!sb || !me || me.anon) return;
-  const { data } = await sb.from("profiles").select("*").eq("id", me.id).maybeSingle();
+  const { data } = await sb.from("topzi_perfis").select("*").eq("id", me.id).maybeSingle();
   if (data) mergeProfile(data);
   await saveProfileNow();
   renderDailyCard();
@@ -286,17 +286,17 @@ async function createRoom() {
     let code = null;
     for (let attempt = 0; attempt < 6 && !code; attempt++) {
       const tryCode = randomCode();
-      const { error } = await sb.from("rooms").insert({ code: tryCode, host_id: me.id, status: "lobby", settings });
+      const { error } = await sb.from("topzi_salas").insert({ code: tryCode, host_id: me.id, status: "lobby", settings });
       if (!error) code = tryCode;
       else if (error.code !== "23505") throw error;
     }
     if (!code) throw new Error(t("on.errCreate"));
     const row = { room_code: code, user_id: me.id, nick, avatar: players[0].avatar, team: 0, joined_at: new Date().toISOString() };
-    const { error } = await sb.from("room_players").insert(row);
+    const { error } = await sb.from("topzi_sala_jogadores").insert(row);
     if (error) throw error;
     enterRoom({ code, host_id: me.id, status: "lobby", settings, state: null }, [row]);
     console.info(`[online] sala criada em ${Math.round(performance.now() - t0)} ms`);
-    sb.rpc("limpar_salas_antigas").then(() => {}, () => {});
+    sb.rpc("topzi_limpar_salas").then(() => {}, () => {});
   });
 }
 
@@ -312,7 +312,7 @@ async function joinRoom(raw, quiet = false) {
     const t0 = performance.now();
     await ensureOnline();
     // Sala e jogadores ao mesmo tempo (uma ida ao servidor só).
-    const [{ data: r, error }, list] = await Promise.all([sb.from("rooms").select("*").eq("code", code).maybeSingle(), fetchRoomPlayers(code)]);
+    const [{ data: r, error }, list] = await Promise.all([sb.from("topzi_salas").select("*").eq("code", code).maybeSingle(), fetchRoomPlayers(code)]);
     if (error) throw error;
     if (!r) throw new Error(t("on.errNotFound"));
     const mine = list.find((p) => p.user_id === me.id);
@@ -321,13 +321,13 @@ async function joinRoom(raw, quiet = false) {
       if (list.length >= MAX_PLAYERS) throw new Error(t("on.errFull"));
       const team = list.filter((p) => p.team === 0).length > list.filter((p) => p.team === 1).length ? 1 : 0;
       const row = { room_code: code, user_id: me.id, nick: nick.slice(0, 16), avatar: players[0].avatar, team, joined_at: new Date().toISOString() };
-      const { error: e2 } = await sb.from("room_players").insert(row);
+      const { error: e2 } = await sb.from("topzi_sala_jogadores").insert(row);
       if (e2) throw new Error(/cheia/.test(e2.message) ? t("on.errFull") : e2.message);
       list.push(row);
     } else {
       mine.nick = nick.slice(0, 16);
       mine.avatar = players[0].avatar;
-      sb.from("room_players").update({ nick: mine.nick, avatar: mine.avatar }).eq("room_code", code).eq("user_id", me.id).then(() => {}, () => {});
+      sb.from("topzi_sala_jogadores").update({ nick: mine.nick, avatar: mine.avatar }).eq("room_code", code).eq("user_id", me.id).then(() => {}, () => {});
     }
     enterRoom(r, list);
     console.info(`[online] entrou na sala em ${Math.round(performance.now() - t0)} ms`);
@@ -349,13 +349,13 @@ function enterRoom(r, list) {
 }
 
 async function fetchRoomPlayers(code) {
-  const { data } = await sb.from("room_players").select("*").eq("room_code", code).order("joined_at");
+  const { data } = await sb.from("topzi_sala_jogadores").select("*").eq("room_code", code).order("joined_at");
   return data || [];
 }
 
 async function refreshRoom(code = room && room.code) {
   if (!code) return;
-  const [{ data: r }, list] = await Promise.all([sb.from("rooms").select("*").eq("code", code).maybeSingle(), fetchRoomPlayers(code)]);
+  const [{ data: r }, list] = await Promise.all([sb.from("topzi_salas").select("*").eq("code", code).maybeSingle(), fetchRoomPlayers(code)]);
   if (!r) return roomClosed(t("on.closed"));
   room = r;
   roomPlayers = list;
@@ -532,7 +532,7 @@ async function updateSettings(patch) {
   room.settings = settings;
   if (patch.mode) modeId = patch.mode;
   renderLobby();
-  const { error } = await sb.from("rooms").update({ settings }).eq("code", room.code);
+  const { error } = await sb.from("topzi_salas").update({ settings }).eq("code", room.code);
   if (error) return onlineError(error);
   send("lobby");
 }
@@ -601,13 +601,13 @@ async function setMyTeam(team) {
   const mine = roomPlayers.find((p) => p.user_id === me.id);
   if (mine) mine.team = team;
   renderLobby();
-  await sb.from("room_players").update({ team }).eq("room_code", room.code).eq("user_id", me.id);
+  await sb.from("topzi_sala_jogadores").update({ team }).eq("room_code", room.code).eq("user_id", me.id);
   send("lobby");
 }
 
 async function kickPlayer(p) {
   if (!confirm(t("lobby.kickConfirm", { nome: p.nick }))) return;
-  await sb.from("room_players").delete().eq("room_code", room.code).eq("user_id", p.user_id);
+  await sb.from("topzi_sala_jogadores").delete().eq("room_code", room.code).eq("user_id", p.user_id);
   send("lobby");
   refreshRoom();
 }
@@ -617,9 +617,9 @@ async function leaveRoom() {
   const code = room.code;
   if (isHost()) {
     send("closed");
-    await sb.from("rooms").delete().eq("code", code);
+    await sb.from("topzi_salas").delete().eq("code", code);
   } else {
-    await sb.from("room_players").delete().eq("room_code", code).eq("user_id", me.id);
+    await sb.from("topzi_sala_jogadores").delete().eq("room_code", code).eq("user_id", me.id);
     send("lobby");
   }
   leaveChannel();
@@ -648,7 +648,7 @@ async function startOnlineGame() {
   const roster = roomPlayers.map((p) => ({ uid: p.user_id, name: p.nick, avatar: p.avatar || DEFAULT_AVATAR, team: p.team }));
   suggestions = new Map();
   startGame(st.list, { online: { roster, timer: st.timer || 0, lives: st.lives === undefined ? !!MODES[st.mode].team : !!st.lives } });
-  sb.from("rooms").update({ status: "playing" }).eq("code", room.code).then(() => {}, () => {});
+  sb.from("topzi_salas").update({ status: "playing" }).eq("code", room.code).then(() => {}, () => {});
 }
 
 // O estado da partida que vai para os outros aparelhos (e fica salvo na sala).
@@ -700,7 +700,7 @@ function onlineSync() {
     send("state", snap);
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
-      sb.from("rooms").update({ state: snap, status: snap.over ? "finished" : "playing" }).eq("code", room.code).then(() => {}, () => {});
+      sb.from("topzi_salas").update({ state: snap, status: snap.over ? "finished" : "playing" }).eq("code", room.code).then(() => {}, () => {});
     }, 250);
   }, 0);
 }
@@ -898,7 +898,7 @@ setInterval(() => {
 function onlineGameFinished() {
   if (!game.isHost || !room || game.savedMatch) return;
   game.savedMatch = true;
-  sb.from("matches").insert({
+  sb.from("topzi_partidas").insert({
     room_code: room.code,
     list_id: game.list.id,
     list_title: game.list.title,
@@ -910,7 +910,7 @@ function onlineGameFinished() {
 async function backToRoom() {
   if (!room) return roomClosed(t("on.closed"));
   if (isHost()) {
-    await sb.from("rooms").update({ status: "lobby", state: null }).eq("code", room.code);
+    await sb.from("topzi_salas").update({ status: "lobby", state: null }).eq("code", room.code);
     send("lobby");
   }
   stopGuestTimer();
@@ -932,7 +932,7 @@ async function renderOnlineHistory() {
     box.innerHTML = `<p class="muted small">${t("on.historyEmpty")}</p>`;
     return;
   }
-  const { data } = await sb.from("matches").select("*").order("created_at", { ascending: false }).limit(10);
+  const { data } = await sb.from("topzi_partidas").select("*").order("created_at", { ascending: false }).limit(10);
   if (!data || !data.length) {
     box.innerHTML = `<p class="muted small">${t("on.historyNone")}</p>`;
     return;

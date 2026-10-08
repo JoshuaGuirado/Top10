@@ -303,6 +303,18 @@ button { font: inherit; cursor: pointer; color: inherit; }
 /* ── perfil ── */
 .profile-me { display: flex; gap: 16px; align-items: center; margin: 8px 0 16px; }
 .profile-me .nick { flex: 1; }
+.closet { display: grid; gap: 10px; margin: 0 0 20px; }
+.closet p { margin: 0; }
+.closet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 8px; }
+.closet-item {
+  display: grid; justify-items: center; gap: 2px; padding: 6px 4px 8px; cursor: pointer;
+  font: inherit; font-size: .74rem; font-weight: 700; line-height: 1.15; text-align: center; color: var(--fg);
+  background: var(--surface); border: 2px solid transparent; border-radius: var(--r-sm);
+}
+.closet-item .pato { width: 64px; height: 64px; }
+.closet-item:hover { border-color: var(--line); }
+.closet-item.active { border-color: var(--accent); background: var(--accent-soft); }
+.closet-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
 .stats-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0; }
 @media (max-width: 640px) { .stats-tiles { grid-template-columns: 1fr 1fr; } }
 .stat { background: var(--surface); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 4px; }

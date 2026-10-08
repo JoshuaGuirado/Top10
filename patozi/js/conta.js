@@ -5,7 +5,7 @@
 // (ver supabase/schema.sql).
 
 const SUPABASE_CDN = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
-const PZ_PERFIL_CHAVES = ["stats", "diario", "nick", "cor"];
+const PZ_PERFIL_CHAVES = ["stats", "diario", "nick", "cor", "pato"];
 
 let sb = null;
 let me = null; // { id, email, anon }
@@ -86,7 +86,7 @@ async function salvarPerfil() {
   await sb.from("patozi_perfis").upsert({
     id: me.id,
     nick: (store("nick") || "").trim().slice(0, 16),
-    data: { stats: store("stats"), diario: store("diario"), cor: store("cor") },
+    data: { stats: store("stats"), diario: store("diario"), cor: store("cor"), pato: store("pato") },
   });
 }
 
@@ -95,6 +95,7 @@ function juntarPerfil(remoto) {
   const d = remoto.data || {};
   if (remoto.nick && !store("nick")) store("nick", remoto.nick);
   if (Number.isInteger(d.cor) && store("cor") == null) store("cor", d.cor);
+  if (d.pato && typeof d.pato === "object" && store("pato") == null) store("pato", patoLimpo(d.pato));
   const local = loadStats();
   if (d.stats && (d.stats.partidas || 0) + (d.stats.diarios || 0) > local.partidas + local.diarios) store("stats", d.stats);
   store("diario", { ...(d.diario || {}), ...(store("diario") || {}) });

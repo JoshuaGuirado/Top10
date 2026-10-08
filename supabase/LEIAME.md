@@ -14,11 +14,18 @@ Leva uns 10 minutos e é gratuito. Os nomes dos menus podem mudar um pouco no pa
 2. Cole todo o conteúdo de [`schema.sql`](schema.sql) e clique em **Run**.
 3. Deve aparecer "Success". Pode rodar de novo sem problema se precisar.
 
-Isso cria `profiles` (perfis), `rooms` (salas), `room_players` (quem está em cada sala) e `matches` (histórico) do Topzi, e as tabelas do Patozi: `patozi_perfis`, `patozi_diario` (ranking do Pato do dia), `patozi_sugestoes` (cartas enviadas), `patozi_salas`, `patozi_sala_jogadores` e `patozi_partidas`, já com as regras de segurança (RLS).
+Isso cria as tabelas do Topzi, `topzi_perfis`, `topzi_salas`, `topzi_sala_jogadores` (quem está em cada sala) e `topzi_partidas` (histórico), e as do Patozi: `patozi_perfis`, `patozi_diario` (ranking do Pato do dia), `patozi_sugestoes` (cartas enviadas), `patozi_salas`, `patozi_sala_jogadores` e `patozi_partidas`, já com as regras de segurança (RLS).
 
 Já tinha rodado antes? Rode de novo o arquivo inteiro: ele só cria o que falta e não apaga nada.
 
-Cada tabela tem uma descrição dizendo de qual jogo é (as do Topzi não têm prefixo: `profiles`, `rooms`, `room_players`, `matches`; as do Patozi começam com `patozi_`). Para ver os dois jogos juntos, com a coluna `jogo`, use as visões **`gamezi_salas`** (salas) e **`gamezi_jogadores_nas_salas`** (quem está em cada sala); elas só aparecem no painel, o site não tem acesso.
+Toda tabela começa com o nome do jogo (`topzi_…`, `patozi_…`) e tem uma descrição no painel. Até outubro de 2026 as do Topzi se chamavam `profiles`, `rooms`, `room_players` e `matches`: o `schema.sql` troca os nomes sozinho, sem perder dados, e deixa os nomes antigos como atalhos (visões) para quem ainda estiver com o site antigo aberto. Depois de uns dias, dá para apagar os atalhos com:
+
+```sql
+drop view if exists public.profiles, public.rooms, public.room_players, public.matches;
+drop function if exists public.limpar_salas_antigas();
+```
+
+(Se apagar e rodar o `schema.sql` inteiro de novo, os atalhos voltam; tudo bem, não atrapalham.) Para ver os dois jogos juntos, com a coluna `jogo`, use as visões **`gamezi_salas`** (salas) e **`gamezi_jogadores_nas_salas`** (quem está em cada sala); elas só aparecem no painel, o site não tem acesso.
 
 As cartas que os jogadores mandam ficam em **Table Editor → patozi_sugestoes** (com o tema escolhido na coluna `tema`).
 

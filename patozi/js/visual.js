@@ -105,20 +105,98 @@ function temaNome(id) {
 
 const PZ_CORES = ["#FFC93C", "#FF4D3D", "#3D7BFF", "#2FBF71", "#9B5DE5", "#FF8C42", "#FF7EB6", "#2EC4D6", "#A0703C", "#F2EBDD"];
 
-// Pato de perfil, olhando para a direita. mood: "" | "sad" | "happy".
-function patoSvg(cor = PZ_CORES[0], mood = "") {
+// Guarda-roupa do pato: cada categoria tem itens desenhados no mesmo quadro de 100×100 do pato.
+// Camadas, de trás para a frente: atras, corpo (por cima do corpo; "CLIP" recorta no formato do corpo),
+// asa (o que o pato segura), pescoco (por cima da cabeça) e topo (por cima do olho).
+// O visual de cada um é { chapeu, rosto, roupa, asa } com os ids abaixo; id desconhecido é ignorado.
+const PZ_TRACO = 'stroke="#171717" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"';
+const PZ_VISUAL = [
+  { id: "chapeu", nome: ["Chapéu", "Hat", "Sombrero"], itens: [
+    { id: "bone", nome: ["Boné", "Cap", "Gorra"], topo: `<path d="M41 27a19 17 0 0 1 38 0z" fill="#FF4D3D" ${PZ_TRACO}/><path d="M76 24h15a3 3 0 0 1 0 6H75z" fill="#FF4D3D" ${PZ_TRACO}/><circle cx="60" cy="10" r="2.6" fill="#171717"/>` },
+    { id: "cartola", nome: ["Cartola", "Top hat", "Sombrero de copa"], topo: `<rect x="47" y="1" width="26" height="18" rx="2" fill="#171717"/><rect x="47" y="12" width="26" height="4" fill="#FF4D3D"/><rect x="39" y="16" width="42" height="5" rx="2.5" fill="#171717"/>` },
+    { id: "coroa", nome: ["Coroa", "Crown", "Corona"], topo: `<path d="M44 20 45 4l9 8 6-10 6 10 9-8 1 16z" fill="#FFC93C" ${PZ_TRACO}/><circle cx="60" cy="14" r="2.4" fill="#FF4D3D"/>` },
+    { id: "festa", nome: ["Chapéu de festa", "Party hat", "Gorro de fiesta"], topo: `<path d="M48 19 60 4l12 15z" fill="#9B5DE5" ${PZ_TRACO}/><path d="M52.5 14h15M56.5 9h7" stroke="#FFC93C" stroke-width="2.5" stroke-linecap="round"/><circle cx="60" cy="4.5" r="3.5" fill="#FF7EB6" ${PZ_TRACO}/>` },
+    { id: "touca", nome: ["Touca", "Beanie", "Gorro"], topo: `<path d="M42 26a18 17 0 0 1 36 0z" fill="#3D7BFF" ${PZ_TRACO}/><rect x="40" y="21" width="40" height="8" rx="4" fill="#3D7BFF" ${PZ_TRACO}/><circle cx="60" cy="7.5" r="4.5" fill="#FFF4DE" ${PZ_TRACO}/>` },
+    { id: "cauboi", nome: ["Chapéu de caubói", "Cowboy hat", "Sombrero vaquero"], topo: `<path d="M47 20c0-9 3-15 7-15 2 0 4 2 6 2s4-2 6-2c4 0 7 6 7 15z" fill="#A0703C" ${PZ_TRACO}/><path d="M33 19c6 5 48 5 54 0 0 4-6 8-12 8H45c-6 0-12-4-12-8z" fill="#A0703C" ${PZ_TRACO}/><path d="M47.5 16.5h25" stroke="#171717" stroke-width="3"/>` },
+    { id: "viking", nome: ["Capacete viking", "Viking helmet", "Casco vikingo"], topo: `<path d="M42 21c-6-1-10-7-9-14 3 5 7 7 12 7zM78 21c6-1 10-7 9-14-3 5-7 7-12 7z" fill="#FFF4DE" ${PZ_TRACO}/><path d="M41 27a19 17 0 0 1 38 0z" fill="#9AA3AE" ${PZ_TRACO}/><path d="M60 10v17" stroke="#171717" stroke-width="2.5"/>` },
+    { id: "laco", nome: ["Laço", "Bow", "Moño"], topo: `<path d="M57 15 46 8v14zM57 15l11-7v14z" fill="#FF7EB6" ${PZ_TRACO}/><circle cx="57" cy="15" r="3.4" fill="#FF7EB6" ${PZ_TRACO}/>` },
+  ] },
+  { id: "rosto", nome: ["Rosto", "Face", "Cara"], itens: [
+    { id: "oculos", nome: ["Óculos", "Glasses", "Lentes"], topo: `<circle cx="66" cy="30" r="7.5" fill="rgba(255,255,255,.3)" stroke="#171717" stroke-width="3"/><path d="M58.5 29 42 27" stroke="#171717" stroke-width="3" stroke-linecap="round"/>` },
+    { id: "escuros", nome: ["Óculos escuros", "Sunglasses", "Lentes de sol"], topo: `<path d="M57 25h18v5c0 4-3 7-7 7h-4c-4 0-7-3-7-7z" fill="#171717"/><path d="M58 26 42 24" stroke="#171717" stroke-width="3" stroke-linecap="round"/><path d="M60.5 28.5h5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" opacity=".75"/>` },
+    { id: "coracao", nome: ["Óculos de coração", "Heart glasses", "Lentes de corazón"], topo: `<path d="M66 38c-6-4-9.5-7.5-9.5-11a4.6 4.6 0 0 1 9.5-1.3 4.6 4.6 0 0 1 9.5 1.3c0 3.5-3.5 7-9.5 11z" fill="#FF4D3D" stroke="#171717" stroke-width="2.5" stroke-linejoin="round"/><path d="M57 27.5 42 26" stroke="#171717" stroke-width="3" stroke-linecap="round"/>` },
+    { id: "monoculo", nome: ["Monóculo", "Monocle", "Monóculo"], topo: `<path d="M66 37q-1 9-9 14" stroke="#171717" stroke-width="1.6" fill="none"/><circle cx="66" cy="30" r="7.5" fill="rgba(255,255,255,.3)" stroke="#171717" stroke-width="3"/><circle cx="66" cy="30" r="5.6" fill="none" stroke="#FFC93C" stroke-width="1.6"/>` },
+    { id: "mascara", nome: ["Máscara de herói", "Hero mask", "Antifaz de héroe"], topo: `<path fill-rule="evenodd" d="M42 24q18-6 35 0v11q-17-4-35 0zM60.5 30a5.5 4.6 0 1 0 11 0a5.5 4.6 0 1 0-11 0z" fill="#171717"/>` },
+    { id: "bigode", nome: ["Bigode", "Mustache", "Bigote"], topo: `<path d="M71 42c3-4.5 7.5-4.5 10-1 2.5-3.5 7-3.5 10 1-3 3.5-7.5 3-10 .5-2.5 2.5-7 3-10-.5z" fill="#171717"/>` },
+  ] },
+  { id: "roupa", nome: ["Roupa", "Outfit", "Ropa"], itens: [
+    { id: "cachecol", nome: ["Cachecol", "Scarf", "Bufanda"], pescoco: `<path d="M47 54l-5 15 8 1.5 3-14z" fill="#FF4D3D" ${PZ_TRACO}/><path d="M42 47q18 9 36 0l1 8q-19 10-38 0z" fill="#FF4D3D" ${PZ_TRACO}/><path d="M43.5 61.5l6 1M42.5 65.5l6 1" stroke="#FFF4DE" stroke-width="2"/>` },
+    { id: "gravata", nome: ["Gravata", "Tie", "Corbata"], pescoco: `<path d="M57.5 57h5l3 13-5.5 5-5.5-5z" fill="#3D7BFF" ${PZ_TRACO}/><path d="M55.5 52h9l-2 5.5h-5z" fill="#3D7BFF" ${PZ_TRACO}/>` },
+    { id: "borboleta", nome: ["Gravata-borboleta", "Bow tie", "Moño"], pescoco: `<path d="M60 55 49 49.5v11zM60 55l11-5.5v11z" fill="#FF4D3D" ${PZ_TRACO}/><circle cx="60" cy="55" r="2.8" fill="#FF4D3D" ${PZ_TRACO}/>` },
+    { id: "colar", nome: ["Corrente de ouro", "Gold chain", "Cadena de oro"], pescoco: `<path d="M44 49q16 13 32 0" fill="none" stroke="#171717" stroke-width="5.5" stroke-linecap="round"/><path d="M44 49q16 13 32 0" fill="none" stroke="#FFC93C" stroke-width="2.6" stroke-dasharray="2.5 1.5"/><circle cx="60" cy="59.5" r="4.5" fill="#FFC93C" ${PZ_TRACO}/>` },
+    { id: "listrada", nome: ["Camiseta listrada", "Striped shirt", "Camiseta a rayas"], corpo: `<g clip-path="url(#CLIP)"><rect y="57" width="100" height="43" fill="#FFF4DE"/><path d="M0 63h100M0 71h100M0 79h100M0 87h100" stroke="#FF4D3D" stroke-width="4"/></g>` },
+    { id: "camisa", nome: ["Camisa 10", "Number 10 shirt", "Camiseta 10"], corpo: `<g clip-path="url(#CLIP)"><rect y="57" width="100" height="43" fill="#2FBF71"/><path d="M0 59h100" stroke="#FFC93C" stroke-width="4"/><text x="22" y="84" font-family="Arial, sans-serif" font-size="17" font-weight="800" fill="#FFF4DE">10</text></g>` },
+    { id: "smoking", nome: ["Smoking", "Tuxedo", "Esmoquin"], corpo: `<g clip-path="url(#CLIP)"><rect y="57" width="100" height="43" fill="#171717"/><path d="M51 56h18l-9 17z" fill="#FFF4DE"/></g>`, pescoco: `<path d="M60 56.5 52 52.5v8zM60 56.5l8-4v8z" fill="#171717"/>` },
+    { id: "capa", nome: ["Capa de herói", "Hero cape", "Capa de héroe"], corpo: `<path d="M50 53C36 55 20 56 9 53c-4 11-3 25 5 34 6-13 16-21 27-25 6-2 9-6 9-9z" fill="#FF4D3D" ${PZ_TRACO}/>` },
+  ] },
+  { id: "asa", nome: ["Na asa", "In the wing", "En el ala"], itens: [
+    { id: "balao", nome: ["Balão", "Balloon", "Globo"], asa: `<path d="M40 66Q30 52 23 37" stroke="#171717" stroke-width="1.6" fill="none"/><ellipse cx="21" cy="23" rx="11" ry="13" fill="#FF4D3D" ${PZ_TRACO}/><path d="M21 36l-2.5 3h5z" fill="#FF4D3D" ${PZ_TRACO}/><path d="M15 17q2-4 6-5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity=".7"/>` },
+    { id: "bandeira", nome: ["Bandeira", "Flag", "Bandera"], asa: `<path d="M40 66 29 16" stroke="#171717" stroke-width="3" stroke-linecap="round"/><path d="M29.5 18 6 14l5 9-4 9 25.5 3z" fill="#2FBF71" ${PZ_TRACO}/><path d="M13 24l7-5 7 6-7 5z" fill="#FFC93C"/>` },
+    { id: "pirulito", nome: ["Pirulito", "Lollipop", "Paleta"], asa: `<path d="M40 66 30 36" stroke="#FFF4DE" stroke-width="3.5" stroke-linecap="round"/><path d="M40 66 30 36" stroke="#171717" stroke-width="1" stroke-linecap="round" opacity=".4"/><circle cx="28" cy="27" r="10" fill="#FF7EB6" ${PZ_TRACO}/><path d="M28 27a3 3 0 1 1 3 3 6 6 0 1 1-6-6" stroke="#FFF4DE" stroke-width="2.2" fill="none" stroke-linecap="round"/>` },
+    { id: "trofeu", nome: ["Troféu", "Trophy", "Trofeo"], asa: `<path d="M40 66 30 46" stroke="#171717" stroke-width="3" stroke-linecap="round"/><path d="M15 18h20v7c0 7-4.5 11-10 11s-10-4-10-11z" fill="#FFC93C" ${PZ_TRACO}/><path d="M15 21h-4c0 5 2 8 5 8M35 21h4c0 5-2 8-5 8" fill="none" ${PZ_TRACO}/><path d="M22 36h6v5h-6zM17 41h16v4H17z" fill="#FFC93C" ${PZ_TRACO}/>` },
+    { id: "microfone", nome: ["Microfone", "Microphone", "Micrófono"], asa: `<path d="M40 65 31 41" stroke="#171717" stroke-width="5" stroke-linecap="round"/><circle cx="28.5" cy="34" r="8" fill="#9AA3AE" ${PZ_TRACO}/><path d="M23.5 31h10M23 35h11" stroke="#171717" stroke-width="1.4" opacity=".5"/>` },
+  ] },
+];
+
+// Itens válidos do visual (o que vier do banco ou de outro aparelho passa por aqui).
+function patoItens(pato) {
+  if (!pato || typeof pato !== "object") return [];
+  return PZ_VISUAL.map((cat) => cat.itens.find((it) => it.id === pato[cat.id])).filter(Boolean);
+}
+
+// Só os ids que existem (para salvar e mandar para o banco).
+function patoLimpo(pato) {
+  const out = {};
+  PZ_VISUAL.forEach((cat) => {
+    if (pato && cat.itens.some((it) => it.id === pato[cat.id])) out[cat.id] = pato[cat.id];
+  });
+  return out;
+}
+
+function patoSorteado(rnd = Math.random) {
+  const out = {};
+  PZ_VISUAL.forEach((cat) => {
+    if (rnd() < 0.55) out[cat.id] = cat.itens[Math.floor(rnd() * cat.itens.length)].id;
+  });
+  return out;
+}
+
+const PATO_CORPO = "M10 52c4 1 9 4 14 4h40c13 0 24 8 24 20 0 9-8 16-20 16H38C20 92 8 80 8 64c0-5 .5-9 2-12z";
+let patoSvgN = 0;
+
+// Pato de perfil, olhando para a direita. mood: "" | "sad" | "happy". pato: o visual (chapéu, rosto, roupa, asa).
+function patoSvg(cor = PZ_CORES[0], mood = "", pato = null) {
   const c = typeof cor === "number" ? PZ_CORES[cor % PZ_CORES.length] : cor;
   const eye = mood === "sad"
     ? '<circle cx="66" cy="31" r="3.6" fill="#171717"/><path d="M59 24.5l11 3" stroke="#171717" stroke-width="3" stroke-linecap="round"/>'
     : mood === "happy"
       ? '<path d="M62 32q4 -5 8 0" stroke="#171717" stroke-width="3" fill="none" stroke-linecap="round"/>'
       : '<circle cx="66" cy="30" r="4" fill="#171717"/><circle cx="67.4" cy="28.6" r="1.3" fill="#fff"/>';
+  const itens = patoItens(pato);
+  const camada = (k) => itens.map((it) => (it[k] ? `<g data-item="${it.id}">${it[k]}</g>` : "")).join("");
+  const clip = "pzc" + (++patoSvgN);
+  const corpo = camada("corpo").replace(/CLIP/g, clip);
   return `<svg class="pato" viewBox="0 0 100 100" aria-hidden="true">
-    <path d="M10 52c4 1 9 4 14 4h40c13 0 24 8 24 20 0 9-8 16-20 16H38C20 92 8 80 8 64c0-5 .5-9 2-12z" fill="${c}" stroke="#171717" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="${PATO_CORPO}" fill="${c}"/>
+    ${corpo ? `<clipPath id="${clip}"><path d="${PATO_CORPO}"/></clipPath>${corpo}` : ""}
+    <path d="${PATO_CORPO}" fill="none" stroke="#171717" stroke-width="3.5" stroke-linejoin="round"/>
     <path d="M36 68c8-6 22-6 28 2-6 7-20 8-28-2z" fill="rgba(0,0,0,.14)"/>
+    ${camada("asa")}
     <circle cx="60" cy="34" r="20" fill="${c}" stroke="#171717" stroke-width="3.5"/>
+    ${camada("pescoco")}
     <path d="M77 30c6-2 13-1 17 2-2 6-10 8-17 6z" fill="#FF4D3D" stroke="#171717" stroke-width="3.5" stroke-linejoin="round"/>
     ${eye}
+    ${camada("topo")}
   </svg>`;
 }
 

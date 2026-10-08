@@ -99,14 +99,14 @@ Regras extras (ligadas por padrão, dá para desligar): **Dobrei** (chutar o dob
 
 **Online**: um cria a sala, manda o código ou o link (`patozi/?sala=CODIGO`), escolhe os temas, a duração e as regras, e começa. Quem recarrega a página volta para a partida; se alguém sai no meio, o computador joga por ele.
 
-**Perfil**: nome e cor do pato, estatísticas (partidas, vezes que escapou, vezes que foi o pato, "Nem a pato!" certeiros, patos recebidos, dobreis, Pato do dia), conta Gamezi (a mesma do Topzi) e "Mande uma carta", que guarda sugestões de perguntas, com o tema, no banco.
+**Perfil**: nome do pato e o guarda-roupa "Vista seu pato" (cor, chapéu, rosto, roupa e item na asa, que aparecem na partida, no resultado e na sala online), estatísticas (partidas, vezes que escapou, vezes que foi o pato, "Nem a pato!" certeiros, patos recebidos, dobreis, Pato do dia), conta Gamezi (a mesma do Topzi) e "Mande uma carta", que guarda sugestões de perguntas, com o tema, no banco.
 
 ## Arquivos do Patozi
 
 - `patozi/index.html` e `patozi/style.css`: telas e visual (mesmas cores, fonte e peças do Topzi)
-- `patozi/data/temas.js`: os 23 temas e a função que cadastra as cartas; `patozi/data/cartas-*.js`: as 573 cartas, em português, inglês e espanhol
+- `patozi/data/temas.js`: os 23 temas e a função que cadastra as cartas; `patozi/data/cartas-*.js`: as cartas, em português, inglês e espanhol (419 em jogo); `patozi/data/aposentadas.js`: as cartas óbvias demais, que ficam fora do sorteio (as cartas são recordes, pesos, alturas e quantidades que ninguém sabe de cabeça)
 - `patozi/js/jogo.js`: regras, computador e Pato do dia, sem tela (testado em `tests/patozi.test.js`)
-- `patozi/js/partida.js` (partida na tela), `diario.js` (Pato do dia), `online.js` (salas), `conta.js` (banco e perfil na conta), `visual.js` (ícones, o pato, som e confete), `textos.js` (os três idiomas), `app.js` (liga tudo)
+- `patozi/js/partida.js` (partida na tela), `diario.js` (Pato do dia), `online.js` (salas), `conta.js` (banco e perfil na conta), `guarda-roupa.js` (vestir o pato; os itens e o desenho ficam em `visual.js`), `visual.js` (ícones, o pato, som e confete), `textos.js` (os três idiomas), `app.js` (liga tudo)
 - As chaves do Supabase vêm do `topzi/js/config.js` (é o mesmo projeto)
 - Banco: tabelas `patozi_*` no `supabase/schema.sql`
 - Marca: `brand/patozi-logo*.svg`, `brand/patozi-simbolo*.svg` e `brand/patozi-og.png` (ver `brand.html`)

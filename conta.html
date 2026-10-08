@@ -256,7 +256,7 @@
       function pegar(tabela) {
         return sb.from(tabela).select("nick, data").eq("id", id).maybeSingle().then(function (r) { return r.data; }, function () { return null; });
       }
-      Promise.all([pegar("profiles"), pegar("patozi_perfis")]).then(function (linhas) {
+      Promise.all([pegar("topzi_perfis"), pegar("patozi_perfis")]).then(function (linhas) {
         if (!me || me.id !== id) return;
         var tz = linhas[0] && linhas[0].data && linhas[0].data.stats;
         var pz = linhas[1] && linhas[1].data && linhas[1].data.stats;

@@ -75,7 +75,14 @@ function nickOnline() {
 }
 
 function minhaLinha(codigo, nick) {
-  return { sala_code: codigo, user_id: me.id, nick, cor: minhaCor() };
+  return { sala_code: codigo, user_id: me.id, nick, cor: minhaCor(), pato: meuPato() };
+}
+
+// Entra na sala com o visual do pato. Banco ainda sem a coluna "pato" (schema.sql antigo): entra sem ele.
+async function inserirNaSala(linha) {
+  let { error } = await sb.from("patozi_sala_jogadores").insert(linha);
+  if (error && /pato/.test(error.message || "")) ({ error } = await sb.from("patozi_sala_jogadores").insert({ ...linha, pato: undefined }));
+  return { error };
 }
 
 async function criarSala() {
@@ -89,7 +96,7 @@ async function criarSala() {
     else if (error.code !== "23505") throw erroDoBanco(error);
   }
   if (!codigo) throw new Error(t("on.errNet"));
-  const { error } = await sb.from("patozi_sala_jogadores").insert(minhaLinha(codigo, nick));
+  const { error } = await inserirNaSala(minhaLinha(codigo, nick));
   if (error) throw erroDoBanco(error);
   sb.rpc("patozi_limpar_salas").then(() => {}, () => {});
   await entrarNaSala(codigo);
@@ -109,10 +116,10 @@ async function entrarComCodigo(bruto, silencioso = false) {
   if (!dentro) {
     if (r.status === "playing") throw new Error(t("on.errPlaying"));
     if (lista.length >= PZ_MAX_JOGADORES) throw new Error(t("on.errFull"));
-    const { error } = await sb.from("patozi_sala_jogadores").insert(minhaLinha(codigo, nick));
+    const { error } = await inserirNaSala(minhaLinha(codigo, nick));
     if (error) throw new Error(/cheia|full/i.test(error.message) ? t("on.errFull") : error.message);
   } else if (!silencioso) {
-    sb.from("patozi_sala_jogadores").update({ nick, cor: minhaCor() }).eq("sala_code", codigo).eq("user_id", me.id).then(() => {}, () => {});
+    sb.from("patozi_sala_jogadores").update({ nick, cor: minhaCor(), pato: meuPato() }).eq("sala_code", codigo).eq("user_id", me.id).then(() => {}, () => {});
   }
   await entrarNaSala(codigo);
 }
@@ -271,7 +278,7 @@ function renderSala() {
   const host = isHost();
   $("lobby-players").innerHTML = salaJogadores.map((p) => `
     <div class="lobby-player ${onlinePresente(p.user_id) ? "here" : ""}">
-      ${patoSvg(p.cor || 0)}
+      ${patoSvg(p.cor || 0, "", p.pato)}
       <b>${escapeHtml(p.nick)}${p.user_id === sala.host_id ? ` <small>· ${escapeHtml(t("lobby.host"))}</small>` : ""}${p.user_id === me.id ? ` <small>· ${escapeHtml(t("lobby.you"))}</small>` : ""}</b>
       <span class="dot"></span>
       ${host && p.user_id !== me.id ? `<button type="button" class="remove" data-tirar="${p.user_id}" title="${escapeHtml(t("lobby.kick"))}" aria-label="${escapeHtml(t("lobby.kick"))}">×</button>` : ""}
@@ -305,7 +312,7 @@ async function comecarOnline() {
   await atualizarSala();
   if (salaJogadores.length < 2) return renderSala();
   const cfg = { ...configSalva(), ...(sala.settings || {}) };
-  const lista = salaJogadores.map((p) => ({ id: p.user_id, nome: p.nick, cor: p.cor || 0, bot: false }));
+  const lista = salaJogadores.map((p) => ({ id: p.user_id, nome: p.nick, cor: p.cor || 0, pato: p.pato || null, bot: false }));
   modo = "online";
   partidaRegistrada = false;
   iniciarPartida(pzNovaPartida({ jogadores: lista, ...cfg }));

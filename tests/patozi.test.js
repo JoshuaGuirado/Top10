@@ -41,7 +41,26 @@ test("cartas: ids únicos, tema válido, patos de 1 a 3, resposta inteira e perg
     c.q.forEach((q) => assert.ok(typeof q === "string" && q.length > 10 && q.trim().endsWith("?") || /\)$/.test(q.trim()), `${c.id}: pergunta "${q}"`));
     if (c.ano) assert.ok(c.resposta >= 100 && c.resposta <= 2100, `${c.id}: ano estranho`);
   }
-  for (const t of temas) assert.ok(cartas.filter((c) => c.tema === t).length >= 15, `tema ${t} com poucas cartas`);
+  for (const t of temas) assert.ok(r(`pzCartasDosTemas(["${t}"]).length`) >= 15, `tema ${t} com poucas cartas ativas`);
+});
+
+test("cartas óbvias (aposentadas) existem, saem das partidas e, a partir do dia 2, do Pato do dia", () => {
+  const aposentadas = r("[...PZ_APOSENTADAS]");
+  assert.ok(aposentadas.length > 0);
+  for (const id of aposentadas) assert.ok(r(`!!pzCarta("${id}")`), `aposentada ${id} não existe`);
+  const ativas = new Set(r("pzCartasDosTemas([])"));
+  for (const id of aposentadas) assert.ok(!ativas.has(id), `${id} ainda entra nas partidas`);
+  for (let dia = 2; dia < 40; dia++) {
+    for (const id of r(`pzDiarioCartas(${dia})`)) assert.ok(!r(`PZ_APOSENTADAS.has("${id}")`), `dia ${dia}: ${id} é óbvia`);
+  }
+  assert.equal(JSON.stringify(r("pzDiarioCartas(1)")), JSON.stringify(["futebol-20", "brasil-4", "esporte-19", "jogos-1", "corpo-23"]), "o Pato do dia 1 não muda");
+});
+
+test("partida guarda o visual do pato de cada um", () => {
+  r(`var sv = pzNovaPartida({ jogadores: [{ id: "a", nome: "A", cor: 1, pato: { chapeu: "coroa" } }, { id: "b", nome: "B", cor: 2 }] }, pzRng(3));`);
+  assert.equal(r("sv.jogadores[0].pato.chapeu"), "coroa");
+  assert.equal(r("sv.jogadores[1].pato"), null);
+  assert.equal(r("pzPlacar(sv).find((l) => l.id === 'a').pato.chapeu"), "coroa");
 });
 
 test("perguntas não se repetem", () => {

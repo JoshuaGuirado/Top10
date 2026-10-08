@@ -25,8 +25,12 @@
   `conta.html?volta=<jogo>`. Jogo novo: carregar `../gamezi-conta.js`, pôr a pasta em `GAMEZI_JOGOS` e em `JOGOS` da `conta.html`.
 - Patozi: scripts comuns como no Topzi (ordem no fim do `patozi/index.html`); script novo também vai no `FILES` do
   `sw.js` com o caminho `patozi/…` (o `tests/patozi.test.js` acusa). Regras e computador ficam em `patozi/js/jogo.js`, sem tela.
+- Cartas do Patozi precisam ser **difíceis**: recorde, peso, altura, distância, quantidade que ninguém sabe de cabeça
+  (nada de "quantas patas tem a aranha" ou "quantas estrelas tem a bandeira"). As óbvias antigas ficam em
+  `patozi/data/aposentadas.js` (fora do sorteio; não apague linhas dos `cartas-*.js`, os ids mudariam).
 - Cartas novas do Patozi: arquivo novo em `patozi/data/` carregado depois dos outros, pergunta em português, inglês e
   espanhol, resposta inteira (ano com `"ano"` no fim) e uma linha nova em `PZ_DIARIO_POOLS` valendo a partir de amanhã.
   Número que muda com o tempo leva a data na pergunta ("até 2022").
+- Tabelas do banco sempre com o nome do jogo na frente: `topzi_*` (perfis, salas, sala_jogadores, partidas) e `patozi_*`.
 - O Patozi usa o mesmo Supabase do Topzi (chaves em `topzi/js/config.js`) e tabelas próprias `patozi_*`. Nunca mexa no
   `topzi/` por causa do Patozi.

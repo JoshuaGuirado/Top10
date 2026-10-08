@@ -68,7 +68,7 @@ const PZ_T = {
   "daily.you": ["você", "you", "tú"],
 
   "setup.title": ["Quem vai jogar?", "Who's playing?", "¿Quién va a jugar?"],
-  "setup.sub": ["De 2 a 10 jogadores. Toque no pato para trocar a cor.", "2 to 10 players. Tap the duck to change its color.", "De 2 a 10 jugadores. Toca el pato para cambiar el color."],
+  "setup.sub": ["De 2 a 10 jogadores. Toque no pato para trocar a cor; para vestir o seu, vá no Perfil.", "2 to 10 players. Tap the duck to change its color; dress yours up in your Profile.", "De 2 a 10 jugadores. Toca el pato para cambiar el color; para vestir el tuyo, ve al Perfil."],
   "setup.addHuman": ["+ Pessoa", "+ Person", "+ Persona"],
   "setup.addBot": ["+ Computador", "+ Computer", "+ Computadora"],
   "setup.name": ["Nome", "Name", "Nombre"],
@@ -183,6 +183,13 @@ const PZ_T = {
   "account.connected": ["Conta Gamezi: {email}. Suas estatísticas ficam salvas na conta.", "Gamezi account: {email}. Your stats are saved to your account.", "Cuenta Gamezi: {email}. Tus estadísticas se guardan en la cuenta."],
   "account.needSetup": ["O modo online ainda não foi configurado neste site.", "Online mode isn't set up on this site yet.", "El modo online aún no está configurado en este sitio."],
 
+  "closet.title": ["Vista seu pato", "Dress up your duck", "Viste a tu pato"],
+  "closet.sub": ["Seu visual aparece nas partidas, no resultado e na sala online.", "Your look shows up in games, results and online rooms.", "Tu look aparece en las partidas, en el resultado y en la sala online."],
+  "closet.color": ["Cor", "Color", "Color"],
+  "closet.colorN": ["Cor {n}", "Color {n}", "Color {n}"],
+  "closet.none": ["Nada", "None", "Nada"],
+  "closet.random": ["Sortear visual", "Random look", "Look al azar"],
+  "closet.clear": ["Tirar tudo", "Remove all", "Quitar todo"],
   "suggest.title": ["Mande uma carta", "Send us a card", "Envíanos una carta"],
   "suggest.sub": ["Tem uma pergunta boa com resposta em número (ex.: \"Quantos ossos tem o pé humano?\")? Mande para a gente. As melhores entram no jogo.", "Got a good question with a number for an answer (e.g. \"How many bones are in the human foot?\")? Send it in. The best ones make it into the game.", "¿Tienes una buena pregunta con respuesta numérica (ej.: \"¿Cuántos huesos tiene el pie humano?\")? Envíala. Las mejores entran en el juego."],
   "suggest.q": ["Sua pergunta", "Your question", "Tu pregunta"],

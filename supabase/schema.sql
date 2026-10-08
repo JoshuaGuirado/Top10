@@ -2,20 +2,42 @@
 -- Como usar: Supabase → SQL Editor → New query → cole tudo → Run. Pode rodar de novo sem problema.
 --
 -- A conta é do Gamezi: uma só (auth.users) para a plataforma e todos os jogos, com login em conta.html.
--- Cada jogo guarda o próprio perfil numa tabela dele (profiles no Topzi, patozi_perfis no Patozi).
+-- Cada jogo tem as próprias tabelas, sempre com o nome do jogo na frente (topzi_…, patozi_…).
 --
--- Tabelas:
---   profiles      perfil de cada jogador (nick, skin, estatísticas, recordes, lista do dia, listas criadas)
---   rooms         salas online (código de 5 letras, anfitrião, configurações e estado da partida)
---   room_players  quem está em cada sala
---   matches       histórico das partidas online (cada um vê só as suas)
+-- Tabelas do Topzi:
+--   topzi_perfis          perfil de cada jogador (nick, skin, estatísticas, recordes, lista do dia, listas criadas)
+--   topzi_salas           salas online (código de 5 letras, anfitrião, configurações e estado da partida)
+--   topzi_sala_jogadores  quem está em cada sala
+--   topzi_partidas        histórico das partidas online (cada um vê só as suas)
 --
 -- A partida em si roda no celular de quem criou a sala, e os lances passam pelo Realtime
 -- (broadcast e presence), que não precisa de tabela.
 
--- ───────────── tabelas ─────────────
+-- ───────────── nomes novos do Topzi ─────────────
+-- Até outubro de 2026 as tabelas do Topzi não tinham prefixo (profiles, rooms, room_players, matches).
+-- Se o banco ainda está com os nomes antigos, aqui eles são trocados sem perder nenhum dado.
 
-create table if not exists public.profiles (
+do $$
+declare
+  par text[];
+begin
+  foreach par slice 1 in array array[
+    ['profiles', 'topzi_perfis'], ['rooms', 'topzi_salas'], ['room_players', 'topzi_sala_jogadores'], ['matches', 'topzi_partidas']
+  ] loop
+    if exists (select 1 from pg_class c join pg_namespace n on n.oid = c.relnamespace
+               where n.nspname = 'public' and c.relname = par[1] and c.relkind = 'r')
+       and to_regclass('public.' || par[2]) is null then
+      execute format('alter table public.%I rename to %I', par[1], par[2]);
+    end if;
+  end loop;
+end $$;
+
+alter index if exists public.rooms_updated_idx rename to topzi_salas_updated_idx;
+alter index if exists public.matches_players_idx rename to topzi_partidas_players_idx;
+
+-- ───────────── tabelas do Topzi ─────────────
+
+create table if not exists public.topzi_perfis (
   id uuid primary key references auth.users (id) on delete cascade,
   nick text not null default '' check (char_length(nick) <= 16),
   avatar jsonb,
@@ -23,7 +45,7 @@ create table if not exists public.profiles (
   updated_at timestamptz not null default now()
 );
 
-create table if not exists public.rooms (
+create table if not exists public.topzi_salas (
   code text primary key check (code ~ '^[A-Z0-9]{5}$'),
   host_id uuid not null references auth.users (id) on delete cascade,
   status text not null default 'lobby' check (status in ('lobby', 'playing', 'finished')),
@@ -33,8 +55,8 @@ create table if not exists public.rooms (
   updated_at timestamptz not null default now()
 );
 
-create table if not exists public.room_players (
-  room_code text not null references public.rooms (code) on delete cascade,
+create table if not exists public.topzi_sala_jogadores (
+  room_code text not null references public.topzi_salas (code) on delete cascade,
   user_id uuid not null references auth.users (id) on delete cascade,
   nick text not null check (char_length(nick) between 1 and 16),
   avatar jsonb,
@@ -43,7 +65,7 @@ create table if not exists public.room_players (
   primary key (room_code, user_id)
 );
 
-create table if not exists public.matches (
+create table if not exists public.topzi_partidas (
   id bigint generated always as identity primary key,
   room_code text not null,
   list_id text,
@@ -53,8 +75,8 @@ create table if not exists public.matches (
   created_at timestamptz not null default now()
 );
 
-create index if not exists matches_players_idx on public.matches using gin (players jsonb_path_ops);
-create index if not exists rooms_updated_idx on public.rooms (updated_at);
+create index if not exists topzi_partidas_players_idx on public.topzi_partidas using gin (players jsonb_path_ops);
+create index if not exists topzi_salas_updated_idx on public.topzi_salas (updated_at);
 
 -- ───────────── regras automáticas ─────────────
 
@@ -65,107 +87,126 @@ begin
   return new;
 end $$;
 
-drop trigger if exists rooms_updated on public.rooms;
-create trigger rooms_updated before update on public.rooms
+drop trigger if exists rooms_updated on public.topzi_salas;
+drop trigger if exists topzi_salas_updated on public.topzi_salas;
+create trigger topzi_salas_updated before update on public.topzi_salas
   for each row execute function public.tocar_updated_at();
 
-drop trigger if exists profiles_updated on public.profiles;
-create trigger profiles_updated before update on public.profiles
+drop trigger if exists profiles_updated on public.topzi_perfis;
+drop trigger if exists topzi_perfis_updated on public.topzi_perfis;
+create trigger topzi_perfis_updated before update on public.topzi_perfis
   for each row execute function public.tocar_updated_at();
 
 -- No máximo 8 jogadores por sala.
-create or replace function public.limitar_jogadores()
+create or replace function public.topzi_limitar_jogadores()
 returns trigger language plpgsql as $$
 begin
-  if (select count(*) from public.room_players where room_code = new.room_code) >= 8 then
+  if (select count(*) from public.topzi_sala_jogadores where room_code = new.room_code) >= 8 then
     raise exception 'A sala está cheia (máximo de 8 jogadores).';
   end if;
   return new;
 end $$;
 
-drop trigger if exists room_players_limite on public.room_players;
-create trigger room_players_limite before insert on public.room_players
-  for each row execute function public.limitar_jogadores();
+drop trigger if exists room_players_limite on public.topzi_sala_jogadores;
+drop trigger if exists topzi_sala_jogadores_limite on public.topzi_sala_jogadores;
+create trigger topzi_sala_jogadores_limite before insert on public.topzi_sala_jogadores
+  for each row execute function public.topzi_limitar_jogadores();
+drop function if exists public.limitar_jogadores();
 
 -- Apaga salas paradas há mais de um dia (o site chama ao criar uma sala).
-create or replace function public.limpar_salas_antigas()
+create or replace function public.topzi_limpar_salas()
 returns void language sql security definer set search_path = public as $$
-  delete from public.rooms where updated_at < now() - interval '1 day';
+  delete from public.topzi_salas where updated_at < now() - interval '1 day';
 $$;
 
-grant execute on function public.limpar_salas_antigas() to authenticated;
+grant execute on function public.topzi_limpar_salas() to authenticated;
 
 -- ───────────── segurança (RLS) ─────────────
 -- Todo mundo entra logado: quem não conectou conta usa um login anônimo automático.
 
-alter table public.profiles enable row level security;
-alter table public.rooms enable row level security;
-alter table public.room_players enable row level security;
-alter table public.matches enable row level security;
+alter table public.topzi_perfis enable row level security;
+alter table public.topzi_salas enable row level security;
+alter table public.topzi_sala_jogadores enable row level security;
+alter table public.topzi_partidas enable row level security;
 
-drop policy if exists "perfil: ler o próprio" on public.profiles;
-create policy "perfil: ler o próprio" on public.profiles
+-- Regras com os nomes antigos (de antes do prefixo topzi): saem para dar lugar às de baixo.
+drop policy if exists "perfil: ler o próprio" on public.topzi_perfis;
+drop policy if exists "perfil: criar o próprio" on public.topzi_perfis;
+drop policy if exists "perfil: editar o próprio" on public.topzi_perfis;
+drop policy if exists "salas: ler" on public.topzi_salas;
+drop policy if exists "salas: criar como anfitrião" on public.topzi_salas;
+drop policy if exists "salas: anfitrião edita" on public.topzi_salas;
+drop policy if exists "salas: anfitrião apaga" on public.topzi_salas;
+drop policy if exists "jogadores: ler" on public.topzi_sala_jogadores;
+drop policy if exists "jogadores: entrar" on public.topzi_sala_jogadores;
+drop policy if exists "jogadores: editar a própria linha" on public.topzi_sala_jogadores;
+drop policy if exists "jogadores: sair ou ser removido" on public.topzi_sala_jogadores;
+drop policy if exists "partidas: ver as minhas" on public.topzi_partidas;
+drop policy if exists "partidas: anfitrião registra" on public.topzi_partidas;
+
+drop policy if exists "topzi perfil: ler o próprio" on public.topzi_perfis;
+create policy "topzi perfil: ler o próprio" on public.topzi_perfis
   for select to authenticated using (id = auth.uid());
 
-drop policy if exists "perfil: criar o próprio" on public.profiles;
-create policy "perfil: criar o próprio" on public.profiles
+drop policy if exists "topzi perfil: criar o próprio" on public.topzi_perfis;
+create policy "topzi perfil: criar o próprio" on public.topzi_perfis
   for insert to authenticated with check (id = auth.uid());
 
-drop policy if exists "perfil: editar o próprio" on public.profiles;
-create policy "perfil: editar o próprio" on public.profiles
+drop policy if exists "topzi perfil: editar o próprio" on public.topzi_perfis;
+create policy "topzi perfil: editar o próprio" on public.topzi_perfis
   for update to authenticated using (id = auth.uid()) with check (id = auth.uid());
 
 -- Salas: quem tem o código consegue ver; só o anfitrião cria, muda e apaga.
-drop policy if exists "salas: ler" on public.rooms;
-create policy "salas: ler" on public.rooms
+drop policy if exists "topzi salas: ler" on public.topzi_salas;
+create policy "topzi salas: ler" on public.topzi_salas
   for select to authenticated using (true);
 
-drop policy if exists "salas: criar como anfitrião" on public.rooms;
-create policy "salas: criar como anfitrião" on public.rooms
+drop policy if exists "topzi salas: criar como anfitrião" on public.topzi_salas;
+create policy "topzi salas: criar como anfitrião" on public.topzi_salas
   for insert to authenticated with check (host_id = auth.uid());
 
-drop policy if exists "salas: anfitrião edita" on public.rooms;
-create policy "salas: anfitrião edita" on public.rooms
+drop policy if exists "topzi salas: anfitrião edita" on public.topzi_salas;
+create policy "topzi salas: anfitrião edita" on public.topzi_salas
   for update to authenticated using (host_id = auth.uid()) with check (host_id = auth.uid());
 
-drop policy if exists "salas: anfitrião apaga" on public.rooms;
-create policy "salas: anfitrião apaga" on public.rooms
+drop policy if exists "topzi salas: anfitrião apaga" on public.topzi_salas;
+create policy "topzi salas: anfitrião apaga" on public.topzi_salas
   for delete to authenticated using (host_id = auth.uid());
 
 -- Jogadores: cada um entra e edita a própria linha; sai sozinho ou o anfitrião remove.
-drop policy if exists "jogadores: ler" on public.room_players;
-create policy "jogadores: ler" on public.room_players
+drop policy if exists "topzi jogadores: ler" on public.topzi_sala_jogadores;
+create policy "topzi jogadores: ler" on public.topzi_sala_jogadores
   for select to authenticated using (true);
 
-drop policy if exists "jogadores: entrar" on public.room_players;
-create policy "jogadores: entrar" on public.room_players
+drop policy if exists "topzi jogadores: entrar" on public.topzi_sala_jogadores;
+create policy "topzi jogadores: entrar" on public.topzi_sala_jogadores
   for insert to authenticated with check (
     user_id = auth.uid()
-    and exists (select 1 from public.rooms r where r.code = room_code and r.status <> 'playing')
+    and exists (select 1 from public.topzi_salas r where r.code = room_code and r.status <> 'playing')
   );
 
-drop policy if exists "jogadores: editar a própria linha" on public.room_players;
-create policy "jogadores: editar a própria linha" on public.room_players
+drop policy if exists "topzi jogadores: editar a própria linha" on public.topzi_sala_jogadores;
+create policy "topzi jogadores: editar a própria linha" on public.topzi_sala_jogadores
   for update to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
 
-drop policy if exists "jogadores: sair ou ser removido" on public.room_players;
-create policy "jogadores: sair ou ser removido" on public.room_players
+drop policy if exists "topzi jogadores: sair ou ser removido" on public.topzi_sala_jogadores;
+create policy "topzi jogadores: sair ou ser removido" on public.topzi_sala_jogadores
   for delete to authenticated using (
     user_id = auth.uid()
-    or exists (select 1 from public.rooms r where r.code = room_code and r.host_id = auth.uid())
+    or exists (select 1 from public.topzi_salas r where r.code = room_code and r.host_id = auth.uid())
   );
 
 -- Histórico: o anfitrião registra; cada um vê as partidas em que jogou.
-drop policy if exists "partidas: ver as minhas" on public.matches;
-create policy "partidas: ver as minhas" on public.matches
+drop policy if exists "topzi partidas: ver as minhas" on public.topzi_partidas;
+create policy "topzi partidas: ver as minhas" on public.topzi_partidas
   for select to authenticated using (
     players @> jsonb_build_array(jsonb_build_object('uid', auth.uid()::text))
   );
 
-drop policy if exists "partidas: anfitrião registra" on public.matches;
-create policy "partidas: anfitrião registra" on public.matches
+drop policy if exists "topzi partidas: anfitrião registra" on public.topzi_partidas;
+create policy "topzi partidas: anfitrião registra" on public.topzi_partidas
   for insert to authenticated with check (
-    exists (select 1 from public.rooms r where r.code = room_code and r.host_id = auth.uid())
+    exists (select 1 from public.topzi_salas r where r.code = room_code and r.host_id = auth.uid())
   );
 
 -- ═════════════════════════════ Patozi ═════════════════════════════
@@ -228,6 +269,10 @@ create table if not exists public.patozi_sala_jogadores (
   joined_at timestamptz not null default now(),
   primary key (sala_code, user_id)
 );
+
+-- Visual do pato (chapéu, rosto, roupa, item na asa) de quem está na sala. Entrou depois: add column if not exists.
+alter table public.patozi_sala_jogadores add column if not exists pato jsonb
+  check (pato is null or (jsonb_typeof(pato) = 'object' and octet_length(pato::text) <= 300));
 
 create table if not exists public.patozi_partidas (
   id bigint generated always as identity primary key,
@@ -360,15 +405,14 @@ create policy "patozi partidas: anfitrião registra" on public.patozi_partidas
     exists (select 1 from public.patozi_salas s where s.code = sala_code and s.host_id = auth.uid())
   );
 
--- ═════════════════════════════ Gamezi: nomes e visões ═════════════════════════════
--- As tabelas do Topzi ficaram sem prefixo (ele foi o primeiro jogo). Em vez de renomear (quebraria o site no ar),
--- cada tabela ganha uma descrição dizendo de qual jogo é; ela aparece no painel do Supabase (Description).
+-- ═════════════════════════════ Gamezi: descrições e visões ═════════════════════════════
+-- Cada tabela tem uma descrição dizendo de qual jogo é; ela aparece no painel do Supabase (Description).
 
-comment on table public.profiles is 'Topzi: perfil de cada conta (nick, skin, estatísticas, recordes, listas criadas)';
-comment on table public.rooms is 'Topzi: salas online';
-comment on table public.room_players is 'Topzi: jogadores de cada sala online';
-comment on table public.matches is 'Topzi: histórico das partidas online';
-comment on table public.patozi_perfis is 'Patozi: perfil de cada conta (nick, cor do pato, estatísticas)';
+comment on table public.topzi_perfis is 'Topzi: perfil de cada conta (nick, skin, estatísticas, recordes, listas criadas)';
+comment on table public.topzi_salas is 'Topzi: salas online';
+comment on table public.topzi_sala_jogadores is 'Topzi: jogadores de cada sala online';
+comment on table public.topzi_partidas is 'Topzi: histórico das partidas online';
+comment on table public.patozi_perfis is 'Patozi: perfil de cada conta (nick, cor e visual do pato, estatísticas)';
 comment on table public.patozi_diario is 'Patozi: resultado de cada um no Pato do dia (ranking)';
 comment on table public.patozi_sugestoes is 'Patozi: cartas enviadas pelos jogadores';
 comment on table public.patozi_salas is 'Patozi: salas online';
@@ -380,9 +424,9 @@ comment on table public.patozi_partidas is 'Patozi: histórico das partidas onli
 drop view if exists public.gamezi_salas;
 create view public.gamezi_salas with (security_invoker = true) as
   select 'topzi'::text as jogo, r.code as codigo, r.status, r.host_id as anfitriao,
-         (select count(*) from public.room_players p where p.room_code = r.code) as jogadores,
+         (select count(*) from public.topzi_sala_jogadores p where p.room_code = r.code) as jogadores,
          r.created_at as criada_em, r.updated_at as atualizada_em
-    from public.rooms r
+    from public.topzi_salas r
   union all
   select 'patozi'::text, s.code, s.status, s.host_id,
          (select count(*) from public.patozi_sala_jogadores j where j.sala_code = s.code),
@@ -392,7 +436,7 @@ create view public.gamezi_salas with (security_invoker = true) as
 drop view if exists public.gamezi_jogadores_nas_salas;
 create view public.gamezi_jogadores_nas_salas with (security_invoker = true) as
   select 'topzi'::text as jogo, p.room_code as sala, p.nick, p.user_id, p.joined_at as entrou_em
-    from public.room_players p
+    from public.topzi_sala_jogadores p
   union all
   select 'patozi'::text, j.sala_code, j.nick, j.user_id, j.joined_at
     from public.patozi_sala_jogadores j;
@@ -401,3 +445,29 @@ comment on view public.gamezi_salas is 'Gamezi: salas online dos dois jogos (col
 comment on view public.gamezi_jogadores_nas_salas is 'Gamezi: quem está em cada sala, dos dois jogos (coluna jogo)';
 
 revoke all on public.gamezi_salas, public.gamezi_jogadores_nas_salas from anon, authenticated;
+
+-- ───────────── atalhos com os nomes antigos do Topzi (temporários) ─────────────
+-- Quem ainda está com o site antigo aberto continua jogando: profiles, rooms, room_players e matches viram
+-- visões que apontam para as tabelas novas (com as mesmas regras de segurança). Podem ser apagados quando
+-- todo mundo já estiver no site novo; o comando está em supabase/LEIAME.md.
+do $$
+declare
+  par text[];
+begin
+  foreach par slice 1 in array array[
+    ['profiles', 'topzi_perfis'], ['rooms', 'topzi_salas'], ['room_players', 'topzi_sala_jogadores'], ['matches', 'topzi_partidas']
+  ] loop
+    if to_regclass('public.' || par[1]) is null then
+      execute format('create view public.%I with (security_invoker = true) as select * from public.%I', par[1], par[2]);
+      execute format('comment on view public.%I is %L', par[1], 'Atalho temporário para ' || par[2] || ' (nome antigo do Topzi)');
+      execute format('grant select, insert, update, delete on public.%I to authenticated', par[1]);
+    end if;
+  end loop;
+end $$;
+
+create or replace function public.limpar_salas_antigas()
+returns void language sql security definer set search_path = public as $$
+  select public.topzi_limpar_salas();
+$$;
+
+grant execute on function public.limpar_salas_antigas() to authenticated;

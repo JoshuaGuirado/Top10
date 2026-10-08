@@ -23,7 +23,7 @@ function minhaCor() {
 function jogadoresSalvos() {
   const lista = store("jogadores");
   if (Array.isArray(lista) && lista.length >= 1) return lista;
-  return [{ nome: meuNome(), cor: minhaCor(), bot: false }, { nome: "", cor: 2, bot: true }, { nome: "", cor: 3, bot: true }];
+  return [{ nome: meuNome(), cor: minhaCor(), bot: false }, { nome: "", cor: 2, bot: true, pato: patoSorteado() }, { nome: "", cor: 3, bot: true, pato: patoSorteado() }];
 }
 
 let jogadores = jogadoresSalvos();
@@ -38,6 +38,11 @@ function nomePadrao(i) {
   const p = jogadores[i];
   if (p.bot) return t("setup.bot") + " " + (jogadores.slice(0, i + 1).filter((x) => x.bot).length);
   return i === 0 ? t("setup.you") : t("setup.player", { n: i + 1 });
+}
+
+// Visual do pato de cada um na tela de jogadores: o seu vem do Perfil; o computador sorteia o dele.
+function visualDe(p, i) {
+  return i === 0 && !p.bot ? meuPato() : p.pato || null;
 }
 
 function corLivre() {
@@ -57,7 +62,7 @@ function salvarJogadores() {
 function renderSetup() {
   $("player-list").innerHTML = jogadores.map((p, i) => `
     <div class="player-row" data-i="${i}">
-      <button type="button" class="duck-btn" data-act="cor" aria-label="${escapeHtml(t("setup.color"))}" title="${escapeHtml(t("setup.color"))}">${patoSvg(p.cor)}</button>
+      <button type="button" class="duck-btn" data-act="cor" aria-label="${escapeHtml(t("setup.color"))}" title="${escapeHtml(t("setup.color"))}">${patoSvg(p.cor, "", visualDe(p, i))}</button>
       <input value="${escapeHtml(p.nome || "")}" maxlength="16" placeholder="${escapeHtml(nomePadrao(i))}" aria-label="${escapeHtml(t("setup.name"))}">
       ${p.bot ? `<span class="tag">${UI_ICONS.bot}${escapeHtml(t("setup.botTag"))}</span>` : ""}
       <button type="button" class="remove" data-act="tirar" aria-label="${escapeHtml(t("setup.remove"))}" title="${escapeHtml(t("setup.remove"))}" ${jogadores.length <= 1 ? "disabled" : ""}>×</button>
@@ -95,7 +100,7 @@ function setupInput(e) {
 
 function addJogador(bot) {
   if (jogadores.length >= PZ_MAX_JOGADORES) return;
-  jogadores.push({ nome: "", cor: corLivre(), bot });
+  jogadores.push({ nome: "", cor: corLivre(), bot, pato: bot ? patoSorteado() : null });
   salvarJogadores();
   renderSetup();
   if (!bot) {
@@ -108,7 +113,7 @@ function addJogador(bot) {
 function renderOptions(el, cfg, nJogadores, editavel, onChange) {
   const todos = !cfg.temas.length;
   const dis = editavel ? "" : "disabled";
-  const nCartas = (id) => PZ_CARTAS.filter((c) => c.tema === id).length;
+  const nCartas = (id) => pzCartasDosTemas([id]).length;
   el.innerHTML = `
     <p class="opt-label">${escapeHtml(t("opt.themes"))}</p>
     <div class="chips">
@@ -156,6 +161,7 @@ function comecarLocal() {
     id: i === 0 && !p.bot ? "eu" : "j" + i,
     nome: (p.nome || "").trim().slice(0, 16) || nomePadrao(i),
     cor: p.cor,
+    pato: visualDe(p, i),
     bot: p.bot,
   }));
   modo = "local";
@@ -201,7 +207,7 @@ function renderScoreboard() {
   $("scoreboard").innerHTML = partida.jogadores.map((p, i) => {
     const ausente = modo === "online" && typeof onlinePresente === "function" && !onlinePresente(p.id);
     return `<div class="score-chip ${partida.fase === "lance" && i === partida.vez ? "current" : ""} ${ausente ? "away" : ""}">
-      ${patoSvg(p.cor)}
+      ${patoSvg(p.cor, "", p.pato)}
       <b>${escapeHtml(p.nome)}</b>
       <span title="${escapeHtml(tn("game.ducks", pzPatos(p)) + " · " + tn("game.cards", p.cartas.length))}">${PATO_MINI}${pzPatos(p)} · ${p.cartas.length}/${partida.config.meta}${p.dobreis ? ` · ${UI_ICONS.shield}${p.dobreis}` : ""}</span>
     </div>`;
@@ -246,7 +252,7 @@ function renderTurn() {
   if (controlo(i)) {
     const meu = modo === "online" || partida.jogadores.filter((x) => !x.bot).length === 1;
     box.innerHTML = `
-      <p class="turn-name">${patoSvg(p.cor)}${escapeHtml(t(meu ? "game.yourTurn" : "game.turnOf", { nome: p.nome }))}</p>
+      <p class="turn-name">${patoSvg(p.cor, "", p.pato)}${escapeHtml(t(meu ? "game.yourTurn" : "game.turnOf", { nome: p.nome }))}</p>
       <p class="turn-hint">${escapeHtml(u ? t("game.raise", { min: fmt(minimo, carta.ano) }) : t("game.first"))}</p>
       <form class="guess-row" id="guess-form">
         <input class="answer-input" id="guess" inputmode="numeric" autocomplete="off" placeholder="${escapeHtml(t("game.guessPh"))}" aria-label="${escapeHtml(t("game.guessPh"))}">
@@ -266,7 +272,7 @@ function renderTurn() {
   } else {
     const pensando = jogaComputador(i) || p.bot;
     box.innerHTML = `
-      <p class="turn-name">${patoSvg(p.cor)}${escapeHtml(t("game.turnOf", { nome: p.nome }))}</p>
+      <p class="turn-name">${patoSvg(p.cor, "", p.pato)}${escapeHtml(t("game.turnOf", { nome: p.nome }))}</p>
       <p class="thinking"><span class="dots"><i></i><i></i><i></i></span>${escapeHtml(t(pensando ? "game.thinking" : "game.waiting", { nome: p.nome }))}</p>`;
   }
 }
@@ -300,7 +306,7 @@ function renderReveal() {
     <p class="reveal-label">${escapeHtml(t("game.answerIs"))}</p>
     <p class="reveal-answer" id="answer-num">${fmt(r.resposta, carta.ano)}</p>
     <p class="verdict">${escapeHtml(veredito(r))}</p>
-    <span class="taker">${patoSvg(perdedor.cor, "sad")}${escapeHtml(tn("game.takes", r.patos, { nome: perdedor.nome }))}</span>
+    <span class="taker">${patoSvg(perdedor.cor, "sad", perdedor.pato)}${escapeHtml(tn("game.takes", r.patos, { nome: perdedor.nome }))}</span>
     <div class="actions center">${botao}</div>`;
   const topo = `<p class="reveal-call">${escapeHtml(t("game.called", { nome: nomeDe(r.desafiante) }))}</p><p class="reveal-shout">${escapeHtml(t("game.nemApato"))}</p>`;
   const ligar = () => {
@@ -418,7 +424,7 @@ function mostrarResultado() {
   const nomes = perdedores.map((l) => l.nome);
   const juntos = nomes.length > 1 ? nomes.slice(0, -1).join(", ") + t("res.and") + nomes[nomes.length - 1] : nomes[0];
   $("loser").innerHTML = `
-    <div class="loser-ducks">${perdedores.slice(0, 4).map((l) => patoSvg(l.cor, "sad")).join("")}</div>
+    <div class="loser-ducks">${perdedores.slice(0, 4).map((l) => patoSvg(l.cor, "sad", l.pato)).join("")}</div>
     <h2>${escapeHtml(nomes.length > 1 ? t("res.losers", { nomes: juntos }) : t("res.loser", { nome: juntos }))}</h2>
     <p>${escapeHtml(t("res.sub"))}</p>`;
   let lugar = 0;
@@ -428,7 +434,7 @@ function mostrarResultado() {
     anterior = l.patos;
     return `<div class="rank-row ${l.perdeu ? "lost" : ""}" style="--i:${k}">
       <span class="rank-place">${lugar}</span>
-      ${patoSvg(l.cor, l.perdeu ? "sad" : "happy")}
+      ${patoSvg(l.cor, l.perdeu ? "sad" : "happy", l.pato)}
       <div><b>${escapeHtml(l.nome)}</b><small>${escapeHtml(tn("game.cards", l.cartas))}${l.dobreis ? " · " + escapeHtml(tn("game.shields", l.dobreis)) : ""} · ${escapeHtml(l.perdeu ? t("res.duck") : t("res.won"))}</small></div>
       <span class="rank-ducks">${l.patos}${PATO_MINI}</span>
     </div>`;
