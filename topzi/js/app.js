@@ -156,8 +156,9 @@ $("theme-btn").addEventListener("click", () => {
 });
 
 // Instalar como app e jogar offline (só funciona com o site publicado, não abrindo o arquivo).
+// O service worker fica na raiz do Gamezi e cobre a plataforma e todos os jogos.
 if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
-  addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+  addEventListener("load", () => navigator.serviceWorker.register("../sw.js", { scope: "../" }).catch(() => {}));
 }
 
 // Como jogar: botão "?" no topo, link no rodapé e endereço #como-jogar (usado pelas páginas de termos).

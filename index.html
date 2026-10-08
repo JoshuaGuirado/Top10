@@ -3,430 +3,172 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Topzi · jogo de listas</title>
-  <meta name="description" content="Topzi, o jogo de listas: o óbvio vale 1, o difícil vale 10. Sozinho, com amigos ou online.">
+  <title>Gamezi · jogos para jogar com a turma</title>
+  <meta name="description" content="Gamezi: jogos rápidos para jogar sozinho, com amigos ou online, direto no navegador. Comece pelo Topzi, o jogo de listas.">
   <meta name="theme-color" content="#FFF4DE" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#171717" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="brand/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <script>try { var t = localStorage.getItem("tt:theme"); if (t) document.documentElement.dataset.theme = JSON.parse(t); } catch (e) {}</script>
-  <meta property="og:title" content="Topzi · jogo de listas">
-  <meta property="og:description" content="O óbvio vale 1. O difícil vale 10. Jogue sozinho, com amigos ou online.">
-  <meta property="og:image" content="brand/og-image.png">
+  <meta property="og:title" content="Gamezi · jogos para jogar com a turma">
+  <meta property="og:description" content="Jogos rápidos, direto no navegador. Comece pelo Topzi: o óbvio vale 1, o difícil vale 10.">
+  <meta property="og:image" content="https://top10-bay.vercel.app/brand/gamezi-og.png">
+  <script>
+    // Links antigos do Topzi apontavam para a raiz (convite de sala, lista compartilhada, login da conta):
+    // manda para o jogo com tudo o que veio no endereço.
+    (function () {
+      var s = location.search, h = location.hash;
+      if (/[?&](sala|code)=/.test(s) || /^#(lista=|como-jogar)/.test(h) || /access_token|error_description|type=recovery/.test(h)) {
+        location.replace("topzi/" + s + h);
+      }
+    })();
+    try { var t = localStorage.getItem("tt:theme"); if (t) document.documentElement.dataset.theme = JSON.parse(t); } catch (e) {}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&display=swap">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="gamezi.css">
 </head>
 <body>
-  <div class="topbar">
-    <button type="button" class="logo-btn" id="home-btn" data-i18n-aria="nav.home" aria-label="Início">
-      <img class="logo logo-light" src="brand/logo.svg" alt="Topzi">
-      <img class="logo logo-dark" src="brand/logo-dark.svg" alt="" aria-hidden="true">
-    </button>
-    <div class="topbar-actions">
-      <label class="lang-wrap"><span class="sr-only" data-i18n="nav.lang">Idioma</span>
-        <select id="lang-select" class="lang-select">
-          <option value="pt">PT</option><option value="en">EN</option><option value="es">ES</option>
-        </select>
-      </label>
-      <button type="button" class="icon-btn" id="help-btn" data-i18n-aria="help.title" aria-label="Como jogar" title="Como jogar"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.4-2.7 4"/><circle cx="12" cy="17.6" r=".6" fill="currentColor"/></svg></button>
-      <button type="button" class="icon-btn" id="theme-btn"></button>
-      <button type="button" class="icon-btn" id="sound-btn"></button>
-      <button type="button" class="profile-btn" id="profile-btn" data-i18n-aria="nav.profileOpen" aria-label="Abrir perfil"><span class="profile-btn-avatar" id="profile-btn-avatar"></span><span class="profile-btn-label" data-i18n="nav.profile">Perfil</span></button>
-    </div>
-  </div>
-
-  <main>
-    <!-- Início -->
-    <section id="screen-home" class="screen">
-      <div class="hero">
-        <img class="hero-symbol logo-light" src="brand/simbolo.svg" alt="" aria-hidden="true">
-        <img class="hero-symbol logo-dark" src="brand/simbolo-escuro.svg" alt="" aria-hidden="true">
-        <h1><span data-i18n="hero.line1">O óbvio vale 1.</span><span class="accent" data-i18n="hero.line2">O difícil vale 10.</span></h1>
-        <p class="lead" id="hero-lead"></p>
-        <div class="hero-actions">
-          <button type="button" class="btn big" id="start-btn" data-i18n="btn.play">Jogar</button>
-          <button type="button" class="btn big dark" id="online-btn" data-i18n="btn.online">Jogar online</button>
-          <button type="button" class="btn ghost" id="stats-btn" data-i18n="nav.profile">Perfil</button>
-        </div>
-      </div>
-      <div class="home-account">
-        <span class="home-account-ico"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c.9-3.8 3.9-6 7.5-6s6.6 2.2 7.5 6"/></svg></span>
-        <p class="small account-line"></p>
-        <button type="button" class="btn small account-btn" data-label="account.enter">Entrar ou criar conta</button>
-      </div>
-      <div class="daily" id="daily-card" hidden></div>
-      <ol class="rules">
-        <li><b class="n">1–8</b><p data-i18n="rules.1">Jogadores. Cada um com nickname e skin.</p></li>
-        <li><b class="n" data-i18n="rules.2n">Nº 8</b><p data-i18n="rules.2">Acertou o 8º da lista? Ganhou 8 pontos.</p></li>
-        <li><b class="n">50</b><p data-i18n="rules.3">No Top 50, o último item da lista vale 50 pontos.</p></li>
-        <li><b class="n">VS</b><p data-i18n="rules.4">Ou joguem juntos: a equipe contra a lista.</p></li>
-      </ol>
-      <footer class="site-foot">
-        <button type="button" class="link-btn" id="help-link" data-i18n="help.title">Como jogar</button>
-        <a href="termos.html" data-i18n="foot.terms">Termos de uso</a>
-        <a href="privacidade.html" data-i18n="foot.privacy">Privacidade</a>
-        <span>© 2026 Topzi</span>
-      </footer>
-    </section>
-
-    <!-- Modos de jogo -->
-    <section id="screen-modes" class="screen" hidden>
-      <h2 data-i18n="modes.title">Escolha o modo</h2>
-      <p class="muted mode-intro" data-i18n="modes.intro">Três tamanhos de lista para disputar entre vocês, todo mundo junto contra a lista ou dois times frente a frente.</p>
-      <div class="mode-grid" id="mode-grid"></div>
-    </section>
-
-    <!-- Jogadores -->
-    <section id="screen-players" class="screen" hidden>
-      <div class="mode-bar"></div>
-      <h2 id="players-title">Quantos jogadores?</h2>
-      <div class="count-picker" id="count-picker"></div>
-      <p class="mode-label" id="mode-label"></p>
-      <div class="player-grid" id="player-grid"></div>
-      <div class="match-options">
-        <p class="ctrl-label" data-i18n="opt.timer">Tempo por vez</p>
-        <div class="chips" id="timer-chips"></div>
-        <p class="muted small" id="timer-help"></p>
-        <p class="ctrl-label" data-i18n="opt.lives">Vidas</p>
-        <div class="chips" id="lives-chips"></div>
-        <p class="muted small" id="lives-help"></p>
-      </div>
-      <div class="actions end">
-        <button type="button" class="btn" id="to-lists-btn" data-i18n="btn.chooseList">Escolher a lista</button>
-      </div>
-    </section>
-
-    <!-- Listas -->
-    <section id="screen-lists" class="screen" hidden>
-      <div class="mode-bar"></div>
-      <div class="lists-head">
-        <h2 data-i18n="lists.title">Escolha a lista</h2>
-        <div class="head-actions">
-          <button type="button" class="btn ghost" id="create-list-btn" data-i18n="btn.createList">Criar lista</button>
-          <button type="button" class="btn ghost" id="random-list-btn" data-i18n="btn.random">Sortear</button>
-        </div>
-      </div>
-      <input type="search" id="list-search" class="search" data-i18n-ph="lists.search" data-i18n-aria="lists.searchAria" placeholder="Pesquisar: copa, marvel, pokémon…" aria-label="Pesquisar listas" autocomplete="off">
-      <div class="chips" id="category-chips"></div>
-      <div class="chips sizes" id="size-chips"></div>
-      <p class="muted small" id="list-count"></p>
-      <div class="list-grid" id="list-grid"></div>
-    </section>
-
-    <!-- Criar lista -->
-    <section id="screen-editor" class="screen" hidden>
-      <form id="editor-form" autocomplete="off">
-        <h2 id="editor-title">Criar lista</h2>
-        <p class="muted" data-i18n="editor.intro">Monte seu próprio tema. Coloque do mais óbvio (vale 1 ponto) ao menos óbvio (vale mais).</p>
-        <label class="nick editor-name-label">
-          <span data-i18n="editor.name">Nome da lista</span>
-          <input type="text" id="editor-name" maxlength="120" data-i18n-ph="editor.namePh" placeholder="Ex.: Os 10 lanches favoritos da turma">
+  <div class="wrap">
+    <header class="top">
+      <a href="./" aria-label="Gamezi">
+        <img class="logo logo-light" src="brand/gamezi-logo.svg" alt="Gamezi">
+        <img class="logo logo-dark" src="brand/gamezi-logo-dark.svg" alt="" aria-hidden="true">
+      </a>
+      <div class="top-actions">
+        <label><span class="sr-only" data-t="lang">Idioma</span>
+          <select id="lang" class="lang-select"><option value="pt">PT</option><option value="en">EN</option><option value="es">ES</option></select>
         </label>
-        <p class="ctrl-label editor-size-label" data-i18n="editor.size">Tamanho</p>
-        <div class="chips" id="editor-sizes"></div>
-        <div class="editor-rows" id="editor-rows"></div>
-        <p class="feedback bad" id="editor-error" role="alert"></p>
-        <div class="actions">
-          <button type="submit" class="btn" data-i18n="editor.save">Salvar lista</button>
-          <button type="button" class="btn ghost" id="editor-cancel" data-i18n="btn.cancel">Cancelar</button>
-        </div>
-      </form>
-    </section>
-
-    <!-- Partida -->
-    <section id="screen-game" class="screen" hidden>
-      <div class="game-head">
-        <span class="tag" id="game-cat"></span>
-        <h2 id="game-title"></h2>
-        <p class="progress" id="progress"></p>
+        <button type="button" class="icon-btn" id="theme"></button>
       </div>
-      <div class="versus" id="versus" hidden></div>
-      <div class="scoreboard" id="scoreboard"></div>
+    </header>
 
-      <div class="turn" id="turn">
-        <div class="turn-avatar" id="turn-avatar"></div>
-        <div class="turn-info">
-          <p class="turn-label" id="turn-label">Vez de</p>
-          <p class="turn-name" id="turn-name"></p>
-        </div>
-        <div class="turn-timer" id="turn-timer" hidden><span></span><b></b></div>
-      </div>
-
-      <form id="guess-form" class="guess" autocomplete="off">
-        <input id="guess" type="text" placeholder="Seu palpite" data-i18n-aria="game.guessAria" aria-label="Palpite" enterkeyhint="send">
-        <button type="submit" class="btn" data-i18n="game.guessBtn">Chutar</button>
-      </form>
-      <div class="guess-actions">
-        <button type="button" class="link-btn" id="pass-btn" data-i18n="game.pass">Passar a vez</button>
-        <button type="button" class="link-btn" id="hint-btn" hidden>Dica (−1 vida)</button>
-        <button type="button" class="link-btn" id="end-btn" data-i18n="game.end">Encerrar partida</button>
-      </div>
-      <p id="feedback" class="feedback" role="status"></p>
-
-      <ol class="board" id="board"></ol>
-      <p class="muted small" id="wrong-guesses"></p>
-      <p class="muted small" id="source"></p>
-    </section>
-
-    <!-- Resultado -->
-    <section id="screen-results" class="screen" hidden>
-      <h2 class="center" id="results-title">Pódio</h2>
-      <p class="center results-sub" id="results-sub"></p>
-      <div class="podium" id="podium"></div>
-      <div class="highlights" id="highlights"></div>
-      <div class="results-table" id="results-table"></div>
-      <section class="late-contest" id="late-contest" hidden>
-        <h3 data-i18n="contest.title">Algum chute estava certo?</h3>
-        <p class="muted small" data-i18n="contest.help">Se a turma concordar que um chute valia (faltou um apelido na lista), escolha o item. Os pontos entram no placar e essa resposta passa a valer nas próximas partidas.</p>
-        <div class="contest-rows" id="late-contest-rows"></div>
+    <main>
+      <section class="hero">
+        <h1><span data-t="h1a">Jogos para jogar</span><span class="accent" data-t="h1b">com a turma.</span></h1>
+        <p class="lead" data-t="lead">Partidas rápidas, direto no navegador. Sozinho, no mesmo celular com os amigos ou cada um no seu, online.</p>
       </section>
-      <h3 data-i18n="results.fullList">A lista completa</h3>
-      <ol class="board final" id="final-board"></ol>
-      <div class="actions center">
-        <button type="button" class="btn" id="share-btn" hidden data-i18n="results.share">Compartilhar resultado</button>
-        <button type="button" class="btn" id="rematch-btn">Revanche (outra lista)</button>
-        <button type="button" class="btn ghost" id="new-players-btn" data-i18n="results.changePlayers">Trocar jogadores</button>
-        <button type="button" class="btn ghost" id="change-mode-btn" data-i18n="results.changeMode">Trocar modo</button>
-      </div>
-    </section>
 
-    <!-- Jogar online -->
-    <section id="screen-online" class="screen" hidden>
-      <h2 data-i18n="btn.online">Jogar online</h2>
-      <p class="muted" data-i18n="online.intro">Cada um no seu celular. Crie uma sala e mande o código (ou o link) para a turma.</p>
-      <div class="online-setup" id="online-setup" hidden>
-        <p data-i18n-html="online.setup"><b>O modo online ainda não foi configurado.</b> Ele usa o Supabase (gratuito): o passo a passo está em <code>supabase/LEIAME.md</code>.</p>
-      </div>
-      <div id="online-main">
-        <div class="online-me">
-          <button type="button" class="avatar-btn" id="online-avatar" data-i18n-aria="skin.change" aria-label="Trocar skin"></button>
-          <div class="online-me-info">
-            <label class="nick"><span data-i18n="online.nick">Seu nickname</span><input type="text" id="online-nick" maxlength="16" data-i18n-ph="nick.ph" placeholder="Como a turma te chama"></label>
-            <p class="small muted account-line"></p>
-            <button type="button" class="btn ghost small account-btn" data-label="account.connect">Conectar conta</button>
+      <h2 class="section-title" data-t="games">Jogos</h2>
+      <div class="games">
+        <a class="game" href="topzi/">
+          <div class="game-head">
+            <span class="game-icon">
+              <img class="logo-light" src="brand/simbolo.svg" alt="" aria-hidden="true">
+              <img class="logo-dark" src="brand/simbolo-escuro.svg" alt="" aria-hidden="true">
+            </span>
+            <div class="game-name">
+              <img class="logo-light" src="brand/logo.svg" alt="Topzi">
+              <img class="logo-dark" src="brand/logo-dark.svg" alt="" aria-hidden="true">
+              <p data-t="topziKind">Jogo de listas</p>
+            </div>
           </div>
-        </div>
-        <div class="online-grid">
-          <div class="online-box">
-            <h3 data-i18n="online.create">Criar sala</h3>
-            <p class="muted small" data-i18n="online.createHelp">Você escolhe o modo, o tempo e a lista, e começa quando todo mundo entrar.</p>
-            <button type="button" class="btn" id="create-room-btn" data-i18n="online.create">Criar sala</button>
+          <p class="game-desc" data-t="topziDesc">O óbvio vale 1, o difícil vale 10. Adivinhe os itens de listas de futebol, filmes, Bíblia, comida e muito mais.</p>
+          <div class="tags">
+            <span class="tag red" id="daily-tag"></span>
+            <span class="tag" data-t="tag1">1 a 8 jogadores</span>
+            <span class="tag" data-t="tag2">Online</span>
+            <span class="tag" data-t="tag3">+600 listas</span>
           </div>
-          <form class="online-box" id="join-form" autocomplete="off">
-            <h3 data-i18n="online.join">Entrar numa sala</h3>
-            <input type="text" id="join-code" class="code-input" maxlength="5" data-i18n-ph="online.codePh" data-i18n-aria="online.codeAria" placeholder="CÓDIGO" aria-label="Código da sala" autocapitalize="characters" spellcheck="false">
-            <button type="submit" class="btn" data-i18n="online.enter">Entrar</button>
-          </form>
-        </div>
-        <p class="feedback bad" id="online-error" role="alert"></p>
-      </div>
-    </section>
-
-    <!-- Sala de espera -->
-    <section id="screen-lobby" class="screen" hidden>
-      <div class="lobby-top">
-        <div>
-          <p class="ctrl-label" data-i18n="online.codeAria">Código da sala</p>
-          <p class="room-code" id="room-code"></p>
-        </div>
-        <button type="button" class="btn" id="room-share" data-i18n="lobby.invite">Convidar</button>
-      </div>
-      <h3><span data-i18n="lobby.players">Jogadores</span> <small class="muted" id="lobby-count"></small></h3>
-      <div class="lobby-players" id="lobby-players"></div>
-      <div class="lobby-settings" id="lobby-settings"></div>
-      <div class="lobby-suggestions" id="lobby-suggestions" hidden></div>
-      <p class="muted small" id="lobby-status"></p>
-      <div class="actions">
-        <button type="button" class="btn big" id="lobby-start" data-i18n="lobby.start">Começar partida</button>
-        <button type="button" class="btn ghost" id="lobby-leave" data-i18n="lobby.leave">Sair da sala</button>
-      </div>
-    </section>
-
-    <!-- Perfil -->
-    <section id="screen-profile" class="screen" hidden>
-      <div class="profile-head">
-        <button type="button" class="avatar-btn" id="profile-avatar" data-i18n-aria="skin.change" aria-label="Trocar skin"></button>
-        <div class="profile-info">
-          <p class="ctrl-label" data-i18n="nav.profile">Perfil</p>
-          <h2 id="profile-name"></h2>
-          <label class="nick"><span data-i18n="profile.nick">Nickname</span><input type="text" id="profile-nick" maxlength="16" data-i18n-ph="nick.ph" placeholder="Como a turma te chama"></label>
-          <p class="muted small" id="profile-skin"></p>
+          <span class="play" data-t="play">Jogar Topzi</span>
+        </a>
+        <div class="game soon">
+          <div class="game-head"><span class="game-icon" aria-hidden="true">?</span></div>
+          <h3 data-t="soonTitle">Novos jogos em breve</h3>
+          <p data-t="soonText">O Gamezi está crescendo. Os próximos jogos chegam aqui, com o mesmo jeito: rápido, para jogar junto e sem instalar nada.</p>
         </div>
       </div>
-      <div class="stats-account">
-        <p class="small account-line"></p>
-        <button type="button" class="btn ghost small account-btn" data-label="account.connect">Conectar conta</button>
-      </div>
-      <h3 data-i18n="profile.stats">Estatísticas</h3>
-      <p class="muted small" data-i18n="profile.statsHelp">Salvas neste aparelho e, com a conta conectada, também na conta.</p>
-      <div class="stats-tiles" id="stats-tiles"></div>
-      <p id="stats-best"></p>
-      <h3 data-i18n="profile.byMode">Partidas por modo</h3>
-      <div class="chips" id="stats-modes"></div>
-      <h3 data-i18n="profile.records">Recordes</h3>
-      <div class="records" id="stats-records"></div>
-      <h3 data-i18n="profile.online">Partidas online</h3>
-      <div class="records" id="stats-online"></div>
-      <div class="actions">
-        <button type="button" class="btn" id="stats-back" data-i18n="btn.backHome">Voltar ao início</button>
-        <button type="button" class="btn ghost" id="stats-reset" data-i18n="profile.reset">Zerar estatísticas</button>
-      </div>
-    </section>
-  </main>
 
-  <!-- Escolha de skin -->
-  <dialog id="avatar-dialog" class="avatar-dialog">
-    <form method="dialog" class="dialog-inner" id="avatar-form">
-      <div class="dialog-head">
-        <h2 id="avatar-dialog-title">Escolha sua skin</h2>
-        <button type="submit" value="cancel" class="text-btn" data-i18n="btn.close">Fechar</button>
-      </div>
-      <div class="tabs" id="avatar-tabs" role="tablist"></div>
-      <div id="avatar-presets" class="preset-grid"></div>
-      <div id="avatar-builder" class="builder" hidden>
-        <div class="builder-preview" id="builder-preview"></div>
-        <div>
-          <div class="chips builder-sections" id="builder-sections"></div>
-          <div class="builder-controls" id="builder-controls"></div>
-        </div>
-      </div>
-      <div class="dialog-foot" id="builder-foot" hidden>
-        <button type="button" class="btn ghost" id="builder-random" data-i18n="btn.random">Sortear</button>
-        <button type="button" class="btn" id="builder-save" data-i18n="skin.use">Usar esta skin</button>
-      </div>
-    </form>
-  </dialog>
-
-  <!-- Conta -->
-  <dialog id="account-dialog" class="avatar-dialog account-dialog">
-    <div class="dialog-inner">
-      <div class="dialog-head">
-        <h2 data-i18n="account.title">Sua conta</h2>
-        <form method="dialog"><button type="submit" class="text-btn" data-i18n="btn.close">Fechar</button></form>
-      </div>
-      <p id="account-status"></p>
-      <form id="account-form" class="account-form" novalidate>
-        <label class="nick"><span data-i18n="account.email">E-mail</span><input type="email" id="account-email" data-i18n-ph="account.emailPh" placeholder="voce@email.com" autocomplete="email"></label>
-        <label class="nick"><span data-i18n="account.password">Senha</span>
-          <span class="pass-wrap"><input type="password" id="account-password" minlength="6" data-i18n-ph="account.passwordPh" placeholder="Pelo menos 6 caracteres" autocomplete="current-password"><button type="button" class="pass-toggle" data-i18n="account.show">Mostrar</button></span>
-        </label>
-        <p class="muted small" data-i18n="account.help">Entre com e-mail e senha. Seu nickname, skin, estatísticas, recordes, lista do dia e listas criadas ficam salvos na conta.</p>
-        <div class="actions">
-          <button type="submit" class="btn" value="entrar" data-i18n="account.login">Entrar</button>
-          <button type="submit" class="btn ghost" value="criar" data-i18n="account.create">Criar conta</button>
-        </div>
-        <button type="button" class="link-btn account-forgot" id="account-forgot" data-i18n="account.forgot">Esqueci a senha</button>
-      </form>
-      <form id="password-form" class="account-form" hidden novalidate>
-        <label class="nick"><span data-i18n="account.newPassword">Nova senha</span>
-          <span class="pass-wrap"><input type="password" id="new-password" minlength="6" data-i18n-ph="account.passwordPh" placeholder="Pelo menos 6 caracteres" autocomplete="new-password"><button type="button" class="pass-toggle" data-i18n="account.show">Mostrar</button></span>
-        </label>
-        <div class="actions">
-          <button type="submit" class="btn" data-i18n="account.savePassword">Salvar senha</button>
-        </div>
-      </form>
-      <div class="actions account-logged" id="account-logged" hidden>
-        <button type="button" class="btn ghost" id="account-change-pass" data-i18n="account.changePassword">Trocar senha</button>
-        <button type="button" class="btn ghost" id="account-logout" data-i18n="account.logout">Sair da conta</button>
-      </div>
-      <p class="feedback" id="account-msg" role="status"></p>
-    </div>
-  </dialog>
-
-  <!-- Como jogar (abre sozinho na primeira visita; sem barra de rolagem à vista) -->
-  <dialog id="help-dialog" class="avatar-dialog help-dialog" aria-labelledby="help-title">
-    <div class="dialog-inner" tabindex="-1" autofocus>
-      <div class="dialog-head">
-        <h2 id="help-title" data-i18n="help.title">Como jogar</h2>
-        <form method="dialog"><button type="submit" class="text-btn" data-i18n="btn.close">Fechar</button></form>
-      </div>
-      <p data-i18n="help.intro">Descubra os itens de uma lista que está em ordem, do mais óbvio ao mais difícil. O número de cada item é a pontuação dele.</p>
-      <p class="help-list"><span class="tag" data-i18n="help.exCat">Geografia</span><b data-i18n="help.exTitle">Os 10 países mais populosos do mundo</b></p>
-
-      <ol class="board help-board"><li class="slot found"><span class="rank">1</span><span class="slot-name" data-i18n="help.exItem1">Índia</span><span class="pts">+1</span></li></ol>
-      <p data-i18n-html="help.ex1">Acertou o <b>nº 1</b>? Ganhou <b>1 ponto</b>. É o óbvio: quase todo mundo lembra.</p>
-
-      <ol class="board help-board" start="10"><li class="slot found"><span class="rank">10</span><span class="slot-name" data-i18n="help.exItem10">México</span><span class="pts">+10</span></li></ol>
-      <p data-i18n-html="help.ex10">O último é o mais difícil e vale mais: o <b>nº 10</b> vale <b>10 pontos</b>. No Top 50, o nº 50 vale 50.</p>
-
-      <ol class="board help-board" start="7"><li class="slot"><span class="rank">7</span><span class="slot-name"><span class="hidden-name"></span></span><span class="pts">7 pts</span></li></ol>
-      <p data-i18n-html="help.exHidden">Os itens que ninguém achou ficam <b>escondidos</b> até alguém acertar ou a partida acabar.</p>
-
-      <div class="help-guess"><span data-i18n="help.exWrong">Japão</span><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
-      <p data-i18n-html="help.exMiss">Chutou algo que <b>não está na lista</b>? Passa a vez sem pontos. Jogando com vidas, ainda perde uma.</p>
-
-      <ol class="board help-board" start="8"><li class="slot"><span class="rank">8</span><span class="slot-name"><span class="hint" data-i18n="help.exHint">B… · 10 letras</span></span><span class="pts">8 pts</span></li></ol>
-      <p data-i18n-html="help.exHintText">Com vidas, dá para trocar <b>uma vida por uma dica</b>: a primeira letra e o tamanho de um item.</p>
-
-      <ol class="board help-board" start="9"><li class="slot missed"><span class="rank">9</span><span class="slot-name" data-i18n="help.exItem9">Rússia</span><span class="pts">9 pts</span></li></ol>
-      <p data-i18n-html="help.exMissed">No fim, o que ninguém achou aparece <b>tracejado</b>. Na Equipe contra a lista, esses pontos vão para a lista.</p>
-
-      <h3 data-i18n="help.guessTitle">Vale do seu jeito</h3>
-      <p data-i18n="help.guess">Maiúsculas e acentos não importam, singular e plural valem igual, siglas e apelidos também (“EUA”, “BH”) e um errinho de digitação passa. Nas listas de frases, basta acertar a ideia principal.</p>
-
-      <h3 data-i18n="help.modesTitle">Modos</h3>
-      <ul class="help-modes">
-        <li data-i18n-html="help.modeTop"><b>Top 10, 30 e 50:</b> sozinho, 1v1 ou todos contra todos. Quem somar mais pontos vence.</li>
-        <li data-i18n-html="help.modeTeam"><b>Equipe contra a lista:</b> todos jogam juntos. A equipe vence se fizer mais da metade dos pontos.</li>
-        <li data-i18n-html="help.modeTimes"><b>Times:</b> Time Vermelho contra Time Preto. A vez alterna entre os times.</li>
+      <h2 class="section-title" data-t="howTitle">Como funciona</h2>
+      <ul class="points">
+        <li><b data-t="p1t">Sem instalar</b><p data-t="p1">Abre no navegador do celular ou do computador. Se quiser, dá para adicionar à tela inicial.</p></li>
+        <li><b data-t="p2t">Com a turma</b><p data-t="p2">Passe o celular de mão em mão ou crie uma sala online e mande o código.</p></li>
+        <li><b data-t="p3t">De graça</b><p data-t="p3">Sem anúncios e sem compras dentro do jogo.</p></li>
       </ul>
-      <p data-i18n="help.turn">Na sua vez, chute ou passe a vez. A partida acaba quando todos os itens aparecem, quando todo mundo passa seguido ou quando acabam as vidas.</p>
+    </main>
 
-      <h3 data-i18n="help.dailyTitle">Lista do dia e online</h3>
-      <p data-i18n="help.daily">Todo dia tem uma lista nova, igual para todo mundo, com 3 vidas e resultado para compartilhar. No “Jogar online”, cada um usa o próprio celular: crie uma sala e mande o código para a turma.</p>
-
-      <p class="help-foot"><a href="termos.html" data-i18n="foot.terms">Termos de uso</a><a href="privacidade.html" data-i18n="foot.privacy">Privacidade</a></p>
-    </div>
-  </dialog>
-
-  <!-- Suspense antes do resultado -->
-  <div class="reveal" id="reveal" hidden>
-    <div class="reveal-inner" id="reveal-inner" role="status"></div>
-    <p class="reveal-skip" data-i18n="reveal.skip">toque para pular</p>
+    <footer class="foot">
+      <a href="termos.html" data-t="terms">Termos de uso</a>
+      <a href="privacidade.html" data-t="privacy">Privacidade</a>
+      <span>© 2026 Gamezi</span>
+    </footer>
   </div>
 
-  <canvas id="fx" aria-hidden="true"></canvas>
+  <script>
+    // Textos do portal em [português, inglês, espanhol]. O idioma é o mesmo escolhido nos jogos (tt:lang).
+    var T = {
+      lang: ["Idioma", "Language", "Idioma"],
+      h1a: ["Jogos para jogar", "Games to play", "Juegos para jugar"],
+      h1b: ["com a turma.", "with your friends.", "con tus amigos."],
+      lead: ["Partidas rápidas, direto no navegador. Sozinho, no mesmo celular com os amigos ou cada um no seu, online.", "Quick games, right in your browser. Solo, passing one phone around, or everyone on their own phone, online.", "Partidas rápidas, directo en el navegador. Solo, en el mismo celular con amigos o cada uno en el suyo, online."],
+      games: ["Jogos", "Games", "Juegos"],
+      topziKind: ["Jogo de listas", "List game", "Juego de listas"],
+      topziDesc: ["O óbvio vale 1, o difícil vale 10. Adivinhe os itens de listas de futebol, filmes, Bíblia, comida e muito mais.", "The obvious is worth 1, the hard one is worth 10. Guess the items of lists about sports, movies, the Bible, food and much more.", "Lo obvio vale 1, lo difícil vale 10. Adivina los ítems de listas de fútbol, películas, la Biblia, comida y mucho más."],
+      daily: ["Lista do dia #{n}", "Daily list #{n}", "Lista del día #{n}"],
+      tag1: ["1 a 8 jogadores", "1 to 8 players", "1 a 8 jugadores"],
+      tag2: ["Online", "Online", "Online"],
+      tag3: ["+600 listas", "600+ lists", "+600 listas"],
+      play: ["Jogar Topzi", "Play Topzi", "Jugar Topzi"],
+      soonTitle: ["Novos jogos em breve", "More games coming soon", "Nuevos juegos muy pronto"],
+      soonText: ["O Gamezi está crescendo. Os próximos jogos chegam aqui, com o mesmo jeito: rápido, para jogar junto e sem instalar nada.", "Gamezi is growing. New games will show up here, in the same spirit: quick, made to play together, nothing to install.", "Gamezi está creciendo. Los próximos juegos llegan aquí, con el mismo estilo: rápidos, para jugar juntos y sin instalar nada."],
+      howTitle: ["Como funciona", "How it works", "Cómo funciona"],
+      p1t: ["Sem instalar", "Nothing to install", "Sin instalar"],
+      p1: ["Abre no navegador do celular ou do computador. Se quiser, dá para adicionar à tela inicial.", "Opens in your phone or computer browser. You can add it to your home screen if you like.", "Se abre en el navegador del celular o de la computadora. Si quieres, puedes agregarlo a la pantalla de inicio."],
+      p2t: ["Com a turma", "With friends", "Con amigos"],
+      p2: ["Passe o celular de mão em mão ou crie uma sala online e mande o código.", "Pass one phone around, or create an online room and share the code.", "Pasa el celular de mano en mano o crea una sala online y comparte el código."],
+      p3t: ["De graça", "Free", "Gratis"],
+      p3: ["Sem anúncios e sem compras dentro do jogo.", "No ads and no in-game purchases.", "Sin anuncios y sin compras dentro del juego."],
+      terms: ["Termos de uso", "Terms of use", "Términos de uso"],
+      privacy: ["Privacidade", "Privacy", "Privacidad"],
+      dark: ["Usar modo escuro", "Switch to dark mode", "Usar modo oscuro"],
+      light: ["Usar modo claro", "Switch to light mode", "Usar modo claro"],
+    };
+    var LANGS = ["pt", "en", "es"];
+    function load(k) { try { return JSON.parse(localStorage.getItem("tt:" + k)); } catch (e) { return null; } }
+    function save(k, v) { try { localStorage.setItem("tt:" + k, JSON.stringify(v)); } catch (e) {} }
+    var lang = load("lang");
+    if (LANGS.indexOf(lang) < 0) lang = LANGS.indexOf((navigator.language || "pt").slice(0, 2)) >= 0 ? navigator.language.slice(0, 2) : "pt";
+    function t(k) { return T[k][LANGS.indexOf(lang)]; }
 
-  <script src="data/listas.js"></script>
-  <script src="data/listas-mais.js"></script>
-  <script src="data/listas-grandes.js"></script>
-  <script src="data/listas-grandes-2.js"></script>
-  <script src="data/listas-extra.js"></script>
-  <script src="data/listas-grandes-3.js"></script>
-  <script src="data/listas-populares.js"></script>
-  <script src="data/traducoes.js"></script>
-  <script src="data/traducoes-titulos.js"></script>
-  <script src="data/traducoes-itens-1.js"></script>
-  <script src="data/traducoes-itens-2.js"></script>
-  <script src="data/traducoes-itens-3.js"></script>
-  <script src="data/traducoes-itens-4.js"></script>
-  <script src="data/traducoes-itens-5.js"></script>
-  <script src="data/traducoes-itens-6.js"></script>
-  <script src="data/traducoes-itens-7.js"></script>
-  <script src="data/traducoes-itens-8.js"></script>
-  <script src="data/traducoes-itens-9.js"></script>
-  <script src="data/traducoes-itens-10.js"></script>
-  <script src="js/icons.js"></script>
-  <script src="js/avatars.js"></script>
-  <script src="js/util.js"></script>
-  <script src="js/i18n.js"></script>
-  <script src="js/textos.js"></script>
-  <script src="js/match.js"></script>
-  <script src="js/efeitos.js"></script>
-  <script src="js/listas.js"></script>
-  <script src="js/modos.js"></script>
-  <script src="js/jogadores.js"></script>
-  <script src="js/skins.js"></script>
-  <script src="js/partida.js"></script>
-  <script src="js/resultado.js"></script>
-  <script src="js/estatisticas.js"></script>
-  <script src="js/diaria.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/online.js"></script>
-  <script src="js/app.js"></script>
+    // Número da lista do dia do Topzi (mesma conta de topzi/js/diaria.js).
+    function dailyNumber() {
+      var d = new Date();
+      return Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(2026, 9, 1)) / 864e5) + 1;
+    }
+
+    var ICONS = {
+      moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>',
+      sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg>',
+    };
+    function isDark() { return (document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark"; }
+
+    function render() {
+      document.documentElement.lang = { pt: "pt-BR", en: "en", es: "es" }[lang];
+      document.querySelectorAll("[data-t]").forEach(function (el) { el.textContent = t(el.dataset.t); });
+      document.getElementById("lang").value = lang;
+      var n = dailyNumber();
+      var tag = document.getElementById("daily-tag");
+      tag.hidden = n < 1;
+      tag.textContent = t("daily").replace("{n}", n);
+      var b = document.getElementById("theme");
+      b.innerHTML = ICONS[isDark() ? "sun" : "moon"];
+      b.title = t(isDark() ? "light" : "dark");
+      b.setAttribute("aria-label", b.title);
+    }
+    document.getElementById("lang").addEventListener("change", function (e) { lang = e.target.value; save("lang", lang); render(); });
+    document.getElementById("theme").addEventListener("click", function () {
+      var next = isDark() ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      save("theme", next);
+      render();
+    });
+    render();
+
+    if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+      addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+    }
+  </script>
 </body>
 </html>

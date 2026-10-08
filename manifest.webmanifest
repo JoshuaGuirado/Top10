@@ -1,7 +1,7 @@
 {
-  "name": "Topzi — jogo de listas",
-  "short_name": "Topzi",
-  "description": "Jogo de listas: o óbvio vale 1, o difícil vale 10. De 1 a 8 jogadores.",
+  "name": "Gamezi — jogos para jogar com a turma",
+  "short_name": "Gamezi",
+  "description": "Plataforma de jogos rápidos para jogar sozinho ou com a turma. Comece pelo Topzi, o jogo de listas.",
   "lang": "pt-BR",
   "start_url": "./",
   "scope": "./",

@@ -1,0 +1,98 @@
+/* Gamezi — plataforma de jogos. Mesmas cores e fonte do Topzi: vermelho, preto e creme. Ver brand.html */
+:root {
+  --accent: #FF4D3D; --accent-ink: #D93A2B; --accent-soft: #FFE1D4; --on-accent: #171717;
+  --bg: #FFF4DE; --surface: #F7E7C8; --fg: #171717; --muted: #6B6151; --line: #E8D5B0;
+  --r: 16px;
+  --font: "Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --accent-ink: #FF6B5D; --accent-soft: #3B1F1A;
+    --bg: #171717; --surface: #232120; --fg: #FFF4DE; --muted: #B5AA93; --line: #38342F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --accent-ink: #FF6B5D; --accent-soft: #3B1F1A;
+  --bg: #171717; --surface: #232120; --fg: #FFF4DE; --muted: #B5AA93; --line: #38342F;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); line-height: 1.45; min-height: 100vh; transition: background-color .25s, color .25s; }
+a { color: inherit; }
+.wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
+
+/* marca nos dois temas */
+.logo-dark { display: none !important; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .logo-light { display: none !important; }
+  :root:not([data-theme="light"]) .logo-dark { display: block !important; }
+}
+:root[data-theme="dark"] .logo-light { display: none !important; }
+:root[data-theme="dark"] .logo-dark { display: block !important; }
+
+/* topo */
+.top { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 14px 0; }
+.top .logo { height: 32px; width: auto; display: block; }
+.top-actions { display: flex; gap: 6px; align-items: center; }
+.lang-select {
+  appearance: none; font: inherit; font-weight: 700; font-size: .85rem; color: var(--fg);
+  background: var(--surface); border: 1.5px solid var(--line); border-radius: 999px; padding: .45rem .8rem; min-height: 40px; cursor: pointer;
+}
+.icon-btn {
+  display: inline-grid; place-items: center; width: 40px; height: 40px; padding: 0; cursor: pointer;
+  color: var(--fg); background: var(--surface); border: 1.5px solid var(--line); border-radius: 999px;
+}
+.icon-btn svg { width: 20px; height: 20px; }
+.lang-select:hover, .icon-btn:hover { border-color: var(--fg); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* abertura */
+.hero { padding: 36px 0 28px; }
+.hero h1 { margin: 0 0 18px; font-stretch: 75%; font-weight: 800; text-transform: uppercase; letter-spacing: -0.02em; line-height: .95; font-size: clamp(2.6rem, 11vw, 5.4rem); }
+.hero h1 span { display: block; }
+.hero h1 .accent { color: var(--accent); }
+.lead { color: var(--muted); font-size: 1.1rem; margin: 0; max-width: 46ch; }
+
+/* jogos */
+.section-title { font-stretch: 75%; font-weight: 800; font-size: 1.9rem; line-height: 1; margin: 32px 0 14px; }
+.games { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; }
+@media (max-width: 720px) { .games { grid-template-columns: 1fr; } }
+.game {
+  position: relative; display: grid; gap: 14px; align-content: start;
+  background: var(--surface); border: 2px solid transparent; border-radius: 22px; padding: 22px;
+  text-decoration: none; transition: border-color .15s, transform .15s;
+}
+a.game:hover { border-color: var(--accent); transform: translateY(-2px); }
+.game-head { display: flex; align-items: center; gap: 16px; }
+.game-icon { width: 76px; height: 76px; flex: none; border-radius: 20px; background: var(--bg); display: grid; place-items: center; }
+.game-icon img { width: 54px; height: auto; }
+.game-name img { height: 34px; width: auto; display: block; }
+.game-name p { margin: 6px 0 0; color: var(--muted); font-weight: 600; font-size: .95rem; }
+.game-desc { margin: 0; font-size: 1.05rem; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { background: var(--bg); border-radius: 999px; padding: 5px 11px; font-size: .8rem; font-weight: 700; }
+.tag.red { background: var(--accent-soft); color: var(--accent-ink); }
+.play { justify-self: start; background: var(--accent); color: var(--on-accent); border-radius: 999px; padding: 13px 34px; font-weight: 700; font-size: 1.05rem; }
+a.game:hover .play { filter: brightness(1.08); }
+.game.soon { background: transparent; border: 2px dashed var(--line); color: var(--muted); }
+.game.soon .game-icon { background: var(--surface); color: var(--muted); font-stretch: 75%; font-weight: 800; font-size: 2.4rem; }
+.game.soon h3 { margin: 0; color: var(--fg); font-stretch: 75%; font-weight: 800; font-size: 1.6rem; line-height: 1; }
+.game.soon p { margin: 0; }
+
+/* como funciona */
+.points { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+@media (max-width: 720px) { .points { grid-template-columns: 1fr; } }
+.points li { background: var(--surface); border-radius: var(--r); padding: 18px; }
+.points b { display: block; font-stretch: 75%; font-weight: 800; font-size: 1.5rem; line-height: 1; margin-bottom: 8px; color: var(--accent-ink); }
+.points p { margin: 0; font-size: .95rem; }
+
+/* rodapé */
+.foot { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 20px; margin: 48px 0 0; padding: 18px 0 40px; border-top: 1.5px solid var(--line); font-size: .88rem; }
+.foot a { color: var(--muted); font-weight: 600; text-underline-offset: 3px; }
+.foot a:hover { color: var(--fg); }
+.foot span { margin-left: auto; color: var(--muted); }
+@media (max-width: 480px) { .foot span { margin-left: 0; width: 100%; } .top .logo { height: 27px; } }

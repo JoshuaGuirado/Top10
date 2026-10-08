@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 434 108" role="img" aria-label="Gamezi">
+  <g fill="#FFF4DE" stroke="#FFF4DE" stroke-width="5" stroke-linejoin="round"><path d="M72.77 21.32 A40 50 0 1 0 80 50 L80 46 L44 46 L44 66 L52.61 66 A16 26 0 1 1 53.11 35.09 Z"/><path fill-rule="evenodd" d="M88 61 A32 39 0 1 0 152 61 A32 39 0 1 0 88 61 Z M110 61 A10 17 0 1 1 130 61 A10 17 0 1 1 110 61 Z"/><path d="M128 22 H152 V100 H128 Z"/><path d="M160 100 V0 H184 L204 46 L224 0 H248 V100 H224 V48 L212 76 H196 L184 48 V100 Z"/><path d="M256 0 H312 V22 H280 V39 H306 V61 H280 V78 H312 V100 H256 Z"/><path d="M402 0 H426 V100 H402 Z"/></g>
+  <path fill="#FF4D3D" stroke="#FF4D3D" stroke-width="5" stroke-linejoin="round" d="M322 0 H392 V22 L354 78 H394 V100 H320 V78 L358 22 H322 Z"/>
+</svg>

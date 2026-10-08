@@ -1,3 +1,9 @@
+# Gamezi
+
+Plataforma de jogos rápidos para jogar no navegador, sozinho ou com a turma. A raiz do site (`index.html`) é o portal do Gamezi, com a lista de jogos; cada jogo fica na própria pasta. O primeiro é o **Topzi**, em `topzi/`.
+
+Para adicionar um jogo novo: crie a pasta dele (`nomezi/`), ponha um cartão no `index.html` da raiz (e o texto nos três idiomas, no objeto `T`), inclua os arquivos no `sw.js` com o caminho da pasta e use as mesmas cores, fonte e o Z vermelho (ver `brand.html`).
+
 # Topzi
 
 Jogo de adivinhar listas para jogar sozinho ou com até 8 pessoas. Cada lista tem 10, 30 ou 50 itens em ordem, e o número do item é a pontuação: o nº 1 é o óbvio e vale 1 ponto, o último é o mais difícil e vale mais.
@@ -20,7 +26,7 @@ Na tela inicial também tem a **Lista do dia**: a mesma lista de 10 para todo mu
 
 ## Como jogar
 
-Abra o `index.html` no navegador. Não precisa instalar nada.
+Abra o `topzi/index.html` no navegador (ou o `index.html` da raiz, que é o portal do Gamezi). Não precisa instalar nada.
 
 1. Escolha o modo de jogo.
 2. Escolha de 1 a 8 jogadores (no modo Times, toque no time de cada um para trocar).
@@ -44,18 +50,21 @@ Na tela de listas, "Criar lista" monta uma lista sua de 10, 30 ou 50 itens, do m
 
 ## Arquivos
 
-- `index.html` e `style.css`: telas e visual
-- `data/`: categorias e as 624 listas (`listas-grandes*.js` têm as de 30 e 50; `listas-populares.js` tem a Bíblia e as listas mais procuradas de cada categoria)
-- `data/traducoes*.js`: títulos, fontes e itens das listas em inglês e espanhol (a resposta vale em qualquer idioma)
-- `js/`: o jogo, dividido por assunto
+Na raiz ficam o portal do Gamezi (`index.html`, `gamezi.css`), as páginas de texto (`termos.html`, `privacidade.html`, `brand.html`, `404.html`, com `docs.css`), o `sw.js`, o `manifest.webmanifest`, a pasta `brand/` e os testes. O jogo fica em `topzi/`:
+
+
+- `topzi/index.html` e `topzi/style.css`: telas e visual
+- `topzi/data/`: categorias e as 624 listas (`listas-grandes*.js` têm as de 30 e 50; `listas-populares.js` tem a Bíblia e as listas mais procuradas de cada categoria)
+- `topzi/data/traducoes*.js`: títulos, fontes e itens das listas em inglês e espanhol (a resposta vale em qualquer idioma)
+- `topzi/js/`: o jogo, dividido por assunto
   - `match.js`: comparação de palpites, dicas e sugestões do "Aceitar mesmo assim" (sem tela, por isso testado)
   - `partida.js`: vez, vidas, tempo e dicas · `resultado.js`: pódio e placares · `modos.js`, `jogadores.js`, `listas.js`, `diaria.js`, `estatisticas.js`
   - `util.js`, `efeitos.js` (som e confete), `skins.js`, `avatars.js`, `icons.js`, `app.js` (liga tudo)
-- `js/online.js` e `js/config.js`: modo online e conta (as chaves do Supabase vão no `config.js`)
+- `topzi/js/online.js` e `topzi/js/config.js`: modo online e conta (as chaves do Supabase vão no `config.js`)
 - `supabase/`: SQL do banco e passo a passo de configuração
-- `sw.js` e `manifest.webmanifest`: instalar como app e jogar offline
+- `sw.js` e `manifest.webmanifest` (na raiz): instalar o Gamezi como app e jogar offline
 - `tests/`: testes automáticos (`npm test`), que também rodam no GitHub a cada push, e o teste do online com duas abas e um Supabase falso (`npm run test:online`)
-- `brand/` e `brand.html`: logo TOPZI, símbolo 10, ícones (o Z da logo no preto, na aba e no app) e manual de identidade visual (logo, cores, tipografia, componentes, ícones e tom de voz) (vermelho `#FF4D3D`, preto `#171717`, creme `#FFF4DE`)
+- `brand/` e `brand.html`: logo GAMEZI (plataforma), logo TOPZI, símbolo 10, ícones (o Z da logo no preto, na aba e no app) e manual de identidade visual (logo, cores, tipografia, componentes, ícones e tom de voz) (vermelho `#FF4D3D`, preto `#171717`, creme `#FFF4DE`)
 - `termos.html` e `privacidade.html`: Termos de uso e Política de privacidade (LGPD), com o visual de `docs.css`
 - `404.html`, `robots.txt` e `sitemap.xml`: página de erro e arquivos para buscadores
 
@@ -63,11 +72,11 @@ Listas sem dado oficial (rankings de opinião e de popularidade) indicam "Curado
 
 ## Adicionar uma lista ao jogo
 
-Em um dos arquivos de `data/`, acrescente um bloco com `id`, `cat` (uma das categorias), `title`, `source` e 10, 30 ou 50 `items` em ordem. Cada item é uma string `"Nome|apelido|apelido"`; valores começando com `~` são palavras-chave que valem se aparecerem no palpite.
+Em um dos arquivos de `topzi/data/`, acrescente um bloco com `id`, `cat` (uma das categorias), `title`, `source` e 10, 30 ou 50 `items` em ordem. Cada item é uma string `"Nome|apelido|apelido"`; valores começando com `~` são palavras-chave que valem se aparecerem no palpite.
 
 Depois rode `npm test`: ele confere tamanho, categoria, ids repetidos e se alguma resposta vale para dois itens da mesma lista.
 
-Para o jogo em inglês e espanhol, acrescente o título traduzido em `data/traducoes-titulos.js` e, se algum item tiver outro nome nesses idiomas, a tradução em `data/traducoes-itens-*.js` (`"Nome": ["English|outra grafia", "Español"]`). O `npm test` avisa se faltar título ou se uma resposta traduzida valer para dois itens.
+Para o jogo em inglês e espanhol, acrescente o título traduzido em `topzi/data/traducoes-titulos.js` e, se algum item tiver outro nome nesses idiomas, a tradução em `topzi/data/traducoes-itens-*.js` (`"Nome": ["English|outra grafia", "Español"]`). O `npm test` avisa se faltar título ou se uma resposta traduzida valer para dois itens.
 
 ## Publicar
 

@@ -727,5 +727,7 @@ Object.assign(TEXTS, {
     "Cada día hay una lista nueva, igual para todos, con 3 vidas y un resultado para compartir. En “Jugar online”, cada uno usa su propio celular: crea una sala y manda el código al grupo.",
   ],
   "foot.terms": ["Termos de uso", "Terms of use", "Términos de uso"],
+  "foot.gamezi": ["Mais jogos no Gamezi", "More games on Gamezi", "Más juegos en Gamezi"],
+  "nav.gamezi": ["← Gamezi: todos os jogos", "← Gamezi: all games", "← Gamezi: todos los juegos"],
   "foot.privacy": ["Privacidade", "Privacy", "Privacidad"],
 });

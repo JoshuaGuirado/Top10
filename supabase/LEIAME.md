@@ -24,7 +24,7 @@ Isso cria `profiles` (perfis), `rooms` (salas), `room_players` (quem está em ca
 
 ## 4. Colocar as chaves no site
 1. **Project Settings → API** (ou **API Keys**): copie a **Project URL** e a chave **anon public** (ou **publishable**).
-2. Cole em [`js/config.js`](../js/config.js):
+2. Cole em [`topzi/js/config.js`](../topzi/js/config.js):
    ```js
    const SUPABASE_URL = "https://xxxxxxxx.supabase.co";
    const SUPABASE_ANON_KEY = "eyJhbGciOi...";
