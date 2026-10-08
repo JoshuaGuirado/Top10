@@ -309,15 +309,30 @@
         <form method="dialog"><button type="submit" class="text-btn" data-i18n="btn.close">Fechar</button></form>
       </div>
       <p id="account-status"></p>
-      <form id="account-form" class="account-form">
+      <form id="account-form" class="account-form" novalidate>
         <label class="nick"><span data-i18n="account.email">E-mail</span><input type="email" id="account-email" data-i18n-ph="account.emailPh" placeholder="voce@email.com" autocomplete="email"></label>
-        <p class="muted small" data-i18n="account.help">Sem senha: a gente manda um link para o seu e-mail. Seu nickname, skin, estatísticas, recordes, lista do dia e listas criadas ficam salvos na conta.</p>
+        <label class="nick"><span data-i18n="account.password">Senha</span>
+          <span class="pass-wrap"><input type="password" id="account-password" minlength="6" data-i18n-ph="account.passwordPh" placeholder="Pelo menos 6 caracteres" autocomplete="current-password"><button type="button" class="pass-toggle" data-i18n="account.show">Mostrar</button></span>
+        </label>
+        <p class="muted small" data-i18n="account.help">Entre com e-mail e senha. Seu nickname, skin, estatísticas, recordes, lista do dia e listas criadas ficam salvos na conta.</p>
         <div class="actions">
-          <button type="submit" class="btn" value="salvar" data-i18n="account.create">Criar conta</button>
-          <button type="submit" class="btn ghost" value="entrar" data-i18n="account.login">Já tenho conta: entrar</button>
+          <button type="submit" class="btn" value="entrar" data-i18n="account.login">Entrar</button>
+          <button type="submit" class="btn ghost" value="criar" data-i18n="account.create">Criar conta</button>
+        </div>
+        <button type="button" class="link-btn account-forgot" id="account-forgot" data-i18n="account.forgot">Esqueci a senha</button>
+      </form>
+      <form id="password-form" class="account-form" hidden novalidate>
+        <label class="nick"><span data-i18n="account.newPassword">Nova senha</span>
+          <span class="pass-wrap"><input type="password" id="new-password" minlength="6" data-i18n-ph="account.passwordPh" placeholder="Pelo menos 6 caracteres" autocomplete="new-password"><button type="button" class="pass-toggle" data-i18n="account.show">Mostrar</button></span>
+        </label>
+        <div class="actions">
+          <button type="submit" class="btn" data-i18n="account.savePassword">Salvar senha</button>
         </div>
       </form>
-      <button type="button" class="btn ghost" id="account-logout" hidden data-i18n="account.logout">Sair da conta</button>
+      <div class="actions account-logged" id="account-logged" hidden>
+        <button type="button" class="btn ghost" id="account-change-pass" data-i18n="account.changePassword">Trocar senha</button>
+        <button type="button" class="btn ghost" id="account-logout" data-i18n="account.logout">Sair da conta</button>
+      </div>
       <p class="feedback" id="account-msg" role="status"></p>
     </div>
   </dialog>

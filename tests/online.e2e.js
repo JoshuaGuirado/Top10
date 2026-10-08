@@ -119,6 +119,30 @@ const server = http.createServer((req, res) => {
   assert.equal(await A.evaluate(() => game.lives), await B.evaluate(() => game.lives));
   step("equipe contra a lista: erro e dica da convidada valem para todos");
 
+  // Conta com senha: cria, sai e entra de novo em outro "celular" sem abrir o e-mail.
+  const C = await page();
+  await C.goto(base);
+  await C.click(".home-account .account-btn");
+  await C.fill("#account-email", "lara@exemplo.com");
+  await C.fill("#account-password", "123");
+  await C.click('#account-form button[value="criar"]');
+  assert.match(await C.textContent("#account-msg"), /6 caracteres/);
+  await C.fill("#account-password", "segredo1");
+  await C.click('#account-form button[value="criar"]');
+  await C.waitForFunction(() => /criada/.test(document.getElementById("account-msg").textContent), null, { timeout: 5000 });
+  assert.match(await C.textContent("#account-status"), /lara@exemplo\.com/);
+  await C.click("#account-logout");
+  await C.click(".home-account .account-btn");
+  await C.fill("#account-email", "lara@exemplo.com");
+  await C.fill("#account-password", "errada1");
+  await C.click('#account-form button[value="entrar"]');
+  await C.waitForFunction(() => /errados/.test(document.getElementById("account-msg").textContent), null, { timeout: 5000 });
+  await C.fill("#account-password", "segredo1");
+  await C.click('#account-form button[value="entrar"]');
+  await C.waitForFunction(() => /entrou/.test(document.getElementById("account-msg").textContent), null, { timeout: 5000 });
+  assert.equal(await C.isVisible("#account-logout"), true);
+  step("conta com senha: cria, sai e entra de novo sem abrir o e-mail");
+
   assert.deepEqual(errors, []);
   console.log("\nTudo certo no modo online.");
   await browser.close();

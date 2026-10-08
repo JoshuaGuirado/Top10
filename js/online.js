@@ -68,6 +68,8 @@ async function connectOnline() {
     sb.auth.onAuthStateChange((event, session) => {
       setMe(session);
       renderAccount();
+      // Voltou pelo link de "Esqueci a senha": abre a conta pedindo a nova senha.
+      if (event === "PASSWORD_RECOVERY") setTimeout(() => openAccount("password"), 0);
       // O Supabase pede para não chamar o banco dentro deste aviso (pode travar o login):
       // o perfil é carregado logo depois, e só para quem conectou conta.
       if (me && !me.anon && (event === "SIGNED_IN" || event === "USER_UPDATED") && profileLoadedFor !== me.id) {
@@ -211,7 +213,7 @@ store.onWrite = (key) => {
   if (PROFILE_SYNC_KEYS.includes(key)) scheduleProfileSave();
 };
 
-// ───────────── conta (e-mail) ─────────────
+// ───────────── conta (e-mail e senha) ─────────────
 
 function accountLine() {
   if (!onlineConfigured()) return t("account.needSetup");
@@ -228,47 +230,107 @@ function renderAccount() {
   document.querySelectorAll(".home-account").forEach((el) => (el.hidden = !onlineConfigured()));
 }
 
-async function openAccount() {
-  $("account-msg").textContent = "";
-  $("account-msg").className = "feedback";
+// Janela da conta. mode: "form" (entrar/criar), "password" (nova senha) ou automático.
+async function openAccount(mode) {
+  const msg = $("account-msg");
+  msg.textContent = "";
+  msg.className = "feedback";
   try {
     await ensureOnline();
   } catch (e) {
-    $("account-msg").textContent = e.message;
+    msg.textContent = e.message;
   }
   const logged = me && !me.anon;
-  $("account-status").innerHTML = accountLine();
+  const newPassword = mode === "password" && logged;
+  $("account-status").innerHTML = newPassword ? t("account.recovery") : accountLine();
   $("account-form").hidden = logged;
-  $("account-logout").hidden = !logged;
-  $("account-dialog").showModal();
+  $("password-form").hidden = !newPassword;
+  $("account-logged").hidden = !logged || newPassword;
+  if (!$("account-dialog").open) $("account-dialog").showModal();
+  if (newPassword) $("new-password").focus();
 }
 
+function accountMessage(text, good) {
+  const msg = $("account-msg");
+  msg.className = "feedback" + (good ? " good" : " bad");
+  msg.textContent = text;
+}
+
+function readAccountForm() {
+  const email = $("account-email").value.trim();
+  const password = $("account-password").value;
+  if (!/^\S+@\S+\.\S+$/.test(email)) return accountMessage(t("account.errEmail"));
+  if (password.length < 6) return accountMessage(t("account.errPassword"));
+  return { email, password };
+}
+
+// Entrar ou criar conta com e-mail e senha. Criar a conta leva junto o que já está neste aparelho.
 async function accountSave(e) {
   e.preventDefault();
-  const email = $("account-email").value.trim();
-  const msg = $("account-msg");
-  if (!/^\S+@\S+\.\S+$/.test(email)) {
-    msg.textContent = t("account.errEmail");
-    return;
-  }
-  const login = e.submitter && e.submitter.value === "entrar";
+  const form = readAccountForm();
+  if (!form) return;
+  const create = e.submitter && e.submitter.value === "criar";
   try {
     await ensureOnline();
-    const redirect = siteUrl();
-    const res = login
-      ? await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: redirect } })
-      : await sb.auth.updateUser({ email }, { emailRedirectTo: redirect });
+    const res = create ? await sb.auth.signUp(form) : await sb.auth.signInWithPassword(form);
     if (res.error) {
-      const taken = /already|registered|exists/i.test(res.error.message);
-      msg.textContent = taken ? t("account.errTaken") : res.error.message;
-      return;
+      const m = res.error.message || "";
+      if (/already|registered|exists/i.test(m)) return accountMessage(t("account.errTaken"));
+      if (/invalid login|credentials/i.test(m)) return accountMessage(t("account.errLogin"));
+      if (/not confirmed/i.test(m)) return accountMessage(t("account.errConfirm"));
+      if (/password/i.test(m) && /least|short|weak/i.test(m)) return accountMessage(t("account.errPassword"));
+      return accountMessage(m);
     }
-    await saveProfileNow();
-    msg.className = "feedback good";
-    msg.textContent = t(login ? "account.sentLogin" : "account.sentCreate", { email });
+    if (!res.data.session) return accountMessage(t("account.needConfirm", { email: form.email }), true);
+    setMe(res.data.session);
+    profileLoadedFor = me.id;
+    await loadProfile();
+    renderAccount();
+    $("account-password").value = "";
+    await openAccount();
+    accountMessage(t(create ? "account.created" : "account.loggedIn"), true);
   } catch (err) {
-    msg.textContent = err.message;
+    accountMessage(err.message);
   }
+}
+
+// Esqueci a senha: o link do e-mail volta para o site já pedindo a nova senha.
+async function accountForgot() {
+  const email = $("account-email").value.trim();
+  if (!/^\S+@\S+\.\S+$/.test(email)) return accountMessage(t("account.errEmail"));
+  try {
+    await ensureOnline();
+    const res = await sb.auth.resetPasswordForEmail(email, { redirectTo: siteUrl() });
+    if (res.error) return accountMessage(res.error.message);
+    accountMessage(t("account.sentReset", { email }), true);
+  } catch (err) {
+    accountMessage(err.message);
+  }
+}
+
+async function accountNewPassword(e) {
+  e.preventDefault();
+  const password = $("new-password").value;
+  if (password.length < 6) return accountMessage(t("account.errPassword"));
+  try {
+    const res = await sb.auth.updateUser({ password });
+    if (res.error) return accountMessage(res.error.message);
+    $("new-password").value = "";
+    await openAccount();
+    accountMessage(t("account.passwordSaved"), true);
+  } catch (err) {
+    accountMessage(err.message);
+  }
+}
+
+function togglePassword(e) {
+  const btn = e.target.closest(".pass-toggle");
+  if (!btn) return;
+  const input = btn.previousElementSibling;
+  const show = input.type === "password";
+  input.type = show ? "text" : "password";
+  btn.dataset.i18n = show ? "account.hide" : "account.show";
+  btn.textContent = t(btn.dataset.i18n);
 }
 
 async function accountLogout() {

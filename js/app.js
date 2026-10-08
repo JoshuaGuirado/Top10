@@ -125,8 +125,12 @@ $("lobby-leave").addEventListener("click", () => {
   if (confirm(t(isHost() ? "confirm.closeRoom" : "confirm.leaveRoom"))) leaveRoom();
 });
 $("room-share").addEventListener("click", (e) => shareRoom(e.currentTarget));
-document.querySelectorAll(".account-btn").forEach((b) => b.addEventListener("click", openAccount));
+document.querySelectorAll(".account-btn").forEach((b) => b.addEventListener("click", () => openAccount()));
 $("account-form").addEventListener("submit", accountSave);
+$("account-forgot").addEventListener("click", accountForgot);
+$("password-form").addEventListener("submit", accountNewPassword);
+$("account-change-pass").addEventListener("click", () => openAccount("password"));
+$("account-dialog").addEventListener("click", togglePassword);
 $("account-logout").addEventListener("click", accountLogout);
 
 // Modo claro/escuro: começa seguindo o aparelho; o botão fixa a escolha.

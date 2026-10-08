@@ -103,7 +103,17 @@
   }
 
   const listeners = [];
-  const session = (id) => ({ user: { id, email: null, is_anonymous: true } });
+  const session = (id) => {
+    const email = Object.keys(users()).find((e) => users()[e].id === id) || null;
+    return { user: { id, email, is_anonymous: !email } };
+  };
+  // Contas com e-mail e senha (sem confirmação de e-mail, como no projeto configurado).
+  const users = () => JSON.parse(localStorage.getItem("__fakeusers") || "{}");
+  const signIn = (id) => {
+    sessionStorage.setItem("__fakeuid", id);
+    setTimeout(() => listeners.forEach((l) => l("SIGNED_IN", session(id))), 0);
+    return { data: { session: session(id), user: session(id).user }, error: null };
+  };
   const client = {
     from: (t) => new Query(t),
     rpc: () => Promise.resolve({ data: null, error: null }),
@@ -121,8 +131,26 @@
         return { data: { session: session(id) }, error: null };
       },
       onAuthStateChange(cb) { listeners.push(cb); return { data: { subscription: { unsubscribe() {} } } }; },
-      async updateUser() { return { data: {}, error: null }; },
-      async signInWithOtp() { return { data: {}, error: null }; },
+      async signUp({ email, password }) {
+        const all = users();
+        if (all[email]) return { data: {}, error: { message: "User already registered" } };
+        all[email] = { id: crypto.randomUUID(), password };
+        localStorage.setItem("__fakeusers", JSON.stringify(all));
+        return signIn(all[email].id);
+      },
+      async signInWithPassword({ email, password }) {
+        const u = users()[email];
+        if (!u || u.password !== password) return { data: {}, error: { message: "Invalid login credentials" } };
+        return signIn(u.id);
+      },
+      async resetPasswordForEmail() { return { data: {}, error: null }; },
+      async updateUser({ password } = {}) {
+        const id = sessionStorage.getItem("__fakeuid");
+        const all = users();
+        const email = Object.keys(all).find((e) => all[e].id === id);
+        if (password && email) { all[email].password = password; localStorage.setItem("__fakeusers", JSON.stringify(all)); }
+        return { data: { user: session(id).user }, error: null };
+      },
       async signOut() { sessionStorage.removeItem("__fakeuid"); return { error: null }; },
     },
   };

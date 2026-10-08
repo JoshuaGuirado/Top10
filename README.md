@@ -12,7 +12,7 @@ Jogo de adivinhar listas para jogar sozinho ou com até 8 pessoas. Cada lista te
 | **Equipe contra a lista** | 10, 30 ou 50 | Todos somam juntos; o que ninguém achar vira ponto da lista. A equipe vence se fizer mais da metade dos pontos. Cada chute errado custa uma vida (3 no Top 10, 6 no Top 30, 10 no Top 50), e dá para trocar uma vida por uma dica (primeira letra e tamanho de um item). |
 | **Times** | 10, 30 ou 50 | Time Vermelho × Time Preto (1v1 a 4v4). A vez alterna entre os times e cada ponto vai para o time de quem acertou. |
 
-**Jogar online**: cada um no próprio celular. Um cria a sala, manda o código ou o link, escolhe o modo, o tempo e a lista, e começa. Funciona em todos os modos (Top 10/30/50, Equipe contra a lista e Times). Usa o Supabase (gratuito): o passo a passo está em [`supabase/LEIAME.md`](supabase/LEIAME.md) e as tabelas em [`supabase/schema.sql`](supabase/schema.sql). Quem quiser pode **conectar a conta** com o e-mail para guardar perfil, skin, estatísticas e recordes.
+**Jogar online**: cada um no próprio celular. Um cria a sala, manda o código ou o link, escolhe o modo, o tempo e a lista, e começa. Funciona em todos os modos (Top 10/30/50, Equipe contra a lista e Times). Usa o Supabase (gratuito): o passo a passo está em [`supabase/LEIAME.md`](supabase/LEIAME.md) e as tabelas em [`supabase/schema.sql`](supabase/schema.sql). Quem quiser pode **conectar a conta** com e-mail e senha para guardar perfil, skin, estatísticas e recordes (tem "Esqueci a senha" e "Trocar senha").
 
 O botão **?** no topo abre o **Como jogar**, com exemplos de peças do quadro (abre sozinho na primeira visita; o endereço `/#como-jogar` também abre).
 
