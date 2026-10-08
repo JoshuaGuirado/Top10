@@ -35,5 +35,9 @@
   para rodar no Supabase: o banco calcula os pontos do Pato do dia com essas respostas (o `tests/patozi.test.js` acusa).
 - Rankings do dia (`topzi_diario`, `patozi_diario`) só recebem resultado pelas funções `*_registrar_diario` do banco.
 - Tabelas do banco sempre com o nome do jogo na frente: `topzi_*` (perfis, salas, sala_jogadores, partidas) e `patozi_*`.
+- Datazi (`datazi/`): scripts comuns, ordem no fim do `datazi/index.html`; script novo vai no `FILES` do `sw.js` com o caminho
+  `datazi/…` (o `tests/datazi.test.js` acusa). Acontecimento novo: no fim de `datazi/data/eventos.js` e linha nova em
+  `DZ_DIARIO_POOLS` valendo a partir de amanhã (o Datazi do dia 1 está fixado no teste).
+- Nível e conquistas (todos os jogos) ficam em `gamezi-conta.js`; jogo novo precisa entrar em `gameziDadosLocais`.
 - O Patozi usa o mesmo Supabase do Topzi (chaves em `topzi/js/config.js`) e tabelas próprias `patozi_*`. Nunca mexa no
   `topzi/` por causa do Patozi.

@@ -3,7 +3,7 @@
 // a sessão que o Supabase guarda neste navegador e, para entrar ou mexer na conta, mandam a pessoa
 // para conta.html com ?volta=<pasta do jogo>, que a traz de volta para o jogo depois do login.
 
-var GAMEZI_JOGOS = ["topzi", "patozi"];
+var GAMEZI_JOGOS = ["topzi", "patozi", "datazi"];
 
 // Sessão salva pelo Supabase neste navegador: { email, anon } ou null. Não precisa carregar a biblioteca.
 function gameziSessao() {

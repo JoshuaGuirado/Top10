@@ -106,6 +106,20 @@ Regras extras (ligadas por padrão, dá para desligar): **Dobrei** (chutar o dob
 
 **Tela inicial** (nos dois jogos, no jeito do Contexto e do Termo): uma frase, o desafio do dia com a semana (dá para jogar os dias que passaram tocando no dia), "Partida" e "Online". Idioma, tema e som ficam no ícone de Configurações.
 
+# Datazi
+
+Jogo de linha do tempo: coloque os acontecimentos na ordem em que aconteceram. A linha começa com um acontecimento e o ano; a cada rodada aparece outro, e você toca no lugar onde ele entra. Errou, perde uma vida (são 3), e ele vai para o lugar certo.
+
+**Datazi do dia**: os mesmos 8 acontecimentos para todo mundo, com a semana (dá para jogar os dias que passaram) e o resultado em quadradinhos para compartilhar. **Partida livre**: vai até errar 3 vezes, valendo recorde.
+
+- `datazi/data/eventos.js`: os acontecimentos (`[ano, "português", "English", "español"]`); novos entram no fim, com uma linha nova em `DZ_DIARIO_POOLS` (`datazi/js/jogo.js`) valendo a partir de amanhã
+- `datazi/js/jogo.js`: regras, sem tela (testado em `tests/datazi.test.js`); `textos.js` (três idiomas); `app.js` (telas)
+- Marca: `brand/datazi-logo*.svg` e `brand/datazi-simbolo*.svg`
+
+## Nível e conquistas do Gamezi
+
+`gamezi-conta.js` soma o que se joga em todos os jogos (partidas, desafios do dia, acertos) em XP e nível, e confere 12 conquistas. Algumas liberam itens do guarda-roupa do pato. Aparecem na página da conta e no portal (testado em `tests/gamezi.test.js`).
+
 ## Arquivos do Patozi
 
 - `patozi/index.html` e `patozi/style.css`: telas e visual (mesmas cores, fonte e peças do Topzi)

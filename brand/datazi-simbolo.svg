@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Datazi">
+  <rect fill="#171717" x="10" y="18" width="80" height="72" rx="14"/>
+  <path fill="#FF4D3D" d="M24 18 H76 A14 14 0 0 1 90 32 V40 H10 V32 A14 14 0 0 1 24 18 Z"/>
+  <rect fill="#171717" x="27" y="8" width="10" height="20" rx="5"/>
+  <rect fill="#171717" x="63" y="8" width="10" height="20" rx="5"/>
+  <path fill="none" stroke="#FFF4DE" stroke-width="6" stroke-linecap="round" d="M26 65 H74"/>
+  <circle fill="#FFF4DE" cx="27" cy="65" r="7.5"/>
+  <circle fill="#FF4D3D" cx="50" cy="65" r="9.5"/>
+  <circle fill="#FFF4DE" cx="73" cy="65" r="7.5"/>
+</svg>

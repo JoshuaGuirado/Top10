@@ -2,7 +2,7 @@
 // Cada jogo fica numa pasta (topzi/…, patozi/…); os arquivos dele entram na lista com o caminho da pasta.
 // Online, busca sempre a versão nova (rede primeiro); sem internet, usa a cópia guardada.
 
-const CACHE = "gamezi-v10";
+const CACHE = "gamezi-v11";
 const FILES = [
   "./",
   "index.html",
@@ -85,6 +85,17 @@ const FILES = [
   "brand/patozi-logo-dark.svg",
   "brand/patozi-simbolo.svg",
   "brand/patozi-simbolo-escuro.svg",
+  "datazi/",
+  "datazi/index.html",
+  "datazi/style.css",
+  "datazi/data/eventos.js",
+  "datazi/js/jogo.js",
+  "datazi/js/textos.js",
+  "datazi/js/app.js",
+  "brand/datazi-logo.svg",
+  "brand/datazi-logo-dark.svg",
+  "brand/datazi-simbolo.svg",
+  "brand/datazi-simbolo-escuro.svg",
 ];
 
 self.addEventListener("install", (e) => {
@@ -118,7 +129,7 @@ self.addEventListener("fetch", (e) => {
       .catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => {
         if (hit) return hit;
         if (req.mode !== "navigate") return Response.error();
-        const jogo = ["topzi", "patozi"].find((j) => url.pathname.includes(`/${j}/`));
+        const jogo = ["topzi", "patozi", "datazi"].find((j) => url.pathname.includes(`/${j}/`));
         return caches.match(jogo ? `${jogo}/index.html` : "index.html");
       })),
   );
