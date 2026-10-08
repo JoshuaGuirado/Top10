@@ -39,6 +39,7 @@ $("to-lists-btn").addEventListener("click", () => {
 $("list-search").addEventListener("input", renderListGrid);
 $("random-list-btn").addEventListener("click", randomList);
 $("create-list-btn").addEventListener("click", () => openEditor());
+$("cat-back").addEventListener("click", backToCategories);
 $("editor-cancel").addEventListener("click", openLists);
 $("editor-form").addEventListener("submit", (e) => {
   e.preventDefault();

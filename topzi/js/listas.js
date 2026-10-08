@@ -59,21 +59,20 @@ function chipButton(label, count, active, onClick, iconHtml = "") {
   return b;
 }
 
-function renderChips() {
-  const lists = allLists().filter(sizeOk);
-  const cats = $("category-chips");
-  cats.innerHTML = "";
-  const all = [{ id: "all", label: t("lists.all") }, MY_CAT, ...CATEGORIES];
-  all.forEach((cat) => {
-    const count = cat.id === "all" ? lists.length : lists.filter((l) => l.cat === cat.id).length;
-    if (!count) return;
-    cats.appendChild(chipButton(catLabel(cat), count, activeCat === cat.id, () => {
-      activeCat = cat.id;
-      renderChips();
-      renderListGrid();
-    }, cat.id === "all" ? "" : icon(cat.id)));
-  });
+// Tela de listas em dois níveis, no jeito simples do resto do jogo:
+// 1) sem pesquisa e sem categoria: Sortear, sugestões e as categorias em quadradinhos;
+// 2) categoria escolhida ou pesquisa: as listas em linhas curtas.
+let suggestedIds = [];
 
+function pickSuggestions() {
+  const pool = allLists().filter((l) => sizeOk(l) && !l.custom);
+  const fresh = pool.filter((l) => !lastListIds.includes(l.id));
+  const from = (fresh.length >= 5 ? fresh : pool).slice();
+  suggestedIds = [];
+  while (from.length && suggestedIds.length < 5) suggestedIds.push(from.splice(Math.floor(Math.random() * from.length), 1)[0].id);
+}
+
+function renderSizeChips() {
   const sizes = $("size-chips");
   sizes.innerHTML = "";
   sizes.hidden = !!mode().size;
@@ -81,9 +80,29 @@ function renderChips() {
     const label = size === "all" ? t("lists.anySize") : mode().team && livesOn() ? `Top ${size} · ${t("game.lives", { n: TEAM_LIVES[size] })}` : `Top ${size}`;
     sizes.appendChild(chipButton(label, null, activeSize === size, () => {
       activeSize = size;
-      renderChips();
+      pickSuggestions();
       renderListGrid();
     }));
+  });
+}
+
+function renderCatGrid() {
+  const lists = allLists().filter(sizeOk);
+  const grid = $("cat-grid");
+  grid.innerHTML = "";
+  [MY_CAT, ...CATEGORIES].forEach((cat) => {
+    const count = lists.filter((l) => l.cat === cat.id).length;
+    if (!count) return;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "cat-tile";
+    b.innerHTML = `${icon(cat.id)}<span>${escapeHtml(catLabel(cat))}</span><small>${count}</small>`;
+    b.addEventListener("click", () => {
+      activeCat = cat.id;
+      renderListGrid();
+      window.scrollTo(0, 0);
+    });
+    grid.appendChild(b);
   });
 }
 
@@ -95,48 +114,70 @@ function recordLine(list) {
   return parts.length ? `<span class="list-record">${parts.join(" · ")}</span>` : "";
 }
 
+// Uma linha por lista: título e, quando ajuda, a categoria, o tamanho e o recorde.
+function listRow(l, showCat) {
+  const cat = categoryOf(l);
+  const played = lastListIds.includes(l.id);
+  const card = document.createElement("div");
+  card.className = "list-card" + (played ? " played" : "");
+  const meta = [showCat ? `${icon(cat.id)}${escapeHtml(catLabel(cat))}` : "", mode().size ? "" : t("game.items", { n: l.items.length })].filter(Boolean).join(" · ");
+  card.innerHTML = `
+    <button type="button" class="list-play">
+      ${meta ? `<span class="list-cat">${meta}</span>` : ""}
+      <span class="list-title">${escapeHtml(listTitle(l))}</span>
+      ${recordLine(l)}
+      ${played ? `<span class="list-played">${t("lists.recent")}</span>` : ""}
+    </button>
+    ${l.custom ? `<div class="list-tools"><button type="button" data-act="edit">${t("lists.edit")}</button><button type="button" data-act="share">${t("lists.share")}</button><button type="button" data-act="delete">${t("lists.delete")}</button></div>` : ""}`;
+  card.querySelector(".list-play").addEventListener("click", () => chooseList(l));
+  card.querySelectorAll(".list-tools button").forEach((b) => b.addEventListener("click", () => {
+    if (b.dataset.act === "edit") openEditor(l);
+    if (b.dataset.act === "share") shareList(l, b);
+    if (b.dataset.act === "delete" && confirm(t("lists.deleteConfirm", { title: l.title }))) {
+      customLists = customLists.filter((x) => x.id !== l.id);
+      saveCustomLists();
+      if (!customLists.length && activeCat === MY_CAT.id) activeCat = "all";
+      renderListGrid();
+    }
+  }));
+  return card;
+}
+
 function renderListGrid() {
-  const lists = filteredLists();
-  $("list-count").textContent = t("mode.lists", { n: lists.length });
+  const searching = !!normalize($("list-search").value);
+  const browsing = !searching && activeCat === "all";
+  $("lists-start").hidden = !browsing;
+  $("lists-cats").hidden = !browsing;
+  $("cat-back").hidden = browsing;
+  renderSizeChips();
   const grid = $("list-grid");
   grid.innerHTML = "";
+  if (browsing) {
+    $("lists-sub").textContent = t("lists.suggest");
+    renderCatGrid();
+    suggestedIds.map((id) => allLists().find((l) => l.id === id)).filter((l) => l && sizeOk(l)).forEach((l) => grid.appendChild(listRow(l, true)));
+    return;
+  }
+  const lists = filteredLists();
+  const cat = activeCat !== "all" ? categoryOf({ cat: activeCat }) : null;
+  $("lists-sub").textContent = `${cat && !searching ? catLabel(cat) + " · " : ""}${t("mode.lists", { n: lists.length })}`;
   if (!lists.length) {
     grid.innerHTML = `<p class="muted">${mode().size ? t("lists.noneIn", { mode: mode().name }) : t("lists.none")}</p>`;
     return;
   }
-  lists.forEach((l) => {
-    const cat = categoryOf(l);
-    const played = lastListIds.includes(l.id);
-    const card = document.createElement("div");
-    card.className = "list-card" + (played ? " played" : "");
-    card.innerHTML = `
-      <button type="button" class="list-play">
-        <span class="list-cat">${icon(cat.id)}${escapeHtml(catLabel(cat))} · ${t("game.items", { n: l.items.length })}</span>
-        <span class="list-title">${escapeHtml(listTitle(l))}</span>
-        ${recordLine(l)}
-        ${played ? `<span class="list-played">${t("lists.recent")}</span>` : ""}
-      </button>
-      ${l.custom ? `<div class="list-tools"><button type="button" data-act="edit">${t("lists.edit")}</button><button type="button" data-act="share">${t("lists.share")}</button><button type="button" data-act="delete">${t("lists.delete")}</button></div>` : ""}`;
-    card.querySelector(".list-play").addEventListener("click", () => chooseList(l));
-    card.querySelectorAll(".list-tools button").forEach((b) => b.addEventListener("click", () => {
-      if (b.dataset.act === "edit") openEditor(l);
-      if (b.dataset.act === "share") shareList(l, b);
-      if (b.dataset.act === "delete" && confirm(t("lists.deleteConfirm", { title: l.title }))) {
-        customLists = customLists.filter((x) => x.id !== l.id);
-        saveCustomLists();
-        if (!customLists.length && activeCat === MY_CAT.id) activeCat = "all";
-        renderChips();
-        renderListGrid();
-      }
-    }));
-    grid.appendChild(card);
-  });
+  lists.forEach((l) => grid.appendChild(listRow(l, searching)));
+}
+
+function backToCategories() {
+  activeCat = "all";
+  $("list-search").value = "";
+  renderListGrid();
 }
 
 function openLists() {
   if (activeCat !== "all" && !allLists().some((l) => l.cat === activeCat && sizeOk(l))) activeCat = "all";
   renderModeBars();
-  renderChips();
+  pickSuggestions();
   renderListGrid();
   show("lists");
 }

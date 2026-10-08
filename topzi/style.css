@@ -209,7 +209,6 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .chip.active small { color: var(--bg); opacity: .7; }
 .chips.sizes { margin-top: 8px; }
 .chips.sizes .chip.active { background: var(--accent); color: var(--on-accent); }
-#list-count { margin: 16px 0 8px; }
 .list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
 .list-card { background: var(--surface); border-radius: var(--r); border: 2px solid transparent; transition: border-color .12s; }
 .list-card:hover { border-color: var(--accent); }
@@ -864,4 +863,27 @@ body[data-screen="game"] .profile-btn, body[data-screen="profile"] .profile-btn 
 .topbar-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .gamezi-back { flex: none; text-decoration: none; }
 body[data-screen]:not([data-screen="home"]) .gamezi-back { display: none; }
+
+/* ── escolher a lista: Sortear, sugestões, categorias em quadradinhos e listas em linhas curtas ── */
+#screen-lists { max-width: 640px; margin: 0 auto; }
+.lists-actions { display: flex; gap: 8px; align-items: center; margin: 4px 0 18px; }
+.lists-actions #random-list-btn { flex: 1; }
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin: 6px 0 22px; }
+#lists-cats { margin-top: 20px; }
+.cat-tile {
+  display: flex; align-items: center; gap: 8px; padding: 12px; cursor: pointer; text-align: left;
+  font: inherit; font-weight: 700; font-size: .9rem; color: var(--fg); background: var(--surface);
+  border: 2px solid transparent; border-radius: var(--r);
+}
+.cat-tile:hover { border-color: var(--accent); }
+.cat-tile span { flex: 1; min-width: 0; line-height: 1.15; }
+.cat-tile small { color: var(--muted); font-weight: 600; }
+.cat-tile .ico, .cat-tile svg { color: var(--accent-ink); flex: none; }
+.cat-back { margin: 0 0 6px; font-size: .95rem; }
+#lists-sub { margin: 4px 0 8px; }
+#screen-lists .list-grid { grid-template-columns: 1fr; gap: 6px; }
+#screen-lists .list-play { padding: 12px 16px; gap: 2px; }
+#screen-lists .list-title { font-size: 1rem; }
+#screen-lists .search { margin-bottom: 10px; }
+#screen-lists .sizes { margin-bottom: 12px; }
 

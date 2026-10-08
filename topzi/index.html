@@ -19,6 +19,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&display=swap">
   <link rel="stylesheet" href="style.css">
+  <!-- Métricas da Vercel (Web Analytics): visitas por página, sem cookies e sem dados pessoais -->
+  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
   <div class="topbar">
@@ -97,18 +100,20 @@
     <!-- Listas -->
     <section id="screen-lists" class="screen" hidden>
       <div class="mode-bar"></div>
-      <div class="lists-head">
-        <h2 data-i18n="lists.title">Escolha a lista</h2>
-        <div class="head-actions">
-          <button type="button" class="btn ghost" id="create-list-btn" data-i18n="btn.createList">Criar lista</button>
-          <button type="button" class="btn ghost" id="random-list-btn" data-i18n="btn.random">Sortear</button>
-        </div>
-      </div>
+      <h2 data-i18n="lists.title">Escolha a lista</h2>
       <input type="search" id="list-search" class="search" data-i18n-ph="lists.search" data-i18n-aria="lists.searchAria" placeholder="Pesquisar: copa, marvel, pokémon…" aria-label="Pesquisar listas" autocomplete="off">
-      <div class="chips" id="category-chips"></div>
       <div class="chips sizes" id="size-chips"></div>
-      <p class="muted small" id="list-count"></p>
+      <div class="lists-actions" id="lists-start">
+        <button type="button" class="btn big" id="random-list-btn" data-i18n="lists.random">Sortear lista</button>
+        <button type="button" class="btn ghost" id="create-list-btn" data-i18n="btn.createList">Criar lista</button>
+      </div>
+      <button type="button" class="link-btn cat-back" id="cat-back" data-i18n="lists.back" hidden>← Categorias</button>
+      <p class="ctrl-label" id="lists-sub"></p>
       <div class="list-grid" id="list-grid"></div>
+      <div id="lists-cats">
+        <p class="ctrl-label" data-i18n="lists.cats">Categorias</p>
+        <div class="cat-grid" id="cat-grid"></div>
+      </div>
     </section>
 
     <!-- Criar lista -->
