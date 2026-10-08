@@ -18,6 +18,8 @@ Isso cria `profiles` (perfis), `rooms` (salas), `room_players` (quem está em ca
 
 Já tinha rodado antes? Rode de novo o arquivo inteiro: ele só cria o que falta e não apaga nada.
 
+Cada tabela tem uma descrição dizendo de qual jogo é (as do Topzi não têm prefixo: `profiles`, `rooms`, `room_players`, `matches`; as do Patozi começam com `patozi_`). Para ver os dois jogos juntos, com a coluna `jogo`, use as visões **`gamezi_salas`** (salas) e **`gamezi_jogadores_nas_salas`** (quem está em cada sala); elas só aparecem no painel, o site não tem acesso.
+
 As cartas que os jogadores mandam ficam em **Table Editor → patozi_sugestoes** (com o tema escolhido na coluna `tema`).
 
 ## 3. Ligar o login

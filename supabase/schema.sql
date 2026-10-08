@@ -359,3 +359,45 @@ create policy "patozi partidas: anfitrião registra" on public.patozi_partidas
   for insert to authenticated with check (
     exists (select 1 from public.patozi_salas s where s.code = sala_code and s.host_id = auth.uid())
   );
+
+-- ═════════════════════════════ Gamezi: nomes e visões ═════════════════════════════
+-- As tabelas do Topzi ficaram sem prefixo (ele foi o primeiro jogo). Em vez de renomear (quebraria o site no ar),
+-- cada tabela ganha uma descrição dizendo de qual jogo é; ela aparece no painel do Supabase (Description).
+
+comment on table public.profiles is 'Topzi: perfil de cada conta (nick, skin, estatísticas, recordes, listas criadas)';
+comment on table public.rooms is 'Topzi: salas online';
+comment on table public.room_players is 'Topzi: jogadores de cada sala online';
+comment on table public.matches is 'Topzi: histórico das partidas online';
+comment on table public.patozi_perfis is 'Patozi: perfil de cada conta (nick, cor do pato, estatísticas)';
+comment on table public.patozi_diario is 'Patozi: resultado de cada um no Pato do dia (ranking)';
+comment on table public.patozi_sugestoes is 'Patozi: cartas enviadas pelos jogadores';
+comment on table public.patozi_salas is 'Patozi: salas online';
+comment on table public.patozi_sala_jogadores is 'Patozi: jogadores de cada sala online';
+comment on table public.patozi_partidas is 'Patozi: histórico das partidas online';
+
+-- Visões para o dono do site olhar os dois jogos juntos no painel (Table Editor), com a coluna "jogo".
+-- Ficam fechadas para o site (sem acesso pela API); security_invoker faz valer as regras (RLS) de quem consulta.
+drop view if exists public.gamezi_salas;
+create view public.gamezi_salas with (security_invoker = true) as
+  select 'topzi'::text as jogo, r.code as codigo, r.status, r.host_id as anfitriao,
+         (select count(*) from public.room_players p where p.room_code = r.code) as jogadores,
+         r.created_at as criada_em, r.updated_at as atualizada_em
+    from public.rooms r
+  union all
+  select 'patozi'::text, s.code, s.status, s.host_id,
+         (select count(*) from public.patozi_sala_jogadores j where j.sala_code = s.code),
+         s.created_at, s.updated_at
+    from public.patozi_salas s;
+
+drop view if exists public.gamezi_jogadores_nas_salas;
+create view public.gamezi_jogadores_nas_salas with (security_invoker = true) as
+  select 'topzi'::text as jogo, p.room_code as sala, p.nick, p.user_id, p.joined_at as entrou_em
+    from public.room_players p
+  union all
+  select 'patozi'::text, j.sala_code, j.nick, j.user_id, j.joined_at
+    from public.patozi_sala_jogadores j;
+
+comment on view public.gamezi_salas is 'Gamezi: salas online dos dois jogos (coluna jogo = topzi ou patozi)';
+comment on view public.gamezi_jogadores_nas_salas is 'Gamezi: quem está em cada sala, dos dois jogos (coluna jogo)';
+
+revoke all on public.gamezi_salas, public.gamezi_jogadores_nas_salas from anon, authenticated;
