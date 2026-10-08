@@ -12,6 +12,7 @@ let turnTime = TIMER_OPTIONS.includes(store("timer")) ? store("timer") : 0;
 
 // Com vidas ou sem vidas, guardado por modo (a equipe começa com vidas; os outros, sem).
 function livesOn(id = modeId) {
+  if (MODES[id].sudden) return true; // morte súbita: sempre uma vida
   const saved = (store("vidas") || {})[id];
   return saved === undefined ? !!MODES[id].team : !!saved;
 }
@@ -104,6 +105,11 @@ function renderTimerChips() {
 function renderLivesChips() {
   const wrap = $("lives-chips");
   wrap.innerHTML = "";
+  wrap.hidden = !!mode().sudden;
+  if (mode().sudden) {
+    $("lives-help").textContent = t("opt.sudden");
+    return renderOptsSummary();
+  }
   [[false, t("opt.noLives")], [true, t("opt.withLives")]].forEach(([on, label]) => {
     wrap.appendChild(chipButton(label, null, on === livesOn(), () => {
       setLivesOn(on);
@@ -120,7 +126,7 @@ function renderLivesChips() {
 
 // Resumo do "Mais opções" fechado: tempo por vez e vidas.
 function renderOptsSummary() {
-  $("opts-summary").textContent = `${turnTime ? t("opt.seconds", { n: turnTime }) : t("opt.noLimit")} · ${t(livesOn() ? "opt.withLives" : "opt.noLives")}`;
+  $("opts-summary").textContent = `${turnTime ? t("opt.seconds", { n: turnTime }) : t("opt.noLimit")} · ${t(mode().sudden ? "opt.oneLife" : livesOn() ? "opt.withLives" : "opt.noLives")}`;
 }
 
 function renderPlayersScreen() {

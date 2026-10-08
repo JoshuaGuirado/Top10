@@ -860,3 +860,8 @@ body[data-screen="game"] .profile-btn, body[data-screen="profile"] .profile-btn 
 .more-opts summary small { color: var(--muted); font-weight: 600; font-size: .85rem; }
 .more-opts .match-options { margin-top: 8px; }
 
+/* ── voltar para o Gamezi (seta à esquerda do logo, na tela inicial do jogo) ── */
+.topbar-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.gamezi-back { flex: none; text-decoration: none; }
+body[data-screen]:not([data-screen="home"]) .gamezi-back { display: none; }
+

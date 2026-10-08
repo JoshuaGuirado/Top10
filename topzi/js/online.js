@@ -481,14 +481,14 @@ function renderLobby() {
     box.innerHTML = `
       <p class="ctrl-label">${t("lobby.mode")}</p><div class="chips" id="lobby-modes"></div>
       <p class="ctrl-label">${t("opt.timer")}</p><div class="chips" id="lobby-timer"></div>
-      <p class="ctrl-label">${t("opt.lives")}</p><div class="chips" id="lobby-lives"></div>
+      ${MODES[st.mode] && MODES[st.mode].sudden ? "" : `<p class="ctrl-label">${t("opt.lives")}</p><div class="chips" id="lobby-lives"></div>`}
       <p class="ctrl-label">${t("game.list")}</p>
       <div class="lobby-list"><p>${listLine}</p>
         <div class="head-actions"><button type="button" class="btn ghost small" id="lobby-pick">${t("btn.chooseList")}</button><button type="button" class="btn ghost small" id="lobby-random">${t("btn.random")}</button></div>
       </div>`;
     Object.entries(MODES).forEach(([id, mm]) => $("lobby-modes").appendChild(chipButton(mm.name, null, id === st.mode, () => updateSettings({ mode: id }))));
     TIMER_OPTIONS.forEach((s) => $("lobby-timer").appendChild(chipButton(s ? `${s}s` : t("opt.noLimit"), null, s === (st.timer || 0), () => updateSettings({ timer: s }))));
-    [[false, t("opt.noLives")], [true, t("opt.withLives")]].forEach(([on, label]) => $("lobby-lives").appendChild(chipButton(label, null, on === roomLives, () => updateSettings({ lives: on }))));
+    if ($("lobby-lives")) [[false, t("opt.noLives")], [true, t("opt.withLives")]].forEach(([on, label]) => $("lobby-lives").appendChild(chipButton(label, null, on === roomLives, () => updateSettings({ lives: on }))));
     $("lobby-pick").addEventListener("click", () => {
       pickingForRoom = "pick";
       modeId = st.mode;

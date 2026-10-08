@@ -22,10 +22,13 @@
 </head>
 <body>
   <div class="topbar">
-    <button type="button" class="logo-btn" id="home-btn" data-i18n-aria="nav.home" aria-label="Início">
-      <img class="logo logo-light" src="../brand/logo.svg" alt="Topzi">
-      <img class="logo logo-dark" src="../brand/logo-dark.svg" alt="" aria-hidden="true">
-    </button>
+    <div class="topbar-left">
+      <a class="icon-btn gamezi-back" href="../" data-i18n-aria="nav.back" aria-label="Voltar para o Gamezi" title="Gamezi"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
+      <button type="button" class="logo-btn" id="home-btn" data-i18n-aria="nav.home" aria-label="Início">
+        <img class="logo logo-light" src="../brand/logo.svg" alt="Topzi">
+        <img class="logo logo-dark" src="../brand/logo-dark.svg" alt="" aria-hidden="true">
+      </button>
+    </div>
     <div class="topbar-actions">
       <button type="button" class="icon-btn" id="help-btn" data-i18n-aria="help.title" aria-label="Como jogar" title="Como jogar"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.4-2.7 4"/><circle cx="12" cy="17.6" r=".6" fill="currentColor"/></svg></button>
       <button type="button" class="icon-btn" id="settings-btn" data-i18n-aria="nav.settings" aria-label="Configurações" title="Configurações"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
@@ -345,6 +348,7 @@
         <li data-i18n-html="help.modeTop"><b>Top 10, 30 e 50:</b> sozinho, 1v1 ou todos contra todos. Quem somar mais pontos vence.</li>
         <li data-i18n-html="help.modeTeam"><b>Equipe contra a lista:</b> todos jogam juntos. A equipe vence se fizer mais da metade dos pontos.</li>
         <li data-i18n-html="help.modeTimes"><b>Times:</b> Time Vermelho contra Time Preto. A vez alterna entre os times.</li>
+        <li data-i18n-html="help.modeMorte"><b>Morte súbita:</b> cada um tem uma vida só. Errou, está fora. Quem somar mais pontos vence.</li>
       </ul>
       <p data-i18n="help.turn">Na sua vez, chute ou passe a vez. A partida acaba quando todos os itens aparecem, quando todo mundo passa seguido ou quando acabam as vidas.</p>
 

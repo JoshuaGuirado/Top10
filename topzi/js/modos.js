@@ -1,10 +1,13 @@
-// Modos de jogo: Top 10, Top 30, Top 50 (disputa), Equipe contra a lista e Times.
+// Modos de jogo: Top 10, Top 30, Top 50 (disputa), Equipe contra a lista, Times e Morte súbita.
 
 // Vidas no modo "Equipe contra a lista": cada chute errado custa uma.
 const TEAM_LIVES = { 10: 3, 30: 6, 50: 10 };
 
 const TEAM_ICON = '<svg class="mode-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2.5 20c.5-3.4 2.7-5.5 5.5-5.5s5 2.1 5.5 5.5M13.2 15.3c.8-.5 1.8-.8 2.8-.8 2.8 0 5 2.1 5.5 5.5"/></svg>';
 const TIMES_ICON = '<svg class="mode-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="7" r="2.5"/><circle cx="18" cy="7" r="2.5"/><path d="M1.5 17c.4-2.8 2.1-4.5 4.5-4.5s4.1 1.7 4.5 4.5M13.5 17c.4-2.8 2.1-4.5 4.5-4.5s4.1 1.7 4.5 4.5M12 4v16"/></svg>';
+
+// Morte súbita: cada um tem uma vida só; errou (ou deixou o tempo acabar), está fora.
+const SUDDEN_ICON = '<svg class="mode-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-8-4.6-8-10.4A4.4 4.4 0 0 1 12 7.4a4.4 4.4 0 0 1 8 2.7c0 5.8-8 10.4-8 10.4z"/><path d="m12.6 7.6-2 4 3 1.5-2.2 4.4"/></svg>';
 
 // Nomes e uma linha curta de descrição, no idioma atual (getters).
 const MODES = {
@@ -13,6 +16,7 @@ const MODES = {
   top50: { size: 50, badge: "50", name: "Top 50", get desc() { return t("mode.top50.short"); } },
   equipe: { team: true, badge: TEAM_ICON, get name() { return t("mode.equipe.name"); }, get desc() { return t("mode.equipe.short"); } },
   times: { teams: true, min: 2, badge: TIMES_ICON, get name() { return t("mode.times.name"); }, get desc() { return t("mode.times.short"); } },
+  morte: { sudden: true, badge: SUDDEN_ICON, get name() { return t("mode.morte.name"); }, get desc() { return t("mode.morte.short"); } },
 };
 
 let modeId = MODES[store("mode")] ? store("mode") : "top10";
@@ -29,7 +33,7 @@ function fitModeToSize(size) {
 }
 
 function modeIcon(m) {
-  return m.team ? TEAM_ICON : m.teams ? TIMES_ICON : "";
+  return m.team ? TEAM_ICON : m.teams ? TIMES_ICON : m.sudden ? SUDDEN_ICON : "";
 }
 
 function renderModes() {

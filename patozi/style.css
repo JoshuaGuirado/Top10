@@ -375,3 +375,9 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .opts[open] summary::after { content: "−"; }
 .opts summary small { color: var(--muted); font-weight: 600; font-size: .85rem; }
 .opts-body { display: grid; gap: 10px; padding: 0 16px 16px; }
+
+/* ── voltar para o Gamezi (seta à esquerda do logo, na tela inicial do jogo) ── */
+.topbar-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.gamezi-back { flex: none; text-decoration: none; }
+body[data-screen]:not([data-screen="home"]) .gamezi-back { display: none; }
+

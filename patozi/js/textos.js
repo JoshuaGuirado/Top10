@@ -6,6 +6,7 @@ const LANGS = ["pt", "en", "es"];
 const PZ_T = {
   "nav.home": ["Início", "Home", "Inicio"],
   "nav.lang": ["Idioma", "Language", "Idioma"],
+  "nav.back": ["Voltar para o Gamezi", "Back to Gamezi", "Volver a Gamezi"],
   "nav.settings": ["Configurações", "Settings", "Ajustes"],
   "nav.theme": ["Tema", "Theme", "Tema"],
   "nav.sound": ["Som", "Sound", "Sonido"],

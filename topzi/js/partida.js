@@ -17,8 +17,10 @@ function startGame(list, opts = {}) {
   const vsList = !!daily || !!mode().team;
   const teams = !daily && !!mode().teams;
   const roster = daily ? [players[0]] : online ? online.roster : players.slice(0, playerCount);
-  const lives = daily ? 3 : TEAM_LIVES[n] || Math.max(3, Math.round(n / 5));
-  const withLives = daily ? true : online ? !!online.lives : livesOn();
+  // Morte súbita: uma vida para cada um, com ou sem a opção de vidas ligada.
+  const sudden = !daily && !!mode().sudden;
+  const lives = daily ? 3 : sudden ? 1 : TEAM_LIVES[n] || Math.max(3, Math.round(n / 5));
+  const withLives = daily || sudden ? true : online ? !!online.lives : livesOn();
   // Fora do modo equipe, cada jogador tem as próprias vidas.
   const ownLives = withLives && !vsList;
   const gamePlayers = roster.map((p, i) => ({
