@@ -7,11 +7,6 @@ function irInicio() {
 
 function renderHome() {
   renderDailyCard();
-  document.querySelector(".pato-n .pato-ico").innerHTML = patoSvg(0);
-  $("home-themes").innerHTML = PZ_TEMAS.map((tema) => {
-    const n = pzCartasDosTemas([tema.id]).length;
-    return `<span class="theme-pill">${themeIcon(tema.id)}${escapeHtml(tr(tema.nome))} <small>${n}</small></span>`;
-  }).join("");
 }
 
 function renderTopo() {
@@ -50,7 +45,7 @@ function abrirPerfil() {
   show("profile");
   $("profile-nick").value = store("nick") || "";
   $("profile-duck").innerHTML = patoSvg(minhaCor(), "happy", meuPato());
-  renderGuardaRoupa();
+  ligarClosetDoPerfil();
   const st = loadStats();
   const tiles = [
     [st.partidas, "stats.games"],
@@ -87,6 +82,8 @@ function trocarMinhaCor() {
   const cor = (minhaCor() + 1) % PZ_CORES.length;
   store("cor", cor);
   aoMudarVisual();
+  renderCloset("closet");
+  sfx.tick();
 }
 
 function mudarMeuNome(nome) {
@@ -129,6 +126,7 @@ function ligar() {
   $("theme-btn").onclick = toggleTheme;
   $("sound-btn").onclick = toggleSound;
   $("help-btn").onclick = abrirAjuda;
+  $("settings-btn").onclick = () => $("settings-dialog").showModal();
   $("help-link").onclick = abrirAjuda;
   $("profile-btn").onclick = abrirPerfil;
   document.querySelectorAll("dialog [data-close]").forEach((b) => (b.onclick = () => b.closest("dialog").close()));
@@ -167,15 +165,13 @@ function ligar() {
   $("leave-room").onclick = sairDaSala;
   $("share-room").onclick = (e) => convidar(e.target);
   $("lobby-players").onclick = (e) => {
+    if (e.target.closest("[data-vestir]")) return vestirNaSala();
     const b = e.target.closest("[data-tirar]");
     if (b) tirarDaSala(b.dataset.tirar);
   };
 
   $("profile-back").onclick = irInicio;
   $("profile-duck").onclick = trocarMinhaCor;
-  $("closet").onclick = closetClick;
-  $("closet-random").onclick = sortearVisual;
-  $("closet-clear").onclick = tirarVisual;
   $("profile-nick").oninput = (e) => mudarMeuNome(e.target.value);
   $("suggest-form").onsubmit = mandarSugestao;
   document.querySelectorAll(".account-btn").forEach((b) => (b.onclick = abrirConta));

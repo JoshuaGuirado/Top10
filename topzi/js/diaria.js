@@ -80,45 +80,46 @@ function dailyShareText(num, res) {
   ].filter(Boolean).join("\n");
 }
 
-function startDaily() {
-  const num = todayNumber();
+function startDaily(num = todayNumber()) {
+  if (num < 1 || num > todayNumber() || !dailyList(num)) return;
   startGame(dailyList(num), { daily: num, counts: !dailyResults()[num] });
 }
 
+// Semana de domingo a sábado, como no Contexto: os dias jogados ficam marcados e os que já passaram dá
+// para jogar tocando no dia.
+function weekHtml(today = new Date()) {
+  const loc = { pt: "pt-BR", en: "en", es: "es" }[lang];
+  const hoje = todayNumber(today);
+  const res = dailyResults();
+  const dias = Array.from({ length: 7 }, (_, i) => new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + i));
+  return `<div class="week">${dias.map((d) => {
+    const n = todayNumber(d);
+    const cls = ["day", res[n] ? "done" : "", n === hoje ? "today" : ""].filter(Boolean).join(" ");
+    return `<button type="button" class="${cls}" data-dia="${n}" ${n > hoje || n < 1 ? "disabled" : ""} aria-label="${escapeHtml(t("daily.tag", { n }))}">
+      <small>${escapeHtml(d.toLocaleDateString(loc, { weekday: "short" }))}</small><b>${d.getDate()}</b></button>`;
+  }).join("")}</div>`;
+}
+
+// Cartão da lista do dia no início: data, Jogar (ou Compartilhar) e a semana.
 function renderDailyCard() {
   const num = todayNumber();
-  const list = dailyList(num);
   const card = $("daily-card");
-  if (!list || num < 1) {
+  if (num < 1 || !dailyList(num)) {
     card.hidden = true;
     return;
   }
   const res = dailyResults()[num];
   const { current } = dailyStreaks(num);
-  const cat = categoryOf(list);
+  const loc = { pt: "pt-BR", en: "en", es: "es" }[lang];
   card.hidden = false;
   card.innerHTML = `
-    <div class="daily-info">
-      <p class="daily-kicker">${t("daily.tag", { n: num })} · ${icon(cat.id)}${escapeHtml(catLabel(cat))}</p>
-      <p class="daily-title">${res ? escapeHtml(listTitle(list)) : t("daily.pitch")}</p>
-      <p class="daily-status">${res
-        ? t(res.score > res.total / 2 ? "daily.doneWon" : "daily.done", { a: res.score, b: res.total, next: num + 1 })
-        : t("daily.same")}${current ? ` ${t("daily.streak", { n: current })}` : ""}</p>
+    <div class="daily-top">
+      <b class="daily-name">${escapeHtml(t("daily.title"))}</b>
+      <span class="daily-date">${escapeHtml(new Date().toLocaleDateString(loc))}</span>
+      <button type="button" class="btn" id="daily-btn">${escapeHtml(t(res ? "results.share" : "btn.play"))}</button>
     </div>
-    <div class="daily-actions"></div>`;
-  const actions = card.querySelector(".daily-actions");
-  const btn = (label, cls, onClick) => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = cls;
-    b.textContent = label;
-    b.addEventListener("click", () => onClick(b));
-    actions.appendChild(b);
-  };
-  if (res) {
-    btn(t("results.share"), "btn", (b) => shareText(dailyShareText(num, res), b, t("results.share")));
-    btn(t("daily.again"), "link-btn", startDaily);
-  } else {
-    btn(t("daily.play"), "btn", startDaily);
-  }
+    ${weekHtml()}
+    ${res ? `<p class="daily-status">${escapeHtml(t("daily.ptsOf", { a: res.score, b: res.total }))}${current > 1 ? ` · ${escapeHtml(t("daily.streak", { n: current }))}` : ""}</p>` : ""}`;
+  $("daily-btn").onclick = (e) => (res ? shareText(dailyShareText(num, res), e.currentTarget, t("results.share")) : startDaily(num));
+  card.querySelectorAll("[data-dia]").forEach((b) => (b.onclick = () => startDaily(Number(b.dataset.dia))));
 }

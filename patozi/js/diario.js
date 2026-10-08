@@ -40,6 +40,22 @@ function diarioSequencia() {
   return n;
 }
 
+// Semana de domingo a sábado, como no Contexto: os dias completos ficam marcados e os que já passaram dá
+// para jogar tocando no dia.
+function semanaHtml(hojeData = new Date()) {
+  const loc = { pt: "pt-BR", en: "en", es: "es" }[lang];
+  const hoje = pzDiaNumero(hojeData);
+  const todos = diarioDados();
+  const dias = Array.from({ length: 7 }, (_, i) => new Date(hojeData.getFullYear(), hojeData.getMonth(), hojeData.getDate() - hojeData.getDay() + i));
+  return `<div class="week">${dias.map((d) => {
+    const n = pzDiaNumero(d);
+    const cls = ["day", todos[n] && diarioCompleto(todos[n]) ? "done" : "", n === hoje ? "today" : ""].filter(Boolean).join(" ");
+    return `<button type="button" class="${cls}" data-dia="${n}" ${n > hoje || n < 1 ? "disabled" : ""} aria-label="${escapeHtml(t("daily.kicker", { n }))}">
+      <small>${escapeHtml(d.toLocaleDateString(loc, { weekday: "short" }))}</small><b>${d.getDate()}</b></button>`;
+  }).join("")}</div>`;
+}
+
+// Cartão do Pato do dia no início: data, Jogar (ou o ranking, se já jogou) e a semana.
 function renderDailyCard() {
   const dia = diarioHoje();
   const el = $("daily-card");
@@ -49,21 +65,25 @@ function renderDailyCard() {
   }
   const reg = diarioDoDia(dia);
   const feito = diarioCompleto(reg);
+  const seq = diarioSequencia();
+  const loc = { pt: "pt-BR", en: "en", es: "es" }[lang];
   el.hidden = false;
   el.innerHTML = `
-    <div class="daily-info">
-      <p class="daily-kicker">${escapeHtml(t("daily.kicker", { n: dia }))}</p>
-      <p class="daily-title">${escapeHtml(feito ? t("daily.done", { pts: diarioTotal(reg) }) : t("daily.title"))}</p>
-      <p class="daily-status">${escapeHtml(feito ? tn("daily.streak", diarioSequencia()) : t("daily.status"))}</p>
+    <div class="daily-top">
+      <b class="daily-name">${escapeHtml(t("daily.name"))}</b>
+      <span class="daily-date">${escapeHtml(new Date().toLocaleDateString(loc))}</span>
+      <button type="button" class="btn ${feito ? "ghost" : ""}" id="daily-btn">${escapeHtml(t(feito ? "daily.see" : "btn.play"))}</button>
     </div>
-    <div class="daily-actions"><button type="button" class="btn ${feito ? "ghost" : ""}" id="daily-btn">${escapeHtml(t(feito ? "daily.see" : "daily.play"))}</button></div>`;
-  $("daily-btn").onclick = abrirDiario;
+    ${semanaHtml()}
+    ${feito ? `<p class="daily-status">${escapeHtml(t("daily.total", { pts: diarioTotal(reg) }))}${seq > 1 ? ` · ${escapeHtml(tn("daily.streak", seq))}` : ""}</p>` : ""}`;
+  $("daily-btn").onclick = () => abrirDiario(dia);
+  el.querySelectorAll("[data-dia]").forEach((b) => (b.onclick = () => abrirDiario(Number(b.dataset.dia))));
 }
 
 let diarioEstado = null; // { dia, ids, mostrando }
 
-function abrirDiario() {
-  const dia = diarioHoje();
+function abrirDiario(dia = diarioHoje()) {
+  if (!(dia >= 1 && dia <= diarioHoje())) return;
   diarioEstado = { dia, ids: pzDiarioCartas(dia), mostrando: false };
   show("daily");
   renderDiario();

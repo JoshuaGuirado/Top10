@@ -159,7 +159,7 @@ function renderConta() {
   document.querySelectorAll(".account-line").forEach((el) => (el.innerHTML = linhaConta()));
   document.querySelectorAll(".account-btn").forEach((b) => {
     b.hidden = !onlineConfigured();
-    b.textContent = t(contaEmail() ? "account.mine" : "account.enter");
+    b.textContent = t(contaEmail() ? "account.mine" : b.dataset.label || "account.enter");
   });
 }
 

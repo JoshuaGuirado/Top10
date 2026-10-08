@@ -20,7 +20,6 @@ $("sound-btn").addEventListener("click", () => {
   sfx.tick();
 });
 $("start-btn").addEventListener("click", openModes);
-$("stats-btn").addEventListener("click", openProfile);
 $("profile-btn").addEventListener("click", openProfile);
 $("profile-avatar").addEventListener("click", () => openAvatarDialog(0));
 $("profile-nick").addEventListener("input", (e) => {
@@ -180,10 +179,13 @@ function maybeOpenHelp() {
   if (!store("ajuda") && !store("stats") && !fromRoom && document.body.dataset.screen === "home") openHelp();
 }
 
-// Idioma: o seletor do topo troca tudo na hora, inclusive a tela aberta.
-function renderHeroLead() {
-  $("hero-lead").textContent = t("hero.lead", { total: allLists().length });
-}
+// Configurações (idioma, tema e som) ficam numa janela, para o topo ter só três ícones.
+$("settings-btn").addEventListener("click", () => $("settings-dialog").showModal());
+$("settings-dialog").addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) e.currentTarget.close(); // toque fora da janela fecha
+});
+
+// Idioma: troca tudo na hora, inclusive a tela aberta.
 $("lang-select").value = lang;
 $("lang-select").addEventListener("change", (e) => setLang(e.target.value));
 function onLangChange() {
@@ -191,7 +193,6 @@ function onLangChange() {
   renderSoundBtn();
   renderThemeBtn();
   renderHelpBtn();
-  renderHeroLead();
   renderDailyCard();
   renderAccount();
   const screen = document.body.dataset.screen;
@@ -227,7 +228,6 @@ renderHelpBtn();
 ensurePlayers();
 renderDailyCard();
 renderProfileButton();
-renderHeroLead();
 if (!importFromHash()) show("home");
 maybeOpenHelp();
 initOnline();

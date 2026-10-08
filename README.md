@@ -99,7 +99,11 @@ Regras extras (ligadas por padrão, dá para desligar): **Dobrei** (chutar o dob
 
 **Online**: um cria a sala, manda o código ou o link (`patozi/?sala=CODIGO`), escolhe os temas, a duração e as regras, e começa. Quem recarrega a página volta para a partida; se alguém sai no meio, o computador joga por ele.
 
-**Perfil**: nome do pato e o guarda-roupa "Vista seu pato" (cor, chapéu, rosto, roupa e item na asa, que aparecem na partida, no resultado e na sala online), estatísticas (partidas, vezes que escapou, vezes que foi o pato, "Nem a pato!" certeiros, patos recebidos, dobreis, Pato do dia), conta Gamezi (a mesma do Topzi) e "Mande uma carta", que guarda sugestões de perguntas, com o tema, no banco.
+**Vestir o pato**: cor, chapéu, rosto, roupa e item na asa. Cada jogador veste o próprio pato tocando nele na tela de jogadores (no jogo local, inclusive o computador) ou na sala online (cada um o seu, e os outros veem na hora). O seu pato também fica no Perfil e vai para a conta.
+
+**Perfil**: nome e visual do seu pato, estatísticas (partidas, vezes que escapou, vezes que foi o pato, "Nem a pato!" certeiros, patos recebidos, dobreis, Pato do dia), conta Gamezi (a mesma do Topzi) e "Mande uma carta", que guarda sugestões de perguntas, com o tema, no banco.
+
+**Tela inicial** (nos dois jogos, no jeito do Contexto e do Termo): uma frase, o desafio do dia com a semana (dá para jogar os dias que passaram tocando no dia), "Partida" e "Online". Idioma, tema e som ficam no ícone de Configurações.
 
 ## Arquivos do Patozi
 

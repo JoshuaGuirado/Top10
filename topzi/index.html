@@ -27,50 +27,37 @@
       <img class="logo logo-dark" src="../brand/logo-dark.svg" alt="" aria-hidden="true">
     </button>
     <div class="topbar-actions">
-      <label class="lang-wrap"><span class="sr-only" data-i18n="nav.lang">Idioma</span>
-        <select id="lang-select" class="lang-select">
-          <option value="pt">PT</option><option value="en">EN</option><option value="es">ES</option>
-        </select>
-      </label>
       <button type="button" class="icon-btn" id="help-btn" data-i18n-aria="help.title" aria-label="Como jogar" title="Como jogar"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.4-2.7 4"/><circle cx="12" cy="17.6" r=".6" fill="currentColor"/></svg></button>
-      <button type="button" class="icon-btn" id="theme-btn"></button>
-      <button type="button" class="icon-btn" id="sound-btn"></button>
+      <button type="button" class="icon-btn" id="settings-btn" data-i18n-aria="nav.settings" aria-label="Configurações" title="Configurações"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
       <button type="button" class="profile-btn" id="profile-btn" data-i18n-aria="nav.profileOpen" aria-label="Abrir perfil"><span class="profile-btn-avatar" id="profile-btn-avatar"></span><span class="profile-btn-label" data-i18n="nav.profile">Perfil</span></button>
     </div>
   </div>
 
   <main>
     <!-- Início -->
-    <section id="screen-home" class="screen">
-      <div class="hero">
-        <a class="crumb" href="../" data-i18n="nav.gamezi">← Gamezi: todos os jogos</a>
-        <img class="hero-symbol logo-light" src="../brand/simbolo.svg" alt="" aria-hidden="true">
-        <img class="hero-symbol logo-dark" src="../brand/simbolo-escuro.svg" alt="" aria-hidden="true">
-        <h1><span data-i18n="hero.line1">O óbvio vale 1.</span><span class="accent" data-i18n="hero.line2">O difícil vale 10.</span></h1>
-        <p class="lead" id="hero-lead"></p>
-        <div class="hero-actions">
-          <button type="button" class="btn big" id="start-btn" data-i18n="btn.play">Jogar</button>
-          <button type="button" class="btn big dark" id="online-btn" data-i18n="btn.online">Jogar online</button>
-          <button type="button" class="btn ghost" id="stats-btn" data-i18n="nav.profile">Perfil</button>
-        </div>
+    <section id="screen-home" class="screen home">
+      <div class="home-head">
+        <img class="home-symbol logo-light" src="../brand/simbolo.svg" alt="" aria-hidden="true">
+        <img class="home-symbol logo-dark" src="../brand/simbolo-escuro.svg" alt="" aria-hidden="true">
+        <h1 class="home-tag" data-i18n="home.tag">Adivinhe os itens da lista. O óbvio vale 1, o difícil vale 10.</h1>
+        <div class="home-account"><button type="button" class="btn small account-btn" data-label="account.short">Entrar</button></div>
       </div>
-      <div class="home-account">
-        <span class="home-account-ico"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c.9-3.8 3.9-6 7.5-6s6.6 2.2 7.5 6"/></svg></span>
-        <p class="small account-line"></p>
-        <button type="button" class="btn small account-btn" data-label="account.enter">Entrar ou criar conta</button>
+      <div class="home-card daily" id="daily-card" hidden></div>
+      <div class="home-card home-row">
+        <div><b data-i18n="home.free">Partida livre</b><span data-i18n="home.freeSub">De 1 a 8 jogadores no mesmo celular</span></div>
+        <button type="button" class="btn" id="start-btn" data-i18n="btn.play">Jogar</button>
       </div>
-      <div class="daily" id="daily-card" hidden></div>
-      <ol class="rules">
-        <li><b class="n">1–8</b><p data-i18n="rules.1">Jogadores. Cada um com nickname e skin.</p></li>
-        <li><b class="n" data-i18n="rules.2n">Nº 8</b><p data-i18n="rules.2">Acertou o 8º da lista? Ganhou 8 pontos.</p></li>
-        <li><b class="n">50</b><p data-i18n="rules.3">No Top 50, o último item da lista vale 50 pontos.</p></li>
-        <li><b class="n">VS</b><p data-i18n="rules.4">Ou joguem juntos: a equipe contra a lista.</p></li>
-      </ol>
-      <footer class="site-foot">
+      <div class="home-card home-row">
+        <div><b data-i18n="home.online">Online</b><span data-i18n="home.onlineSub">Cada um no seu celular</span></div>
+        <button type="button" class="btn dark" id="online-btn" data-i18n="btn.play">Jogar</button>
+      </div>
+      <nav class="home-links">
         <button type="button" class="link-btn" id="help-link" data-i18n="help.title">Como jogar</button>
+        <a href="../" data-i18n="home.more">Mais jogos</a>
+      </nav>
+      <footer class="site-foot">
         <a href="../termos.html" data-i18n="foot.terms">Termos de uso</a>
         <a href="../privacidade.html" data-i18n="foot.privacy">Privacidade</a>
-        <a href="../" data-i18n="foot.gamezi">Mais jogos no Gamezi</a>
         <span>© 2026 Gamezi</span>
       </footer>
     </section>
@@ -301,6 +288,23 @@
         <button type="button" class="btn" id="builder-save" data-i18n="skin.use">Usar esta skin</button>
       </div>
     </form>
+  </dialog>
+
+  <!-- Configurações: idioma, tema e som -->
+  <dialog id="settings-dialog" class="avatar-dialog settings-dialog" aria-labelledby="settings-title">
+    <div class="dialog-inner">
+      <div class="dialog-head">
+        <h2 id="settings-title" data-i18n="nav.settings">Configurações</h2>
+        <form method="dialog"><button type="submit" class="text-btn" data-i18n="btn.close">Fechar</button></form>
+      </div>
+      <label class="setting-row"><span data-i18n="nav.lang">Idioma</span>
+        <select id="lang-select" class="lang-select">
+          <option value="pt">Português</option><option value="en">English</option><option value="es">Español</option>
+        </select>
+      </label>
+      <div class="setting-row"><span data-i18n="nav.theme">Tema</span><button type="button" class="icon-btn" id="theme-btn"></button></div>
+      <div class="setting-row"><span data-i18n="nav.sound">Som</span><button type="button" class="icon-btn" id="sound-btn"></button></div>
+    </div>
   </dialog>
 
   <!-- Como jogar (abre sozinho na primeira visita; sem barra de rolagem à vista) -->

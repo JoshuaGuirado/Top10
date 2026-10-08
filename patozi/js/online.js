@@ -276,13 +276,15 @@ function renderSala() {
   if (!sala) return;
   $("room-code").textContent = sala.code;
   const host = isHost();
-  $("lobby-players").innerHTML = salaJogadores.map((p) => `
-    <div class="lobby-player ${onlinePresente(p.user_id) ? "here" : ""}">
-      ${patoSvg(p.cor || 0, "", p.pato)}
+  trocarHtml($("lobby-players"), salaJogadores.map((p) => `
+    <div class="lobby-player ${onlinePresente(p.user_id) ? "here" : ""} ${p.user_id === me.id ? "me" : ""}">
+      ${p.user_id === me.id
+        ? `<button type="button" class="duck-btn" data-vestir title="${escapeHtml(t("setup.dress"))}" aria-label="${escapeHtml(t("setup.dress"))}">${patoSvg(minhaCor(), "", meuPato())}</button>`
+        : patoSvg(p.cor || 0, "", p.pato)}
       <b>${escapeHtml(p.nick)}${p.user_id === sala.host_id ? ` <small>· ${escapeHtml(t("lobby.host"))}</small>` : ""}${p.user_id === me.id ? ` <small>· ${escapeHtml(t("lobby.you"))}</small>` : ""}</b>
       <span class="dot"></span>
       ${host && p.user_id !== me.id ? `<button type="button" class="remove" data-tirar="${p.user_id}" title="${escapeHtml(t("lobby.kick"))}" aria-label="${escapeHtml(t("lobby.kick"))}">×</button>` : ""}
-    </div>`).join("");
+    </div>`).join(""));
   const cfg = { ...configSalva(), ...(sala.settings || {}) };
   renderOptions($("lobby-options"), cfg, salaJogadores.length, host, async (c) => {
     config = c;
@@ -298,6 +300,27 @@ function renderSala() {
   $("lobby-status").textContent = host
     ? t(salaJogadores.length < 2 ? "lobby.needTwo" : "lobby.ready")
     : t("lobby.waitHost", { nome: dono ? dono.nick : "?" });
+}
+
+// Na sala de espera, cada um veste o próprio pato; os outros veem na hora (e ele vai assim para a partida).
+let vestirTimer = null;
+
+function vestirNaSala() {
+  abrirGuardaRoupa(store("nick") || t("setup.you"), { cor: minhaCor(), pato: meuPato() }, (cor, pato) => {
+    store("cor", cor);
+    store("pato", pato);
+    aoMudarVisual();
+    const eu = salaJogadores.find((p) => p.user_id === me.id);
+    if (eu) Object.assign(eu, { cor, pato });
+    renderSala();
+    clearTimeout(vestirTimer);
+    vestirTimer = setTimeout(async () => {
+      if (!sala) return;
+      const { error } = await sb.from("patozi_sala_jogadores").update({ cor, pato }).eq("sala_code", sala.code).eq("user_id", me.id);
+      if (error && /pato/.test(error.message || "")) await sb.from("patozi_sala_jogadores").update({ cor }).eq("sala_code", sala.code).eq("user_id", me.id);
+      enviar("sala");
+    }, 400);
+  });
 }
 
 async function tirarDaSala(uid) {

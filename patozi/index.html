@@ -27,46 +27,37 @@
       <img class="logo logo-dark" src="../brand/patozi-logo-dark.svg" alt="" aria-hidden="true">
     </button>
     <div class="topbar-actions">
-      <label><span class="sr-only" data-i18n="nav.lang">Idioma</span>
-        <select id="lang-select" class="lang-select">
-          <option value="pt">PT</option><option value="en">EN</option><option value="es">ES</option>
-        </select>
-      </label>
       <button type="button" class="icon-btn" id="help-btn" data-i18n-aria="help.title" aria-label="Como jogar"></button>
-      <button type="button" class="icon-btn" id="theme-btn"></button>
-      <button type="button" class="icon-btn" id="sound-btn"></button>
+      <button type="button" class="icon-btn" id="settings-btn" data-i18n-aria="nav.settings" aria-label="Configurações"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
       <button type="button" class="icon-btn" id="profile-btn" data-i18n-aria="nav.profile" aria-label="Perfil"></button>
     </div>
   </div>
 
   <main>
     <!-- Início -->
-    <section id="screen-home" class="screen">
-      <div class="hero">
-        <a class="crumb" href="../" data-i18n="nav.gamezi">← Gamezi: todos os jogos</a>
-        <img class="hero-symbol logo-light" src="../brand/patozi-simbolo.svg" alt="" aria-hidden="true">
-        <img class="hero-symbol logo-dark" src="../brand/patozi-simbolo-escuro.svg" alt="" aria-hidden="true">
-        <h1><span data-i18n="hero.line1">Chute um número.</span><span class="accent" data-i18n="hero.line2">Nem a pato!</span></h1>
-        <p class="lead" data-i18n="hero.lead">Cada um sobe o chute até alguém duvidar. Quem errar fica com a carta e os patos dela. No fim, quem tiver mais patos perde.</p>
-        <div class="hero-actions">
-          <button type="button" class="btn big" id="start-btn" data-i18n="btn.play">Jogar</button>
-          <button type="button" class="btn big dark" id="online-btn" data-i18n="btn.online">Jogar online</button>
-        </div>
+    <section id="screen-home" class="screen home">
+      <div class="home-head">
+        <img class="home-symbol logo-light" src="../brand/patozi-simbolo.svg" alt="" aria-hidden="true">
+        <img class="home-symbol logo-dark" src="../brand/patozi-simbolo-escuro.svg" alt="" aria-hidden="true">
+        <h1 class="home-tag" data-i18n="home.tag">Chute um número. Quem passar da resposta fica com o pato.</h1>
+        <div class="home-account"><button type="button" class="btn small account-btn" data-label="account.short">Entrar</button></div>
       </div>
-      <div class="daily" id="daily-card"></div>
-      <ol class="rules">
-        <li><b class="n">2–10</b><p data-i18n="rules.1">Jogadores no mesmo celular, contra o computador ou online.</p></li>
-        <li><b class="n">+1</b><p data-i18n="rules.2">Na sua vez, chute um número maior que o último.</p></li>
-        <li><b class="n" data-i18n="rules.3n">Nem a pato!</b><p data-i18n="rules.3">Achou que passou da resposta? Duvide. Quem errar fica com a carta.</p></li>
-        <li><b class="n pato-n"><span class="pato-ico"></span>×3</b><p data-i18n="rules.4">Cada carta vale de 1 a 3 patos. Quem juntar mais perde.</p></li>
-      </ol>
-      <h3 data-i18n="home.themes">Temas</h3>
-      <div class="theme-cloud" id="home-themes"></div>
-      <footer class="site-foot">
+      <div class="home-card daily" id="daily-card"></div>
+      <div class="home-card home-row">
+        <div><b data-i18n="home.free">Partida</b><span data-i18n="home.freeSub">De 2 a 10 jogadores, com amigos ou o computador</span></div>
+        <button type="button" class="btn" id="start-btn" data-i18n="btn.play">Jogar</button>
+      </div>
+      <div class="home-card home-row">
+        <div><b data-i18n="home.online">Online</b><span data-i18n="home.onlineSub">Cada um no seu celular</span></div>
+        <button type="button" class="btn dark" id="online-btn" data-i18n="btn.play">Jogar</button>
+      </div>
+      <nav class="home-links">
         <button type="button" class="link-btn" id="help-link" data-i18n="help.title">Como jogar</button>
+        <a href="../" data-i18n="home.more">Mais jogos</a>
+      </nav>
+      <footer class="site-foot">
         <a href="../termos.html" data-i18n="foot.terms">Termos de uso</a>
         <a href="../privacidade.html" data-i18n="foot.privacy">Privacidade</a>
-        <a href="../" data-i18n="foot.gamezi">Mais jogos no Gamezi</a>
         <span>© 2026 Gamezi</span>
       </footer>
     </section>
@@ -185,11 +176,11 @@
       <h3 data-i18n="closet.title">Vista seu pato</h3>
       <div class="closet" id="closet">
         <p class="small muted" data-i18n="closet.sub">Seu visual aparece nas partidas, no resultado e na sala online.</p>
-        <div class="chips closet-tabs" id="closet-tabs"></div>
-        <div class="closet-grid" id="closet-grid"></div>
+        <div class="chips closet-tabs"></div>
+        <div class="closet-grid"></div>
         <div class="closet-actions">
-          <button type="button" class="btn small ghost" id="closet-random" data-i18n="closet.random">Sortear visual</button>
-          <button type="button" class="link-btn" id="closet-clear" data-i18n="closet.clear">Tirar tudo</button>
+          <button type="button" class="btn small ghost" data-closet="sortear" data-i18n="closet.random">Sortear visual</button>
+          <button type="button" class="link-btn" data-closet="tirar" data-i18n="closet.clear">Tirar tudo</button>
         </div>
       </div>
       <div class="stats-tiles" id="stats"></div>
@@ -212,6 +203,34 @@
       <div class="actions"><button type="button" class="btn ghost" id="profile-back" data-i18n="btn.back">Voltar</button></div>
     </section>
   </main>
+
+  <!-- Vestir o pato de um jogador (tela de jogadores e sala online) -->
+  <dialog class="dialog closet-dialog" id="closet-dialog">
+    <div class="dialog-inner">
+      <div class="dialog-head"><h2 id="closet-dialog-title">Pato</h2><button type="button" class="text-btn" data-close data-i18n="btn.done">Pronto</button></div>
+      <div class="closet-preview"></div>
+      <div class="chips closet-tabs"></div>
+      <div class="closet-grid"></div>
+      <div class="closet-actions">
+        <button type="button" class="btn small ghost" data-closet="sortear" data-i18n="closet.random">Sortear visual</button>
+        <button type="button" class="link-btn" data-closet="tirar" data-i18n="closet.clear">Tirar tudo</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Configurações: idioma, tema e som -->
+  <dialog class="dialog settings-dialog" id="settings-dialog">
+    <div class="dialog-inner">
+      <div class="dialog-head"><h2 data-i18n="nav.settings">Configurações</h2><button type="button" class="text-btn" data-close data-i18n="btn.close">Fechar</button></div>
+      <label class="setting-row"><span data-i18n="nav.lang">Idioma</span>
+        <select id="lang-select" class="lang-select">
+          <option value="pt">Português</option><option value="en">English</option><option value="es">Español</option>
+        </select>
+      </label>
+      <div class="setting-row"><span data-i18n="nav.theme">Tema</span><button type="button" class="icon-btn" id="theme-btn"></button></div>
+      <div class="setting-row"><span data-i18n="nav.sound">Som</span><button type="button" class="icon-btn" id="sound-btn"></button></div>
+    </div>
+  </dialog>
 
   <!-- Como jogar -->
   <dialog class="dialog" id="help-dialog">

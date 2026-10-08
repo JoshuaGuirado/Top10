@@ -62,7 +62,7 @@ function salvarJogadores() {
 function renderSetup() {
   $("player-list").innerHTML = jogadores.map((p, i) => `
     <div class="player-row" data-i="${i}">
-      <button type="button" class="duck-btn" data-act="cor" aria-label="${escapeHtml(t("setup.color"))}" title="${escapeHtml(t("setup.color"))}">${patoSvg(p.cor, "", visualDe(p, i))}</button>
+      <button type="button" class="duck-btn" data-act="cor" aria-label="${escapeHtml(t("setup.dress"))}" title="${escapeHtml(t("setup.dress"))}">${patoSvg(p.cor, "", visualDe(p, i))}</button>
       <input value="${escapeHtml(p.nome || "")}" maxlength="16" placeholder="${escapeHtml(nomePadrao(i))}" aria-label="${escapeHtml(t("setup.name"))}">
       ${p.bot ? `<span class="tag">${UI_ICONS.bot}${escapeHtml(t("setup.botTag"))}</span>` : ""}
       <button type="button" class="remove" data-act="tirar" aria-label="${escapeHtml(t("setup.remove"))}" title="${escapeHtml(t("setup.remove"))}" ${jogadores.length <= 1 ? "disabled" : ""}>×</button>
@@ -82,8 +82,15 @@ function setupClick(e) {
   if (!row || !btn) return;
   const i = Number(row.dataset.i);
   if (btn.dataset.act === "cor") {
-    jogadores[i].cor = (jogadores[i].cor + 1) % PZ_CORES.length;
-    sfx.tick();
+    // Cada um veste o próprio pato (o seu vale também para o Perfil e para a conta).
+    const p = jogadores[i];
+    return abrirGuardaRoupa(p.nome || nomePadrao(i), { cor: p.cor, pato: visualDe(p, i) }, (cor, pato) => {
+      p.cor = cor;
+      if (i === 0 && !p.bot) store("pato", pato);
+      else p.pato = pato;
+      salvarJogadores();
+      renderSetup();
+    });
   } else if (btn.dataset.act === "tirar") {
     jogadores.splice(i, 1);
   }
@@ -114,7 +121,7 @@ function renderOptions(el, cfg, nJogadores, editavel, onChange) {
   const todos = !cfg.temas.length;
   const dis = editavel ? "" : "disabled";
   const nCartas = (id) => pzCartasDosTemas([id]).length;
-  el.innerHTML = `
+  trocarHtml(el, `
     <p class="opt-label">${escapeHtml(t("opt.themes"))}</p>
     <div class="chips">
       <button type="button" class="chip plain ${todos ? "active" : ""}" data-tema="*" ${dis}>${escapeHtml(t("opt.all"))}</button>
@@ -127,7 +134,7 @@ function renderOptions(el, cfg, nJogadores, editavel, onChange) {
     <p class="small muted">${escapeHtml(t("opt.lengthHint", { n: pzMeta(Math.max(2, nJogadores), cfg.duracao) }))}</p>
     <p class="opt-label">${escapeHtml(t("opt.extras"))}</p>
     <label class="check"><input type="checkbox" data-regra="dobrei" ${cfg.dobrei ? "checked" : ""} ${dis}><span>${escapeHtml(t("opt.dobrei"))}</span></label>
-    <label class="check"><input type="checkbox" data-regra="mosca" ${cfg.mosca ? "checked" : ""} ${dis}><span>${escapeHtml(t("opt.mosca"))}</span></label>`;
+    <label class="check"><input type="checkbox" data-regra="mosca" ${cfg.mosca ? "checked" : ""} ${dis}><span>${escapeHtml(t("opt.mosca"))}</span></label>`);
   if (!editavel) return;
   el.onclick = (e) => {
     const b = e.target.closest("button");

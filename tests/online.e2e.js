@@ -132,7 +132,9 @@ const server = http.createServer((req, res) => {
   await C.fill("#password", "segredo1");
   await C.click('#login-form button[value="criar"]');
   await C.waitForURL(/\/topzi\/$/, { timeout: 5000 });
-  await C.waitForFunction(() => /lara@exemplo\.com/.test(document.querySelector(".home-account .account-line").textContent), null, { timeout: 5000 });
+  await C.waitForFunction(() => document.querySelector(".home-account .account-btn").textContent === "Minha conta", null, { timeout: 5000 });
+  await C.click("#profile-btn");
+  await C.waitForFunction(() => /lara@exemplo\.com/.test(document.querySelector("#screen-profile .account-line").textContent), null, { timeout: 5000 });
   await C.waitForFunction(() => JSON.parse(localStorage.getItem("__fakedb")).topzi_perfis.length === 1, null, { timeout: 5000 });
   step("conta Gamezi: cria na conta.html e volta para o Topzi já conectada, com o perfil salvo");
 

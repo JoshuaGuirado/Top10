@@ -16,6 +16,14 @@ function store(key, value) {
   }
 }
 
+// Troca o conteúdo só quando mudou. A sala online redesenha várias vezes por segundo (presença e avisos);
+// sem isso, um botão pode ser trocado bem na hora do toque.
+function trocarHtml(el, html) {
+  if (el.pzHtml === html) return;
+  el.pzHtml = html;
+  el.innerHTML = html;
+}
+
 function escapeHtml(text) {
   return String(text).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 }
@@ -172,7 +180,6 @@ function patoSorteado(rnd = Math.random) {
 }
 
 const PATO_CORPO = "M10 52c4 1 9 4 14 4h40c13 0 24 8 24 20 0 9-8 16-20 16H38C20 92 8 80 8 64c0-5 .5-9 2-12z";
-let patoSvgN = 0;
 
 // Pato de perfil, olhando para a direita. mood: "" | "sad" | "happy". pato: o visual (chapéu, rosto, roupa, asa).
 function patoSvg(cor = PZ_CORES[0], mood = "", pato = null) {
@@ -184,7 +191,8 @@ function patoSvg(cor = PZ_CORES[0], mood = "", pato = null) {
       : '<circle cx="66" cy="30" r="4" fill="#171717"/><circle cx="67.4" cy="28.6" r="1.3" fill="#fff"/>';
   const itens = patoItens(pato);
   const camada = (k) => itens.map((it) => (it[k] ? `<g data-item="${it.id}">${it[k]}</g>` : "")).join("");
-  const clip = "pzc" + (++patoSvgN);
+  // O id do recorte depende só do visual: o mesmo pato gera o mesmo desenho (e trocarHtml não redesenha à toa).
+  const clip = "pzc-" + (c + "-" + itens.map((it) => it.id).join("-")).replace(/[^a-z0-9-]/gi, "");
   const corpo = camada("corpo").replace(/CLIP/g, clip);
   return `<svg class="pato" viewBox="0 0 100 100" aria-hidden="true">
     <path d="${PATO_CORPO}" fill="${c}"/>
