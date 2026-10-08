@@ -22,6 +22,8 @@
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
+/* Nada passa da largura da tela no celular (nem animação de entrada), senão o navegador afasta o zoom. */
+html, body { overflow-x: clip; }
 body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); line-height: 1.45; min-height: 100vh; transition: background-color .25s, color .25s; }
 main { max-width: 800px; margin: 0 auto; padding: 0 16px 80px; }
 [hidden] { display: none !important; }
@@ -110,6 +112,12 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .player-row input:focus, .nick input:focus, .suggest input:focus, .suggest select:focus, .answer-input:focus { outline: none; border-color: var(--accent); }
 .player-row .tag { font-size: .72rem; font-weight: 800; color: var(--muted); white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
 .player-row .tag .ui-ico { width: 16px; height: 16px; }
+@media (max-width: 380px) {
+  .player-row { gap: 8px; }
+  .player-row .tag { font-size: 0; gap: 0; }
+  .player-row .tag .ui-ico { width: 18px; height: 18px; }
+  .player-row input { padding: 10px; }
+}
 .remove { border: 0; background: var(--bg); border-radius: 50%; width: 32px; height: 32px; flex: none; font-size: 1.2rem; line-height: 1; color: var(--muted); }
 .remove:hover { background: var(--bad); color: #fff; }
 .add-row { margin-top: 10px; }
@@ -136,6 +144,7 @@ button { font: inherit; cursor: pointer; color: inherit; }
 
 /* ── partida ── */
 .game-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 4px 0 10px; }
+.game-top .link-btn { white-space: nowrap; }
 .scoreboard { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 6px; padding: 4px 0 8px; }
 .score-chip {
   min-width: 0; display: grid; grid-template-columns: 30px minmax(0, 1fr); column-gap: 6px; align-items: center;
@@ -254,7 +263,7 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .lobby-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
 .lobby-top p { margin: 0; }
 .room-code { font-stretch: 75%; font-weight: 800; font-size: clamp(3rem, 16vw, 5rem); letter-spacing: .12em; line-height: 1; color: var(--accent-ink); }
-.lobby-players { display: grid; gap: 6px; }
+.lobby-players { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
 .lobby-player { display: flex; align-items: center; gap: 10px; background: var(--surface); border-radius: var(--r); padding: 6px 12px 6px 6px; }
 .lobby-player .pato { width: 40px; flex: none; }
 .lobby-player b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

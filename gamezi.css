@@ -21,6 +21,8 @@
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
+/* Nada passa da largura da tela no celular (nem animação de entrada), senão o navegador afasta o zoom. */
+html, body { overflow-x: clip; }
 body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font); line-height: 1.45; min-height: 100vh; transition: background-color .25s, color .25s; }
 a { color: inherit; }
 .wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
@@ -51,7 +53,7 @@ a { color: inherit; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* início: uma coluna, uma frase e uma linha por jogo (no jeito do Contexto) */
-.portal { max-width: 460px; margin: 0 auto; padding: 18px 0 0; display: grid; gap: 12px; }
+.portal { max-width: 460px; margin: 0 auto; padding: 18px 0 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
 .portal-tag { margin: 0 0 6px; text-align: center; font-size: 1.15rem; font-weight: 600; line-height: 1.35; }
 .game-row {
   display: flex; align-items: center; gap: 14px; padding: 12px 14px; text-decoration: none;
@@ -66,6 +68,13 @@ a { color: inherit; }
 .game-text small { color: var(--muted); font-size: .88rem; }
 .game-text .game-daily { color: var(--accent-ink); font-weight: 700; font-size: .78rem; }
 .play { flex: none; background: var(--accent); color: var(--on-accent); border-radius: 999px; padding: 11px 22px; font-weight: 700; }
+@media (max-width: 380px) {
+  .game-row { gap: 10px; padding: 10px; }
+  .game-icon { width: 52px; height: 52px; border-radius: 14px; }
+  .game-icon img { width: 36px; }
+  .game-icon img[src*="patozi"] { width: 40px; }
+  .play { padding: 10px 16px; }
+}
 .game-row:hover .play { filter: brightness(1.08); }
 .soon { margin: 4px 0 0; text-align: center; color: var(--muted); font-size: .9rem; }
 .portal-links { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px 20px; margin-top: 10px; font-weight: 700; font-size: .95rem; }

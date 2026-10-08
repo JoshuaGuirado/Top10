@@ -39,6 +39,8 @@
 
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
+/* Nada passa da largura da tela no celular (nem animação de entrada), senão o navegador afasta o zoom. */
+html, body { overflow-x: clip; }
 
 body {
   margin: 0;
@@ -643,6 +645,11 @@ body.flash-bad .guess input { border-color: var(--bad); }
   width: 100%; padding: 8px 12px; border: 2px solid var(--line); border-radius: var(--r-sm); background: var(--bg); color: var(--fg);
 }
 .code-input:focus { outline: none; border-color: var(--accent); }
+@media (max-width: 380px) {
+  .online-me { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .online-me .avatar-btn { width: 110px; }
+  .online-me-info { justify-items: center; width: 100%; }
+}
 @media (max-width: 560px) {
   .online-grid { grid-template-columns: 1fr; }
   .online-me { grid-template-columns: 96px 1fr; }
@@ -650,7 +657,7 @@ body.flash-bad .guess input { border-color: var(--bad); }
 .lobby-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
 .lobby-top .ctrl-label { margin: 0; }
 .room-code { margin: 0; font-stretch: 75%; font-weight: 800; font-size: clamp(3rem, 16vw, 5rem); letter-spacing: .12em; line-height: 1; color: var(--accent-ink); }
-.lobby-players { display: grid; gap: 6px; margin-bottom: 16px; }
+.lobby-players { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; margin-bottom: 16px; }
 .lobby-player { display: flex; align-items: center; gap: 10px; background: var(--surface); border-radius: var(--r); padding: 6px 12px 6px 6px; }
 .lobby-player b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lobby-player b small { color: var(--muted); font-weight: 600; }
@@ -880,6 +887,11 @@ body[data-screen]:not([data-screen="home"]) .gamezi-back { display: none; }
 .cat-tile small { color: var(--muted); font-weight: 600; }
 .cat-tile .ico, .cat-tile svg { color: var(--accent-ink); flex: none; }
 .cat-back { margin: 0 0 6px; font-size: .95rem; }
+/* Celular estreito: sem o número de listas, para o nome da categoria caber inteiro. */
+@media (max-width: 380px) {
+  .cat-tile { padding: 10px; gap: 6px; font-size: .84rem; }
+  .cat-tile small { display: none; }
+}
 #lists-sub { margin: 4px 0 8px; }
 #screen-lists .list-grid { grid-template-columns: 1fr; gap: 6px; }
 #screen-lists .list-play { padding: 12px 16px; gap: 2px; }
