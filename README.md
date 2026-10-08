@@ -54,7 +54,7 @@ Na tela de listas, "Criar lista" monta uma lista sua de 10, 30 ou 50 itens, do m
 - `supabase/`: SQL do banco e passo a passo de configuração
 - `sw.js` e `manifest.webmanifest`: instalar como app e jogar offline
 - `tests/`: testes automáticos (`npm test`), que também rodam no GitHub a cada push, e o teste do online com duas abas e um Supabase falso (`npm run test:online`)
-- `brand/` e `brand.html`: logo TOPZI, símbolo 10, ícones e manual de identidade visual (logo, cores, tipografia, componentes, ícones e tom de voz) (vermelho `#FF4D3D`, preto `#171717`, creme `#FFF4DE`)
+- `brand/` e `brand.html`: logo TOPZI, símbolo 10, ícones (o Z da logo no preto, na aba e no app) e manual de identidade visual (logo, cores, tipografia, componentes, ícones e tom de voz) (vermelho `#FF4D3D`, preto `#171717`, creme `#FFF4DE`)
 - `termos.html` e `privacidade.html`: Termos de uso e Política de privacidade (LGPD), com o visual de `docs.css`
 - `404.html`, `robots.txt` e `sitemap.xml`: página de erro e arquivos para buscadores
 

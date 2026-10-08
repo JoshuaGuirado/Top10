@@ -140,6 +140,16 @@
     .icons-row { display: flex; gap: 18px; align-items: flex-end; flex-wrap: wrap; }
     .icons-row figure { margin: 0; display: grid; gap: 6px; justify-items: center; font-size: .75rem; color: var(--muted); font-weight: 700; }
     .icons-row svg { width: 28px; height: 28px; color: var(--fg); }
+
+    /* impressão / PDF */
+    @page { size: A4; margin: 14mm 12mm; }
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .back, .doc-foot { display: none; }
+      .doc h2 { break-after: avoid; margin-top: 28px; }
+      .doc h3 { break-after: avoid; }
+      .panel, .card, .demo, .sw, .dont, .voice > div, .type-row, .data-table tr, .note, .toc, .og { break-inside: avoid; }
+    }
   </style>
 </head>
 <body>
@@ -162,7 +172,7 @@
       <ol>
         <li><a href="#essencia">Essência da marca</a></li>
         <li><a href="#logo">Logo</a></li>
-        <li><a href="#simbolo">Símbolo 10</a></li>
+        <li><a href="#simbolo">Símbolo 10 e ícone</a></li>
         <li><a href="#cores">Cores</a></li>
         <li><a href="#tipografia">Tipografia</a></li>
         <li><a href="#formas">Formas e espaçamento</a></li>
@@ -213,7 +223,7 @@
       </div>
       <div class="card">
         <p>Deixe em volta da logo um espaço livre igual à <b>altura do "O"</b> (marcado como <b>x</b>). Nada de texto, borda ou outro elemento dentro dessa área.</p>
-        <p><b>Tamanho mínimo:</b> 96 px de largura na tela (no site ela aparece com 26 a 34 px de altura) e 25 mm no impresso. Abaixo disso, use o <a href="#simbolo">símbolo 10</a>.</p>
+        <p><b>Tamanho mínimo:</b> 96 px de largura na tela (no site ela aparece com 26 a 34 px de altura) e 25 mm no impresso. Abaixo disso, use o <a href="#icone">ícone Z</a>.</p>
       </div>
     </div>
 
@@ -228,14 +238,26 @@
     </div>
 
     <!-- 3 -->
-    <h2 id="simbolo">3. Símbolo 10</h2>
-    <p>O "10" é a pontuação máxima de uma lista de 10: o item mais difícil. O <b>pedaço vermelho no topo do zero</b> é o topo da lista, o lugar que todo mundo quer alcançar. Ele aparece onde falta espaço: ícone do app, aba do navegador, avatar de rede social e na tela inicial, acima do título.</p>
-    <div class="grid three">
+    <h2 id="simbolo">3. Símbolo 10 e ícone</h2>
+    <p>O "10" é a pontuação máxima de uma lista de 10: o item mais difícil. O <b>pedaço vermelho no topo do zero</b> é o topo da lista, o lugar que todo mundo quer alcançar. Ele aparece na tela inicial, acima do título, na imagem de compartilhamento e como avatar de rede social.</p>
+    <div class="grid">
       <div><div class="panel cream"><img src="brand/simbolo.svg" alt="Símbolo 10 no fundo creme" width="150"></div><p class="caption">Fundo creme · <code>simbolo.svg</code></p></div>
       <div><div class="panel ink"><img src="brand/simbolo-escuro.svg" alt="Símbolo 10 no fundo preto" width="150"></div><p class="caption">Fundo preto · <code>simbolo-escuro.svg</code></p></div>
-      <div><div class="panel cream"><div class="icons-row"><figure><img src="brand/icon-192.png" alt="Ícone do app" width="96" style="border-radius:22px;border:2px solid #171717"><figcaption>App</figcaption></figure><figure><img src="brand/favicon.svg" alt="Ícone da aba" width="32"><figcaption>32 px</figcaption></figure><figure><img src="brand/favicon.svg" alt="" width="16"><figcaption>16 px</figcaption></figure></div></div><p class="caption">Ícones · mínimo de 16 px</p></div>
     </div>
     <p>Regra de cor: no símbolo, <b>só o topo do zero é vermelho</b>. Na logo, <b>só o Z</b>. O vermelho nunca aparece em mais de um ponto da mesma peça.</p>
+
+    <h3 id="icone">Ícone do app e da aba</h3>
+    <p>Para a aba do navegador e o ícone do app instalado, o Topzi usa o <b>Z da logo</b>, em vermelho, num quadrado preto. A logo inteira não cabe legível em 16 px, e o Z é a letra que já carrega a cor da marca. É a mesma forma da logo, sem redesenhar.</p>
+    <div class="grid">
+      <div><div class="panel cream"><div class="icons-row"><figure><img src="brand/icon-192.png" alt="Ícone do app" width="96" style="border-radius:22px"><figcaption>App</figcaption></figure><figure><img src="brand/favicon.svg" alt="Ícone da aba" width="32"><figcaption>32 px</figcaption></figure><figure><img src="brand/favicon.svg" alt="" width="16"><figcaption>16 px</figcaption></figure></div></div><p class="caption">Fundo preto <code>#171717</code> · Z vermelho <code>#FF4D3D</code> · mínimo de 16 px</p></div>
+      <div class="card">
+        <ul>
+          <li>Fundo sempre <b>preto</b>, quadrado. O sistema do celular arredonda os cantos; na aba, o arquivo SVG já vem com cantos arredondados.</li>
+          <li>O Z ocupa cerca de <b>60%</b> da altura (66% na aba, 48% na versão "maskable" do Android, que corta as bordas).</li>
+          <li>Não troque a cor do fundo nem coloque o Z em creme: a força do ícone é o vermelho no preto.</li>
+        </ul>
+      </div>
+    </div>
 
     <!-- 4 -->
     <h2 id="cores">4. Cores</h2>
@@ -414,11 +436,11 @@
     <!-- 11 -->
     <h2 id="aplicacoes">11. Aplicações</h2>
     <h3>Imagem de compartilhamento</h3>
-    <img class="og" src="brand/og-image.png" alt="Imagem de compartilhamento do Topzi, 1200 por 630" width="1200" height="630" loading="lazy">
+    <img class="og" src="brand/og-image.png" alt="Imagem de compartilhamento do Topzi, 1200 por 630" width="1200" height="630">
     <p class="caption">1200 × 630 px · aparece quando o link é mandado no WhatsApp e nas redes · <code>brand/og-image.png</code></p>
     <h3>Redes sociais</h3>
     <div class="grid">
-      <div class="card"><p><b>Avatar:</b> símbolo 10 no fundo creme, centralizado, com margem de 20%.</p><p><b>Posts:</b> fundo creme ou preto, título no display em maiúsculas, um único destaque em vermelho. Mostre o quadro da lista como peça principal (itens achados em preto, escondidos com barra).</p></div>
+      <div class="card"><p><b>Avatar:</b> símbolo 10 no fundo creme (ou o ícone Z no preto), centralizado, com margem de 20%.</p><p><b>Posts:</b> fundo creme ou preto, título no display em maiúsculas, um único destaque em vermelho. Mostre o quadro da lista como peça principal (itens achados em preto, escondidos com barra).</p></div>
       <div class="card"><p><b>Lista do dia:</b> o resultado compartilhado usa quadradinhos de texto, para funcionar em qualquer aplicativo de conversa.</p><p><b>Vídeos:</b> abertura com o símbolo, corte seco, fecho com a logo e "topzi" no fundo creme.</p></div>
     </div>
 
@@ -432,8 +454,8 @@
           <tr><td><a href="brand/logo-dark.svg" download><code>brand/logo-dark.svg</code></a></td><td>Logo para fundo preto (escuro)</td></tr>
           <tr><td><a href="brand/simbolo.svg" download><code>brand/simbolo.svg</code></a></td><td>Símbolo 10 para fundo creme</td></tr>
           <tr><td><a href="brand/simbolo-escuro.svg" download><code>brand/simbolo-escuro.svg</code></a></td><td>Símbolo 10 para fundo preto</td></tr>
-          <tr><td><code>brand/favicon.svg</code>, <code>favicon-32.png</code></td><td>Ícone da aba do navegador</td></tr>
-          <tr><td><code>brand/apple-touch-icon.png</code>, <code>icon-192.png</code>, <code>icon-512.png</code>, <code>icon-maskable-512.png</code></td><td>Ícones do app instalado</td></tr>
+          <tr><td><code>brand/favicon.svg</code>, <code>favicon-32.png</code>, <code>favicon.ico</code> (na raiz)</td><td>Ícone da aba do navegador (Z no preto)</td></tr>
+          <tr><td><code>brand/apple-touch-icon.png</code>, <code>icon-192.png</code>, <code>icon-512.png</code>, <code>icon-maskable-512.png</code></td><td>Ícones do app instalado (Z no preto)</td></tr>
           <tr><td><a href="brand/og-image.png" download><code>brand/og-image.png</code></a></td><td>Imagem de compartilhamento (1200 × 630)</td></tr>
           <tr><td><code>style.css</code> (início do arquivo)</td><td>Cores, raios e fonte em variáveis, claro e escuro</td></tr>
         </tbody>

@@ -1,7 +1,7 @@
 // Service worker: deixa o Topzi instalável e jogável offline.
 // Online, busca sempre a versão nova (rede primeiro); sem internet, usa a cópia guardada.
 
-const CACHE = "topzi-v3";
+const CACHE = "topzi-v4";
 const FILES = [
   "./",
   "index.html",
