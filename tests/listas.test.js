@@ -49,7 +49,7 @@ test("nenhuma resposta vale para dois itens da mesma lista", () => {
 
 // O dono pediu pelo menos 100 listas de 50 e 150 de 30.
 test("pelo menos 100 listas de 50 e 150 de 30", () => {
-  for (const [n, minimo] of [[50, 100], [30, 30]]) {
+  for (const [n, minimo] of [[50, 100], [30, 150]]) {
     const total = LISTS.filter((l) => l.items.length === n).length;
     assert.ok(total >= minimo, `só ${total} listas de ${n} (precisa de ${minimo})`);
   }

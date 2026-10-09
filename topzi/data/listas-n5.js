@@ -1,4 +1,222 @@
-// Listas novas (lote 5). Mesmo formato de listas.js.
+// Listas novas (lote 5): listas de 30 itens. Mesmo formato de listas.js.
+
+const N5 = "Curadoria Topzi: do mais lembrado ao menos óbvio";
 
 LISTS.push(
+  { id: "30-pokemon-357", cat: "games", title: "Os 30 Pokémon de nº 357 a 386 da Pokédex", source: "Pokédex Nacional",
+    items: [
+      "Tropius", "Chimecho", "Absol", "Wynaut", "Snorunt", "Glalie", "Spheal", "Sealeo", "Walrein", "Clamperl",
+      "Huntail", "Gorebyss", "Relicanth", "Luvdisc", "Bagon", "Shelgon", "Salamence", "Beldum", "Metang", "Metagross",
+      "Regirock", "Regice", "Registeel", "Latias", "Latios", "Kyogre", "Groudon", "Rayquaza", "Jirachi", "Deoxys",
+    ] },
+  { id: "30-pokemon-487", cat: "games", title: "Os 30 Pokémon de nº 487 a 516 da Pokédex", source: "Pokédex Nacional",
+    items: [
+      "Giratina", "Cresselia", "Phione", "Manaphy", "Darkrai", "Shaymin", "Arceus", "Victini", "Snivy", "Servine",
+      "Serperior", "Tepig", "Pignite", "Emboar", "Oshawott", "Dewott", "Samurott", "Patrat", "Watchog", "Lillipup",
+      "Herdier", "Stoutland", "Purrloin", "Liepard", "Pansage", "Simisage", "Pansear", "Simisear", "Panpour", "Simipour",
+    ] },
+  { id: "30-minecraft", cat: "games", title: "Os 30 mobs do Minecraft mais lembrados", source: N5,
+    items: [
+      "Creeper", "Zumbi", "Esqueleto", "Enderman", "Aranha", "Steve", "Alex", "Ender Dragon|Dragão do Ender", "Wither", "Porco",
+      "Vaca", "Galinha", "Ovelha", "Lobo", "Aldeão", "Golem de Ferro", "Bruxa", "Blaze", "Ghast", "Slime",
+      "Piglin", "Warden", "Axolote", "Abelha", "Lhama", "Cavalo", "Panda", "Raposa", "Phantom", "Guardião",
+    ] },
+  { id: "30-consoles", cat: "games", title: "Os 30 consoles de videogame mais famosos", source: N5,
+    items: [
+      "PlayStation 2|PS2", "PlayStation|PS1", "PlayStation 4|PS4", "PlayStation 5|PS5", "Nintendo Switch|Switch", "Super Nintendo|SNES", "Xbox 360", "Nintendo 64|N64", "Nintendinho|NES", "Game Boy",
+      "PlayStation 3|PS3", "Xbox One", "Nintendo DS|DS", "Wii", "Mega Drive", "Xbox Series X", "Xbox", "GameCube", "Master System", "Atari 2600|Atari",
+      "Game Boy Advance|GBA", "Nintendo 3DS|3DS", "PSP", "Wii U", "Dreamcast", "Sega Saturn|Saturn", "Game Boy Color", "PS Vita", "Steam Deck", "Nintendo Switch 2|Switch 2",
+    ] },
+  { id: "30-jogos-pc", cat: "games", title: "Os 30 jogos de PC mais famosos", source: N5,
+    items: [
+      "Minecraft", "Counter-Strike|CS", "League of Legends|LoL", "Dota 2", "World of Warcraft|WoW", "The Sims", "Valorant", "Age of Empires", "StarCraft", "Diablo",
+      "Half-Life", "Warcraft III", "Roblox", "The Witcher 3", "Skyrim", "Cyberpunk 2077", "Baldur's Gate 3", "SimCity", "Civilization", "Doom",
+      "Quake", "Portal", "Team Fortress 2", "Among Us", "Stardew Valley", "Terraria", "PUBG", "Overwatch", "Elden Ring", "Hollow Knight",
+    ] },
+  { id: "30-jogos-corrida", cat: "games", title: "Os 30 jogos de corrida e de esporte mais famosos", source: N5,
+    items: [
+      "EA Sports FC|FIFA", "PES|Pro Evolution Soccer|Winning Eleven", "Need for Speed", "Mario Kart", "Gran Turismo", "Forza Horizon", "NBA 2K", "Madden NFL", "Tony Hawk's Pro Skater", "Rocket League",
+      "Crash Team Racing", "Burnout", "Top Gear", "F1", "Wii Sports", "Asphalt", "Road Rash", "OutRun", "Daytona USA", "Ridge Racer",
+      "Sega Rally", "Kinect Sports", "Mario Tennis", "Mario Golf", "Fight Night", "WWE 2K", "EA Sports UFC|UFC", "Trackmania", "Colin McRae Rally|Dirt", "Twisted Metal",
+    ] },
+  { id: "30-mario", cat: "games", title: "Os 30 personagens do universo Mario mais lembrados", source: N5,
+    items: [
+      "Mario", "Luigi", "Princesa Peach|Peach", "Bowser", "Yoshi", "Toad", "Donkey Kong", "Wario", "Waluigi", "Daisy",
+      "Rosalina", "Bowser Jr.", "Koopa Troopa", "Goomba", "Boo", "Shy Guy", "Toadette", "Diddy Kong", "Birdo", "Kamek",
+      "Lakitu", "Planta Piranha|Piranha Plant", "Bullet Bill", "Chain Chomp", "Dry Bones", "Cappy", "Pauline", "Capitão Toad|Captain Toad", "King Boo", "Funky Kong",
+    ] },
+  { id: "30-beatles", cat: "musica", title: "As 30 músicas mais famosas dos Beatles", source: N5,
+    items: [
+      "Hey Jude", "Let It Be", "Yesterday", "Here Comes the Sun", "Come Together", "Twist and Shout", "Help!", "A Hard Day's Night", "All You Need Is Love", "Yellow Submarine",
+      "Something", "In My Life", "Strawberry Fields Forever", "Penny Lane", "Eleanor Rigby", "I Want to Hold Your Hand", "She Loves You", "Can't Buy Me Love", "Love Me Do", "Ob-La-Di, Ob-La-Da",
+      "Blackbird", "While My Guitar Gently Weeps", "Lucy in the Sky with Diamonds", "Get Back", "Hello, Goodbye", "Ticket to Ride", "Day Tripper", "We Can Work It Out", "Revolution", "Michelle",
+    ] },
+  { id: "30-michael-jackson", cat: "musica", title: "As 30 músicas mais famosas de Michael Jackson", source: N5,
+    items: [
+      "Thriller", "Billie Jean", "Beat It", "Smooth Criminal", "Black or White", "Bad", "Man in the Mirror", "Heal the World", "Don't Stop 'Til You Get Enough", "Rock with You",
+      "Remember the Time", "They Don't Care About Us", "You Are Not Alone", "Earth Song", "The Way You Make Me Feel", "Dirty Diana", "Human Nature", "Wanna Be Startin' Somethin'", "Off the Wall", "Leave Me Alone",
+      "Liberian Girl", "Scream", "Jam", "In the Closet", "Will You Be There", "Ben", "I Just Can't Stop Loving You", "Blood on the Dance Floor", "Stranger in Moscow", "Childhood",
+    ] },
+  { id: "30-queen", cat: "musica", title: "As 30 músicas mais famosas do Queen", source: N5,
+    items: [
+      "Bohemian Rhapsody", "We Will Rock You", "We Are the Champions", "Don't Stop Me Now", "Another One Bites the Dust", "Somebody to Love", "I Want to Break Free", "Radio Ga Ga", "Under Pressure", "Love of My Life",
+      "Killer Queen", "The Show Must Go On", "Who Wants to Live Forever", "Crazy Little Thing Called Love", "A Kind of Magic", "I Want It All", "Bicycle Race", "Fat Bottomed Girls", "You're My Best Friend", "Innuendo",
+      "Too Much Love Will Kill You", "These Are the Days of Our Lives", "Friends Will Be Friends", "Flash", "Princes of the Universe", "Seven Seas of Rhye", "Tie Your Mother Down", "Save Me", "Spread Your Wings", "Hammer to Fall",
+    ] },
+  { id: "30-funk", cat: "musica", title: "Os 30 nomes mais famosos do funk brasileiro", source: N5,
+    items: [
+      "Anitta", "Ludmilla", "MC Kevinho|Kevinho", "MC Livinho|Livinho", "MC Guimê", "Valesca Popozuda", "Tati Quebra Barraco", "MC Marcinho", "Claudinho e Buchecha", "Bonde do Tigrão",
+      "MC Créu", "Naldo Benny|Naldo", "MC Don Juan", "MC Kekel", "MC Hariel", "MC Ryan SP", "MC Poze do Rodo", "Kevin O Chris", "Pedro Sampaio", "MC Pedrinho",
+      "MC Lan", "MC Fioti", "Dennis DJ", "DJ Marlboro", "MC Carol", "MC Mirella", "Lexa", "MC Loma", "Jojo Todynho", "Pocah",
+    ] },
+  { id: "30-samba-pagode", cat: "musica", title: "Os 30 nomes mais famosos do samba e do pagode", source: N5,
+    items: [
+      "Zeca Pagodinho", "Thiaguinho", "Péricles", "Alexandre Pires", "Belo", "Ferrugem", "Dilsinho", "Sorriso Maroto", "Exaltasamba", "Raça Negra",
+      "Só Pra Contrariar|SPC", "Revelação|Grupo Revelação", "Menos é Mais", "Turma do Pagode", "Molejo", "Art Popular", "Fundo de Quintal", "Arlindo Cruz", "Jorge Aragão", "Beth Carvalho",
+      "Alcione", "Martinho da Vila", "Paulinho da Viola", "Cartola", "Noel Rosa", "Clara Nunes", "Diogo Nogueira", "Mumuzinho", "Xande de Pilares", "Pixote",
+    ] },
+  { id: "30-kpop", cat: "musica", title: "Os 30 grupos e artistas de K-pop mais famosos", source: N5,
+    items: [
+      "BTS", "Blackpink", "Twice", "Stray Kids", "EXO", "NewJeans", "Big Bang", "PSY", "Seventeen", "Red Velvet",
+      "ATEEZ", "aespa", "IVE", "LE SSERAFIM", "ITZY", "Girls' Generation|SNSD", "Super Junior", "NCT", "TXT|Tomorrow X Together", "ENHYPEN",
+      "(G)I-DLE|G-Idle", "Mamamoo", "GOT7", "Monsta X", "SHINee", "2NE1", "BABYMONSTER", "ILLIT", "Wonder Girls", "TVXQ",
+    ] },
+  { id: "30-natal", cat: "musica", title: "As 30 músicas de Natal mais famosas", source: N5,
+    items: [
+      "Jingle Bells|Bate o Sino", "Noite Feliz|Silent Night", "All I Want for Christmas Is You", "Last Christmas", "Feliz Navidad", "Então É Natal|Happy Xmas (War Is Over)", "White Christmas|Natal Branco", "Let It Snow", "Rockin' Around the Christmas Tree", "Santa Claus Is Coming to Town",
+      "Rudolph, a Rena do Nariz Vermelho|Rudolph", "Jingle Bell Rock", "We Wish You a Merry Christmas", "O Holy Night|Ó Noite Santa", "Do They Know It's Christmas?", "O Pequeno Tamborileiro|The Little Drummer Boy", "Deck the Halls", "Joy to the World", "Adeste Fideles", "Boas Festas",
+      "Christmas Lights", "Underneath the Tree", "Santa Tell Me", "It's Beginning to Look a Lot Like Christmas", "Have Yourself a Merry Little Christmas", "Blue Christmas", "Mistletoe", "Santa Baby", "Merry Christmas Everyone", "Wonderful Christmastime",
+    ] },
+  { id: "30-albuns", cat: "musica", title: "Os 30 álbuns mais famosos da história", source: N5,
+    items: [
+      "Thriller", "The Dark Side of the Moon", "Abbey Road", "Back in Black", "Nevermind", "Sgt. Pepper's Lonely Hearts Club Band|Sgt. Pepper's", "Rumours", "Hotel California", "Led Zeppelin IV", "The Wall",
+      "A Night at the Opera", "Appetite for Destruction", "21", "1989", "Bad", "Purple Rain", "Born in the U.S.A.", "Like a Virgin", "Hybrid Theory", "The Joshua Tree",
+      "OK Computer", "Revolver", "Pet Sounds", "Back to Black", "Lemonade", "Random Access Memories", "Black Album|Metallica", "Kind of Blue", "Blood Sugar Sex Magik", "Acabou Chorare",
+    ] },
+  { id: "30-djs", cat: "musica", title: "Os 30 DJs e produtores mais famosos", source: N5,
+    items: [
+      "David Guetta", "Calvin Harris", "Avicii", "Tiësto", "Martin Garrix", "Alok", "Marshmello", "Skrillex", "Diplo", "Armin van Buuren",
+      "Steve Aoki", "Daft Punk", "The Chainsmokers", "Kygo", "Zedd", "Swedish House Mafia", "Hardwell", "Afrojack", "Deadmau5", "Major Lazer",
+      "Fatboy Slim", "Bob Sinclar", "Alan Walker", "Vintage Culture", "Dimitri Vegas & Like Mike", "Fred again..", "Peggy Gou", "Anyma", "Kaskade", "Paul van Dyk",
+    ] },
+  { id: "30-dancas", cat: "musica", title: "As 30 danças mais conhecidas", source: N5,
+    items: [
+      "Samba", "Forró", "Funk", "Tango", "Salsa", "Valsa", "Balé", "Hip-hop", "Frevo", "Axé",
+      "Bolero", "Zouk", "Lambada", "Bachata", "Merengue", "Flamenco", "Sapateado", "Breakdance|Break", "Quadrilha", "Maracatu",
+      "Carimbó", "Dança do ventre", "Pole dance", "Zumba", "Swing", "Cha-cha-chá", "Rumba", "Kizomba", "Passinho", "Vogue",
+    ] },
+  { id: "30-series-comedia", cat: "tv", title: "As 30 séries de comédia mais famosas", source: N5,
+    items: [
+      "Friends", "The Office", "Seinfeld", "The Big Bang Theory", "How I Met Your Mother", "Two and a Half Men", "Modern Family", "Brooklyn Nine-Nine", "Todo Mundo Odeia o Chris", "Um Maluco no Pedaço",
+      "Parks and Recreation", "That '70s Show", "Community", "Scrubs", "Ted Lasso", "The Good Place", "Malcolm in the Middle|Malcolm", "Sex and the City", "Will & Grace", "Frasier",
+      "Todo Mundo Ama Raymond", "The Nanny", "Family Matters", "Eu, a Patroa e as Crianças", "2 Broke Girls", "The IT Crowd", "A Grande Família", "Os Normais", "Sai de Baixo", "Vai que Cola",
+    ] },
+  { id: "30-series-policiais", cat: "tv", title: "As 30 séries policiais e de crime mais famosas", source: N5,
+    items: [
+      "Breaking Bad", "La Casa de Papel", "CSI", "Dexter", "Narcos", "Prison Break", "Law & Order|Lei & Ordem", "Sherlock", "True Detective", "Peaky Blinders",
+      "The Wire", "Mindhunter", "Ozark", "Better Call Saul", "Bones", "NCIS", "Criminal Minds|Mentes Criminosas", "Castle", "The Mentalist", "Lupin",
+      "Os Sopranos|The Sopranos", "Fargo", "Twin Peaks", "Monk", "How to Get Away with Murder", "You", "Mare of Easttown", "Sintonia", "Elite", "Lucifer",
+    ] },
+  { id: "30-series-ficcao", cat: "tv", title: "As 30 séries de ficção e fantasia mais famosas", source: N5,
+    items: [
+      "Game of Thrones", "Stranger Things", "The Walking Dead", "Lost", "Arquivo X", "Doctor Who", "Star Trek|Jornada nas Estrelas", "Westworld", "Black Mirror", "The Witcher",
+      "The Mandalorian", "A Casa do Dragão|House of the Dragon", "The Last of Us", "Dark", "Wandinha|Wednesday", "The Boys", "Supernatural", "Fringe", "Heroes", "Além da Imaginação|Twilight Zone",
+      "Os Anéis de Poder", "Loki", "WandaVision", "Ruptura|Severance", "Fallout", "Arcane", "The Umbrella Academy", "Outlander", "Vikings", "Era Uma Vez|Once Upon a Time",
+    ] },
+  { id: "30-reality", cat: "tv", title: "Os 30 reality shows mais famosos", source: N5,
+    items: [
+      "Big Brother Brasil|BBB", "A Fazenda", "MasterChef", "The Voice", "No Limite", "Casa dos Artistas", "Survivor", "American Idol", "The X Factor|X Factor", "Got Talent",
+      "Ídolos", "Dança dos Famosos", "De Férias com o Ex", "Casamento às Cegas|Love Is Blind", "Brincando com Fogo|Too Hot to Handle", "The Bachelor", "Keeping Up with the Kardashians|Kardashians", "Queer Eye", "RuPaul's Drag Race|Drag Race", "Shark Tank",
+      "Pesadelo na Cozinha|Kitchen Nightmares", "Hell's Kitchen", "Power Couple", "Jersey Shore", "The Masked Singer", "The Amazing Race", "Estrela da Casa", "Ilha Record", "Bake Off Brasil|Bake Off", "Mestre do Sabor",
+    ] },
+  { id: "30-infantis", cat: "tv", title: "Os 30 programas infantis mais marcantes da TV no Brasil", source: N5,
+    items: [
+      "Xou da Xuxa", "Castelo Rá-Tim-Bum", "TV Colosso", "Sítio do Picapau Amarelo", "Bom Dia & Cia", "TV Globinho", "Mundo da Lua", "Rá-Tim-Bum", "Cocoricó", "Bambalalão",
+      "Balão Mágico", "Angel Mix", "Eliana & Alegria", "Vila Sésamo", "Glub Glub", "TV Cruj", "Disney Cruj", "Carrossel", "Chiquititas", "Xuxa no Mundo da Imaginação",
+      "Gente Inocente", "Bananas de Pijama", "Teletubbies", "Barney e Seus Amigos|Barney", "Turma do Didi", "Sandy & Junior", "Planeta Xuxa", "Ilha Rá-Tim-Bum", "TV Xuxa", "Patati Patatá",
+    ] },
+  { id: "30-stranger-things", cat: "tv", title: "Os 30 personagens de Stranger Things mais lembrados", source: N5,
+    items: [
+      "Eleven|Onze", "Mike", "Dustin", "Lucas", "Will", "Max", "Steve", "Nancy", "Jonathan", "Joyce",
+      "Hopper", "Robin", "Erica", "Billy", "Eddie Munson|Eddie", "Vecna|Henry Creel", "Dr. Brenner|Papa", "Demogorgon", "Devorador de Mentes|Mind Flayer", "Murray",
+      "Argyle", "Barb", "Bob", "Kali|Oito", "Karen Wheeler|Karen", "Suzie", "Alexei", "Chrissy", "Jason Carver|Jason", "Holly",
+    ] },
+  { id: "30-got", cat: "tv", title: "Os 30 personagens de Game of Thrones mais lembrados", source: N5,
+    items: [
+      "Jon Snow", "Daenerys Targaryen|Daenerys", "Tyrion Lannister|Tyrion", "Cersei Lannister|Cersei", "Arya Stark|Arya", "Sansa Stark|Sansa", "Ned Stark|Eddard Stark", "Jaime Lannister|Jaime", "Joffrey", "Bran Stark|Bran",
+      "Khal Drogo", "Robb Stark|Robb", "Catelyn Stark|Catelyn", "Theon Greyjoy|Theon", "Brienne de Tarth|Brienne", "Cão de Caça|Sandor Clegane", "Montanha|Gregor Clegane", "Mindinho|Petyr Baelish", "Varys", "Ramsay Bolton|Ramsay",
+      "Tywin Lannister|Tywin", "Melisandre", "Davos", "Stannis", "Samwell Tarly|Sam", "Jorah Mormont|Jorah", "Missandei", "Verme Cinzento", "Hodor", "Oberyn Martell|Oberyn",
+    ] },
+  { id: "30-youtubers", cat: "tv", title: "Os 30 youtubers mais famosos", source: N5,
+    items: [
+      "MrBeast", "PewDiePie", "Felipe Neto", "Whindersson Nunes", "Casimiro|Cazé", "Luccas Neto", "Markiplier", "Dude Perfect", "Logan Paul", "KSI",
+      "IShowSpeed|Speed", "Kai Cenat", "Mark Rober", "Marques Brownlee|MKBHD", "Ninja", "Vsauce", "Veritasium", "Smosh", "Jacksepticeye", "Lele Pons",
+      "ElRubius", "Fernanfloo", "JuegaGerman", "Luisito Comunica", "Yuya", "RezendeEvil|Rezende", "AuthenticGames", "Enaldinho", "Jovem Nerd", "Manual do Mundo",
+    ] },
+  { id: "30-orgaos", cat: "ciencia", title: "Os 30 órgãos e partes internas do corpo mais conhecidos", source: N5,
+    items: [
+      "Coração", "Cérebro", "Pulmão", "Fígado", "Estômago", "Rim", "Intestino delgado", "Intestino grosso", "Pâncreas", "Bexiga",
+      "Baço", "Vesícula biliar", "Esôfago", "Traqueia", "Laringe", "Faringe", "Tireoide", "Apêndice", "Útero", "Ovário",
+      "Próstata", "Medula espinhal", "Diafragma", "Pele", "Hipófise", "Timo", "Amígdalas", "Glândulas suprarrenais|Suprarrenais", "Retina", "Tímpano",
+    ] },
+  { id: "30-quimica", cat: "ciencia", title: "As 30 substâncias químicas mais conhecidas", source: N5,
+    items: [
+      "Água|H2O", "Gás carbônico|Dióxido de carbono|CO2", "Oxigênio|O2", "Sal de cozinha|Cloreto de sódio|NaCl", "Glicose", "Álcool|Etanol", "Metano|CH4", "Amônia|NH3", "Ácido sulfúrico|H2SO4", "Ácido clorídrico|HCl",
+      "Soda cáustica|Hidróxido de sódio|NaOH", "Água oxigenada|Peróxido de hidrogênio|H2O2", "Bicarbonato de sódio|Bicarbonato", "Calcário|Carbonato de cálcio", "Ozônio|O3", "Monóxido de carbono|CO", "Açúcar|Sacarose", "Cafeína", "Ácido acético", "Ácido cítrico",
+      "Nitrogênio|N2", "Hidrogênio|H2", "Hélio", "Cloro", "Ferrugem|Óxido de ferro", "Aspirina|Ácido acetilsalicílico", "Propano", "Butano", "Nitroglicerina", "Ácido nítrico|HNO3",
+    ] },
+  { id: "30-constelacoes", cat: "ciencia", title: "As 30 constelações mais conhecidas", source: N5,
+    items: [
+      "Órion", "Ursa Maior", "Ursa Menor", "Cruzeiro do Sul", "Escorpião", "Leão", "Touro", "Gêmeos", "Câncer", "Virgem",
+      "Libra", "Sagitário", "Capricórnio", "Aquário", "Peixes", "Áries", "Cassiopeia", "Andrômeda", "Pégaso", "Cão Maior",
+      "Cão Menor", "Lira", "Cisne", "Águia", "Dragão", "Centauro", "Hércules", "Perseu", "Boieiro", "Hidra",
+    ] },
+  { id: "30-unidades", cat: "ciencia", title: "As 30 unidades de medida mais conhecidas", source: N5,
+    items: [
+      "Metro", "Quilômetro", "Centímetro", "Milímetro", "Quilograma|Quilo", "Grama", "Litro", "Mililitro", "Segundo", "Minuto",
+      "Hora", "Tonelada", "Grau Celsius|Celsius", "Fahrenheit", "Kelvin", "Watt", "Volt", "Ampère", "Joule", "Caloria",
+      "Polegada", "Pé", "Milha", "Jarda", "Libra", "Galão", "Hectare", "Byte", "Newton", "Ano-luz",
+    ] },
+  { id: "30-presidentes-eua", cat: "historia", title: "Os 30 presidentes dos EUA mais lembrados", source: N5,
+    items: [
+      "Abraham Lincoln|Lincoln", "George Washington|Washington", "Barack Obama|Obama", "Donald Trump|Trump", "John F. Kennedy|JFK|Kennedy", "Joe Biden|Biden", "Franklin D. Roosevelt|FDR", "Theodore Roosevelt|Teddy Roosevelt", "Ronald Reagan|Reagan", "Bill Clinton|Clinton",
+      "George W. Bush", "George H. W. Bush", "Richard Nixon|Nixon", "Thomas Jefferson|Jefferson", "Jimmy Carter|Carter", "Dwight Eisenhower|Eisenhower", "Harry Truman|Truman", "Lyndon B. Johnson|LBJ", "Gerald Ford", "Andrew Jackson",
+      "James Madison|Madison", "John Adams", "James Monroe|Monroe", "Woodrow Wilson|Wilson", "Ulysses S. Grant|Grant", "Herbert Hoover|Hoover", "John Quincy Adams", "Calvin Coolidge|Coolidge", "William McKinley|McKinley", "James K. Polk|Polk",
+    ] },
+  { id: "30-guerras", cat: "historia", title: "As 30 guerras e batalhas mais famosas da história", source: N5,
+    items: [
+      "Segunda Guerra Mundial", "Primeira Guerra Mundial", "Guerra Fria", "Guerra do Vietnã", "Guerra do Paraguai", "Guerra de Troia", "Guerra Civil Americana|Guerra de Secessão", "Guerra dos Cem Anos", "Cruzadas", "Guerras Napoleônicas",
+      "Guerra do Golfo", "Guerra do Iraque", "Guerra do Afeganistão", "Guerra da Coreia", "Guerra das Malvinas", "Guerra Civil Espanhola", "Revolução Farroupilha|Guerra dos Farrapos", "Guerra de Canudos", "Batalha de Waterloo|Waterloo", "Batalha de Stalingrado|Stalingrado",
+      "Dia D|Desembarque na Normandia", "Ataque a Pearl Harbor|Pearl Harbor", "Guerra da Ucrânia", "Guerras Púnicas", "Guerra do Peloponeso", "Batalha das Termópilas|Termópilas", "Guerra dos Seis Dias", "Guerra dos Trinta Anos", "Independência dos EUA|Revolução Americana", "Guerra do Contestado",
+    ] },
+  { id: "30-filosofos", cat: "historia", title: "Os 30 filósofos mais famosos", source: N5,
+    items: [
+      "Sócrates", "Platão", "Aristóteles", "René Descartes|Descartes", "Friedrich Nietzsche|Nietzsche", "Immanuel Kant|Kant", "Confúcio", "Karl Marx|Marx", "Maquiavel", "Jean-Jacques Rousseau|Rousseau",
+      "Voltaire", "Hegel", "Jean-Paul Sartre|Sartre", "Simone de Beauvoir", "Espinosa|Spinoza", "John Locke|Locke", "Thomas Hobbes|Hobbes", "Santo Agostinho", "Tomás de Aquino", "Pitágoras",
+      "Heráclito", "Epicuro", "Sêneca", "Marco Aurélio", "Arthur Schopenhauer|Schopenhauer", "Søren Kierkegaard|Kierkegaard", "Hannah Arendt", "Michel Foucault|Foucault", "Ludwig Wittgenstein|Wittgenstein", "Diógenes",
+    ] },
+  { id: "30-escritores", cat: "historia", title: "Os 30 escritores mais famosos", source: N5,
+    items: [
+      "William Shakespeare|Shakespeare", "Machado de Assis", "Paulo Coelho", "J. K. Rowling|JK Rowling", "Stephen King", "Agatha Christie", "Jorge Amado", "Clarice Lispector", "Monteiro Lobato", "Miguel de Cervantes|Cervantes",
+      "Gabriel García Márquez|García Márquez", "José Saramago|Saramago", "Fernando Pessoa", "Carlos Drummond de Andrade|Drummond", "Victor Hugo", "Charles Dickens|Dickens", "Jane Austen", "Liev Tolstói|Tolstói", "Fiódor Dostoiévski|Dostoiévski", "Franz Kafka|Kafka",
+      "Ernest Hemingway|Hemingway", "George Orwell|Orwell", "Mark Twain", "Edgar Allan Poe|Poe", "J. R. R. Tolkien|Tolkien", "Dante Alighieri|Dante", "Homero", "Júlio Verne", "Cecília Meireles", "Guimarães Rosa",
+    ] },
+  { id: "30-livros", cat: "historia", title: "Os 30 livros mais famosos de todos os tempos", source: N5,
+    items: [
+      "Dom Quixote", "Harry Potter e a Pedra Filosofal", "O Senhor dos Anéis", "O Pequeno Príncipe", "1984", "Dom Casmurro", "O Alquimista", "Romeu e Julieta", "Orgulho e Preconceito", "Cem Anos de Solidão",
+      "O Hobbit", "A Revolução dos Bichos", "Moby Dick", "Crime e Castigo", "Guerra e Paz", "O Diário de Anne Frank", "O Código Da Vinci", "Os Miseráveis", "Alice no País das Maravilhas", "O Grande Gatsby",
+      "Memórias Póstumas de Brás Cubas", "Grande Sertão: Veredas", "O Cortiço", "Iracema", "Vidas Secas", "Capitães da Areia", "As Crônicas de Nárnia", "Drácula", "Hamlet", "A Divina Comédia",
+    ] },
+  { id: "30-reis-rainhas", cat: "historia", title: "Os 30 reis, rainhas e imperadores mais famosos", source: N5,
+    items: [
+      "Rainha Elizabeth II|Elizabeth II", "Henrique VIII", "Luís XIV", "Rainha Vitória", "Dom Pedro II", "Dom Pedro I", "Dom João VI", "Cleópatra", "Rei Arthur", "Ricardo Coração de Leão",
+      "Carlos Magno", "Rainha Elizabeth I|Elizabeth I", "Rei Charles III|Charles III", "Maria Antonieta", "Luís XVI", "Rei Salomão", "Rei Davi", "Catarina, a Grande", "Pedro, o Grande", "Nicolau II",
+      "Isabel de Castela|Isabel, a Católica", "Filipe II", "Tutancâmon", "Ramsés II", "Nabucodonosor", "Montezuma", "Atahualpa", "Rainha Maria I|Maria, a Louca", "Imperatriz Leopoldina|Leopoldina", "Napoleão Bonaparte|Napoleão",
+    ] },
+  { id: "30-carros-esportivos", cat: "curiosidades", title: "Os 30 carros esportivos e de luxo mais famosos", source: N5,
+    items: [
+      "Ferrari F40", "Lamborghini Aventador", "Porsche 911", "Bugatti Veyron", "Bugatti Chiron", "McLaren F1", "Ford GT", "Ford Mustang|Mustang", "Chevrolet Corvette|Corvette", "Chevrolet Camaro|Camaro",
+      "Dodge Charger", "Dodge Challenger", "Nissan GT-R|GT-R", "Toyota Supra|Supra", "Mazda RX-7|RX-7", "Honda NSX|NSX", "Lamborghini Countach|Countach", "Lamborghini Huracán|Huracán", "Ferrari Enzo", "LaFerrari",
+      "Ferrari Testarossa|Testarossa", "Aston Martin DB5|DB5", "Pagani Zonda", "Koenigsegg Agera", "Rolls-Royce Phantom", "Bentley Continental", "Audi R8", "BMW M3", "DeLorean", "Shelby Cobra",
+    ] },
 );
