@@ -413,14 +413,11 @@ Object.assign(ITEM_I18N, {
   "Sapoti": ["Sapodilla", "Zapote|Chicozapote"],
 
   // Os Simpsons
-  "Sr. Burns": ["Mr. Burns", "Señor Burns|Sr. Burns"],
   "Krusty": ["Krusty the Clown|Krusty", "Krusty el payaso|Krusty"],
-  "Chefe Wiggum": ["Chief Wiggum|Wiggum", "Jefe Gorgory|Gorgory|Jefe Wiggum"],
   "50-simpsons/Ralph": ["Ralph Wiggum|Ralph", "Ralph Gorgory|Ralph"],
   "Diretor Skinner": ["Principal Skinner|Skinner", "Director Skinner|Skinner"],
   "50-simpsons/Willie": ["Groundskeeper Willie|Willie", "Willie el jardinero|Willie"],
   "Vovô Simpson": ["Grampa Simpson|Abe Simpson|Grampa", "Abuelo Simpson|Abe Simpson"],
-  "Cara dos Quadrinhos": ["Comic Book Guy", "Sujeto de las historietas"],
   "Sideshow Bob": ["Sideshow Bob", "Bob Patiño"],
   "Comichão e Coçadinha": ["Itchy & Scratchy|Itchy and Scratchy", "Tomy y Daly"],
   "Kang e Kodos": ["Kang and Kodos", "Kang y Kodos"],
