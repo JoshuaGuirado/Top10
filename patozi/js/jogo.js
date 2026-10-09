@@ -74,6 +74,68 @@ function pzCartasDosTemas(temas) {
   return PZ_CARTAS.filter((c) => (!ok || ok.has(c.tema)) && !PZ_APOSENTADAS.has(c.id)).map((c) => c.id);
 }
 
+// ───────────── unidade da resposta ─────────────
+// Tirada da pergunta em português ("Quantos litros…", "…, em km/h?"), para a tela mostrar o número com a
+// unidade (180 L, 8.849 m, 46 °C). Devolve { mult, u, abaixo } ou null (resposta sem unidade: pessoas, peças…).
+// mult: "mil", "milhoes", "bilhoes" ou "trilhoes" ("Quantos milhões de quilômetros…"). abaixo: graus abaixo de zero.
+const PZ_UNIDADES = [
+  [/^(quilometros? por hora|km\/h)/, "km/h"],
+  [/^metros? por segundo/, "m/s"],
+  [/^metros? quadrados?/, "m²"],
+  [/^metros? cubicos?/, "m³"],
+  [/^(quilometros? quadrados?|km²)/, "km²"],
+  [/^(quilometros? cubicos?|km³)/, "km³"],
+  [/^(quilometros?|km)\b/, "km"],
+  [/^(centimetros?|cm)\b/, "cm"],
+  [/^(milimetros?|mm)\b/, "mm"],
+  [/^metros?\b/, "m"],
+  [/^toneladas?\b/, "t"],
+  [/^(quilos?|quilogramas?|kg)\b/, "kg"],
+  [/^gramas?\b/, "g"],
+  [/^mililitros?\b/, "mL"],
+  [/^litros?\b/, "L"],
+  [/^(graus celsius|°c)/, "°C"],
+  [/^(graus fahrenheit|°f)/, "°F"],
+  [/^graus\b/, "°"],
+  [/^segundos?\b/, "s"],
+  [/^minutos?\b/, "min"],
+  [/^horas?\b/, "h"],
+  [/^decibeis\b/, "dB"],
+  [/^megawatts?\b/, "MW"],
+  [/^kb\b/, "KB"],
+  [/^quilotons?\b/, "kt"],
+  [/^hectares?\b/, "ha"],
+  [/^pes\b/, "ft"],
+  [/^polegadas?\b/, "in"],
+];
+const PZ_MULT = { "mil ": "mil", "milhoes de ": "milhoes", "bilhoes de ": "bilhoes", "trilhoes de ": "trilhoes" };
+const pzUnidadesCache = new Map();
+
+function pzUnidadeDoTexto(txt) {
+  const acha = (resto) => (PZ_UNIDADES.find(([re]) => re.test(resto)) || [])[1] || null;
+  // Sem acentos e em minúsculas ("Quilômetros" → "quilometros"); °, ² e ³ ficam.
+  const q = txt.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  const ini = q.match(/^(?:a |ate |com |em |de )?quant[oa]s (mil |milhoes de |bilhoes de |trilhoes de )?(.*)$/);
+  if (ini) {
+    if (/^graus abaixo de zero/.test(ini[2])) return { mult: "", u: "°C", abaixo: true };
+    const u = acha(ini[2]);
+    if (u) return { mult: PZ_MULT[ini[1]] || "", u, abaixo: false };
+  }
+  // "…, em quilômetros?", "…, em °C (Vale da Morte, 1913)?": vale a última.
+  const fins = [...q.matchAll(/\bem ((?:mil |milhoes de )?)([^,?()]+)/g)].reverse();
+  for (const m of fins) {
+    const u = acha(m[2]);
+    if (u) return { mult: PZ_MULT[m[1]] || "", u, abaixo: false };
+  }
+  return null;
+}
+
+function pzUnidade(carta) {
+  if (!carta || carta.ano) return null;
+  if (!pzUnidadesCache.has(carta.id)) pzUnidadesCache.set(carta.id, pzUnidadeDoTexto(carta.q[0]));
+  return pzUnidadesCache.get(carta.id);
+}
+
 // Quantas cartas alguém precisa juntar para o jogo acabar.
 function pzMeta(nJogadores, duracao = "normal") {
   const base = nJogadores <= 4 ? 5 : nJogadores <= 7 ? 4 : 3;

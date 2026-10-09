@@ -402,3 +402,13 @@ body[data-screen]:not([data-screen="home"]) .gamezi-back { display: none; }
 .lb-row { grid-template-columns: 32px 1fr auto auto; }
 .lb-time { font-style: normal; font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .lb-note { margin: 8px 0 0; text-align: center; }
+
+/* Unidade da resposta (L, kg, m, km/h…): na carta e no fim do campo do chute */
+.card-unit { display: inline-block; margin: -8px 0 16px; padding: 4px 12px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-weight: 800; font-size: .85rem; }
+.unit-input { position: relative; flex: 1 1 180px; display: flex; }
+.unit-input .answer-input { flex: 1; min-width: 0; }
+.unit-suffix { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-weight: 800; font-size: 1.05rem; color: var(--muted); pointer-events: none; white-space: nowrap; }
+.unit-input.long { flex-basis: 100%; }
+.guess-row:has(.unit-input.long) .btn { flex: 1; }
+.num-unit { margin-left: .2em; font-size: .4em; letter-spacing: 0; white-space: nowrap; }
+.num-unit.grau { margin-left: 0; font-size: 1em; }

@@ -48,6 +48,7 @@ const PZ_T = {
   "daily.guessPh": ["Seu chute", "Your guess", "Tu número"],
   "daily.send": ["Chutar", "Guess", "Decir"],
   "daily.answer": ["Resposta: {n}", "Answer: {n}", "Respuesta: {n}"],
+  "card.unit": ["Resposta em {u}", "Answer in {u}", "Respuesta en {u}"],
   "daily.over": ["Passou! Nem a pato.", "Too high! No way, duck.", "¡Te pasaste! Ni de pato."],
   "daily.pts": ["+{n} pontos", "+{n} points", "+{n} puntos"],
   "daily.next": ["Próxima", "Next", "Siguiente"],
@@ -284,4 +285,34 @@ function applyI18n(root = document) {
 function fmt(n, ano) {
   if (ano) return String(n);
   return new Intl.NumberFormat({ pt: "pt-BR", en: "en-US", es: "es-ES" }[lang], { maximumFractionDigits: 0, useGrouping: n >= 10000 || lang !== "es" }).format(n);
+}
+
+// Unidade da resposta da carta no idioma da tela ("km", "milhões de km", "°C abaixo de zero") ou "" (ver pzUnidade).
+const PZ_UNIDADE_T = {
+  mil: ["mil", "thousand", "mil"],
+  milhoes: ["milhões de", "million", "millones de"],
+  bilhoes: ["bilhões de", "billion", "mil millones de"],
+  trilhoes: ["trilhões de", "trillion", "billones de"],
+  abaixo: ["abaixo de zero", "below zero", "bajo cero"],
+};
+
+function unidade(carta) {
+  const u = carta && typeof pzUnidade === "function" ? pzUnidade(carta) : null;
+  if (!u) return "";
+  const i = LANGS.indexOf(lang);
+  return [u.mult ? PZ_UNIDADE_T[u.mult][i] : "", u.u, u.abaixo ? PZ_UNIDADE_T.abaixo[i] : ""].filter(Boolean).join(" ");
+}
+
+// Número com a unidade da carta: "180 L", "8.849 m", "15 milhões de °C", "180°".
+function fmtU(n, carta) {
+  const v = fmt(n, carta && carta.ano);
+  const u = unidade(carta);
+  if (!u) return v;
+  return u === "°" ? v + u : v + "\u00a0" + u;
+}
+
+// Unidade em letra menor ao lado de um número grande (lance e resposta). "" quando a carta não tem.
+function unidadeHtml(carta) {
+  const u = unidade(carta);
+  return u ? `<small class="num-unit${u === "°" ? " grau" : ""}">${escapeHtml(u)}</small>` : "";
 }

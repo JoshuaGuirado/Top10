@@ -258,15 +258,17 @@ function renderCard() {
   $("card-theme").innerHTML = themeIcon(carta.tema) + escapeHtml(temaNome(carta.tema));
   $("card-ducks").innerHTML = patosHtml(carta.patos);
   $("card-q").textContent = tr(carta.q);
+  $("card-unit").hidden = !unidade(carta);
+  $("card-unit").textContent = t("card.unit", { u: unidade(carta) });
   const u = pzUltimo(partida);
   const bid = $("bid");
   const chave = u ? partida.lances.length + ":" + u.valor : "0";
   if (u) {
     const novo = bid.dataset.k !== chave;
-    bid.innerHTML = `<span class="bid-value ${novo ? "pop" : ""}">${fmt(u.valor, carta.ano)}</span><span class="bid-who">${escapeHtml(t("game.lastBid", { nome: nomeDe(u.j) }))}${u.dobrei ? ` · ${escapeHtml(t("game.dobrei"))}` : ""}</span>`;
+    bid.innerHTML = `<span class="bid-value ${novo ? "pop" : ""}">${fmt(u.valor, carta.ano)}${unidadeHtml(carta)}</span><span class="bid-who">${escapeHtml(t("game.lastBid", { nome: nomeDe(u.j) }))}${u.dobrei ? ` · ${escapeHtml(t("game.dobrei"))}` : ""}</span>`;
   } else bid.innerHTML = `<span class="bid-empty">${escapeHtml(t("game.noBid"))}</span>`;
   bid.dataset.k = chave;
-  $("bids").innerHTML = partida.lances.slice(0, -1).map((l) => `<li class="${l.dobrei ? "dbl" : ""}">${escapeHtml(nomeDe(l.j))}: ${fmt(l.valor, carta.ano)}</li>`).join("");
+  $("bids").innerHTML = partida.lances.slice(0, -1).map((l) => `<li class="${l.dobrei ? "dbl" : ""}">${escapeHtml(nomeDe(l.j))}: ${fmtU(l.valor, carta)}</li>`).join("");
 }
 
 function renderTurn() {
@@ -285,9 +287,9 @@ function renderTurn() {
     const meu = modo === "online" || partida.jogadores.filter((x) => !x.bot).length === 1;
     box.innerHTML = `
       <p class="turn-name">${patoSvg(p.cor, "", p.pato)}${escapeHtml(t(meu ? "game.yourTurn" : "game.turnOf", { nome: p.nome }))}</p>
-      <p class="turn-hint">${escapeHtml(u ? t("game.raise", { min: fmt(minimo, carta.ano) }) : t("game.first"))}</p>
+      <p class="turn-hint">${escapeHtml(u ? t("game.raise", { min: fmtU(minimo, carta) }) : t("game.first"))}</p>
       <form class="guess-row" id="guess-form">
-        <input class="answer-input" id="guess" inputmode="numeric" autocomplete="off" placeholder="${escapeHtml(t("game.guessPh"))}" aria-label="${escapeHtml(t("game.guessPh"))}">
+        ${campoChute("guess", t("game.guessPh"), carta)}
         <button type="submit" class="btn">${escapeHtml(t("game.guess"))}</button>
       </form>
       <button type="button" class="btn nem" id="nem-btn" ${u ? "" : "disabled"}>${escapeHtml(t("game.nemApato"))}</button>
@@ -296,7 +298,7 @@ function renderTurn() {
       e.preventDefault();
       const v = lerNumero($("guess").value);
       if (!Number.isFinite(v)) return ($("guess-error").textContent = t("game.errNum"));
-      if (v < minimo) return ($("guess-error").textContent = t("game.errLow", { min: fmt(minimo, carta.ano) }));
+      if (v < minimo) return ($("guess-error").textContent = t("game.errLow", { min: fmtU(minimo, carta) }));
       agir({ tipo: "chutar", valor: v });
     };
     $("nem-btn").onclick = () => agir({ tipo: "duvidar" });
@@ -309,8 +311,17 @@ function renderTurn() {
   }
 }
 
+// Campo do chute, com a unidade da carta no fim (km, L, kg…), quando tem.
+function campoChute(id, texto, carta) {
+  const u = unidade(carta);
+  // Espaço à direita do número para caber a unidade (que é menor que o número digitado).
+  const espaco = u ? ` style="padding-right: ${(1.2 + u.length * 0.45).toFixed(1)}em"` : "";
+  const input = `<input class="answer-input" id="${id}" inputmode="numeric" autocomplete="off" placeholder="${escapeHtml(texto)}" aria-label="${escapeHtml(u ? `${texto} (${u})` : texto)}"${espaco}>`;
+  return u ? `<span class="unit-input${u.length > 6 ? " long" : ""}">${input}<span class="unit-suffix" aria-hidden="true">${escapeHtml(u)}</span></span>` : input;
+}
+
 function veredito(r) {
-  const valor = fmt(r.valor, pzCarta(partida.carta).ano);
+  const valor = fmtU(r.valor, pzCarta(partida.carta));
   if (r.mosca) return t("game.bullseye", { valor, nome: nomeDe(r.perdedor) });
   if (r.passou) return t("game.over", { valor, nome: nomeDe(r.perdedor) });
   return t("game.fits", { valor, nome: nomeDe(r.perdedor) });
@@ -336,7 +347,7 @@ function renderReveal() {
       : `<p class="small muted">${escapeHtml(t("game.waitHost"))}</p>`;
   const final = `
     <p class="reveal-label">${escapeHtml(t("game.answerIs"))}</p>
-    <p class="reveal-answer" id="answer-num">${fmt(r.resposta, carta.ano)}</p>
+    <p class="reveal-answer"><span id="answer-num">${fmt(r.resposta, carta.ano)}</span>${unidadeHtml(carta)}</p>
     <p class="verdict">${escapeHtml(veredito(r))}</p>
     <span class="taker">${patoSvg(perdedor.cor, "sad", perdedor.pato)}${escapeHtml(tn("game.takes", r.patos, { nome: perdedor.nome }))}</span>
     <div class="actions center">${botao}</div>`;

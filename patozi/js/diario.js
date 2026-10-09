@@ -103,6 +103,7 @@ function renderDiario() {
     <article class="card">
       <div class="card-head"><span class="card-theme">${themeIcon(carta.tema)}${escapeHtml(temaNome(carta.tema))}</span></div>
       <p class="card-q">${escapeHtml(tr(carta.q))}</p>
+      ${unidade(carta) ? `<p class="card-unit">${escapeHtml(t("card.unit", { u: unidade(carta) }))}</p>` : ""}
     </article>`;
   if (diarioEstado.mostrando) {
     const chute = reg.chutes[i];
@@ -111,9 +112,9 @@ function renderDiario() {
     const ultimo = i === ids.length - 1;
     corpo += `
       <div class="reveal-box">
-        <p class="reveal-call">${escapeHtml(t("game.guessPh"))}: <b>${fmt(chute)}</b></p>
+        <p class="reveal-call">${escapeHtml(t("game.guessPh"))}: <b>${fmtU(chute, carta)}</b></p>
         <p class="reveal-label">${escapeHtml(t("game.answerIs"))}</p>
-        <p class="reveal-answer" id="answer-num">${fmt(carta.resposta)}</p>
+        <p class="reveal-answer"><span id="answer-num">${fmt(carta.resposta)}</span>${unidadeHtml(carta)}</p>
         <p class="verdict">${escapeHtml(passou ? t("daily.over") : t("daily.pts", { n: pts }))}</p>
         <div class="actions center"><button type="button" class="btn big" id="daily-next">${escapeHtml(t(ultimo ? "daily.finish" : "daily.next"))}</button></div>
       </div>`;
@@ -127,7 +128,7 @@ function renderDiario() {
   } else {
     corpo += `
       <form class="guess-row daily-form" id="daily-form">
-        <input class="answer-input" id="daily-guess" inputmode="numeric" autocomplete="off" placeholder="${escapeHtml(t("daily.guessPh"))}" aria-label="${escapeHtml(t("daily.guessPh"))}">
+        ${campoChute("daily-guess", t("daily.guessPh"), carta)}
         <button type="submit" class="btn">${escapeHtml(t("daily.send"))}</button>
       </form>
       <p class="input-error" id="daily-error"></p>`;
@@ -183,7 +184,7 @@ function renderDiarioFim(reg, dots) {
       </div>
       <div class="daily-lines">${ids.map((id, k) => {
         const c = pzCarta(id);
-        return `<div class="daily-line ${reg.pontos[k] ? "" : "zero"}"><p>${escapeHtml(tr(c.q))}<br><small>${escapeHtml(t("game.guessPh"))}: ${fmt(reg.chutes[k])} · ${escapeHtml(t("daily.answer", { n: fmt(c.resposta) }))}</small></p><b>${reg.pontos[k]}</b></div>`;
+        return `<div class="daily-line ${reg.pontos[k] ? "" : "zero"}"><p>${escapeHtml(tr(c.q))}<br><small>${escapeHtml(t("game.guessPh"))}: ${fmtU(reg.chutes[k], c)} · ${escapeHtml(t("daily.answer", { n: fmtU(c.resposta, c) }))}</small></p><b>${reg.pontos[k]}</b></div>`;
       }).join("")}</div>
     </div>`;
   $("daily-share").onclick = (e) => {

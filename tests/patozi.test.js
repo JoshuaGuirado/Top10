@@ -44,6 +44,27 @@ test("cartas: ids únicos, tema válido, patos de 1 a 3, resposta inteira e perg
   for (const t of temas) assert.ok(r(`pzCartasDosTemas(["${t}"]).length`) >= 15, `tema ${t} com poucas cartas ativas`);
 });
 
+test("unidade da resposta vem da pergunta (L, kg, m, km/h, °C…) e cartas sem medida ficam sem", () => {
+  const u = (q) => JSON.stringify(r(`pzUnidadeDoTexto(${JSON.stringify(q)})`));
+  const un = (q) => JSON.parse(u(q));
+  assert.equal(un("Quantos litros de sangue os rins de um adulto filtram por dia?").u, "L");
+  assert.equal(un("Quantos quilos pesa a língua de uma baleia-azul?").u, "kg");
+  assert.equal(un("Quantos metros de altura tem o Monte Everest?").u, "m");
+  assert.equal(un("Quantos centímetros media Robert Wadlow?").u, "cm");
+  assert.equal(un("A quantos km/h viaja a Estação Espacial Internacional?").u, "km/h");
+  assert.equal(un("Qual é a distância média da Terra à Lua, em quilômetros?").u, "km");
+  assert.equal(un("Qual é a temperatura mais alta já medida na Terra, em °C (Vale da Morte, 1913)?").u, "°C");
+  assert.equal(un("Quantos km³ de água tem o lago Baikal?").u, "km³");
+  assert.deepEqual(un("Quantos milhões de quilômetros separam a Terra do Sol?"), { mult: "milhoes", u: "km", abaixo: false });
+  assert.deepEqual(un("Quantos graus abaixo de zero fica o zero absoluto, em °C?"), { mult: "", u: "°C", abaixo: true });
+  for (const q of ["Quantos ossos tem o corpo humano adulto?", "Quantos dias da Terra Marte leva para dar uma volta no Sol?", "Quantos mil fãs assistiram ao show?", "Quantos cachorros-quentes Joey Chestnut comeu em 10 minutos?"]) {
+    assert.equal(u(q), "null", q);
+  }
+  // Ano não tem unidade; toda carta com unidade tem uma das conhecidas.
+  assert.equal(r("PZ_CARTAS.filter((c) => c.ano && pzUnidade(c)).length"), 0);
+  assert.ok(r("PZ_CARTAS.filter((c) => pzUnidade(c)).length") > 200);
+});
+
 test("cartas óbvias (aposentadas) existem, saem das partidas e, a partir do dia 2, do Pato do dia", () => {
   const aposentadas = r("[...PZ_APOSENTADAS]");
   assert.ok(aposentadas.length > 0);
