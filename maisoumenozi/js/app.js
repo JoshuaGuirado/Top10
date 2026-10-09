@@ -245,20 +245,15 @@ function medidaHtml(valor, unidade) {
   return `<p class="measure">${parte(antes)}<b class="value" data-alvo="${valor}">${escapeHtml(fmt(valor))}</b>${parte(depois)}</p>`;
 }
 
-function cartaoHtml(item, mostrar) {
-  const nome = `<p class="name">${escapeHtml(mmNome(item, LANGS.indexOf(lang)))}</p>`;
-  if (!mostrar) return nome; // escondido: só o nome (o número aparece depois de responder)
-  return nome + medidaHtml(item.valor, mmTemaDe(item.tema).unidade);
-}
-
 // Alto da tela: tempo (ou o nome do modo), combo e pontos (ou o placar).
 function renderHud() {
   const s = partida;
   const diario = modo === "diario";
   const relogio = modo === "relogio";
+  $("hud-left").classList.toggle("mode", !relogio);
   if (!relogio) {
     $("hud-left").classList.remove("low");
-    $("hud-left").textContent = diario ? t("daily.kicker", { n: diaAtual }) : t("game.free");
+    $("hud-left").textContent = diario ? t("daily.name") : t("game.free");
   }
   $("hud-right").textContent = relogio
     ? t("game.pts", { n: fmt(s.pontos) })
@@ -286,9 +281,6 @@ function renderJogo() {
   const uau = !!r.uau;
   $("round-normal").hidden = uau;
   $("round-uau").hidden = !uau;
-  const topic = $("game-topic");
-  topic.classList.toggle("new", !!(r.novo && !esperando));
-  topic.classList.toggle("uau", uau);
   if (uau) renderUau(r);
   else renderNormal(r);
 
@@ -296,13 +288,9 @@ function renderJogo() {
   $("game-fact").hidden = true;
   if (!esperando) return;
 
-  // Depois de responder: reação, curiosidade (na maluca) e a próxima.
+  // Depois de responder: acertou ou errou, a curiosidade (na maluca) e a próxima.
   const certo = s.ultimo.certo;
-  const [va, vb] = mmValores(r);
-  const razao = Math.max(va, vb) / Math.min(va, vb);
-  const dif = razao >= 100 ? "cem" : razao >= 10 ? "dez" : razao >= 2 ? "dobro" : razao < 1.2 ? "quase" : null;
-  const extra = dif ? tr(MM_DIFERENCA[dif]) : "";
-  $("game-verdict").innerHTML = `<b>${escapeHtml(tr(sortear(certo ? MM_CERTO : MM_ERRADO)))}</b>${extra ? `<span>${escapeHtml(extra)}</span>` : ""}`;
+  $("game-verdict").textContent = tr(sortear(certo ? MM_CERTO : MM_ERRADO));
   $("game-verdict").className = "verdict " + (certo ? "good" : "bad");
   if (uau) {
     $("game-fact").hidden = false;
@@ -313,39 +301,41 @@ function renderJogo() {
   document.querySelectorAll("#stage .revealed .value[data-alvo]").forEach(contar);
   // Segue sozinho: rápido no relógio; no resto, só quando acerta (errou: a pessoa vê com calma e toca em Próxima).
   clearTimeout(autoTimer);
-  const espera = modo === "relogio" ? (uau ? 1800 : certo ? 650 : 1100) : certo ? (uau ? 3200 : 1700) : 0;
+  const espera = modo === "relogio" ? (uau ? 1800 : certo ? 700 : 1200) : certo ? (uau ? 3200 : 1700) : 0;
   if (espera && !s.fim) autoTimer = setTimeout(proxima, espera);
 }
 
+// Rodada comum: a referência (com o número), a pergunta sobre o outro e os dois botões.
 function renderNormal(r) {
   const a = mmItem(r.a);
   const b = mmItem(r.b);
   const assunto = mmAssunto(r.tema);
-  $("game-topic").textContent = tr(assunto.titulo);
-  $("card-a").innerHTML = cartaoHtml(a, true);
-  $("card-b-item").innerHTML = cartaoHtml(b, esperando);
-  $("card-b-item").classList.toggle("revealed", esperando);
-  $("card-b").className = "item-card ask" + (esperando ? (partida.ultimo.certo ? " right" : " wrong") : "");
-  $("game-question").textContent = tr(assunto.perguntas[r.p]);
-  $("game-question").hidden = esperando;
+  const l = LANGS.indexOf(lang);
+  $("ref").innerHTML = `<span class="ref-name">${escapeHtml(mmNome(a, l))}</span>${medidaHtml(a.valor, mmTemaDe(a.tema).unidade)}`;
+  $("ask-name").textContent = mmNome(b, l);
+  $("ask-q").textContent = tr(assunto.curta || mmTemaDe(b.tema).curta);
+  $("ask-q").hidden = esperando;
+  $("ask-answer").hidden = !esperando;
+  $("ask-answer").innerHTML = esperando ? medidaHtml(b.valor, mmTemaDe(b.tema).unidade) : "";
+  $("ask-answer").classList.toggle("revealed", esperando);
+  $("ask").className = "ask" + (esperando ? (partida.ultimo.certo ? " right" : " wrong") : "");
   const [up, down] = assunto.botoes;
   $("btn-up").innerHTML = ICONES.up + `<span>${escapeHtml(tr(up))}</span>`;
   $("btn-down").innerHTML = ICONES.down + `<span>${escapeHtml(tr(down))}</span>`;
   $("game-answers").hidden = esperando;
 }
 
-// Comparação maluca: os dois escondidos; toca no que tem mais. Depois, o maior fica marcado.
+// Comparação maluca: a pergunta e os dois para escolher. Depois, os números aparecem e o maior fica marcado.
 function renderUau(r) {
   const u = mmUauDe(r.uau);
   const l = LANGS.indexOf(lang);
-  $("game-topic").textContent = t("game.uau");
   $("uau-question").textContent = tr(u.pergunta);
   for (const quem of ["a", "b"]) {
     const el = $("uau-" + quem);
     const item = u[quem];
     el.disabled = esperando;
-    el.innerHTML = `<p class="name">${escapeHtml(item[l + 1] || item[1])}</p>${esperando ? medidaHtml(item[0], u.unidade) : ""}`;
-    let cls = "item-card choice" + (esperando ? " revealed" : "");
+    el.innerHTML = `<span class="choice-name">${escapeHtml(item[l + 1] || item[1])}</span>${esperando ? medidaHtml(item[0], u.unidade) : ""}`;
+    let cls = "choice" + (esperando ? " revealed" : "");
     if (esperando) {
       const maior = (u.b[0] > u.a[0]) === (quem === "b");
       cls += maior ? " winner" : " loser";

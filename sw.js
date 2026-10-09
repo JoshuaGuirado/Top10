@@ -2,7 +2,7 @@
 // Cada jogo fica numa pasta (topzi/…, patozi/…); os arquivos dele entram na lista com o caminho da pasta.
 // Online, busca sempre a versão nova (rede primeiro); sem internet, usa a cópia guardada.
 
-const CACHE = "gamezi-v15";
+const CACHE = "gamezi-v16";
 const FILES = [
   "./",
   "index.html",
@@ -126,6 +126,9 @@ const FILES = [
   "maisoumenozi/data/assuntos-3.js",
   "maisoumenozi/data/grupos.js",
   "maisoumenozi/data/uau-1.js",
+  "maisoumenozi/data/assuntos-4.js",
+  "maisoumenozi/data/uau-2.js",
+  "maisoumenozi/data/perguntas.js",
   "maisoumenozi/js/textos.js",
   "maisoumenozi/js/app.js",
   "brand/maisoumenozi-logo.svg",

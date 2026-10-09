@@ -118,22 +118,21 @@ Jogo de linha do tempo: coloque os acontecimentos na ordem em que aconteceram. A
 
 # Maisoumenozi
 
-Jogo de "tem mais ou tem menos?". Na rodada comum, em cima aparece um item com o número e embaixo outro com o número escondido: o de baixo tem mais ou menos (é mais alto, mais pesado, mais rápido…)? O de baixo sobe e chega um novo. Assuntos da mesma grandeza se misturam (o Monte Fuji contra o Burj Khalifa contra o Yao Ming, tudo em altura; a Lagoa dos Patos contra um país), e a grandeza muda a cada 2 ou 3 rodadas.
+Jogo de "tem mais ou tem menos?". A tela é de cima para baixo: o placar, a referência ("Comparado com: Carro popular, 1.000 kg"), a pergunta com o nome do outro item em letra grande ("Girafa — pesa mais ou menos?") e os dois botões embaixo. Depois de responder, o número aparece e o item vira a referência da próxima.
 
-De vez em quando cai uma **comparação maluca**: um par escolhido a dedo, com os dois números escondidos ("Uma baleia-azul ou 30 elefantes: qual pesa mais?"). Toca-se no que tem mais e aparece uma curiosidade.
+Assuntos da mesma grandeza se misturam (girafa × carro × tanque de guerra no peso; Monte Fuji × Burj Khalifa × Yao Ming × porta de casa na altura). Metade das rodadas do desafio do dia (e boa parte das outras) é **comparação maluca**: um par escolhido a dedo, com a pergunta e as duas opções para tocar ("Onde mora mais gente: na cidade do Rio ou na Nova Zelândia inteira?"), e uma curiosidade depois.
 
-- **Contra o relógio** (o modo principal): 60 segundos; cada acerto vale 10 pontos (20 na maluca) e acertos seguidos multiplicam (×2 a partir do 3º, ×3 do 6º, até ×5). Errar zera o combo e tira 3 segundos. Tem barra de tempo, combo pulando, pontos voando, tremida no erro, som (dá para desligar nas Configurações) e confete no recorde.
-- **Desafio do dia**: as mesmas 10 comparações para todo mundo (3 delas malucas, a partir do dia 2), com a semana e quadradinhos para compartilhar.
+- **Contra o relógio** (o modo principal): 60 segundos; acerto vale 10 pontos (20 na maluca) e acertos seguidos multiplicam até ×5. Errar zera o combo e tira 3 segundos.
+- **Desafio do dia**: as mesmas 10 para todo mundo (5 malucas, a partir do dia 2), com a semana e quadradinhos para compartilhar.
 - **Sem errar**: até o primeiro erro, valendo recorde.
 
-São 30 assuntos e 441 itens, 4 grandezas que misturam assuntos e 58 comparações malucas. Dois itens só caem juntos se a diferença passar da margem dos assuntos (10% no geral), e nada repete na mesma partida.
-
-- `maisoumenozi/data/assuntos-*.js`: os assuntos (`mmTema({ id, titulo, unidade, perguntas, botoes, margem, itens })`, cada item `[valor, "português", "English", "español"]`). As perguntas não citam os nomes (falam "o de baixo", "esse"), para sempre concordar nos três idiomas
-- `maisoumenozi/data/grupos.js`: grandezas que misturam assuntos (`mmGrupo({ id, titulo, perguntas, botoes, temas: { assunto: fator } })`; o fator põe tudo na mesma medida, ex.: cm → m = 0,01)
-- `maisoumenozi/data/uau-1.js`: as comparações malucas (`{ pergunta, unidade, a: [valor, pt, en, es], b: [...], fato }`)
-- Itens, assuntos ou malucas novos: arquivo novo carregado depois dos outros, no `sw.js`, e uma linha nova em `MM_DIARIO_POOLS` (`maisoumenozi/js/jogo.js`) com os totais, valendo a partir de amanhã
+Arquivos:
+- `maisoumenozi/data/assuntos-*.js`: os assuntos (`mmTema({ id, titulo, unidade, perguntas, botoes, margem, itens })`, cada item `[valor, "português", "English", "español"]`)
+- `maisoumenozi/data/grupos.js`: grandezas que misturam assuntos (o fator põe tudo na mesma medida, ex.: cm → m = 0,01)
+- `maisoumenozi/data/uau-*.js`: as comparações malucas (`{ pergunta, unidade, a: [valor, pt, en, es], b: [...], fato }`)
+- `maisoumenozi/data/perguntas.js`: a pergunta de cada assunto (uma frase só, com verbo que serve para qualquer nome: "pesa mais ou menos?", "mede mais ou menos de altura?"), os botões e os assuntos fora do sorteio (sem graça; ficam só para o desafio do dia 1)
+- Itens, assuntos ou malucas novos: arquivo novo carregado depois dos outros, no `sw.js`, pergunta em `perguntas.js` e uma linha nova em `MM_DIARIO_POOLS` (`maisoumenozi/js/jogo.js`) com os totais, valendo a partir de amanhã
 - `maisoumenozi/js/jogo.js`: regras, pontos e combo, sem tela (testado em `tests/maisoumenozi.test.js`); `textos.js` (três idiomas e frases); `app.js` (telas, relógio, som e efeitos)
-- Marca: `brand/maisoumenozi-logo*.svg` e `brand/maisoumenozi-simbolo*.svg`
 
 ## Nível e conquistas do Gamezi
 

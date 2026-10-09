@@ -18,6 +18,7 @@ let lang = store("lang");
 if (!LANGS.includes(lang)) lang = LANGS.includes((navigator.language || "pt").slice(0, 2)) ? navigator.language.slice(0, 2) : "pt";
 
 const MM_T = {
+  "game.compared": ["Comparado com", "Compared with", "Comparado con"],
   "res.shareClock": ["Fiz {n} pontos em 60 segundos no Maisoumenozi. Você bate? {url}", "I scored {n} points in 60 seconds on Maisoumenozi. Can you beat it? {url}", "Hice {n} puntos en 60 segundos en Maisoumenozi. ¿Me superas? {url}"],
   "res.clockSub": ["{a} acertos de {b} · maior combo ×{c}", "{a} right out of {b} · best combo ×{c}", "{a} aciertos de {b} · mejor combo ×{c}"],
   "res.clock": ["{n} pontos", "{n} points", "{n} puntos"],

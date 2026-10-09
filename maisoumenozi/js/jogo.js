@@ -15,7 +15,7 @@ const MM_DIARIO_INICIO = Date.UTC(2026, 9, 9);
 // versao 1: o jeito do primeiro dia (só assuntos, sem mistura); versao 2: mistura e rodadas "uau".
 const MM_DIARIO_POOLS = [
   { desde: 1, itens: 441, versao: 1 },
-  { desde: 2, itens: 441, uau: 58, versao: 2 },
+  { desde: 2, itens: 511, uau: 82, versao: 2 },
 ];
 
 // ───────────── assuntos e itens ─────────────
@@ -98,6 +98,11 @@ const MM_UAU = [];
 
 function mmUau(lista) {
   for (const u of lista) MM_UAU.push({ id: "u" + (MM_UAU.length + 1), ...u });
+}
+
+// Pode cair no sorteio (os assuntos marcados como fora só ficam para o desafio do dia 1).
+function mmNoSorteio(item) {
+  return !mmTemaDe(item.tema).fora;
 }
 
 function mmUauDe(id) {
@@ -206,7 +211,7 @@ function mmGeradorV1(ids, rnd) {
 // Gera as rodadas de uma partida. Rodada comum: { tema (grandeza ou assunto), a, b, p (frase), novo }.
 // Rodada uau: { uau: id, novo: true }. ids: itens que podem aparecer; uaus: pares uau. Nada repete na partida.
 function mmGerador(ids, rnd, uaus = [], uauNas = null) {
-  const livres = new Set(ids);
+  const livres = new Set(ids.filter((id) => mmNoSorteio(mmItem(id))));
   const uauFila = mmEmbaralhar(uaus, rnd);
   const recentes = []; // últimas grandezas, para não voltar logo
   const frases = {};
@@ -248,7 +253,7 @@ function mmGerador(ids, rnd, uaus = [], uauNas = null) {
     // uauNas (desafio do dia): o par uau cai sempre nas mesmas rodadas. Senão, de tempos em tempos.
     if (uauNas && uauFila.length && uauNas.includes(geradas)) return rodadaUau();
     const trocar = !grupo || falta <= 0 || !candidatos(grupo, a).length;
-    if (!uauNas && uauFila.length && trocar && desdeUau >= 2 && rnd() < 0.55) return rodadaUau();
+    if (!uauNas && uauFila.length && desdeUau >= 2 && rnd() < 0.5) return rodadaUau();
     let novo = false;
     if (trocar) {
       if (!trocarGrandeza()) return uauFila.length ? rodadaUau() : null;
@@ -366,7 +371,7 @@ function mmDiarioRodadas(dia) {
   const ids = MM_ITENS.slice(0, pool.itens).map((i) => i.id);
   const proxima = pool.versao === 1
     ? mmGeradorV1(ids, mmRng(dia * 7919 + 41))
-    : mmGerador(ids, mmRng(dia * 7919 + 41), MM_UAU.slice(0, pool.uau).map((u) => u.id), [3, 6, 9]);
+    : mmGerador(ids, mmRng(dia * 7919 + 41), MM_UAU.slice(0, pool.uau).map((u) => u.id), [2, 4, 6, 8, 10]);
   const out = [];
   for (let k = 0; k < MM_DIARIO_QTD; k++) out.push(proxima());
   return out;

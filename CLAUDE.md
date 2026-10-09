@@ -47,4 +47,6 @@
   por assunto que não citem os nomes, e linha nova em `MM_DIARIO_POOLS` valendo a partir de amanhã (o dia 1 está fixado no teste
   e usa o gerador antigo `mmGeradorV1`, que não pode mudar). Comparação maluca nova: no fim de `data/uau-1.js` (ou arquivo novo),
   os dois valores na mesma unidade e com diferença clara, e o total novo em `uau` na linha nova de `MM_DIARIO_POOLS`.
-  Número que muda com o tempo leva o ano no título do assunto ("(2024)").
+  Número que muda com o tempo leva o ano no título do assunto ("(2024)"). Assunto novo precisa da pergunta curta em
+  `data/perguntas.js` (verbo que serve para qualquer nome, sem "é mais alto": "mede mais ou menos de altura?") e botões "Mais"/"Menos".
+  O dono quer a tela simples: referência, pergunta e dois botões. Nada de título de assunto, frases variadas ou enfeite na partida.
