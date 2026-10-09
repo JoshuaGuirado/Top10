@@ -930,3 +930,8 @@ body[data-screen]:not([data-screen="home"]) .gamezi-back { display: none; }
 .lb-row b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lb-row em { font-style: normal; font-stretch: 75%; font-weight: 800; font-size: 1.3rem; color: var(--accent-ink); }
 
+
+/* Ranking do dia: tempo (desempate) entre o nome e os pontos */
+.lb-row { grid-template-columns: 32px 1fr auto auto; }
+.lb-time { font-style: normal; font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lb-note { margin: 8px 0 0; text-align: center; }

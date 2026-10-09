@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ranking do dia | Gamezi</title>
+  <meta name="description" content="Ranking do desafio do dia de todos os jogos do Gamezi: Topzi, Patozi, Datazi e Maisoumenozi. No empate, ganha quem foi mais rápido.">
+  <meta name="theme-color" content="#FFF4DE" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#171717" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="brand/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <script>try { var t = localStorage.getItem("tt:theme"); if (t) document.documentElement.dataset.theme = JSON.parse(t); } catch (e) {}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&display=swap">
+  <link rel="stylesheet" href="gamezi.css">
+  <!-- Métricas da Vercel (Web Analytics): visitas por página, sem cookies e sem dados pessoais -->
+  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <a href="./" aria-label="Gamezi">
+        <img class="logo logo-light" src="brand/gamezi-logo.svg" alt="Gamezi">
+        <img class="logo logo-dark" src="brand/gamezi-logo-dark.svg" alt="" aria-hidden="true">
+      </a>
+    </header>
+
+    <main class="account-page rank-page">
+      <a class="back-link" href="./" data-t="back">Voltar para o Gamezi</a>
+      <section class="panel">
+        <h1 data-t="title">Ranking do dia</h1>
+        <p class="muted" data-t="sub">O desafio do dia de cada jogo. Mais pontos na frente; no empate, ganha quem foi mais rápido.</p>
+        <div class="rank-tabs" id="tabs" role="tablist"></div>
+      </section>
+      <section class="panel rank-box" id="rank" aria-live="polite"></section>
+    </main>
+
+    <footer class="foot">
+      <a href="termos.html" data-t="terms">Termos de uso</a>
+      <a href="privacidade.html" data-t="privacy">Privacidade</a>
+      <span>© 2026 Gamezi</span>
+    </footer>
+  </div>
+
+  <script src="topzi/js/config.js"></script>
+  <script src="gamezi-conta.js"></script>
+  <script src="gamezi-ranking.js"></script>
+  <script>
+    // Textos em [português, inglês, espanhol]. O idioma é o mesmo escolhido nos jogos (tt:lang).
+    var T = {
+      back: ["Voltar para o Gamezi", "Back to Gamezi", "Volver a Gamezi"],
+      title: ["Ranking do dia", "Daily ranking", "Ranking del día"],
+      sub: ["O desafio do dia de cada jogo. Mais pontos na frente; no empate, ganha quem foi mais rápido.", "Each game's daily challenge. Most points first; on a tie, the fastest player wins.", "El desafío del día de cada juego. Más puntos adelante; en el empate, gana quien fue más rápido."],
+      terms: ["Termos de uso", "Terms of use", "Términos de uso"],
+      privacy: ["Privacidade", "Privacy", "Privacidad"],
+      play: ["Jogar o de hoje", "Play today's", "Jugar el de hoy"],
+      off: ["O ranking aparece quando o modo online está ligado.", "The ranking shows up when online mode is on.", "El ranking aparece cuando el modo online está activo."],
+      pts: ["pontos", "points", "puntos"],
+    };
+    // Jogos e o dia 1 do desafio de cada um (mesma conta dos jogos).
+    var JOGOS = [
+      { id: "topzi", nome: "Topzi", inicio: Date.UTC(2026, 9, 1), dia: ["Lista do dia #{n}", "Daily list #{n}", "Lista del día #{n}"], pts: ["pontos (máx. 55)", "points (max 55)", "puntos (máx. 55)"] },
+      { id: "patozi", nome: "Patozi", inicio: Date.UTC(2026, 9, 8), dia: ["Pato do dia #{n}", "Daily duck #{n}", "Pato del día #{n}"], pts: ["pontos (máx. 500)", "points (max 500)", "puntos (máx. 500)"] },
+      { id: "datazi", nome: "Datazi", inicio: Date.UTC(2026, 9, 8), dia: ["Datazi do dia #{n}", "Daily Datazi #{n}", "Datazi del día #{n}"], pts: ["na ordem certa (de 8)", "in the right order (of 8)", "en el orden correcto (de 8)"] },
+      { id: "maisoumenozi", nome: "Maisoumenozi", inicio: Date.UTC(2026, 9, 9), dia: ["Desafio do dia #{n}", "Daily challenge #{n}", "Desafío del día #{n}"], pts: ["acertos (de 10)", "right answers (of 10)", "aciertos (de 10)"] },
+    ];
+    var LANGS = ["pt", "en", "es"];
+    function load(k) { try { return JSON.parse(localStorage.getItem("tt:" + k)); } catch (e) { return null; } }
+    var lang = load("lang");
+    if (LANGS.indexOf(lang) < 0) lang = LANGS.indexOf((navigator.language || "pt").slice(0, 2)) >= 0 ? navigator.language.slice(0, 2) : "pt";
+    function tr(arr) { return arr[LANGS.indexOf(lang)]; }
+    function diaDe(j) {
+      var d = new Date();
+      return Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - j.inicio) / 864e5) + 1;
+    }
+
+    var escolhido = (location.hash.slice(1) && JOGOS.some(function (j) { return j.id === location.hash.slice(1); })) ? location.hash.slice(1) : "topzi";
+
+    function renderAbas() {
+      document.getElementById("tabs").innerHTML = JOGOS.map(function (j) {
+        return '<button type="button" role="tab" class="rank-tab" data-jogo="' + j.id + '" aria-selected="' + (j.id === escolhido) + '">' + gameziEsc(j.nome) + "</button>";
+      }).join("");
+      document.querySelectorAll("[data-jogo]").forEach(function (b) {
+        b.onclick = function () {
+          escolhido = b.dataset.jogo;
+          history.replaceState(null, "", "#" + escolhido);
+          renderAbas();
+          renderRanking();
+        };
+      });
+    }
+
+    function renderRanking() {
+      var j = JOGOS.filter(function (x) { return x.id === escolhido; })[0];
+      var n = diaDe(j);
+      var box = document.getElementById("rank");
+      box.innerHTML = '<div class="rank-head"><div><b>' + gameziEsc(j.nome) + "</b><small>" + gameziEsc(tr(j.dia).replace("{n}", n)) + " · " + gameziEsc(tr(j.pts)) + "</small></div>" +
+        '<a class="btn" href="' + j.id + '/">' + gameziEsc(tr(T.play)) + '</a></div><div class="leaderboard" id="lb"></div>';
+      var lb = document.getElementById("lb");
+      if (!gameziRankingLigado() || n < 1) {
+        lb.innerHTML = '<p class="muted">' + gameziEsc(tr(T.off)) + "</p>";
+        return;
+      }
+      gameziRankingDesenhar(lb, gameziCliente(false), j.id, n, lang).then(function (res) {
+        if (!res) {
+          lb.hidden = false;
+          lb.innerHTML = '<p class="muted">' + gameziEsc(gameziRankingTexto("erro", lang)) + "</p>";
+        }
+      });
+    }
+
+    document.documentElement.lang = { pt: "pt-BR", en: "en", es: "es" }[lang];
+    document.querySelectorAll("[data-t]").forEach(function (el) { el.textContent = tr(T[el.dataset.t]); });
+    renderAbas();
+    renderRanking();
+  </script>
+</body>
+</html>

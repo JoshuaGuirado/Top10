@@ -9,6 +9,8 @@ let autoTimer = null;
 let fimDoTempo = 0; // relógio: quando o tempo acaba (performance.now)
 let relogioRaf = 0;
 let ultimoTique = 0;
+let pensandoDesde = 0; // quando apareceu a pergunta da vez (performance.now)
+let tempoMs = 0; // tempo pensando na partida: desempata o ranking do dia
 
 function show(tela) {
   document.querySelectorAll(".screen").forEach((s) => (s.hidden = s.id !== "screen-" + tela));
@@ -183,6 +185,8 @@ function comecar(novoModo, estado) {
   esperando = false;
   show("game");
   renderJogo();
+  tempoMs = 0;
+  pensandoDesde = performance.now();
   if (modo === "relogio") iniciarRelogio();
 }
 
@@ -383,6 +387,7 @@ function flutuar(texto, cls) {
 
 function responder(resposta) {
   if (!partida || esperando || partida.fim) return;
+  tempoMs += performance.now() - pensandoDesde; // conta só o tempo pensando (não o de ver se acertou)
   const antes = mmMultiplicador(partida.combo);
   const r = mmResponder(partida, resposta);
   if (!r) return;
@@ -407,6 +412,7 @@ function proxima() {
   mmProxima(partida);
   if (partida.fim) return terminar();
   renderJogo();
+  pensandoDesde = performance.now();
   const stage = $("stage");
   stage.classList.remove("enter");
   void stage.offsetWidth;
@@ -437,7 +443,7 @@ function terminar() {
   store("stats", st);
   if (modo === "diario" && !diarios()[diaAtual]) {
     const todos = diarios();
-    todos[diaAtual] = { acertos: s.acertos, total: MM_DIARIO_QTD, marcas: s.marcas, rodadas: s.rodadas };
+    todos[diaAtual] = { acertos: s.acertos, total: MM_DIARIO_QTD, marcas: s.marcas, rodadas: s.rodadas, ms: Math.round(tempoMs) };
     store("diario", todos);
   }
   mostrarResultado({ acertos: s.acertos, total: s.marcas.length, marcas: s.marcas, rodadas: s.rodadas, recorde, pontos: s.pontos, maiorCombo: s.maiorCombo });
@@ -469,6 +475,8 @@ function mostrarResultado(r) {
   $("res-record").textContent = t("res.record");
   $("res-share").onclick = (e) => (modo === "diario" ? compartilhar(diaAtual, r, e.currentTarget) : compartilharPartida(r, e.currentTarget));
   $("res-again").hidden = modo === "diario";
+  $("leaderboard").hidden = true;
+  if (modo === "diario") mostrarRanking();
   $("res-again").onclick = modo === "livre" ? comecarLivre : comecarRelogio;
   const l = LANGS.indexOf(lang);
   $("res-list").innerHTML = r.rodadas.slice(0, r.marcas.length).map((rd, i) => {
@@ -490,6 +498,18 @@ function mostrarResultado(r) {
     }
     return `<li class="${ok ? "ok" : "no"}"><span class="mark">${ok ? "✓" : "✗"}</span><span class="pair">${cima}</span><span class="pair other">${baixo}</span></li>`;
   }).join("");
+}
+
+// Ranking do dia (../gamezi-ranking.js): manda o resultado de hoje uma vez e mostra quem foi melhor.
+function mostrarRanking() {
+  const dia = diaAtual;
+  const reg = diarios()[dia];
+  if (!reg || typeof gameziRankingDoDia !== "function") return;
+  gameziRankingDoDia({
+    box: $("leaderboard"), jogo: "maisoumenozi", dia, hoje: mmDiaNumero(), reg, lang, nick: store("nick"),
+    salvar: (r) => store("diario", { ...diarios(), [dia]: r }),
+    guardarNick: (n) => store("nick", n),
+  });
 }
 
 function copiar(texto, btn) {

@@ -5,6 +5,8 @@ let partida = null; // estado de jogo.js
 let modo = "diario"; // "diario" ou "livre"
 let diaAtual = 0;
 let esperando = false; // mostrando se acertou, antes do próximo
+let pensandoDesde = 0; // quando apareceu o acontecimento da vez (performance.now)
+let tempoMs = 0; // tempo pensando na partida: desempata o ranking do dia
 
 function show(tela) {
   document.querySelectorAll(".screen").forEach((s) => (s.hidden = s.id !== "screen-" + tela));
@@ -97,6 +99,7 @@ function comecarDiario(dia = dzDiaNumero()) {
   esperando = false;
   show("game");
   renderJogo();
+  comecarTempo();
 }
 
 function comecarLivre() {
@@ -105,6 +108,13 @@ function comecarLivre() {
   esperando = false;
   show("game");
   renderJogo();
+  comecarTempo();
+}
+
+// O tempo conta só enquanto a pessoa pensa onde pôr o acontecimento (não enquanto vê se acertou).
+function comecarTempo() {
+  tempoMs = 0;
+  pensandoDesde = performance.now();
 }
 
 function renderJogo() {
@@ -142,6 +152,7 @@ function renderJogo() {
 
 function colocar(pos) {
   if (!partida || esperando || partida.fim) return;
+  tempoMs += performance.now() - pensandoDesde;
   dzColocar(partida, pos);
   esperando = true;
   renderJogo();
@@ -153,6 +164,7 @@ function proximo() {
   if (partida.fim) return terminar();
   esperando = false;
   renderJogo();
+  pensandoDesde = performance.now();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -172,7 +184,7 @@ function terminar() {
   const total = s.marcas.length + s.fila.length;
   if (modo === "diario" && !diarios()[diaAtual]) {
     const todos = diarios();
-    todos[diaAtual] = { acertos: s.acertos, total: DZ_DIARIO_QTD, marcas: s.marcas, linha: s.linha };
+    todos[diaAtual] = { acertos: s.acertos, total: DZ_DIARIO_QTD, marcas: s.marcas, linha: s.linha, ms: Math.round(tempoMs) };
     store("diario", todos);
   }
   mostrarResultado({ acertos: s.acertos, total, marcas: s.marcas, linha: s.linha, recorde });
@@ -195,10 +207,24 @@ function mostrarResultado(r) {
   $("res-share").hidden = !diario;
   $("res-share").onclick = (e) => compartilhar(diaAtual, r, e.currentTarget);
   $("res-again").hidden = diario;
+  $("leaderboard").hidden = true;
+  if (diario) mostrarRanking();
   $("res-timeline").innerHTML = r.linha.map((id) => {
     const e = dzEvento(id);
     return e ? `<li class="event"><b>${e.ano}</b><span>${escapeHtml(tr(e.txt))}</span></li>` : "";
   }).join("");
+}
+
+// Ranking do dia (../gamezi-ranking.js): manda o resultado de hoje uma vez e mostra quem foi melhor.
+function mostrarRanking() {
+  const dia = diaAtual;
+  const reg = diarios()[dia];
+  if (!reg || typeof gameziRankingDoDia !== "function") return;
+  gameziRankingDoDia({
+    box: $("leaderboard"), jogo: "datazi", dia, hoje: dzDiaNumero(), reg, lang, nick: store("nick"),
+    salvar: (r) => store("diario", { ...diarios(), [dia]: r }),
+    guardarNick: (n) => store("nick", n),
+  });
 }
 
 function compartilhar(dia, r, btn) {

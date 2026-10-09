@@ -553,7 +553,64 @@ drop policy if exists "topzi diário: ler" on public.topzi_diario;
 create policy "topzi diário: ler" on public.topzi_diario
   for select to authenticated using (true);
 
-create or replace function public.topzi_registrar_diario(p_dia integer, p_lista text, p_nick text, p_pontos integer, p_acertos integer)
+-- Patozi: respostas das cartas (dados em supabase/patozi-respostas.sql, gerado a partir do jogo).
+create table if not exists public.patozi_respostas (
+  carta text primary key,
+  resposta bigint not null check (resposta >= 1)
+);
+alter table public.patozi_respostas enable row level security; -- sem regras: só as funções leem
+
+drop policy if exists "patozi diário: registrar o próprio" on public.patozi_diario;
+
+-- ═════════════════════════════ Ranking do dia de todos os jogos (desempate pelo tempo) ═════════════════════════════
+-- Cada jogo tem a tabela <jogo>_diario com o resultado de cada um no desafio do dia. Quem faz mais pontos fica
+-- na frente; no empate, quem levou menos tempo (tempo_ms, medido pelo jogo). Sem tempo (resultado antigo) fica
+-- atrás no empate. O ranking é lido pela função gamezi_ranking_dia (também no portal, sem login).
+
+alter table public.topzi_diario add column if not exists tempo_ms integer check (tempo_ms between 0 and 86400000);
+alter table public.patozi_diario add column if not exists tempo_ms integer check (tempo_ms between 0 and 86400000);
+
+-- Datazi: acontecimentos no lugar certo (de 0 a 8). Maisoumenozi: acertos nas 10 rodadas.
+create table if not exists public.datazi_diario (
+  dia integer not null check (dia >= 1),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  nick text not null default '' check (char_length(nick) <= 16),
+  pontos smallint not null check (pontos between 0 and 8),
+  tempo_ms integer check (tempo_ms between 0 and 86400000),
+  created_at timestamptz not null default now(),
+  primary key (dia, user_id)
+);
+
+create table if not exists public.maisoumenozi_diario (
+  dia integer not null check (dia >= 1),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  nick text not null default '' check (char_length(nick) <= 16),
+  pontos smallint not null check (pontos between 0 and 10),
+  tempo_ms integer check (tempo_ms between 0 and 86400000),
+  created_at timestamptz not null default now(),
+  primary key (dia, user_id)
+);
+
+comment on table public.datazi_diario is 'Datazi: resultado de cada um no Datazi do dia (ranking)';
+comment on table public.maisoumenozi_diario is 'Maisoumenozi: resultado de cada um no desafio do dia (ranking)';
+
+do $$
+declare
+  tabela text;
+begin
+  foreach tabela in array array['topzi_diario', 'patozi_diario', 'datazi_diario', 'maisoumenozi_diario'] loop
+    execute format('create index if not exists %I on public.%I (dia, pontos desc, tempo_ms)', tabela || '_tempo_idx', tabela);
+  end loop;
+  foreach tabela in array array['datazi_diario', 'maisoumenozi_diario'] loop
+    execute format('drop trigger if exists %I on public.%I', tabela || '_nick_limpo', tabela);
+    execute format('create trigger %I before insert or update of nick on public.%I for each row execute function public.gamezi_limpar_nick()', tabela || '_nick_limpo', tabela);
+    execute format('alter table public.%I enable row level security', tabela); -- sem regras: só as funções leem e gravam
+  end loop;
+end $$;
+
+-- Topzi e Patozi: as funções de registrar ganham o tempo (opcional, para o jogo antigo em cache continuar entrando).
+drop function if exists public.topzi_registrar_diario(integer, text, text, integer, integer);
+create or replace function public.topzi_registrar_diario(p_dia integer, p_lista text, p_nick text, p_pontos integer, p_acertos integer, p_tempo integer default null)
 returns void language plpgsql security definer set search_path = public as $$
 declare
   hoje integer := ((now() at time zone 'utc')::date - date '2026-10-01') + 1;
@@ -564,32 +621,16 @@ begin
   if p_pontos is null or p_pontos < p_acertos * (p_acertos + 1) / 2 or p_pontos > p_acertos * (21 - p_acertos) / 2 then
     raise exception 'Resultado inválido.';
   end if;
-  insert into public.topzi_diario (dia, user_id, nick, lista, pontos, acertos)
-  values (p_dia, auth.uid(), left(coalesce(p_nick, ''), 16), left(coalesce(p_lista, ''), 80), p_pontos, p_acertos)
+  insert into public.topzi_diario (dia, user_id, nick, lista, pontos, acertos, tempo_ms)
+  values (p_dia, auth.uid(), left(coalesce(p_nick, ''), 16), left(coalesce(p_lista, ''), 80), p_pontos, p_acertos,
+          case when p_tempo between 0 and 86400000 then p_tempo end)
   on conflict (dia, user_id) do nothing;
 end $$;
 
-grant execute on function public.topzi_registrar_diario(integer, text, text, integer, integer) to authenticated;
+grant execute on function public.topzi_registrar_diario(integer, text, text, integer, integer, integer) to authenticated;
 
-create or replace function public.topzi_minha_posicao(p_dia integer)
-returns table (posicao bigint, total bigint) language sql stable security definer set search_path = public as $$
-  select (select count(*) from public.topzi_diario d where d.dia = p_dia and d.pontos > m.pontos) + 1,
-         (select count(*) from public.topzi_diario d where d.dia = p_dia)
-    from public.topzi_diario m where m.dia = p_dia and m.user_id = auth.uid();
-$$;
-
-grant execute on function public.topzi_minha_posicao(integer) to authenticated;
-
--- Patozi: respostas das cartas (dados em supabase/patozi-respostas.sql, gerado a partir do jogo).
-create table if not exists public.patozi_respostas (
-  carta text primary key,
-  resposta bigint not null check (resposta >= 1)
-);
-alter table public.patozi_respostas enable row level security; -- sem regras: só as funções abaixo leem
-
-drop policy if exists "patozi diário: registrar o próprio" on public.patozi_diario;
-
-create or replace function public.patozi_registrar_diario(p_dia integer, p_nick text, p_chutes jsonb)
+drop function if exists public.patozi_registrar_diario(integer, text, jsonb);
+create or replace function public.patozi_registrar_diario(p_dia integer, p_nick text, p_chutes jsonb, p_tempo integer default null)
 returns integer language plpgsql security definer set search_path = public as $$
 declare
   hoje integer := ((now() at time zone 'utc')::date - date '2026-10-08') + 1;
@@ -610,19 +651,83 @@ begin
     chute := nullif(item ->> 'chute', '')::numeric;
     if chute is not null and chute >= 0 and chute <= resp then total := total + floor(100 * chute / resp); end if;
   end loop;
-  insert into public.patozi_diario (dia, user_id, nick, pontos, chutes)
-  values (p_dia, auth.uid(), left(coalesce(p_nick, ''), 16), total, p_chutes)
+  insert into public.patozi_diario (dia, user_id, nick, pontos, chutes, tempo_ms)
+  values (p_dia, auth.uid(), left(coalesce(p_nick, ''), 16), total, p_chutes, case when p_tempo between 0 and 86400000 then p_tempo end)
   on conflict (dia, user_id) do nothing;
   return total;
 end $$;
 
-grant execute on function public.patozi_registrar_diario(integer, text, jsonb) to authenticated;
+grant execute on function public.patozi_registrar_diario(integer, text, jsonb, integer) to authenticated;
+
+-- Datazi do dia (o dia 1 é 8/10/2026) e desafio do dia do Maisoumenozi (o dia 1 é 9/10/2026).
+create or replace function public.datazi_registrar_diario(p_dia integer, p_nick text, p_acertos integer, p_tempo integer default null)
+returns void language plpgsql security definer set search_path = public as $$
+declare
+  hoje integer := ((now() at time zone 'utc')::date - date '2026-10-08') + 1;
+begin
+  if auth.uid() is null then raise exception 'Entre para registrar o resultado.'; end if;
+  if p_dia is null or p_dia not between hoje - 1 and hoje + 1 then raise exception 'Esse dia já passou.'; end if;
+  if p_acertos is null or p_acertos not between 0 and 8 then raise exception 'Resultado inválido.'; end if;
+  insert into public.datazi_diario (dia, user_id, nick, pontos, tempo_ms)
+  values (p_dia, auth.uid(), left(coalesce(p_nick, ''), 16), p_acertos, case when p_tempo between 0 and 86400000 then p_tempo end)
+  on conflict (dia, user_id) do nothing;
+end $$;
+
+grant execute on function public.datazi_registrar_diario(integer, text, integer, integer) to authenticated;
+
+create or replace function public.maisoumenozi_registrar_diario(p_dia integer, p_nick text, p_acertos integer, p_tempo integer default null)
+returns void language plpgsql security definer set search_path = public as $$
+declare
+  hoje integer := ((now() at time zone 'utc')::date - date '2026-10-09') + 1;
+begin
+  if auth.uid() is null then raise exception 'Entre para registrar o resultado.'; end if;
+  if p_dia is null or p_dia not between hoje - 1 and hoje + 1 then raise exception 'Esse dia já passou.'; end if;
+  if p_acertos is null or p_acertos not between 0 and 10 then raise exception 'Resultado inválido.'; end if;
+  insert into public.maisoumenozi_diario (dia, user_id, nick, pontos, tempo_ms)
+  values (p_dia, auth.uid(), left(coalesce(p_nick, ''), 16), p_acertos, case when p_tempo between 0 and 86400000 then p_tempo end)
+  on conflict (dia, user_id) do nothing;
+end $$;
+
+grant execute on function public.maisoumenozi_registrar_diario(integer, text, integer, integer) to authenticated;
+
+-- Ranking do dia de um jogo: os primeiros (p_limite) e, se a pessoa conectada ficou fora deles, a linha dela no fim.
+-- posicao: empate em pontos e tempo divide o lugar. total: quantos jogaram no dia. eu: é a pessoa conectada.
+create or replace function public.gamezi_ranking_dia(p_jogo text, p_dia integer, p_limite integer default 10)
+returns table (posicao bigint, nick text, pontos integer, tempo_ms integer, eu boolean, total bigint)
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if p_jogo is null or p_jogo not in ('topzi', 'patozi', 'datazi', 'maisoumenozi') then raise exception 'Jogo desconhecido.'; end if;
+  return query execute format($q$
+    with r as (
+      select d.nick, d.pontos::integer as pontos, d.tempo_ms, d.user_id,
+             rank() over (order by d.pontos desc, d.tempo_ms asc nulls last) as posicao,
+             row_number() over (order by d.pontos desc, d.tempo_ms asc nulls last, d.created_at) as ordem,
+             count(*) over () as total
+        from public.%I d
+       where d.dia = $1
+    )
+    select r.posicao, r.nick, r.pontos, r.tempo_ms, coalesce(r.user_id = auth.uid(), false), r.total
+      from r
+     where r.ordem <= $2 or r.user_id = auth.uid()
+     order by r.ordem
+  $q$, p_jogo || '_diario') using p_dia, least(greatest(coalesce(p_limite, 10), 1), 50);
+end $$;
+
+grant execute on function public.gamezi_ranking_dia(text, integer, integer) to anon, authenticated;
+
+-- Posição no ranking do Topzi e do Patozi (usada pelo jogo antigo em cache), com o mesmo desempate pelo tempo.
+create or replace function public.topzi_minha_posicao(p_dia integer)
+returns table (posicao bigint, total bigint) language sql stable security definer set search_path = public as $$
+  select (select count(*) from public.topzi_diario d where d.dia = p_dia
+           and (d.pontos > m.pontos or (d.pontos = m.pontos and coalesce(d.tempo_ms, 86400001) < coalesce(m.tempo_ms, 86400001)))) + 1,
+         (select count(*) from public.topzi_diario d where d.dia = p_dia)
+    from public.topzi_diario m where m.dia = p_dia and m.user_id = auth.uid();
+$$;
 
 create or replace function public.patozi_minha_posicao(p_dia integer)
 returns table (posicao bigint, total bigint) language sql stable security definer set search_path = public as $$
-  select (select count(*) from public.patozi_diario d where d.dia = p_dia and d.pontos > m.pontos) + 1,
+  select (select count(*) from public.patozi_diario d where d.dia = p_dia
+           and (d.pontos > m.pontos or (d.pontos = m.pontos and coalesce(d.tempo_ms, 86400001) < coalesce(m.tempo_ms, 86400001)))) + 1,
          (select count(*) from public.patozi_diario d where d.dia = p_dia)
     from public.patozi_diario m where m.dia = p_dia and m.user_id = auth.uid();
 $$;
-
-grant execute on function public.patozi_minha_posicao(integer) to authenticated;

@@ -7,6 +7,7 @@
     topzi_salas: ["code"], topzi_sala_jogadores: ["room_code", "user_id"], topzi_perfis: ["id"], topzi_partidas: ["id"],
     patozi_salas: ["code"], patozi_sala_jogadores: ["sala_code", "user_id"], patozi_perfis: ["id"], patozi_partidas: ["id"],
     patozi_diario: ["dia", "user_id"], patozi_sugestoes: ["id"], topzi_diario: ["dia", "user_id"],
+    datazi_diario: ["dia", "user_id"], maisoumenozi_diario: ["dia", "user_id"],
   };
   const empty = () => Object.fromEntries(Object.keys(PK).map((k) => [k, []]));
   const load = () => ({ ...empty(), ...(JSON.parse(localStorage.getItem(DB_KEY) || "null") || {}) });
@@ -132,14 +133,32 @@
       const db = load();
       if (nome === "patozi_registrar_diario") {
         const pontos = a.p_chutes.reduce((s, x) => s + window.pzDiarioPontos(x.chute, window.pzCarta(x.carta).resposta), 0);
-        if (!db.patozi_diario.some((x) => x.dia === a.p_dia && x.user_id === uid)) db.patozi_diario.push({ dia: a.p_dia, user_id: uid, nick: a.p_nick, pontos, chutes: a.p_chutes });
+        if (!db.patozi_diario.some((x) => x.dia === a.p_dia && x.user_id === uid)) db.patozi_diario.push({ dia: a.p_dia, user_id: uid, nick: a.p_nick, pontos, chutes: a.p_chutes, tempo_ms: a.p_tempo ?? null, created_at: now() });
         save(db);
         return { data: pontos, error: null };
       }
       if (nome === "topzi_registrar_diario") {
-        if (!db.topzi_diario.some((x) => x.dia === a.p_dia && x.user_id === uid)) db.topzi_diario.push({ dia: a.p_dia, user_id: uid, nick: a.p_nick, lista: a.p_lista, pontos: a.p_pontos, acertos: a.p_acertos });
+        if (!db.topzi_diario.some((x) => x.dia === a.p_dia && x.user_id === uid)) db.topzi_diario.push({ dia: a.p_dia, user_id: uid, nick: a.p_nick, lista: a.p_lista, pontos: a.p_pontos, acertos: a.p_acertos, tempo_ms: a.p_tempo ?? null, created_at: now() });
         save(db);
         return { data: null, error: null };
+      }
+      if (nome === "datazi_registrar_diario" || nome === "maisoumenozi_registrar_diario") {
+        const tabela = nome.replace("_registrar_diario", "_diario");
+        if (!uid) return { data: null, error: { message: "Entre para registrar o resultado." } };
+        if (!db[tabela].some((x) => x.dia === a.p_dia && x.user_id === uid)) db[tabela].push({ dia: a.p_dia, user_id: uid, nick: a.p_nick, pontos: a.p_acertos, tempo_ms: a.p_tempo ?? null, created_at: now() });
+        save(db);
+        return { data: null, error: null };
+      }
+      // Como gamezi_ranking_dia do schema.sql: mais pontos na frente; no empate, menos tempo (sem tempo fica atrás).
+      if (nome === "gamezi_ranking_dia") {
+        const sem = 864e5 + 1;
+        const rows = db[a.p_jogo + "_diario"].filter((x) => x.dia === a.p_dia)
+          .sort((x, y) => y.pontos - x.pontos || (x.tempo_ms ?? sem) - (y.tempo_ms ?? sem) || String(x.created_at).localeCompare(String(y.created_at)));
+        const out = rows.map((x, i) => ({
+          posicao: rows.findIndex((y) => y.pontos === x.pontos && (y.tempo_ms ?? sem) === (x.tempo_ms ?? sem)) + 1,
+          nick: x.nick, pontos: x.pontos, tempo_ms: x.tempo_ms ?? null, eu: !!uid && x.user_id === uid, total: rows.length, ordem: i + 1,
+        })).filter((x) => x.ordem <= (a.p_limite || 10) || x.eu);
+        return { data: out, error: null };
       }
       if (nome === "patozi_minha_posicao" || nome === "topzi_minha_posicao") {
         const rows = db[nome.startsWith("patozi") ? "patozi_diario" : "topzi_diario"].filter((x) => x.dia === a.p_dia);

@@ -173,8 +173,11 @@ const server = http.createServer((req, res) => {
   await C.waitForSelector("#screen-results:not([hidden])", { timeout: 8000 });
   await C.waitForSelector("#daily-ranking .lb-pos", { timeout: 5000 });
   assert.match(await C.textContent("#daily-ranking .lb-pos"), /1º de 1/);
-  assert.equal(await C.evaluate(() => JSON.parse(localStorage.getItem("__fakedb")).topzi_diario.length), 1);
-  step("lista do dia entra no ranking de hoje, com a posição");
+  const topziDia = await C.evaluate(() => JSON.parse(localStorage.getItem("__fakedb")).topzi_diario);
+  assert.equal(topziDia.length, 1);
+  assert.ok(topziDia[0].tempo_ms > 0, "o tempo da partida vai junto (desempate)");
+  assert.match(await C.textContent("#daily-ranking .lb-time"), /\d+s/);
+  step("lista do dia entra no ranking de hoje, com a posição e o tempo");
 
   assert.deepEqual(errors, []);
   console.log("\nTudo certo no modo online.");

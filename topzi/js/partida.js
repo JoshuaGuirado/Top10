@@ -60,6 +60,8 @@ function startGame(list, opts = {}) {
     isHost: !!online,
     gid: online ? Math.random().toString(36).slice(2, 10) : null,
     me: 0,
+    startedAt: Date.now(), // lista do dia: o tempo desempata o ranking
+    endedAt: null,
   };
   if (online) game.me = gamePlayers.findIndex((p) => p.uid === myId());
   // Quem começa: escolhido na tela de jogadores ou sorteado (no Times, o time dele começa e ele abre a vez).
@@ -417,6 +419,7 @@ function passTurn() {
 function endGame(reason) {
   if (!game || game.over) return;
   game.over = true;
+  game.endedAt = Date.now();
   game.busy = false;
   game.hintMode = false;
   stopTurnTimer();

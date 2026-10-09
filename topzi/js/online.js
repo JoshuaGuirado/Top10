@@ -947,7 +947,8 @@ async function renderOnlineHistory() {
 }
 
 // ───────────── ranking da lista do dia ─────────────
-// O resultado entra pelo banco (topzi_registrar_diario confere o dia e se os pontos são possíveis).
+// O resultado entra pelo banco (topzi_registrar_diario confere o dia e se os pontos são possíveis) com o
+// tempo da partida, que desempata. Quem lê e desenha o ranking é ../gamezi-ranking.js (igual em todos os jogos).
 // Banco sem a função (schema.sql antigo): o ranking só não aparece.
 
 async function sendDailyScore(num, res) {
@@ -955,43 +956,23 @@ async function sendDailyScore(num, res) {
   await ensureOnline();
   ensurePlayers();
   const nick = (players[0].nick || "").trim().slice(0, 16) || t("rank.anon");
-  await sb.rpc("topzi_registrar_diario", { p_dia: num, p_lista: res.listId, p_nick: nick, p_pontos: res.score, p_acertos: res.found.filter(Boolean).length });
-}
-
-async function fetchDailyRanking(num) {
-  await ensureOnline();
-  const list = dailyList(num);
-  const [top, pos] = await Promise.all([
-    sb.from("topzi_diario").select("*").eq("dia", num).eq("lista", list ? list.id : "").order("pontos", { ascending: false }).limit(10),
-    sb.rpc("topzi_minha_posicao", { p_dia: num }),
-  ]);
-  if (top.error) throw new Error(t("on.errNet"));
-  const p = Array.isArray(pos.data) && pos.data[0];
-  return { rows: top.data || [], pos: p ? { posicao: Number(p.posicao), total: Number(p.total) } : null };
+  const args = { p_dia: num, p_lista: res.listId, p_nick: nick, p_pontos: res.score, p_acertos: res.found.filter(Boolean).length };
+  const { error } = await sb.rpc("topzi_registrar_diario", { ...args, p_tempo: gameziTempoValido(res.ms) });
+  // Banco ainda sem o tempo (schema.sql antigo): registra sem ele.
+  if (error && error.code === "PGRST202") await sb.rpc("topzi_registrar_diario", args);
 }
 
 // Ranking do dia na tela de resultado (e a posição no cartão do início).
 async function renderDailyRanking(num, box) {
   if (!onlineConfigured() || !box) return;
-  box.hidden = false;
-  box.innerHTML = `<h3>${t("rank.title")}</h3><p class="small muted">${t("rank.loading")}</p>`;
-  try {
-    const { rows, pos } = await fetchDailyRanking(num);
-    box.innerHTML = `<h3>${t("rank.title")}</h3>` +
-      (pos ? `<p class="lb-pos">${t("rank.position", { pos: pos.posicao, total: pos.total })}</p>` : "") +
-      (rows.length
-        ? rows.map((r, k) => `<div class="lb-row ${r.user_id === myId() ? "me" : ""}"><span>${k + 1}</span><b>${escapeHtml(r.nick || "?")}</b><em>${r.pontos}</em></div>`).join("")
-        : `<p class="small muted">${t("rank.empty")}</p>`);
-  } catch (e) {
-    box.hidden = true;
-  }
+  await gameziRankingDesenhar(box, ensureOnline().then(() => sb), "topzi", num, lang);
 }
 
 async function dailyPositionLine(num) {
   if (!onlineConfigured() || !gameziSessao()) return null;
   try {
-    const { pos } = await fetchDailyRanking(num);
-    return pos;
+    await ensureOnline();
+    return (await gameziRankingBuscar(sb, "topzi", num)).eu;
   } catch (e) {
     return null;
   }

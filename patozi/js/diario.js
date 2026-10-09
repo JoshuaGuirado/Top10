@@ -132,11 +132,19 @@ function renderDiario() {
       </form>
       <p class="input-error" id="daily-error"></p>`;
     $("daily-body").innerHTML = corpo;
+    // Tempo para responder (desempata o ranking): conta desde que a carta apareceu. Fica salvo, então sair e
+    // voltar não zera o relógio da carta.
+    if (!reg.vista) {
+      reg.vista = Date.now();
+      diarioSalvar(dia, reg);
+    }
     $("daily-form").onsubmit = (e) => {
       e.preventDefault();
       const v = lerNumero($("daily-guess").value);
       if (!Number.isFinite(v)) return ($("daily-error").textContent = t("game.errNum"));
       const r = diarioDoDia(dia);
+      r.ms = (r.ms || 0) + Math.max(0, Date.now() - (r.vista || Date.now()));
+      delete r.vista;
       r.chutes.push(v);
       r.pontos.push(pzDiarioPontos(v, carta.resposta));
       diarioSalvar(dia, r);
@@ -186,25 +194,14 @@ function renderDiarioFim(reg, dots) {
   renderRanking();
 }
 
+// Ranking do dia (pontos e, no empate, o tempo): desenhado por ../gamezi-ranking.js, igual em todos os jogos.
 async function renderRanking() {
   if (!diarioEstado || document.body.dataset.screen !== "daily") return;
   const box = $("leaderboard");
   box.hidden = false;
-  if (typeof buscarRanking !== "function" || !onlineConfigured()) {
+  if (typeof ensureOnline !== "function" || !onlineConfigured()) {
     box.innerHTML = `<h3>${escapeHtml(t("daily.rankTitle"))}</h3><p class="small muted">${escapeHtml(t("daily.rankOff"))}</p>`;
     return;
   }
-  box.innerHTML = `<h3>${escapeHtml(t("daily.rankTitle"))}</h3><p class="small muted">${escapeHtml(t("daily.rankLoading"))}</p>`;
-  let linhas = [];
-  let pos = null;
-  try {
-    [linhas, pos] = await Promise.all([buscarRanking(diarioEstado.dia), buscarPosicao(diarioEstado.dia).catch(() => null)]);
-  } catch (e) {
-    box.innerHTML = `<h3>${escapeHtml(t("daily.rankTitle"))}</h3><p class="small muted">${escapeHtml(e.message || t("on.errNet"))}</p>`;
-    return;
-  }
-  box.innerHTML = `<h3>${escapeHtml(t("daily.rankTitle"))}</h3>` +
-    (pos ? `<p class="lb-pos">${escapeHtml(t("daily.position", { pos: pos.posicao, total: pos.total }))}</p>` : "") + (linhas.length
-    ? linhas.map((l, k) => `<div class="lb-row ${l.user_id === myId() ? "me" : ""}"><span>${k + 1}</span><b>${escapeHtml(l.nick || "?")}${l.user_id === myId() ? ` <small class="muted">(${escapeHtml(t("daily.you"))})</small>` : ""}</b><em>${l.pontos}</em></div>`).join("")
-    : `<p class="small muted">${escapeHtml(t("daily.rankEmpty"))}</p>`);
+  await gameziRankingDesenhar(box, ensureOnline().then(() => sb), "patozi", diarioEstado.dia, lang);
 }

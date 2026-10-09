@@ -173,3 +173,28 @@ a { color: inherit; }
 .badge.done { opacity: 1; box-shadow: inset 0 0 0 2px var(--accent); }
 .badge.done b::before { content: "★ "; color: var(--accent); }
 
+
+/* ranking do dia (portal e ranking.html; as linhas vêm de gamezi-ranking.js) */
+.portal-rank { justify-self: center; display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 999px; border: 2px solid var(--accent); color: var(--fg); font-weight: 700; text-decoration: none; }
+.portal-rank:hover { background: var(--accent-soft); }
+.portal-rank svg { width: 20px; height: 20px; color: var(--accent-ink); }
+.rank-page .panel > p { margin-bottom: 14px; }
+.rank-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.rank-tab { font: inherit; font-weight: 700; font-size: .9rem; padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--bg); color: var(--fg); cursor: pointer; }
+.rank-tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.rank-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.rank-head b { display: block; font-stretch: 75%; font-weight: 800; font-size: 1.8rem; line-height: 1; }
+.rank-head small { color: var(--muted); font-size: .85rem; }
+.rank-head .btn { text-decoration: none; min-height: 0; padding: 10px 20px; }
+.rank-box .leaderboard { margin: 16px 0 0; }
+.leaderboard h3 { margin: 0 0 10px; }
+.lb-pos { margin: 0 0 10px; font-weight: 800; font-size: 1.1rem; color: var(--accent-ink); }
+.lb-row { display: grid; grid-template-columns: 32px 1fr auto auto; gap: 10px; align-items: center; padding: 8px 12px; border-radius: 12px; }
+.lb-row:nth-child(odd) { background: var(--bg); }
+.lb-row.me { box-shadow: inset 0 0 0 2px var(--accent); }
+.lb-row span { font-stretch: 75%; font-weight: 800; font-size: 1.2rem; color: var(--muted); text-align: center; }
+.lb-row b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-row em { font-style: normal; font-stretch: 75%; font-weight: 800; font-size: 1.3rem; color: var(--accent-ink); }
+.lb-time { font-style: normal; font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lb-note { margin: 8px 0 0; text-align: center; font-size: .85rem; }
+.small { font-size: .85rem; }

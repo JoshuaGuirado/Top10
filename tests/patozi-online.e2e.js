@@ -174,6 +174,7 @@ const server = http.createServer((req, res) => {
   const diario = await A.evaluate(() => JSON.parse(localStorage.getItem("__fakedb")).patozi_diario);
   assert.equal(diario.length, 1);
   assert.equal(typeof diario[0].chutes[0].carta, "string", "o banco recebe a carta de cada chute e calcula os pontos");
+  assert.ok(diario[0].tempo_ms > 0, "o tempo para responder vai junto (desempate)");
   await A.waitForSelector(".lb-pos", { timeout: 5000 });
   assert.match(await A.textContent(".lb-pos"), /1º de 1/);
   step("Pato do dia vai para o ranking de hoje, com a posição");

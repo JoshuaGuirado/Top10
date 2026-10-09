@@ -54,6 +54,7 @@ function dailyResultOf(g) {
     hints: g.hints.size,
     lives: g.lives,
     maxLives: g.maxLives,
+    ms: (g.endedAt || Date.now()) - g.startedAt, // tempo da partida (desempate no ranking)
   };
 }
 
