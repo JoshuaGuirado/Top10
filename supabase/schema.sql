@@ -731,3 +731,64 @@ returns table (posicao bigint, total bigint) language sql stable security define
          (select count(*) from public.patozi_diario d where d.dia = p_dia)
     from public.patozi_diario m where m.dia = p_dia and m.user_id = auth.uid();
 $$;
+
+-- ═════════════════════════════ Salas online: a partida continua sem o anfitrião ═════════════════════════════
+-- Quem sai da sala chama <jogo>_sair_da_sala: se era o anfitrião e ainda tem gente, o comando passa para quem
+-- entrou primeiro (a sala só é apagada quando sai o último). Se o anfitrião some sem sair (fechou o app, caiu
+-- a internet), o próximo da fila chama <jogo>_assumir_sala, que só passa o comando se o anfitrião não está mais
+-- na sala ou se a sala está parada há 10 segundos (quem decide que ele sumiu é o jogo, pela presença).
+
+do $$
+declare
+  jogo text;
+  col text;
+begin
+  foreach jogo in array array['topzi', 'patozi'] loop
+    col := case jogo when 'topzi' then 'room_code' else 'sala_code' end;
+
+    execute format($f$
+      create or replace function public.%1$I(p_code text)
+      returns uuid language plpgsql security definer set search_path = public as $b$
+      declare
+        s public.%2$I;
+        novo uuid;
+      begin
+        if auth.uid() is null then raise exception 'Entre para jogar online.'; end if;
+        select * into s from public.%2$I where code = p_code for update;
+        if not found then return null; end if;
+        delete from public.%3$I where %4$I = p_code and user_id = auth.uid();
+        if s.host_id <> auth.uid() then return s.host_id; end if;
+        select user_id into novo from public.%3$I where %4$I = p_code order by joined_at limit 1;
+        if novo is null then
+          delete from public.%2$I where code = p_code;
+          return null;
+        end if;
+        update public.%2$I set host_id = novo where code = p_code;
+        return novo;
+      end $b$;
+    $f$, jogo || '_sair_da_sala', jogo || '_salas', jogo || '_sala_jogadores', col);
+
+    execute format($f$
+      create or replace function public.%1$I(p_code text)
+      returns boolean language plpgsql security definer set search_path = public as $b$
+      declare
+        s public.%2$I;
+      begin
+        if auth.uid() is null then return false; end if;
+        select * into s from public.%2$I where code = p_code for update;
+        if not found then return false; end if;
+        if s.host_id = auth.uid() then return true; end if;
+        if not exists (select 1 from public.%3$I where %4$I = p_code and user_id = auth.uid()) then return false; end if;
+        if exists (select 1 from public.%3$I where %4$I = p_code and user_id = s.host_id)
+           and s.updated_at > now() - interval '10 seconds' then
+          return false;
+        end if;
+        update public.%2$I set host_id = auth.uid() where code = p_code;
+        return true;
+      end $b$;
+    $f$, jogo || '_assumir_sala', jogo || '_salas', jogo || '_sala_jogadores', col);
+
+    execute format('grant execute on function public.%I(text) to authenticated', jogo || '_sair_da_sala');
+    execute format('grant execute on function public.%I(text) to authenticated', jogo || '_assumir_sala');
+  end loop;
+end $$;

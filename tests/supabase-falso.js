@@ -80,7 +80,10 @@
     subscribe(cb) {
       setTimeout(() => cb && cb("SUBSCRIBED"), 40);
       this.beat = setInterval(() => {
-        if (this.tracked) this.post({ kind: "here", key: this.key });
+        if (this.tracked) {
+          this.seen[this.key] = Date.now(); // como no Supabase, quem está na sala se vê na presença
+          this.post({ kind: "here", key: this.key });
+        }
         this.firePresence();
       }, 1000);
       return this;
@@ -148,6 +151,35 @@
         if (!db[tabela].some((x) => x.dia === a.p_dia && x.user_id === uid)) db[tabela].push({ dia: a.p_dia, user_id: uid, nick: a.p_nick, pontos: a.p_acertos, tempo_ms: a.p_tempo ?? null, created_at: now() });
         save(db);
         return { data: null, error: null };
+      }
+      // Salas: quem sai passa o comando para quem entrou primeiro; quem fica assume se o anfitrião sumiu.
+      if (/^(topzi|patozi)_(sair_da_sala|assumir_sala)$/.test(nome)) {
+        const jogo = nome.split("_")[0];
+        const col = jogo === "topzi" ? "room_code" : "sala_code";
+        const salas = db[jogo + "_salas"];
+        const s = salas.find((x) => x.code === a.p_code);
+        const membros = () => db[jogo + "_sala_jogadores"].filter((p) => p[col] === a.p_code).sort((x, y) => String(x.joined_at).localeCompare(String(y.joined_at)));
+        if (nome.endsWith("sair_da_sala")) {
+          if (!s) return { data: null, error: null };
+          db[jogo + "_sala_jogadores"] = db[jogo + "_sala_jogadores"].filter((p) => !(p[col] === a.p_code && p.user_id === uid));
+          if (s.host_id !== uid) { save(db); return { data: s.host_id, error: null }; }
+          const novo = membros()[0];
+          if (!novo) {
+            db[jogo + "_salas"] = salas.filter((x) => x !== s);
+            save(db);
+            return { data: null, error: null };
+          }
+          Object.assign(s, { host_id: novo.user_id, updated_at: now() });
+          save(db);
+          return { data: novo.user_id, error: null };
+        }
+        if (!s) return { data: false, error: null };
+        if (s.host_id === uid) return { data: true, error: null };
+        if (!membros().some((p) => p.user_id === uid)) return { data: false, error: null };
+        if (membros().some((p) => p.user_id === s.host_id) && Date.now() - new Date(s.updated_at).getTime() < 10000) return { data: false, error: null };
+        Object.assign(s, { host_id: uid, updated_at: now() });
+        save(db);
+        return { data: true, error: null };
       }
       // Como gamezi_ranking_dia do schema.sql: mais pontos na frente; no empate, menos tempo (sem tempo fica atrás).
       if (nome === "gamezi_ranking_dia") {

@@ -3,7 +3,9 @@
 // Como funciona (igual ao Topzi): o aparelho de quem cria a sala (anfitrião) roda a partida com as regras
 // de jogo.js e manda o estado inteiro para os outros pelo Realtime. Os outros só mandam o próprio lance
 // (chutar ou "Nem a pato!") na sua vez. O estado também fica salvo em patozi_salas.state, então quem cai ou
-// recarrega a página volta para a partida. Se alguém sai no meio, o computador joga por ele.
+// recarrega a página volta para a partida. Se alguém sai no meio, o computador joga por ele. Se quem sai é o
+// anfitrião, o comando passa para quem entrou primeiro (patozi_sair_da_sala) ou, se ele só sumiu, quem ficou
+// assume depois de alguns segundos (patozi_assumir_sala), e a partida continua.
 
 const SALA_LETRAS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const AUSENTE_MS = 6000;
@@ -134,9 +136,43 @@ async function atualizarSala(codigo = sala && sala.code) {
   const [{ data: r }, lista] = await Promise.all([sb.from("patozi_salas").select("*").eq("code", codigo).maybeSingle(), buscarJogadores(codigo)]);
   if (!r) return salaFechada(t("on.closed"));
   if (!lista.some((p) => p.user_id === me.id)) return salaFechada(t("on.kicked"));
+  const anfitriaoAntes = sala && sala.host_id;
   sala = r;
   salaJogadores = lista;
+  if (anfitriaoAntes && anfitriaoAntes !== r.host_id) anfitriaoMudou();
 }
+
+// O comando da sala mudou de mão: quem virou anfitrião passa a rodar a partida (e o computador joga por quem saiu).
+function anfitriaoMudou() {
+  if (document.body.dataset.screen === "lobby") renderSala();
+  if (!isHost() || !partida || modo !== "online") return;
+  renderGame();
+  agendarComputador();
+  onlineTransmitir();
+}
+
+// Anfitrião sumiu sem sair (fechou o app, caiu a internet): quem entrou primeiro entre os que ficaram assume.
+let anfitriaoSumiuEm = null;
+
+async function conferirAnfitriao() {
+  if (!sala || !me || !canal || isHost() || !presentes.size || presentes.has(sala.host_id)) {
+    anfitriaoSumiuEm = null;
+    return;
+  }
+  anfitriaoSumiuEm = anfitriaoSumiuEm || Date.now();
+  if (Date.now() - anfitriaoSumiuEm < AUSENTE_MS + 2000) return;
+  const proximo = salaJogadores
+    .filter((p) => p.user_id !== sala.host_id && (p.user_id === me.id || presentes.has(p.user_id)))
+    .sort((a, b) => String(a.joined_at).localeCompare(String(b.joined_at)))[0];
+  if (!proximo || proximo.user_id !== me.id) return;
+  anfitriaoSumiuEm = null;
+  const { data, error } = await sb.rpc("patozi_assumir_sala", { p_code: sala.code });
+  if (error || !data) return;
+  await atualizarSala();
+  enviar("sala");
+}
+
+setInterval(() => conferirAnfitriao().catch(() => {}), 2000);
 
 async function entrarNaSala(codigo) {
   await atualizarSala(codigo);
@@ -362,13 +398,20 @@ async function voltarParaSala() {
 async function sairDaSala() {
   const codigo = sala && sala.code;
   try {
-    if (codigo && isHost()) {
-      enviar("fechou");
-      await sb.from("patozi_salas").delete().eq("code", codigo);
-    } else if (codigo) {
-      await sb.from("patozi_sala_jogadores").delete().eq("sala_code", codigo).eq("user_id", me.id);
-      enviar("sala");
-    }
+    // Anfitrião saindo no meio da partida: deixa o estado salvo para quem assumir.
+    if (codigo && isHost() && partida && modo === "online") await sb.from("patozi_salas").update({ state: partida }).eq("code", codigo);
+    // O banco passa o comando para quem entrou primeiro (a sala só fecha quando sai o último).
+    const { data: novo, error } = codigo ? await sb.rpc("patozi_sair_da_sala", { p_code: codigo }) : { data: null, error: null };
+    if (error && error.code === "PGRST202") {
+      // Banco sem a função (schema.sql antigo): o anfitrião fecha a sala, como antes.
+      if (isHost()) {
+        enviar("fechou");
+        await sb.from("patozi_salas").delete().eq("code", codigo);
+      } else {
+        await sb.from("patozi_sala_jogadores").delete().eq("sala_code", codigo).eq("user_id", me.id);
+        enviar("sala");
+      }
+    } else if (codigo) enviar(novo ? "sala" : "fechou");
   } catch (e) { /* sai mesmo assim */ }
   sairDoCanal();
   sala = null;

@@ -337,7 +337,7 @@ Object.assign(TEXTS, {
   "confirm.leaveOnline": ["Sair da partida online? Você sai da sala.", "Leave the online game? You'll leave the room.", "¿Salir de la partida online? Saldrás de la sala."],
   "confirm.leaveGame": ["Sair da partida atual?", "Leave the current game?", "¿Salir de la partida actual?"],
   "confirm.end": ["Encerrar a partida e ver o resultado?", "End the game and see the results?", "¿Terminar la partida y ver el resultado?"],
-  "confirm.closeRoom": ["Fechar a sala para todo mundo?", "Close the room for everyone?", "¿Cerrar la sala para todos?"],
+  "confirm.closeRoom": ["Sair da sala? Outro jogador vira o anfitrião e a sala continua.", "Leave the room? Another player becomes the host and the room goes on.", "¿Salir de la sala? Otro jugador pasa a ser el anfitrión y la sala sigue."],
   "confirm.leaveRoom": ["Sair da sala?", "Leave the room?", "¿Salir de la sala?"],
 });
 
@@ -592,7 +592,9 @@ Object.assign(TEXTS, {
   "on.left": ["Você saiu da sala.", "You left the room.", "Saliste de la sala."],
   "on.hostClosed": ["O anfitrião fechou a sala.", "The host closed the room.", "El anfitrión cerró la sala."],
   "on.sending": ["Enviando \"{text}\"…", "Sending \"{text}\"…", "Enviando \"{text}\"…"],
-  "on.hostDown": ["O anfitrião caiu. Esperando ele voltar…", "The host disconnected. Waiting for them to come back…", "El anfitrión se desconectó. Esperando que vuelva…"],
+  "on.hostDown": ["O anfitrião saiu. Em instantes outro jogador assume e a partida continua…", "The host left. Another player will take over in a moment and the game goes on…", "El anfitrión salió. En un momento otro jugador toma el control y la partida sigue…"],
+  "on.youHost": ["O anfitrião saiu: agora você comanda a sala. A partida continua!", "The host left: you're running the room now. The game goes on!", "El anfitrión salió: ahora tú diriges la sala. ¡La partida sigue!"],
+  "on.newHost": ["{nome} agora é o anfitrião. A partida continua!", "{nome} is the host now. The game goes on!", "{nome} ahora es el anfitrión. ¡La partida sigue!"],
   "on.playerLeft": ["{nome} saiu da sala e perdeu a vez.", "{nome} left the room and lost their turn.", "{nome} salió de la sala y perdió el turno."],
   "on.historyEmpty": ["Jogue online para ver o histórico aqui.", "Play online to see your history here.", "Juega online para ver el historial aquí."],
   "on.historyNone": ["Nenhuma partida online ainda.", "No online games yet.", "Todavía no hay partidas online."],

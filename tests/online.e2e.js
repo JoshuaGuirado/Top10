@@ -119,6 +119,46 @@ const server = http.createServer((req, res) => {
   assert.equal(await A.evaluate(() => game.lives), await B.evaluate(() => game.lives));
   step("equipe contra a lista: erro e dica da convidada valem para todos");
 
+  // O anfitrião sai no meio da partida: a convidada vira anfitriã e a partida continua.
+  const foundBefore = await B.evaluate(() => game.found.size);
+  const bId = await B.evaluate(() => me.id);
+  await A.click("#home-btn");
+  await B.waitForFunction(() => game && game.isHost && room.host_id === me.id, null, { timeout: 8000 });
+  assert.equal(await B.evaluate(() => JSON.parse(localStorage.getItem("__fakedb")).topzi_salas[0].host_id), bId);
+  // A vez do Arthur (que saiu) passa sozinha; depois a Lara chuta e acerta.
+  await B.waitForFunction(() => game.players[game.turn].uid === me.id && !game.busy, null, { timeout: 15000 });
+  const teamItems = await B.evaluate(() => game.list.items.map((x) => x.split("|")[0]));
+  const missing = await B.evaluate(() => game.items.findIndex((_, i) => !game.found.has(i)));
+  await guess(B, teamItems[missing]);
+  assert.equal(await B.evaluate(() => game.found.size), foundBefore + 1);
+  step("anfitrião sai no meio da partida: a convidada assume e a partida continua");
+
+  // O anfitrião some sem sair (fechou o app): depois de alguns segundos, quem ficou assume.
+  const D = await page();
+  await D.goto(base);
+  await D.click("#online-btn");
+  await D.fill("#online-nick", "Davi");
+  await D.click("#create-room-btn");
+  await D.waitForSelector("#screen-lobby:not([hidden])");
+  const code2 = await D.textContent("#room-code");
+  await D.evaluate(() => localStorage.removeItem("tt:sala"));
+  const E = await page();
+  await E.goto(`${base}?sala=${code2}`);
+  await E.waitForSelector("#screen-lobby:not([hidden])", { timeout: 8000 });
+  await D.waitForFunction(() => document.querySelectorAll(".lobby-player").length === 2, null, { timeout: 5000 });
+  await D.click("#lobby-random");
+  await D.waitForTimeout(300);
+  await D.click("#lobby-start");
+  await E.waitForSelector("#screen-game:not([hidden])", { timeout: 5000 });
+  const dItems = await D.evaluate(() => game.list.items.map((x) => x.split("|")[0]));
+  await guess(D, dItems[0]);
+  await D.close();
+  await E.waitForFunction(() => game && game.isHost, null, { timeout: 25000 });
+  await E.waitForFunction(() => game.players[game.turn].uid === me.id && !game.busy, null, { timeout: 15000 });
+  await guess(E, dItems[1]);
+  assert.equal(await E.evaluate(() => game.found.size), 2);
+  step("anfitrião fecha o app: quem ficou assume e a partida continua");
+
   // Conta do Gamezi: uma só para todos os jogos, com login em conta.html (na raiz).
   const C = await page();
   await C.goto(base);

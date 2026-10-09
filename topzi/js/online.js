@@ -357,9 +357,11 @@ async function refreshRoom(code = room && room.code) {
   if (!code) return;
   const [{ data: r }, list] = await Promise.all([sb.from("topzi_salas").select("*").eq("code", code).maybeSingle(), fetchRoomPlayers(code)]);
   if (!r) return roomClosed(t("on.closed"));
+  const oldHost = room && room.host_id;
   room = r;
   roomPlayers = list;
   if (!list.some((p) => p.user_id === me.id)) return roomClosed(t("on.left"));
+  if (oldHost && oldHost !== r.host_id) hostChanged();
   if (document.body.dataset.screen === "lobby") renderLobby();
 }
 
@@ -615,13 +617,22 @@ async function kickPlayer(p) {
 async function leaveRoom() {
   if (!room) return;
   const code = room.code;
-  if (isHost()) {
-    send("closed");
-    await sb.from("topzi_salas").delete().eq("code", code);
-  } else {
-    await sb.from("topzi_sala_jogadores").delete().eq("room_code", code).eq("user_id", me.id);
-    send("lobby");
+  // Anfitrião saindo no meio da partida: deixa o estado salvo para quem assumir.
+  if (isHost() && game && game.online) {
+    await sb.from("topzi_salas").update({ state: snapshot() }).eq("code", code).then(() => {}, () => {});
   }
+  // O banco passa o comando para quem entrou primeiro (a sala só fecha quando sai o último).
+  const { data: newHost, error } = await sb.rpc("topzi_sair_da_sala", { p_code: code });
+  if (error && error.code === "PGRST202") {
+    // Banco sem a função (schema.sql antigo): o anfitrião fecha a sala, como antes.
+    if (isHost()) {
+      send("closed");
+      await sb.from("topzi_salas").delete().eq("code", code);
+    } else {
+      await sb.from("topzi_sala_jogadores").delete().eq("room_code", code).eq("user_id", me.id);
+      send("lobby");
+    }
+  } else send(newHost ? "lobby" : "closed");
   leaveChannel();
   room = null;
   roomPlayers = [];
@@ -864,13 +875,65 @@ function sendAction(action) {
   if (action.type === "guess") paintFeedback([["on.sending", { text: action.text }]], "info");
 }
 
-// Quem sumiu na própria vez perde a vez; se o anfitrião sumir, os outros ficam sabendo.
+// Quem sumiu na própria vez perde a vez; se o anfitrião sumir, os outros ficam sabendo e, depois de alguns
+// segundos, quem entrou primeiro na sala assume o comando (topzi_assumir_sala) e a partida continua.
 let absentSince = null;
+let hostGoneSince = null;
+const HOST_GONE_MS = 8000;
 
 function watchHost() {
   if (!game || !game.online || game.over || !room) return;
-  if (!game.isHost && !presentIds.has(room.host_id)) {
+  if (!game.isHost && presentIds.size && !presentIds.has(room.host_id)) {
     paintFeedback([["on.hostDown"]], "info");
+  }
+}
+
+// Próximo anfitrião: quem entrou primeiro entre os que estão na sala agora.
+function nextHost() {
+  return roomPlayers
+    .filter((p) => p.user_id !== room.host_id && (p.user_id === me.id || presentIds.has(p.user_id)))
+    .sort((a, b) => String(a.joined_at).localeCompare(String(b.joined_at)))[0] || null;
+}
+
+async function checkHost() {
+  if (!room || !me || !channel || isHost() || !presentIds.size || presentIds.has(room.host_id)) {
+    hostGoneSince = null;
+    return;
+  }
+  hostGoneSince = hostGoneSince || Date.now();
+  if (Date.now() - hostGoneSince < HOST_GONE_MS) return;
+  const next = nextHost();
+  if (!next || next.user_id !== me.id) return;
+  hostGoneSince = null;
+  const { data, error } = await sb.rpc("topzi_assumir_sala", { p_code: room.code });
+  if (error || !data) return;
+  await refreshRoom();
+  send("lobby");
+}
+
+setInterval(() => checkHost().catch(() => {}), 2000);
+
+// O comando da sala mudou de mão: quem virou anfitrião passa a rodar a partida; quem deixou de ser, só assiste.
+function hostChanged() {
+  const host = isHost();
+  const nome = (roomPlayers.find((p) => p.user_id === room.host_id) || {}).nick || "";
+  if (!game || !game.online) return;
+  if (host && !game.isHost) {
+    game.isHost = true;
+    stopGuestTimer();
+    if (!game.over) {
+      game.busy = false;
+      renderGame();
+      startTurnTimer();
+      paintFeedback([["on.youHost"]], "info"); // só aqui (os outros veem "fulano agora é o anfitrião")
+    }
+    onlineSync();
+  } else if (!host && game.isHost) {
+    game.isHost = false;
+    stopTurnTimer();
+    guestTimer();
+  } else if (!host && !game.over) {
+    paintFeedback([["on.newHost", { nome }]], "info");
   }
 }
 

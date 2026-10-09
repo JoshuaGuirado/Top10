@@ -151,6 +151,7 @@ const server = http.createServer((req, res) => {
   step("convidada recarrega e volta para a partida");
 
   // Se a convidada some, o computador joga por ela.
+  const laraId = await B.evaluate(() => me.id);
   await B.close();
   await A.evaluate(() => { if (partida.vez === 0) pzChutar(partida, 0, 1); partida.seq += 1; renderGame(); });
   await A.waitForFunction(() => partida.lances.some((l) => l.j === 1) || partida.fase === "revelado", null, { timeout: 25000 });
@@ -159,8 +160,57 @@ const server = http.createServer((req, res) => {
   await A.click("#game-quit");
   await A.waitForSelector("#screen-home:not([hidden])");
   const salas = await A.evaluate(() => JSON.parse(localStorage.getItem("__fakedb")).patozi_salas);
-  assert.equal(salas.length, 0, "sala apagada quando o anfitrião sai");
-  step("anfitrião sai e a sala é fechada");
+  assert.equal(salas.length, 1, "a sala continua com quem ficou");
+  assert.equal(salas[0].host_id, laraId, "quem ficou vira o anfitrião");
+  step("anfitrião sai e o comando passa para quem ficou na sala");
+
+  // Duas salas novas: numa o anfitrião sai pelo botão, na outra ele fecha o app. Nas duas a partida continua.
+  const novaSala = async (nomeHost, nomeConvidado) => {
+    const H = await page();
+    await H.goto(base);
+    await H.evaluate((n) => localStorage.setItem("pz:nick", JSON.stringify(n)), nomeHost);
+    await H.click("#online-btn");
+    await H.fill("#online-nick", nomeHost);
+    await H.click("#create-room-btn");
+    await H.waitForSelector("#screen-lobby:not([hidden])");
+    const c = await H.textContent("#room-code");
+    await H.evaluate((n) => { localStorage.removeItem("pz:sala"); localStorage.setItem("pz:nick", JSON.stringify(n)); }, nomeConvidado);
+    const G = await page();
+    await G.goto(`${base}?sala=${c}`);
+    await G.waitForSelector("#screen-lobby:not([hidden])", { timeout: 8000 });
+    await H.waitForFunction(() => document.querySelectorAll(".lobby-player").length === 2, null, { timeout: 5000 });
+    await H.click("#lobby-start");
+    await G.waitForSelector("#screen-game:not([hidden])", { timeout: 5000 });
+    return [H, G];
+  };
+  // Continua: a convidada passa a rodar a partida e o computador joga pelo anfitrião que saiu.
+  const continua = async (G, timeout) => {
+    await G.waitForFunction(() => isHost(), null, { timeout });
+    const seq = await G.evaluate(() => partida.seq);
+    for (let k = 0; k < 40; k++) {
+      const andou = await G.evaluate((s) => {
+        if (partida.seq > s + 1 || partida.fase === "revelado") return true;
+        if (partida.jogadores[partida.vez].id === me.id && partida.fase === "lance") aplicarAcao({ tipo: "chutar", valor: pzMinimo(partida) + 1 }, partida.vez);
+        return false;
+      }, seq);
+      if (andou) return;
+      await G.waitForTimeout(500);
+    }
+    throw new Error("a partida não continuou");
+  };
+
+  const nickAntes = await A.evaluate(() => localStorage.getItem("pz:nick"));
+  const [C1, D1] = await novaSala("Caio", "Duda");
+  await C1.click("#game-quit");
+  await C1.waitForSelector("#screen-home:not([hidden])");
+  await continua(D1, 8000);
+  step("anfitrião sai pelo botão no meio da partida: a convidada assume e a partida continua");
+
+  const [E1, F1] = await novaSala("Edu", "Fabi");
+  await E1.close();
+  await continua(F1, 30000);
+  step("anfitrião fecha o app: quem ficou assume e a partida continua");
+  await A.evaluate((n) => { localStorage.setItem("pz:nick", n); localStorage.removeItem("pz:sala"); }, nickAntes);
 
   // Pato do dia: o resultado vai para o ranking.
   await A.click("#daily-btn");
