@@ -1,4 +1,4 @@
-# Gamezi (plataforma), Topzi, Patozi, Datazi e Maisoumenozi (jogos) — instruções para o Claude
+# Gamezi (plataforma), Topzi, Patozi, Datazi, Maisoumenozi e Cravazi (jogos) — instruções para o Claude
 
 - Responder em português.
 - Ao terminar uma mudança: commit na branch de trabalho e, em seguida, levar o mesmo commit para a `main`
@@ -50,3 +50,7 @@
   Número que muda com o tempo leva o ano no título do assunto ("(2024)"). Assunto novo precisa da pergunta curta em
   `data/perguntas.js` (verbo que serve para qualquer nome, sem "é mais alto": "mede mais ou menos de altura?") e botões "Mais"/"Menos".
   O dono quer a tela simples: referência, pergunta e dois botões. Nada de título de assunto, frases variadas ou enfeite na partida.
+- Cravazi (`cravazi/`): jogo local de 2 a 8 pessoas, sem banco nem desafio do dia. Scripts comuns, ordem no fim do `cravazi/index.html`
+  (`js/jogo.js` antes de `data/`); script novo vai no `FILES` do `sw.js` com o caminho `cravazi/…` (o `tests/cravazi.test.js` acusa).
+  Pergunta nova: resposta inteira, nos 3 idiomas, difícil, que faça sentido sozinha (as perguntas são sorteadas) e que não repita carta do Patozi.
+  Tela simples: pergunta, "É MAIS"/"É MENOS", de quem é a vez e o campo do chute.

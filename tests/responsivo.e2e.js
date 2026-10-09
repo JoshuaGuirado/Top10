@@ -179,6 +179,24 @@ function medir(W) {
         await page.waitForTimeout(150);
       }
     });
+    // ── Cravazi ──
+    await tentar("crava-inicio", () => page.goto(base + "/cravazi/index.html"));
+    await tentar("crava-ajuda", () => page.click("#help-btn"));
+    await fechar();
+    await tentar("crava-oito-jogadores", async () => { for (let i = 0; i < 6; i++) await page.click("#add-player"); });
+    await tentar("crava-partida", () => page.click("#start-btn"));
+    await tentar("crava-chutou", async () => { await page.fill("#guess", "1"); await page.click("#guess-btn"); });
+    await tentar("crava-fora", async () => { await page.fill("#guess", "1"); await page.click("#guess-btn"); });
+    await tentar("crava-cravou", async () => {
+      await page.fill("#guess", String(await page.evaluate(() => partida.atual.pergunta.resposta)));
+      await page.click("#guess-btn");
+    });
+    await tentar("crava-resultado", async () => {
+      for (let i = 0; i < 40 && (await page.isVisible("#screen-game")); i++) {
+        if (await page.isVisible("#next-btn")) await page.click("#next-btn");
+        else { await page.fill("#guess", String(await page.evaluate(() => partida.atual.pergunta.resposta))); await page.click("#guess-btn"); }
+      }
+    });
     await tentar("portal-com-nivel", () => page.goto(base + "/index.html"));
     await tentar("conta-nivel", () => page.goto(base + "/conta.html"));
 

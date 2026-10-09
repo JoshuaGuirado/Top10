@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cravazi · quem crava o número? | Gamezi</title>
+  <meta name="description" content="Cravazi: jogo de 2 ou mais jogadores. Cada um chuta um número, o jogo diz se é mais ou menos, e quem cravar a resposta exata leva o ponto.">
+  <meta name="theme-color" content="#FFF4DE" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#171717" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="../brand/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="../brand/apple-touch-icon.png">
+  <link rel="manifest" href="../manifest.webmanifest">
+  <script>try { var t = localStorage.getItem("tt:theme"); if (t) document.documentElement.dataset.theme = JSON.parse(t); } catch (e) {}</script>
+  <meta property="og:title" content="Cravazi · quem crava o número?">
+  <meta property="og:description" content="Chute, ouça se é mais ou menos e crave a resposta antes dos amigos.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <!-- Métricas da Vercel (Web Analytics): visitas por página, sem cookies e sem dados pessoais -->
+  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <a class="icon-btn gamezi-back" href="../" data-i18n-aria="nav.back" aria-label="Voltar para o Gamezi" title="Gamezi"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a>
+      <button type="button" class="logo-btn" id="home-btn" data-i18n-aria="nav.home" aria-label="Início">
+        <img class="logo logo-light" src="../brand/cravazi-logo.svg" alt="Cravazi">
+        <img class="logo logo-dark" src="../brand/cravazi-logo-dark.svg" alt="" aria-hidden="true">
+      </button>
+    </div>
+    <div class="topbar-actions">
+      <button type="button" class="icon-btn" id="help-btn" data-i18n-aria="help.title" aria-label="Como jogar"></button>
+      <button type="button" class="icon-btn" id="settings-btn" data-i18n-aria="nav.settings" aria-label="Configurações"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+    </div>
+  </div>
+
+  <main>
+    <!-- Início: quem joga, quantas rodadas e Começar -->
+    <section id="screen-home" class="screen home">
+      <div class="home-head">
+        <img class="home-symbol logo-light" src="../brand/cravazi-simbolo.svg" alt="" aria-hidden="true">
+        <img class="home-symbol logo-dark" src="../brand/cravazi-simbolo-escuro.svg" alt="" aria-hidden="true">
+        <h1 class="home-tag" data-i18n="home.tag">Todo mundo chuta um número. Quem cravar a resposta exata leva o ponto.</h1>
+      </div>
+      <div class="home-card">
+        <p class="card-label" data-i18n="home.players">Jogadores</p>
+        <div class="players" id="players"></div>
+        <button type="button" class="btn ghost small" id="add-player" data-i18n="home.add">+ Jogador</button>
+      </div>
+      <div class="home-card">
+        <p class="card-label" data-i18n="home.rounds">Rodadas</p>
+        <div class="seg" id="rounds" role="radiogroup"></div>
+      </div>
+      <button type="button" class="btn big" id="start-btn" data-i18n="btn.start">Começar</button>
+      <nav class="home-links">
+        <button type="button" class="link-btn" id="help-link" data-i18n="help.title">Como jogar</button>
+        <a href="../" data-i18n="home.more">Mais jogos</a>
+      </nav>
+      <footer class="site-foot">
+        <a href="../termos.html">Termos de uso</a>
+        <a href="../privacidade.html">Privacidade</a>
+        <span>© 2026 Gamezi</span>
+      </footer>
+    </section>
+
+    <!-- Partida, de cima para baixo: rodada e placar · pergunta · dica (é mais / é menos) · vez e chute -->
+    <section id="screen-game" class="screen game" hidden>
+      <div class="game-top">
+        <span class="round" id="round"></span>
+        <div class="score" id="score"></div>
+      </div>
+      <p class="theme" id="theme"></p>
+      <h2 class="question" id="question"></h2>
+
+      <div class="hint" id="hint" hidden>
+        <p class="hint-who" id="hint-who"></p>
+        <p class="hint-big" id="hint-big"></p>
+      </div>
+      <p class="range" id="range" hidden></p>
+
+      <form class="play" id="play" autocomplete="off">
+        <p class="turn" id="turn"></p>
+        <div class="guess-row">
+          <label class="guess-box">
+            <input id="guess" type="text" inputmode="numeric" enterkeyhint="send" data-i18n-placeholder="game.placeholder">
+            <span class="unit" id="unit"></span>
+          </label>
+          <button type="submit" class="btn" id="guess-btn" data-i18n="btn.guess">Chutar</button>
+        </div>
+        <p class="guess-msg" id="guess-msg" aria-live="polite"></p>
+      </form>
+
+      <div class="nailed" id="nailed" hidden>
+        <p class="nailed-who" id="nailed-who"></p>
+        <p class="nailed-answer" id="nailed-answer"></p>
+        <p class="muted" id="nailed-tries"></p>
+        <button type="button" class="btn big" id="next-btn"></button>
+      </div>
+
+      <ol class="history" id="history"></ol>
+    </section>
+
+    <!-- Resultado -->
+    <section id="screen-results" class="screen results" hidden>
+      <div class="result-head">
+        <p class="result-title" id="res-title"></p>
+        <p class="muted" id="res-sub"></p>
+      </div>
+      <ol class="ranking" id="res-ranking"></ol>
+      <div class="actions center">
+        <button type="button" class="btn" id="res-again" data-i18n="btn.again">Jogar de novo</button>
+        <button type="button" class="btn ghost" id="res-home" data-i18n="btn.home">Início</button>
+      </div>
+      <h3 data-i18n="res.rounds">As rodadas</h3>
+      <ol class="rounds-list" id="res-rounds"></ol>
+    </section>
+  </main>
+
+  <!-- Como jogar -->
+  <dialog class="dialog" id="help-dialog">
+    <div class="dialog-inner">
+      <div class="dialog-head"><h2 data-i18n="help.title">Como jogar</h2><button type="button" class="text-btn" data-close data-i18n="btn.close">Fechar</button></div>
+      <div class="help-body" id="help-body"></div>
+    </div>
+  </dialog>
+
+  <!-- Configurações: idioma e tema -->
+  <dialog class="dialog settings-dialog" id="settings-dialog">
+    <div class="dialog-inner">
+      <div class="dialog-head"><h2 data-i18n="nav.settings">Configurações</h2><button type="button" class="text-btn" data-close data-i18n="btn.close">Fechar</button></div>
+      <label class="setting-row"><span data-i18n="nav.lang">Idioma</span>
+        <select id="lang-select" class="lang-select">
+          <option value="pt">Português</option><option value="en">English</option><option value="es">Español</option>
+        </select>
+      </label>
+      <div class="setting-row"><span data-i18n="nav.theme">Tema</span><button type="button" class="icon-btn" id="theme-btn"></button></div>
+    </div>
+  </dialog>
+
+  <script src="js/jogo.js"></script>
+  <script src="data/perguntas-1.js"></script>
+  <script src="data/perguntas-2.js"></script>
+  <script src="../gamezi-conta.js"></script>
+  <script src="js/textos.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

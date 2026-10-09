@@ -12,5 +12,5 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: for f in topzi/js/*.js topzi/data/*.js patozi/js/*.js patozi/data/*.js datazi/js/*.js datazi/data/*.js maisoumenozi/js/*.js maisoumenozi/data/*.js sw.js; do node --check "$f"; done
+      - run: for f in topzi/js/*.js topzi/data/*.js patozi/js/*.js patozi/data/*.js datazi/js/*.js datazi/data/*.js maisoumenozi/js/*.js maisoumenozi/data/*.js cravazi/js/*.js cravazi/data/*.js sw.js; do node --check "$f"; done
       - run: npm test

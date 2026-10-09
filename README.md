@@ -134,6 +134,20 @@ Arquivos:
 - Itens, assuntos ou malucas novos: arquivo novo carregado depois dos outros, no `sw.js`, pergunta em `perguntas.js` e uma linha nova em `MM_DIARIO_POOLS` (`maisoumenozi/js/jogo.js`) com os totais, valendo a partir de amanhã
 - `maisoumenozi/js/jogo.js`: regras, pontos e combo, sem tela (testado em `tests/maisoumenozi.test.js`); `textos.js` (três idiomas e frases); `app.js` (telas, relógio, som e efeitos)
 
+# Cravazi
+
+Jogo de 2 a 8 pessoas num celular só, passando de mão em mão. Cada rodada tem uma pergunta com resposta em número ("Com quantos anos Mozart morreu?"). Um de cada vez, cada jogador chuta; o jogo responde **É MAIS** ou **É MENOS** e a faixa vai fechando ("Está entre 20 e 40"). Quem **cravar** o número exato leva 1 ponto; a rodada só acaba quando alguém crava. Quem começa muda a cada rodada. Depois de 5, 10 ou 15 rodadas, ganha quem tiver mais pontos (empate fica empatado).
+
+A tela é de cima para baixo: rodada e placar, o tema em letra pequena, a pergunta, a dica do último chute, de quem é a vez com o campo do número (com a unidade ao lado) e os chutes da rodada. Chute fora da faixa conhecida não vale e não passa a vez.
+
+São 13 temas e mais de 230 perguntas difíceis, diferentes das do Patozi (o teste acusa pergunta com a mesma resposta e o mesmo assunto de uma carta do Patozi). O aparelho lembra as últimas 150 perguntas para não repetir logo.
+
+Arquivos:
+- `cravazi/data/perguntas-*.js`: os temas (`czTema({ id, nome, unidade, itens })`, cada item `[resposta inteira, "português", "English", "español", unidade?]`). Cada pergunta precisa fazer sentido sozinha (nada de "E a altura…?") e dizer como arredondar
+- Perguntas novas: no fim de um tema ou em arquivo novo carregado depois dos outros (e no `sw.js`)
+- `cravazi/js/jogo.js`: regras e placar, sem tela (testado em `tests/cravazi.test.js`); `textos.js` (três idiomas); `app.js` (telas)
+- Marca: `brand/cravazi-logo*.svg` e `brand/cravazi-simbolo*.svg` (um alvo)
+
 ## Nível e conquistas do Gamezi
 
 `gamezi-conta.js` soma o que se joga em todos os jogos (partidas, desafios do dia, acertos) em XP e nível, e confere 12 conquistas. Algumas liberam itens do guarda-roupa do pato. Aparecem na página da conta e no portal (testado em `tests/gamezi.test.js`).

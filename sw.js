@@ -2,7 +2,7 @@
 // Cada jogo fica numa pasta (topzi/…, patozi/…); os arquivos dele entram na lista com o caminho da pasta.
 // Online, busca sempre a versão nova (rede primeiro); sem internet, usa a cópia guardada.
 
-const CACHE = "gamezi-v17";
+const CACHE = "gamezi-v18";
 const FILES = [
   "./",
   "index.html",
@@ -137,6 +137,18 @@ const FILES = [
   "brand/maisoumenozi-logo-dark.svg",
   "brand/maisoumenozi-simbolo.svg",
   "brand/maisoumenozi-simbolo-escuro.svg",
+  "cravazi/",
+  "cravazi/index.html",
+  "cravazi/style.css",
+  "cravazi/js/jogo.js",
+  "cravazi/data/perguntas-1.js",
+  "cravazi/data/perguntas-2.js",
+  "cravazi/js/textos.js",
+  "cravazi/js/app.js",
+  "brand/cravazi-logo.svg",
+  "brand/cravazi-logo-dark.svg",
+  "brand/cravazi-simbolo.svg",
+  "brand/cravazi-simbolo-escuro.svg",
 ];
 
 self.addEventListener("install", (e) => {
@@ -170,7 +182,7 @@ self.addEventListener("fetch", (e) => {
       .catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => {
         if (hit) return hit;
         if (req.mode !== "navigate") return Response.error();
-        const jogo = ["topzi", "patozi", "datazi", "maisoumenozi"].find((j) => url.pathname.includes(`/${j}/`));
+        const jogo = ["topzi", "patozi", "datazi", "maisoumenozi", "cravazi"].find((j) => url.pathname.includes(`/${j}/`));
         return caches.match(jogo ? `${jogo}/index.html` : "index.html");
       })),
   );
