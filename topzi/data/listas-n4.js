@@ -163,7 +163,7 @@ LISTS.push(
     items: [
       "Woody", "Buzz Lightyear|Buzz", "Nemo", "Dory", "Relâmpago McQueen|McQueen", "Sulley", "Mike Wazowski|Mike", "Wall-E", "Marlin", "Mate",
       "Carl Fredricksen|Carl", "Russell", "Dug", "Remy", "Sr. Incrível", "Mulher-Elástica|Helena Pêra", "Flecha", "Violeta", "Zezé|Jack-Jack", "Edna Moda",
-      "Gelado|Frozone", "Alegria", "Tristeza", "Bing Bong", "Miguel", "Mérida", "Jessie", "Rex", "Sr. Cabeça de Batata", "Garfinho|Forky",
+      "Gelado|Frozone", "Alegria", "Tristeza", "Bing Bong", "Miguel|Miguel Rivera", "Mérida", "Jessie", "Rex", "Sr. Cabeça de Batata|Cabeça de Batata|Senhor Cabeça de Batata|Sr. Batata", "Garfinho|Forky",
     ] },
   { id: "30-dreamworks", cat: "personagens", title: "Os 30 personagens da DreamWorks mais lembrados", source: N4,
     items: [

@@ -115,7 +115,41 @@ function matchGuess(items, found, raw) {
     });
     if (best <= limit && bestIdx.length === 1) return choose(bestIdx);
   }
+
+  // Parte do nome, palavra por palavra: "sr batata" = "Sr. Cabeça de Batata", "vingadores" = "Vingadores: Ultimato"
+  // (palavra longa também perdoa um errinho: "vinagores"). Só vale se apontar para um item só da lista.
+  const gw = palavras(g);
+  if (letras(gw) >= 5) {
+    const hits = where((it) => it.exact.some((e) => parteDoNome(gw, palavras(e))));
+    if (hits.length === 1) return choose(hits);
+  }
   return null;
+}
+
+// Palavras que não ajudam a dizer qual é o item (artigos, "de", "Sr.", "Dr."…).
+const PALAVRAS_VAZIAS = new Set("de da do das dos e o a os as um uma sr sra srta dr dra the of and mr mrs ms el la los las del y senor senora don dona".split(" "));
+
+function palavras(texto) {
+  return texto.split(" ").filter((w) => w && !PALAVRAS_VAZIAS.has(w));
+}
+
+function letras(ws) {
+  return ws.join("").length;
+}
+
+// Mesma palavra, no plural ou com um errinho (só palavras de 7 letras ou mais, sem números e com o
+// mesmo começo, para "Monte" não virar "Morte" nem "Revolution" virar "Evolution").
+function mesmaPalavra(a, b) {
+  if (a === b || stem(a) === stem(b)) return true;
+  if (a.length < 7 || b.length < 7 || a.slice(0, 2) !== b.slice(0, 2) || /\d/.test(a + b)) return false;
+  return levenshtein(a, b) <= (Math.min(a.length, b.length) >= 9 ? 2 : 1);
+}
+
+// O palpite (gw) é parte do nome (ew): todas as palavras dele estão no nome e somam pelo menos 40% das letras.
+// Nome com algo a mais ("Harrison Ford" para "Ford") não vale: o apelido entra na lista ("Miguel|Miguel Rivera").
+function parteDoNome(gw, ew) {
+  if (!ew.length || gw.length > ew.length) return false;
+  return gw.every((w) => ew.some((m) => mesmaPalavra(w, m))) && letras(gw) >= 0.4 * letras(ew);
 }
 
 // Parecença entre dois textos já normalizados (0 a 1), por pares de letras.

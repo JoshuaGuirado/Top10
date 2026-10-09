@@ -76,3 +76,20 @@ test("dica mostra a primeira letra e o tamanho", () => {
   assert.equal(hintFor("Brasil"), "B… · 6 letras");
   assert.equal(hintFor("São Paulo"), "S… · 8 letras · 2 palavras");
 });
+
+test("parte do nome também vale (se for um item só)", () => {
+  const filmes = parseList({ items: ["Woody", "Sr. Cabeça de Batata", "Miguel", "Vingadores: Ultimato|Ultimato", "Homem-Aranha: Longe de Casa", "Homem-Aranha: Sem Volta para Casa", "Rocky", "Toy Story 3"] });
+  const em = (p) => plain(matchGuess(filmes, new Map(), p));
+  assert.deepEqual(em("sr batata"), { index: 1 });
+  assert.deepEqual(em("cabeça de batata"), { index: 1 });
+  assert.equal(em("miguel rivera"), null, "nome com algo a mais não vale (o apelido vai na lista)");
+  assert.equal(em("monte everest"), null);
+  assert.deepEqual(em("vingadores"), { index: 3 });
+  assert.deepEqual(em("vinagores"), { index: 3 }, "com errinho");
+  assert.equal(em("homem aranha"), null, "dois itens: não dá para saber qual");
+  assert.deepEqual(em("homem aranha sem volta"), { index: 5 });
+  assert.equal(em("casa"), null, "pedaço pequeno demais do nome");
+  assert.equal(em("rocky 2"), null, "número a mais é outro filme");
+  assert.equal(em("toy story 2"), null);
+  assert.equal(em("batman"), null);
+});

@@ -143,7 +143,7 @@ LISTS.push(
   { id: "bob-esponja", cat: "personagens", title: "Os 10 personagens mais lembrados de Bob Esponja", source: POP,
     items: ["Bob Esponja", "Patrick", "Lula Molusco", "Sr. Siriguejo|Siriguejo", "Sandy", "Plankton", "Gary", "Karen", "Sra. Puff|Senhora Puff", "Pérola"] },
   { id: "toy-story", cat: "personagens", title: "Os 10 personagens mais lembrados de Toy Story", source: POP,
-    items: ["Woody", "Buzz Lightyear|Buzz", "Jessie", "Sr. Cabeça de Batata|Cabeça de Batata", "Rex", "Porquinho|Porco|Hamm", "Slinky", "Bala no Alvo", "Lotso", "Garfinho|Forky"] },
+    items: ["Woody", "Buzz Lightyear|Buzz", "Jessie", "Sr. Cabeça de Batata|Cabeça de Batata|Senhor Cabeça de Batata|Sr. Batata", "Rex", "Porquinho|Porco|Hamm", "Slinky", "Bala no Alvo", "Lotso", "Garfinho|Forky"] },
   { id: "hp-personagens", cat: "personagens", title: "Os 10 personagens mais lembrados de Harry Potter", source: POP,
     items: ["Harry Potter|Harry", "Hermione", "Rony|Ron", "Dumbledore", "Voldemort", "Hagrid", "Snape", "Draco Malfoy|Draco|Malfoy", "Sirius Black|Sirius", "Neville"] },
   { id: "sw-personagens", cat: "personagens", title: "Os 10 personagens mais lembrados de Star Wars", source: POP,
