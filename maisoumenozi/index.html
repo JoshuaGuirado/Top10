@@ -44,7 +44,6 @@
         <img class="home-symbol logo-light" src="../brand/maisoumenozi-simbolo.svg" alt="" aria-hidden="true">
         <img class="home-symbol logo-dark" src="../brand/maisoumenozi-simbolo-escuro.svg" alt="" aria-hidden="true">
         <h1 class="home-tag" data-i18n="home.tag">Tem mais ou tem menos? Compare números do mundo todo, um atrás do outro.</h1>
-        <p class="home-count" id="home-count"></p>
       </div>
       <div class="home-card daily" id="daily-card"></div>
       <div class="home-card home-row">
@@ -62,31 +61,31 @@
       </footer>
     </section>
 
-    <!-- Partida -->
-    <section id="screen-game" class="screen" hidden>
+    <!-- Partida: o assunto e o placar no alto; o item conhecido; o escondido, com a pergunta e os botões dentro dele -->
+    <section id="screen-game" class="screen game" hidden>
       <div class="game-head">
-        <b id="game-title"></b>
+        <p class="topic" id="game-topic"></p>
         <span class="game-score" id="game-score"></span>
       </div>
       <div class="dots" id="game-dots" aria-hidden="true"></div>
-      <p class="topic" id="game-topic"></p>
       <article class="item-card known" id="card-a"></article>
-      <p class="question" id="game-question"></p>
-      <article class="item-card hidden-value" id="card-b"></article>
-      <div class="answers" id="game-answers">
-        <button type="button" class="btn answer up" id="btn-up"></button>
-        <button type="button" class="btn answer down" id="btn-down"></button>
-      </div>
+      <span class="vs" aria-hidden="true">×</span>
+      <article class="item-card ask" id="card-b">
+        <div id="card-b-item"></div>
+        <p class="question" id="game-question"></p>
+        <div class="answers" id="game-answers">
+          <button type="button" class="btn answer up" id="btn-up"></button>
+          <button type="button" class="btn answer down" id="btn-down"></button>
+        </div>
+      </article>
       <div class="feedback-box" id="game-feedback" hidden>
         <p class="verdict" id="game-verdict"></p>
-        <p class="diff" id="game-diff"></p>
         <button type="button" class="btn big" id="game-next"></button>
       </div>
-      <div class="actions center"><button type="button" class="link-btn" id="game-quit" data-i18n="btn.home">Início</button></div>
     </section>
 
     <!-- Resultado -->
-    <section id="screen-results" class="screen" hidden>
+    <section id="screen-results" class="screen results" hidden>
       <div class="result-head">
         <p class="kicker" id="res-kicker"></p>
         <p class="result-score" id="res-score"></p>

@@ -36,7 +36,6 @@ const MM_T = {
   "home.freeSub": ["Até errar a primeira. Recorde: {n}", "Until your first miss. Best: {n}", "Hasta el primer error. Récord: {n}"],
   "home.freeSubNew": ["Até errar a primeira", "Until your first miss", "Hasta el primer error"],
   "home.more": ["Mais jogos", "More games", "Más juegos"],
-  "home.count": ["{t} assuntos · {n} comparações diferentes", "{t} topics · {n} different comparisons", "{t} temas · {n} comparaciones distintas"],
   "help.title": ["Como jogar", "How to play", "Cómo jugar"],
   "help.html": [
     "<ol class=\"help-steps\"><li>Em cima aparece um item com o número dele (por exemplo, quantos habitantes tem um país).</li><li>Embaixo, outro item do mesmo assunto, com o número escondido.</li><li>Responda: o de baixo tem <b>mais</b> ou <b>menos</b>? (às vezes é mais alto, mais pesado, mais rápido…)</li><li>Acertou? O de baixo sobe e chega um novo. De tempos em tempos, o assunto muda.</li></ol><p><b>Desafio do dia:</b> as mesmas 10 comparações para todo mundo, todo dia. <b>Partida livre:</b> vai até o primeiro erro. Quantas você acerta seguidas?</p>",
@@ -47,10 +46,8 @@ const MM_T = {
   "daily.kicker": ["Maisoumenozi do dia #{n}", "Daily Maisoumenozi #{n}", "Maisoumenozi del día #{n}"],
   "daily.done": ["{a} de {b} certas", "{a} of {b} right", "{a} de {b} correctas"],
   "game.free": ["Partida livre", "Free play", "Partida libre"],
-  "game.round": ["{i} de {n}", "{i} of {n}", "{i} de {n}"],
   "game.streak": ["{n} seguidas", "{n} in a row", "{n} seguidas"],
   "game.streak1": ["1 seguida", "1 in a row", "1 seguida"],
-  "game.newTopic": ["Assunto novo", "New topic", "Tema nuevo"],
   "game.hidden": ["?", "?", "?"],
   "game.next": ["Próxima", "Next", "Siguiente"],
   "game.finish": ["Ver resultado", "See result", "Ver resultado"],

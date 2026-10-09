@@ -48,13 +48,6 @@ const ICONES = {
   down: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 3 9H9V4H15V9H21Z"/></svg>',
 };
 
-// Quantas comparações diferentes dá para fazer (pares de itens do mesmo assunto que podem cair juntos).
-const MM_TOTAL_PARES = (() => {
-  let n = 0;
-  for (const tema of MM_TEMAS) for (let i = 0; i < tema.itens.length; i++) for (let j = i + 1; j < tema.itens.length; j++) if (mmComparaveis(tema.itens[i], tema.itens[j])) n++;
-  return n;
-})();
-
 function semanaHtml(hoje = new Date()) {
   const loc = { pt: "pt-BR", en: "en", es: "es" }[lang];
   const n0 = mmDiaNumero(hoje);
@@ -73,7 +66,6 @@ function renderHome() {
   const feito = diarios()[dia];
   const loc = { pt: "pt-BR", en: "en", es: "es" }[lang];
   const seq = sequenciaDiaria();
-  $("home-count").textContent = t("home.count", { t: MM_TEMAS.length, n: fmt(MM_TOTAL_PARES) });
   $("daily-card").innerHTML = `
     <div class="daily-top">
       <b class="daily-name">${escapeHtml(t("daily.name"))}</b>
@@ -122,10 +114,12 @@ function comecarLivre() {
 }
 
 function cartaoHtml(item, tema, mostrar) {
-  const valor = mostrar ? `<b class="value" data-alvo="${item.valor}">${escapeHtml(fmt(item.valor))}</b>` : `<b class="value secret">?</b>`;
+  const nome = `<p class="name">${escapeHtml(mmNome(item, LANGS.indexOf(lang)))}</p>`;
+  if (!mostrar) return nome; // escondido: só o nome (o número aparece depois de responder)
+  const valor = `<b class="value" data-alvo="${item.valor}">${escapeHtml(fmt(item.valor))}</b>`;
   const [antes, depois = ""] = tr(tema.unidade).split("{n}");
   const parte = (txt) => (txt.trim() ? `<small class="unit">${escapeHtml(txt.trim())}</small>` : "");
-  return `<p class="name">${escapeHtml(mmNome(item, LANGS.indexOf(lang)))}</p><p class="measure">${parte(antes)}${valor}${parte(depois)}</p>`;
+  return `${nome}<p class="measure">${parte(antes)}${valor}${parte(depois)}</p>`;
 }
 
 function renderJogo() {
@@ -136,17 +130,21 @@ function renderJogo() {
   const b = mmItem(r.b);
   const diario = modo === "diario";
 
-  $("game-title").textContent = diario ? t("daily.kicker", { n: diaAtual }) : t("game.free");
-  if (diario) $("game-score").textContent = t("game.round", { i: s.marcas.length + (esperando ? 0 : 1), n: MM_DIARIO_QTD });
-  else $("game-score").textContent = s.acertos === 1 ? t("game.streak1") : t("game.streak", { n: s.acertos });
+  // Alto: o assunto (pisca quando muda) e o placar; no desafio do dia, as 10 barrinhas.
+  const topic = $("game-topic");
+  topic.textContent = tr(tema.titulo);
+  topic.classList.toggle("new", !!(r.novo && !esperando));
+  $("game-score").textContent = diario
+    ? `${s.marcas.length + (esperando ? 0 : 1)}/${MM_DIARIO_QTD}`
+    : s.acertos === 1 ? t("game.streak1") : t("game.streak", { n: s.acertos });
   $("game-dots").hidden = !diario;
   if (diario) $("game-dots").innerHTML = Array.from({ length: MM_DIARIO_QTD }, (_, i) => `<i class="${i < s.marcas.length ? (s.marcas[i] ? "ok" : "no") : i === s.marcas.length ? "now" : ""}"></i>`).join("");
 
-  $("game-topic").innerHTML = `${r.novo && !esperando ? `<span class="new">${escapeHtml(t("game.newTopic"))}</span>` : ""}${escapeHtml(tr(tema.titulo))}`;
   $("card-a").innerHTML = cartaoHtml(a, tema, true);
+  $("card-b-item").innerHTML = cartaoHtml(b, tema, esperando);
+  $("card-b").className = "item-card ask" + (esperando ? (s.ultimo.certo ? " right" : " wrong") : "");
   $("game-question").textContent = tr(tema.perguntas[r.p]);
-  $("card-b").innerHTML = cartaoHtml(b, tema, esperando);
-  $("card-b").className = "item-card hidden-value" + (esperando ? (s.ultimo.certo ? " right" : " wrong") : "");
+  $("game-question").hidden = esperando;
 
   const [up, down] = tema.botoes;
   $("btn-up").innerHTML = ICONES.up + `<span>${escapeHtml(tr(up))}</span>`;
@@ -156,11 +154,10 @@ function renderJogo() {
 
   if (esperando) {
     const certo = s.ultimo.certo;
-    $("game-verdict").textContent = tr(sortear(certo ? MM_CERTO : MM_ERRADO));
-    $("game-verdict").className = "verdict " + (certo ? "good" : "bad");
     const razao = Math.max(a.valor, b.valor) / Math.min(a.valor, b.valor);
     const dif = razao >= 100 ? "cem" : razao >= 10 ? "dez" : razao >= 2 ? "dobro" : razao < 1.2 ? "quase" : null;
-    $("game-diff").textContent = dif ? tr(MM_DIFERENCA[dif]) : "";
+    $("game-verdict").innerHTML = `<b>${escapeHtml(tr(sortear(certo ? MM_CERTO : MM_ERRADO)))}</b>${dif ? `<span>${escapeHtml(tr(MM_DIFERENCA[dif]))}</span>` : ""}`;
+    $("game-verdict").className = "verdict " + (certo ? "good" : "bad");
     $("game-next").textContent = t(s.fim ? "game.finish" : "game.next");
     contar($("card-b").querySelector(".value"));
     // Acertou e ainda tem rodada: segue sozinho depois de um instante (o botão adianta).
@@ -248,8 +245,10 @@ function mostrarResultado(r) {
     const a = mmItem(rd.a);
     const b = mmItem(rd.b);
     if (!a || !b) return "";
-    return `<li class="${r.marcas[i] ? "ok" : "no"}"><span class="mark" aria-label="${r.marcas[i] ? "✓" : "✗"}">${r.marcas[i] ? "✓" : "✗"}</span>
-      <span><b>${escapeHtml(mmNome(b, l))}</b> ${escapeHtml(fmt(b.valor))} × <b>${escapeHtml(mmNome(a, l))}</b> ${escapeHtml(fmt(a.valor))}<small>${escapeHtml(tr(mmTemaDe(a.tema).titulo))}</small></span></li>`;
+    const ok = r.marcas[i];
+    return `<li class="${ok ? "ok" : "no"}"><span class="mark">${ok ? "✓" : "✗"}</span>
+      <span class="pair"><b>${escapeHtml(mmNome(b, l))}</b> <em>${escapeHtml(fmt(b.valor))}</em></span>
+      <span class="pair other">× ${escapeHtml(mmNome(a, l))} ${escapeHtml(fmt(a.valor))}</span></li>`;
   }).join("");
 }
 
@@ -318,7 +317,6 @@ function ligar() {
   $("btn-up").onclick = () => responder("mais");
   $("btn-down").onclick = () => responder("menos");
   $("game-next").onclick = proxima;
-  $("game-quit").onclick = irInicio;
   $("res-again").onclick = comecarLivre;
   $("res-home").onclick = irInicio;
   // No computador: seta para cima/baixo responde; Enter ou espaço passa para a próxima.
