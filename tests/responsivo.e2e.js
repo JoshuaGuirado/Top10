@@ -183,7 +183,11 @@ function medir(W) {
     await tentar("crava-inicio", () => page.goto(base + "/cravazi/index.html"));
     await tentar("crava-ajuda", () => page.click("#help-btn"));
     await fechar();
+    await tentar("crava-turma", () => page.click("#together-btn"));
     await tentar("crava-oito-jogadores", async () => { for (let i = 0; i < 6; i++) await page.click("#add-player"); });
+    await tentar("crava-skins", () => page.click('#players [data-skin="7"]'));
+    await tentar("crava-skins-editor", () => page.click("#skin-tabs .tab-builder"));
+    await tentar("crava-skins-pronta", async () => { await page.click("#skin-tabs .tab >> nth=0"); await page.click("#skin-presets [data-skin] >> nth=2"); });
     await tentar("crava-partida", () => page.click("#start-btn"));
     await tentar("crava-chutou", async () => { await page.fill("#guess", "1"); await page.click("#guess-btn"); });
     await tentar("crava-fora", async () => { await page.fill("#guess", "1"); await page.click("#guess-btn"); });
@@ -197,7 +201,17 @@ function medir(W) {
         else { await page.fill("#guess", String(await page.evaluate(() => partida.atual.pergunta.resposta))); await page.click("#guess-btn"); }
       }
     });
-    await tentar("portal-com-nivel", () => page.goto(base + "/index.html"));
+    await tentar("crava-dia", async () => { await page.goto(base + "/cravazi/index.html"); await page.click("#daily-btn"); });
+    await tentar("crava-dia-chute", async () => { await page.fill("#solo-guess", "1"); await page.click("#solo-guess-btn"); });
+    await tentar("crava-dia-resultado", async () => {
+      for (let i = 0; i < 20 && (await page.isVisible("#screen-solo")); i++) {
+        if (await page.isVisible("#solo-next")) await page.click("#solo-next");
+        else { await page.fill("#solo-guess", String(await page.evaluate(() => solo.atual.pergunta.resposta))); await page.click("#solo-guess-btn"); }
+      }
+    });
+    await tentar("crava-online", async () => { await page.goto(base + "/cravazi/index.html"); await page.click("#online-btn"); });
+    await tentar("crava-sala", async () => { await page.fill("#online-nick", "Arthur Henrique"); await page.click("#create-room-btn"); await page.waitForSelector("#screen-lobby:not([hidden])"); });
+    await tentar("portal-com-nivel", async () => { await page.evaluate(() => localStorage.removeItem("cz:sala")); await page.goto(base + "/index.html"); });
     await tentar("conta-nivel", () => page.goto(base + "/conta.html"));
 
     await ctx.close();

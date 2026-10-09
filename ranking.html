@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ranking do dia | Gamezi</title>
-  <meta name="description" content="Ranking do desafio do dia de todos os jogos do Gamezi: Topzi, Patozi, Datazi e Maisoumenozi. No empate, ganha quem foi mais rápido.">
+  <meta name="description" content="Ranking do desafio do dia de todos os jogos do Gamezi: Topzi, Patozi, Datazi, Maisoumenozi e Cravazi. No empate, ganha quem foi mais rápido.">
   <meta name="theme-color" content="#FFF4DE" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#171717" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="brand/favicon.svg" type="image/svg+xml">
@@ -67,6 +67,7 @@
       { id: "patozi", nome: "Patozi", inicio: Date.UTC(2026, 9, 8), dia: ["Pato do dia #{n}", "Daily duck #{n}", "Pato del día #{n}"], pts: ["pontos (máx. 500)", "points (max 500)", "puntos (máx. 500)"] },
       { id: "datazi", nome: "Datazi", inicio: Date.UTC(2026, 9, 8), dia: ["Datazi do dia #{n}", "Daily Datazi #{n}", "Datazi del día #{n}"], pts: ["na ordem certa (de 8)", "in the right order (of 8)", "en el orden correcto (de 8)"] },
       { id: "maisoumenozi", nome: "Maisoumenozi", inicio: Date.UTC(2026, 9, 9), dia: ["Desafio do dia #{n}", "Daily challenge #{n}", "Desafío del día #{n}"], pts: ["acertos (de 10)", "right answers (of 10)", "aciertos (de 10)"] },
+      { id: "cravazi", nome: "Cravazi", inicio: Date.UTC(2026, 9, 9), dia: ["Cravazi do dia #{n}", "Daily Cravazi #{n}", "Cravazi del día #{n}"], pts: ["pontos (máx. 50)", "points (max 50)", "puntos (máx. 50)"] },
     ];
     var LANGS = ["pt", "en", "es"];
     function load(k) { try { return JSON.parse(localStorage.getItem("tt:" + k)); } catch (e) { return null; } }

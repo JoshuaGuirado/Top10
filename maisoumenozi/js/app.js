@@ -192,6 +192,10 @@ function comecar(novoModo, estado) {
 
 function comecarDiario(dia = mmDiaNumero()) {
   if (dia < 1 || dia > mmDiaNumero()) return;
+  // O de hoje vai para o ranking: sem nome, pede o nome antes (../gamezi-ranking.js).
+  if (dia === mmDiaNumero() && typeof gameziNomeAntesDoDia === "function" && !gameziNick(store("nick"))) {
+    return gameziNomeAntesDoDia({ nick: store("nick"), lang, guardarNick: (n) => store("nick", n), comecar: () => comecarDiario(dia) });
+  }
   diaAtual = dia;
   comecar("diario", mmNovaPartida({ modo: "diario", rodadas: mmDiarioRodadas(dia) }));
 }

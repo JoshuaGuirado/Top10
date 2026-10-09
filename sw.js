@@ -2,7 +2,7 @@
 // Cada jogo fica numa pasta (topzi/…, patozi/…); os arquivos dele entram na lista com o caminho da pasta.
 // Online, busca sempre a versão nova (rede primeiro); sem internet, usa a cópia guardada.
 
-const CACHE = "gamezi-v18";
+const CACHE = "gamezi-v19";
 const FILES = [
   "./",
   "index.html",
@@ -144,6 +144,9 @@ const FILES = [
   "cravazi/data/perguntas-1.js",
   "cravazi/data/perguntas-2.js",
   "cravazi/js/textos.js",
+  "cravazi/js/skins.js",
+  "cravazi/js/sozinho.js",
+  "cravazi/js/online.js",
   "cravazi/js/app.js",
   "brand/cravazi-logo.svg",
   "brand/cravazi-logo-dark.svg",

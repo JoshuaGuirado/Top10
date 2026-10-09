@@ -84,6 +84,10 @@ let diarioEstado = null; // { dia, ids, mostrando }
 
 function abrirDiario(dia = diarioHoje()) {
   if (!(dia >= 1 && dia <= diarioHoje())) return;
+  // O Pato de hoje vai para o ranking: sem nome, pede o nome antes (../gamezi-ranking.js).
+  if (dia === diarioHoje() && !diarioCompleto(diarioDoDia(dia)) && typeof gameziNomeAntesDoDia === "function" && !gameziNick(store("nick"))) {
+    return gameziNomeAntesDoDia({ nick: store("nick"), lang, guardarNick: (n) => store("nick", n), comecar: () => abrirDiario(dia) });
+  }
   diarioEstado = { dia, ids: pzDiarioCartas(dia), mostrando: false };
   show("daily");
   renderDiario();

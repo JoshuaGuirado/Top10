@@ -8,6 +8,7 @@
     patozi_salas: ["code"], patozi_sala_jogadores: ["sala_code", "user_id"], patozi_perfis: ["id"], patozi_partidas: ["id"],
     patozi_diario: ["dia", "user_id"], patozi_sugestoes: ["id"], topzi_diario: ["dia", "user_id"],
     datazi_diario: ["dia", "user_id"], maisoumenozi_diario: ["dia", "user_id"],
+    cravazi_salas: ["code"], cravazi_sala_jogadores: ["sala_code", "user_id"], cravazi_partidas: ["id"], cravazi_diario: ["dia", "user_id"],
   };
   const empty = () => Object.fromEntries(Object.keys(PK).map((k) => [k, []]));
   const load = () => ({ ...empty(), ...(JSON.parse(localStorage.getItem(DB_KEY) || "null") || {}) });
@@ -33,13 +34,14 @@
       const hit = (r) => this.filters.every(([c, v]) => r[c] === v);
       if (this.op === "insert" || this.op === "upsert") {
         const r = { created_at: now(), joined_at: now(), updated_at: now(), ...this.payload };
-        if (this.t === "topzi_partidas" || this.t === "patozi_partidas" || this.t === "patozi_sugestoes") r.id = rows.length + 1;
+        if (this.t === "topzi_partidas" || this.t === "patozi_partidas" || this.t === "patozi_sugestoes" || this.t === "cravazi_partidas") r.id = rows.length + 1;
         const old = rows.find((x) => key(x) === key(r));
         if (old && this.op === "insert") return { data: null, error: { code: "23505", message: "duplicate key" } };
         if (old) Object.assign(old, this.payload, { updated_at: now() });
         else {
           if (this.t === "topzi_sala_jogadores" && rows.filter((x) => x.room_code === r.room_code).length >= 8) return { data: null, error: { message: "A sala está cheia" } };
           if (this.t === "patozi_sala_jogadores" && rows.filter((x) => x.sala_code === r.sala_code).length >= 10) return { data: null, error: { message: "A sala está cheia" } };
+          if (this.t === "cravazi_sala_jogadores" && rows.filter((x) => x.sala_code === r.sala_code).length >= 8) return { data: null, error: { message: "A sala está cheia" } };
           rows.push(r);
         }
         save(db);
@@ -55,6 +57,7 @@
         db[this.t] = rows.filter((r) => !hit(r));
         if (this.t === "topzi_salas") gone.forEach((g) => (db.topzi_sala_jogadores = db.topzi_sala_jogadores.filter((p) => p.room_code !== g.code)));
         if (this.t === "patozi_salas") gone.forEach((g) => (db.patozi_sala_jogadores = db.patozi_sala_jogadores.filter((p) => p.sala_code !== g.code)));
+        if (this.t === "cravazi_salas") gone.forEach((g) => (db.cravazi_sala_jogadores = db.cravazi_sala_jogadores.filter((p) => p.sala_code !== g.code)));
         save(db);
         return { data: null, error: null };
       }
@@ -145,7 +148,7 @@
         save(db);
         return { data: null, error: null };
       }
-      if (nome === "datazi_registrar_diario" || nome === "maisoumenozi_registrar_diario") {
+      if (nome === "datazi_registrar_diario" || nome === "maisoumenozi_registrar_diario" || nome === "cravazi_registrar_diario") {
         const tabela = nome.replace("_registrar_diario", "_diario");
         if (!uid) return { data: null, error: { message: "Entre para registrar o resultado." } };
         if (!db[tabela].some((x) => x.dia === a.p_dia && x.user_id === uid)) db[tabela].push({ dia: a.p_dia, user_id: uid, nick: a.p_nick, pontos: a.p_acertos, tempo_ms: a.p_tempo ?? null, created_at: now() });
@@ -153,7 +156,7 @@
         return { data: null, error: null };
       }
       // Salas: quem sai passa o comando para quem entrou primeiro; quem fica assume se o anfitrião sumiu.
-      if (/^(topzi|patozi)_(sair_da_sala|assumir_sala)$/.test(nome)) {
+      if (/^(topzi|patozi|cravazi)_(sair_da_sala|assumir_sala)$/.test(nome)) {
         const jogo = nome.split("_")[0];
         const col = jogo === "topzi" ? "room_code" : "sala_code";
         const salas = db[jogo + "_salas"];

@@ -1018,7 +1018,8 @@ async function sendDailyScore(num, res) {
   if (!onlineConfigured()) return;
   await ensureOnline();
   ensurePlayers();
-  const nick = (players[0].nick || "").trim().slice(0, 16) || t("rank.anon");
+  const nick = gameziNick(players[0].nick);
+  if (!nick) return; // sem nome não entra no ranking (o nome é pedido antes da lista do dia)
   const args = { p_dia: num, p_lista: res.listId, p_nick: nick, p_pontos: res.score, p_acertos: res.found.filter(Boolean).length };
   const { error } = await sb.rpc("topzi_registrar_diario", { ...args, p_tempo: gameziTempoValido(res.ms) });
   // Banco ainda sem o tempo (schema.sql antigo): registra sem ele.

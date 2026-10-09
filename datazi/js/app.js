@@ -93,6 +93,10 @@ function abrirDia(dia) {
 
 function comecarDiario(dia = dzDiaNumero()) {
   if (dia < 1 || dia > dzDiaNumero()) return;
+  // O de hoje vai para o ranking: sem nome, pede o nome antes (../gamezi-ranking.js).
+  if (dia === dzDiaNumero() && typeof gameziNomeAntesDoDia === "function" && !gameziNick(store("nick"))) {
+    return gameziNomeAntesDoDia({ nick: store("nick"), lang, guardarNick: (n) => store("nick", n), comecar: () => comecarDiario(dia) });
+  }
   modo = "diario";
   diaAtual = dia;
   partida = dzNovaPartida(dzDiarioEventos(dia));

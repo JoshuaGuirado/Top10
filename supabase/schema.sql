@@ -1,8 +1,8 @@
--- Gamezi (Topzi e Patozi): banco do modo online, dos perfis e do Pato do dia.
+-- Gamezi (Topzi, Patozi, Datazi, Maisoumenozi e Cravazi): banco do modo online, dos perfis e dos rankings do dia.
 -- Como usar: Supabase → SQL Editor → New query → cole tudo → Run. Pode rodar de novo sem problema.
 --
 -- A conta é do Gamezi: uma só (auth.users) para a plataforma e todos os jogos, com login em conta.html.
--- Cada jogo tem as próprias tabelas, sempre com o nome do jogo na frente (topzi_…, patozi_…).
+-- Cada jogo tem as próprias tabelas, sempre com o nome do jogo na frente (topzi_…, patozi_…, cravazi_…).
 --
 -- Tabelas do Topzi:
 --   topzi_perfis          perfil de cada jogador (nick, skin, estatísticas, recordes, lista do dia, listas criadas)
@@ -405,6 +405,125 @@ create policy "patozi partidas: anfitrião registra" on public.patozi_partidas
     exists (select 1 from public.patozi_salas s where s.code = sala_code and s.host_id = auth.uid())
   );
 
+-- ═════════════════════════════ Cravazi ═════════════════════════════
+-- Mesmo projeto e mesma conta (auth.users). Tabelas próprias:
+--   cravazi_salas          salas online (código de 5 letras, anfitrião, rodadas e estado da partida)
+--   cravazi_sala_jogadores quem está em cada sala (até 8), com a skin (as mesmas do Topzi)
+--   cravazi_partidas       histórico das partidas online (cada um vê só as suas)
+--   cravazi_diario         resultado de cada um no Cravazi do dia (lá embaixo, com os outros rankings)
+
+create table if not exists public.cravazi_salas (
+  code text primary key check (code ~ '^[A-Z0-9]{5}$'),
+  host_id uuid not null references auth.users (id) on delete cascade,
+  status text not null default 'lobby' check (status in ('lobby', 'playing', 'finished')),
+  settings jsonb not null default '{}'::jsonb,
+  state jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.cravazi_sala_jogadores (
+  sala_code text not null references public.cravazi_salas (code) on delete cascade,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  nick text not null check (char_length(nick) between 1 and 16),
+  skin jsonb check (skin is null or (jsonb_typeof(skin) = 'object' and octet_length(skin::text) <= 1500)),
+  joined_at timestamptz not null default now(),
+  primary key (sala_code, user_id)
+);
+
+create table if not exists public.cravazi_partidas (
+  id bigint generated always as identity primary key,
+  sala_code text not null,
+  rodadas integer,
+  players jsonb not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists cravazi_partidas_players_idx on public.cravazi_partidas using gin (players jsonb_path_ops);
+create index if not exists cravazi_salas_updated_idx on public.cravazi_salas (updated_at);
+
+drop trigger if exists cravazi_salas_updated on public.cravazi_salas;
+create trigger cravazi_salas_updated before update on public.cravazi_salas
+  for each row execute function public.tocar_updated_at();
+
+-- No máximo 8 jogadores por sala do Cravazi.
+create or replace function public.cravazi_limitar_jogadores()
+returns trigger language plpgsql as $$
+begin
+  if (select count(*) from public.cravazi_sala_jogadores where sala_code = new.sala_code) >= 8 then
+    raise exception 'A sala está cheia';
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists cravazi_sala_jogadores_limite on public.cravazi_sala_jogadores;
+create trigger cravazi_sala_jogadores_limite before insert on public.cravazi_sala_jogadores
+  for each row execute function public.cravazi_limitar_jogadores();
+
+-- Salas paradas há mais de um dia somem (chamada por quem cria uma sala).
+create or replace function public.cravazi_limpar_salas()
+returns void language sql security definer set search_path = public as $$
+  delete from public.cravazi_salas where updated_at < now() - interval '1 day';
+$$;
+grant execute on function public.cravazi_limpar_salas() to authenticated;
+
+alter table public.cravazi_salas enable row level security;
+alter table public.cravazi_sala_jogadores enable row level security;
+alter table public.cravazi_partidas enable row level security;
+
+-- Salas: quem tem o código consegue ver; só o anfitrião cria, muda e apaga.
+drop policy if exists "cravazi salas: ler" on public.cravazi_salas;
+create policy "cravazi salas: ler" on public.cravazi_salas
+  for select to authenticated using (true);
+
+drop policy if exists "cravazi salas: criar como anfitrião" on public.cravazi_salas;
+create policy "cravazi salas: criar como anfitrião" on public.cravazi_salas
+  for insert to authenticated with check (host_id = auth.uid());
+
+drop policy if exists "cravazi salas: anfitrião edita" on public.cravazi_salas;
+create policy "cravazi salas: anfitrião edita" on public.cravazi_salas
+  for update to authenticated using (host_id = auth.uid()) with check (host_id = auth.uid());
+
+drop policy if exists "cravazi salas: anfitrião apaga" on public.cravazi_salas;
+create policy "cravazi salas: anfitrião apaga" on public.cravazi_salas
+  for delete to authenticated using (host_id = auth.uid());
+
+-- Jogadores: cada um entra e edita a própria linha; sai sozinho ou o anfitrião remove.
+drop policy if exists "cravazi jogadores: ler" on public.cravazi_sala_jogadores;
+create policy "cravazi jogadores: ler" on public.cravazi_sala_jogadores
+  for select to authenticated using (true);
+
+drop policy if exists "cravazi jogadores: entrar" on public.cravazi_sala_jogadores;
+create policy "cravazi jogadores: entrar" on public.cravazi_sala_jogadores
+  for insert to authenticated with check (
+    user_id = auth.uid()
+    and exists (select 1 from public.cravazi_salas s where s.code = sala_code and s.status <> 'playing')
+  );
+
+drop policy if exists "cravazi jogadores: editar a própria linha" on public.cravazi_sala_jogadores;
+create policy "cravazi jogadores: editar a própria linha" on public.cravazi_sala_jogadores
+  for update to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+drop policy if exists "cravazi jogadores: sair ou ser removido" on public.cravazi_sala_jogadores;
+create policy "cravazi jogadores: sair ou ser removido" on public.cravazi_sala_jogadores
+  for delete to authenticated using (
+    user_id = auth.uid()
+    or exists (select 1 from public.cravazi_salas s where s.code = sala_code and s.host_id = auth.uid())
+  );
+
+-- Histórico: o anfitrião registra; cada um vê as partidas em que jogou.
+drop policy if exists "cravazi partidas: ver as minhas" on public.cravazi_partidas;
+create policy "cravazi partidas: ver as minhas" on public.cravazi_partidas
+  for select to authenticated using (
+    players @> jsonb_build_array(jsonb_build_object('uid', auth.uid()::text))
+  );
+
+drop policy if exists "cravazi partidas: anfitrião registra" on public.cravazi_partidas;
+create policy "cravazi partidas: anfitrião registra" on public.cravazi_partidas
+  for insert to authenticated with check (
+    exists (select 1 from public.cravazi_salas s where s.code = sala_code and s.host_id = auth.uid())
+  );
+
 -- ═════════════════════════════ Gamezi: descrições e visões ═════════════════════════════
 -- Cada tabela tem uma descrição dizendo de qual jogo é; ela aparece no painel do Supabase (Description).
 
@@ -418,6 +537,9 @@ comment on table public.patozi_sugestoes is 'Patozi: cartas enviadas pelos jogad
 comment on table public.patozi_salas is 'Patozi: salas online';
 comment on table public.patozi_sala_jogadores is 'Patozi: jogadores de cada sala online';
 comment on table public.patozi_partidas is 'Patozi: histórico das partidas online';
+comment on table public.cravazi_salas is 'Cravazi: salas online';
+comment on table public.cravazi_sala_jogadores is 'Cravazi: jogadores de cada sala online (com a skin)';
+comment on table public.cravazi_partidas is 'Cravazi: histórico das partidas online';
 
 -- Visões para o dono do site olhar os dois jogos juntos no painel (Table Editor), com a coluna "jogo".
 -- Ficam fechadas para o site (sem acesso pela API); security_invoker faz valer as regras (RLS) de quem consulta.
@@ -431,7 +553,12 @@ create view public.gamezi_salas with (security_invoker = true) as
   select 'patozi'::text, s.code, s.status, s.host_id,
          (select count(*) from public.patozi_sala_jogadores j where j.sala_code = s.code),
          s.created_at, s.updated_at
-    from public.patozi_salas s;
+    from public.patozi_salas s
+  union all
+  select 'cravazi'::text, c.code, c.status, c.host_id,
+         (select count(*) from public.cravazi_sala_jogadores j where j.sala_code = c.code),
+         c.created_at, c.updated_at
+    from public.cravazi_salas c;
 
 drop view if exists public.gamezi_jogadores_nas_salas;
 create view public.gamezi_jogadores_nas_salas with (security_invoker = true) as
@@ -439,10 +566,13 @@ create view public.gamezi_jogadores_nas_salas with (security_invoker = true) as
     from public.topzi_sala_jogadores p
   union all
   select 'patozi'::text, j.sala_code, j.nick, j.user_id, j.joined_at
-    from public.patozi_sala_jogadores j;
+    from public.patozi_sala_jogadores j
+  union all
+  select 'cravazi'::text, c.sala_code, c.nick, c.user_id, c.joined_at
+    from public.cravazi_sala_jogadores c;
 
-comment on view public.gamezi_salas is 'Gamezi: salas online dos dois jogos (coluna jogo = topzi ou patozi)';
-comment on view public.gamezi_jogadores_nas_salas is 'Gamezi: quem está em cada sala, dos dois jogos (coluna jogo)';
+comment on view public.gamezi_salas is 'Gamezi: salas online dos jogos (coluna jogo = topzi, patozi ou cravazi)';
+comment on view public.gamezi_jogadores_nas_salas is 'Gamezi: quem está em cada sala, de todos os jogos (coluna jogo)';
 
 revoke all on public.gamezi_salas, public.gamezi_jogadores_nas_salas from anon, authenticated;
 
@@ -502,7 +632,7 @@ do $$
 declare
   tabela text;
 begin
-  foreach tabela in array array['topzi_perfis', 'topzi_sala_jogadores', 'patozi_perfis', 'patozi_sala_jogadores', 'patozi_diario'] loop
+  foreach tabela in array array['topzi_perfis', 'topzi_sala_jogadores', 'patozi_perfis', 'patozi_sala_jogadores', 'patozi_diario', 'cravazi_sala_jogadores'] loop
     execute format('drop trigger if exists %I on public.%I', tabela || '_nick_limpo', tabela);
     execute format('create trigger %I before insert or update of nick on public.%I for each row execute function public.gamezi_limpar_nick()', tabela || '_nick_limpo', tabela);
   end loop;
@@ -591,17 +721,29 @@ create table if not exists public.maisoumenozi_diario (
   primary key (dia, user_id)
 );
 
+-- Cravazi do dia: 5 perguntas, de 10 (cravou no 1º chute) a 0 pontos cada.
+create table if not exists public.cravazi_diario (
+  dia integer not null check (dia >= 1),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  nick text not null default '' check (char_length(nick) <= 16),
+  pontos smallint not null check (pontos between 0 and 50),
+  tempo_ms integer check (tempo_ms between 0 and 86400000),
+  created_at timestamptz not null default now(),
+  primary key (dia, user_id)
+);
+
 comment on table public.datazi_diario is 'Datazi: resultado de cada um no Datazi do dia (ranking)';
+comment on table public.cravazi_diario is 'Cravazi: resultado de cada um no Cravazi do dia (ranking)';
 comment on table public.maisoumenozi_diario is 'Maisoumenozi: resultado de cada um no desafio do dia (ranking)';
 
 do $$
 declare
   tabela text;
 begin
-  foreach tabela in array array['topzi_diario', 'patozi_diario', 'datazi_diario', 'maisoumenozi_diario'] loop
+  foreach tabela in array array['topzi_diario', 'patozi_diario', 'datazi_diario', 'maisoumenozi_diario', 'cravazi_diario'] loop
     execute format('create index if not exists %I on public.%I (dia, pontos desc, tempo_ms)', tabela || '_tempo_idx', tabela);
   end loop;
-  foreach tabela in array array['datazi_diario', 'maisoumenozi_diario'] loop
+  foreach tabela in array array['datazi_diario', 'maisoumenozi_diario', 'cravazi_diario'] loop
     execute format('drop trigger if exists %I on public.%I', tabela || '_nick_limpo', tabela);
     execute format('create trigger %I before insert or update of nick on public.%I for each row execute function public.gamezi_limpar_nick()', tabela || '_nick_limpo', tabela);
     execute format('alter table public.%I enable row level security', tabela); -- sem regras: só as funções leem e gravam
@@ -690,13 +832,29 @@ end $$;
 
 grant execute on function public.maisoumenozi_registrar_diario(integer, text, integer, integer) to authenticated;
 
+-- Cravazi do dia (o dia 1 é 9/10/2026): p_acertos são os pontos (de 0 a 50).
+create or replace function public.cravazi_registrar_diario(p_dia integer, p_nick text, p_acertos integer, p_tempo integer default null)
+returns void language plpgsql security definer set search_path = public as $$
+declare
+  hoje integer := ((now() at time zone 'utc')::date - date '2026-10-09') + 1;
+begin
+  if auth.uid() is null then raise exception 'Entre para registrar o resultado.'; end if;
+  if p_dia is null or p_dia not between hoje - 1 and hoje + 1 then raise exception 'Esse dia já passou.'; end if;
+  if p_acertos is null or p_acertos not between 0 and 50 then raise exception 'Resultado inválido.'; end if;
+  insert into public.cravazi_diario (dia, user_id, nick, pontos, tempo_ms)
+  values (p_dia, auth.uid(), left(coalesce(p_nick, ''), 16), p_acertos, case when p_tempo between 0 and 86400000 then p_tempo end)
+  on conflict (dia, user_id) do nothing;
+end $$;
+
+grant execute on function public.cravazi_registrar_diario(integer, text, integer, integer) to authenticated;
+
 -- Ranking do dia de um jogo: os primeiros (p_limite) e, se a pessoa conectada ficou fora deles, a linha dela no fim.
 -- posicao: empate em pontos e tempo divide o lugar. total: quantos jogaram no dia. eu: é a pessoa conectada.
 create or replace function public.gamezi_ranking_dia(p_jogo text, p_dia integer, p_limite integer default 10)
 returns table (posicao bigint, nick text, pontos integer, tempo_ms integer, eu boolean, total bigint)
 language plpgsql stable security definer set search_path = public as $$
 begin
-  if p_jogo is null or p_jogo not in ('topzi', 'patozi', 'datazi', 'maisoumenozi') then raise exception 'Jogo desconhecido.'; end if;
+  if p_jogo is null or p_jogo not in ('topzi', 'patozi', 'datazi', 'maisoumenozi', 'cravazi') then raise exception 'Jogo desconhecido.'; end if;
   return query execute format($q$
     with r as (
       select d.nick, d.pontos::integer as pontos, d.tempo_ms, d.user_id,
@@ -743,7 +901,7 @@ declare
   jogo text;
   col text;
 begin
-  foreach jogo in array array['topzi', 'patozi'] loop
+  foreach jogo in array array['topzi', 'patozi', 'cravazi'] loop
     col := case jogo when 'topzi' then 'room_code' else 'sala_code' end;
 
     execute format($f$

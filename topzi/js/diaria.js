@@ -88,7 +88,11 @@ function dailyShareText(num, res) {
 
 function startDaily(num = todayNumber()) {
   if (num < 1 || num > todayNumber() || !dailyList(num)) return;
-  startGame(dailyList(num), { daily: num, counts: !dailyResults()[num] });
+  const comecar = () => startGame(dailyList(num), { daily: num, counts: !dailyResults()[num] });
+  // A lista de hoje vai para o ranking: sem nome, pede o nome antes (../gamezi-ranking.js).
+  if (num !== todayNumber() || dailyResults()[num] || typeof gameziNomeAntesDoDia !== "function") return comecar();
+  ensurePlayers();
+  gameziNomeAntesDoDia({ nick: players[0].nick, lang, guardarNick: (n) => { players[0].nick = n; savePlayers(); }, comecar });
 }
 
 // Semana de domingo a sábado, como no Contexto: os dias jogados ficam marcados e os que já passaram dá

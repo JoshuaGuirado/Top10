@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cravazi · quem crava o número? | Gamezi</title>
-  <meta name="description" content="Cravazi: jogo de 2 ou mais jogadores. Cada um chuta um número, o jogo diz se é mais ou menos, e quem cravar a resposta exata leva o ponto.">
+  <meta name="description" content="Cravazi: chute um número, o jogo diz se é mais ou menos e quem cravar a resposta exata leva o ponto. Sozinho no Cravazi do dia (com ranking), com a turma ou online.">
   <meta name="theme-color" content="#FFF4DE" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#171717" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
@@ -38,25 +38,25 @@
   </div>
 
   <main>
-    <!-- Início: quem joga, quantas rodadas e Começar -->
+    <!-- Início: o Cravazi do dia (sozinho, com ranking), com a turma (passando o celular) e online -->
     <section id="screen-home" class="screen home">
       <div class="home-head">
         <img class="home-symbol logo-light" src="../brand/cravazi-simbolo.svg" alt="" aria-hidden="true">
         <img class="home-symbol logo-dark" src="../brand/cravazi-simbolo-escuro.svg" alt="" aria-hidden="true">
-        <h1 class="home-tag" data-i18n="home.tag">Todo mundo chuta um número. Quem cravar a resposta exata leva o ponto.</h1>
+        <h1 class="home-tag" data-i18n="home.tag">Chute um número, descubra se é mais ou menos e crave a resposta exata.</h1>
       </div>
-      <div class="home-card">
-        <p class="card-label" data-i18n="home.players">Jogadores</p>
-        <div class="players" id="players"></div>
-        <button type="button" class="btn ghost small" id="add-player" data-i18n="home.add">+ Jogador</button>
+      <div class="home-card daily" id="daily-card"></div>
+      <div class="home-card home-row">
+        <div><b data-i18n="home.together">Com a turma</b><span data-i18n="home.togetherSub">De 2 a 8 jogadores, passando o celular</span></div>
+        <button type="button" class="btn" id="together-btn" data-i18n="btn.play">Jogar</button>
       </div>
-      <div class="home-card">
-        <p class="card-label" data-i18n="home.rounds">Rodadas</p>
-        <div class="seg" id="rounds" role="radiogroup"></div>
+      <div class="home-card home-row">
+        <div><b data-i18n="home.online">Online</b><span data-i18n="home.onlineSub">Cada um no seu celular</span></div>
+        <button type="button" class="btn dark" id="online-btn" data-i18n="btn.play">Jogar</button>
       </div>
-      <button type="button" class="btn big" id="start-btn" data-i18n="btn.start">Começar</button>
       <nav class="home-links">
         <button type="button" class="link-btn" id="help-link" data-i18n="help.title">Como jogar</button>
+        <a href="../ranking.html#cravazi" data-i18n="home.ranking">Ranking</a>
         <a href="../" data-i18n="home.more">Mais jogos</a>
       </nav>
       <footer class="site-foot">
@@ -66,10 +66,31 @@
       </footer>
     </section>
 
-    <!-- Partida, de cima para baixo: rodada e placar · pergunta · dica (é mais / é menos) · vez e chute -->
+    <!-- Com a turma: quem joga (nome e skin) e quantas rodadas -->
+    <section id="screen-setup" class="screen setup" hidden>
+      <h2 data-i18n="setup.title">Quem vai jogar?</h2>
+      <div class="home-card">
+        <p class="card-label" data-i18n="home.players">Jogadores</p>
+        <div class="players" id="players"></div>
+        <button type="button" class="btn ghost small" id="add-player" data-i18n="home.add">+ Jogador</button>
+      </div>
+      <div class="home-card">
+        <p class="card-label" data-i18n="home.rounds">Rodadas</p>
+        <div class="seg" id="rounds" role="radiogroup"></div>
+      </div>
+      <div class="actions end">
+        <button type="button" class="btn ghost" id="setup-back" data-i18n="btn.back">Voltar</button>
+        <button type="button" class="btn big" id="start-btn" data-i18n="btn.start">Começar</button>
+      </div>
+    </section>
+
+    <!-- Partida (com a turma ou online), de cima para baixo: rodada e placar · pergunta · dica · vez e chute -->
     <section id="screen-game" class="screen game" hidden>
       <div class="game-top">
-        <span class="round" id="round"></span>
+        <div class="game-bar">
+          <span class="round" id="round"></span>
+          <button type="button" class="link-btn" id="game-quit" data-i18n="game.quit" hidden>Sair da partida</button>
+        </div>
         <div class="score" id="score"></div>
       </div>
       <p class="theme" id="theme"></p>
@@ -82,8 +103,8 @@
       <p class="range" id="range" hidden></p>
 
       <form class="play" id="play" autocomplete="off">
-        <p class="turn" id="turn"></p>
-        <div class="guess-row">
+        <div class="turn-row"><span id="turn-skin"></span><p class="turn" id="turn"></p></div>
+        <div class="guess-row" id="guess-row">
           <label class="guess-box">
             <input id="guess" type="text" inputmode="numeric" enterkeyhint="send" data-i18n-placeholder="game.placeholder">
             <span class="unit" id="unit"></span>
@@ -91,9 +112,11 @@
           <button type="submit" class="btn" id="guess-btn" data-i18n="btn.guess">Chutar</button>
         </div>
         <p class="guess-msg" id="guess-msg" aria-live="polite"></p>
+        <p class="wait-msg" id="wait-msg" data-i18n="game.waitTurn" hidden>Espere a sua vez</p>
       </form>
 
       <div class="nailed" id="nailed" hidden>
+        <span id="nailed-skin"></span>
         <p class="nailed-who" id="nailed-who"></p>
         <p class="nailed-answer" id="nailed-answer"></p>
         <p class="muted" id="nailed-tries"></p>
@@ -103,9 +126,10 @@
       <ol class="history" id="history"></ol>
     </section>
 
-    <!-- Resultado -->
+    <!-- Resultado (com a turma ou online) -->
     <section id="screen-results" class="screen results" hidden>
       <div class="result-head">
+        <div class="podium" id="res-podium"></div>
         <p class="result-title" id="res-title"></p>
         <p class="muted" id="res-sub"></p>
       </div>
@@ -117,7 +141,134 @@
       <h3 data-i18n="res.rounds">As rodadas</h3>
       <ol class="rounds-list" id="res-rounds"></ol>
     </section>
+
+    <!-- Sozinho (Cravazi do dia ou treino): progresso · pergunta · dica · chutes restantes e chute -->
+    <section id="screen-solo" class="screen game" hidden>
+      <div class="solo-hud">
+        <span class="round" id="solo-kicker"></span>
+        <span class="solo-points" id="solo-points"></span>
+      </div>
+      <div class="dots" id="solo-dots" aria-hidden="true"></div>
+      <p class="theme" id="solo-theme"></p>
+      <h2 class="question" id="solo-question"></h2>
+
+      <div class="hint" id="solo-hint" hidden>
+        <p class="hint-who" id="solo-hint-who"></p>
+        <p class="hint-big" id="solo-hint-big"></p>
+      </div>
+      <p class="range" id="solo-range" hidden></p>
+
+      <form class="play" id="solo-play" autocomplete="off">
+        <p class="turn" id="solo-left"></p>
+        <div class="guess-row">
+          <label class="guess-box">
+            <input id="solo-guess" type="text" inputmode="numeric" enterkeyhint="send" data-i18n-placeholder="game.placeholder">
+            <span class="unit" id="solo-unit"></span>
+          </label>
+          <button type="submit" class="btn" id="solo-guess-btn" data-i18n="btn.guess">Chutar</button>
+        </div>
+        <p class="guess-msg" id="solo-msg" aria-live="polite"></p>
+      </form>
+
+      <div class="nailed" id="solo-end" hidden>
+        <p class="nailed-who" id="solo-end-title"></p>
+        <p class="nailed-answer" id="solo-end-answer"></p>
+        <p class="muted" id="solo-end-sub"></p>
+        <button type="button" class="btn big" id="solo-next"></button>
+      </div>
+
+      <ol class="history" id="solo-history"></ol>
+    </section>
+
+    <!-- Resultado sozinho: pontos, ranking do dia e as perguntas -->
+    <section id="screen-solo-results" class="screen results" hidden>
+      <div class="result-head">
+        <span id="solo-res-skin"></span>
+        <p class="kicker" id="solo-res-kicker"></p>
+        <p class="result-title" id="solo-res-score"></p>
+        <p class="muted" id="solo-res-sub"></p>
+      </div>
+      <div class="actions center">
+        <button type="button" class="btn dark" id="solo-res-share" data-i18n="btn.share">Compartilhar</button>
+        <button type="button" class="btn" id="solo-res-train" data-i18n="daily.train">Treinar</button>
+        <button type="button" class="btn ghost" id="solo-res-home" data-i18n="btn.home">Início</button>
+      </div>
+      <div class="leaderboard" id="leaderboard" hidden></div>
+      <h3 data-i18n="res.questions">As perguntas</h3>
+      <ol class="rounds-list" id="solo-res-list"></ol>
+    </section>
+
+    <!-- Online: entrar ou criar sala -->
+    <section id="screen-online" class="screen" hidden>
+      <h2 data-i18n="on.title">Jogar online</h2>
+      <p class="muted" data-i18n="on.sub">Cada um no seu celular. Crie uma sala e mande o código, ou entre na sala de alguém.</p>
+      <div class="online-setup feedback" id="online-setup" hidden></div>
+      <div id="online-main">
+        <div class="online-me">
+          <button type="button" class="avatar-btn" id="online-skin" data-i18n-aria="skin.change" aria-label="Trocar skin"></button>
+          <label class="nick"><span data-i18n="on.nick">Seu nome</span>
+            <input id="online-nick" maxlength="16" autocomplete="nickname" data-i18n-placeholder="on.nickPh" placeholder="Como te chamam?">
+          </label>
+        </div>
+        <div class="online-grid">
+          <div class="home-card online-box">
+            <p class="card-label" data-i18n="on.create">Criar sala</p>
+            <p class="small muted" data-i18n="on.createSub">Você escolhe as rodadas e começa quando a turma chegar.</p>
+            <button type="button" class="btn" id="create-room-btn" data-i18n="on.create">Criar sala</button>
+          </div>
+          <form class="home-card online-box" id="join-form">
+            <p class="card-label" data-i18n="on.join">Entrar numa sala</p>
+            <input class="code-input" id="join-code" maxlength="5" autocomplete="off" autocapitalize="characters" placeholder="ABCDE" data-i18n-aria="on.code" aria-label="Código da sala">
+            <button type="submit" class="btn dark" id="join-room-btn" data-i18n="on.joinBtn">Entrar</button>
+          </form>
+        </div>
+      </div>
+      <p class="feedback bad" id="online-error" aria-live="polite"></p>
+      <div class="actions"><button type="button" class="btn ghost" id="online-back" data-i18n="btn.back">Voltar</button></div>
+    </section>
+
+    <!-- Online: sala de espera -->
+    <section id="screen-lobby" class="screen" hidden>
+      <div class="lobby-top">
+        <div>
+          <p class="small muted" data-i18n="on.code">Código da sala</p>
+          <p class="room-code" id="room-code"></p>
+        </div>
+        <button type="button" class="btn dark" id="share-room" data-i18n="lobby.share">Convidar</button>
+      </div>
+      <h3 data-i18n="lobby.players">Na sala</h3>
+      <div class="lobby-players" id="lobby-players"></div>
+      <div class="home-card">
+        <p class="card-label" data-i18n="home.rounds">Rodadas</p>
+        <div class="seg" id="lobby-rounds" role="radiogroup"></div>
+      </div>
+      <p class="small muted" id="lobby-status" aria-live="polite"></p>
+      <div class="actions end">
+        <button type="button" class="btn ghost" id="leave-room" data-i18n="lobby.leave">Sair da sala</button>
+        <button type="button" class="btn big" id="lobby-start" data-i18n="btn.start">Começar</button>
+      </div>
+    </section>
   </main>
+
+  <!-- Escolha de skin (as mesmas do Topzi) -->
+  <dialog class="dialog skin-dialog" id="skin-dialog">
+    <div class="dialog-inner">
+      <div class="dialog-head"><h2 id="skin-dialog-title">Skin</h2><button type="button" class="text-btn" data-close data-i18n="btn.close">Fechar</button></div>
+      <div class="tabs" id="skin-tabs"></div>
+      <div class="preset-grid" id="skin-presets"></div>
+      <div class="builder" id="skin-builder" hidden>
+        <div class="builder-preview" id="skin-preview"></div>
+        <div>
+          <div class="tabs builder-sections" id="skin-sections"></div>
+          <div class="builder-controls" id="skin-controls"></div>
+        </div>
+      </div>
+      <div class="dialog-foot" id="skin-foot" hidden>
+        <button type="button" class="btn ghost" id="skin-random" data-i18n="btn.random">Sortear</button>
+        <button type="button" class="btn" id="skin-save" data-i18n="skin.use">Usar esta skin</button>
+      </div>
+    </div>
+  </dialog>
 
   <!-- Como jogar -->
   <dialog class="dialog" id="help-dialog">
@@ -143,8 +294,14 @@
   <script src="js/jogo.js"></script>
   <script src="data/perguntas-1.js"></script>
   <script src="data/perguntas-2.js"></script>
+  <script src="../topzi/js/avatars.js"></script>
+  <script src="../topzi/js/config.js"></script>
   <script src="../gamezi-conta.js"></script>
+  <script src="../gamezi-ranking.js"></script>
   <script src="js/textos.js"></script>
+  <script src="js/skins.js"></script>
+  <script src="js/sozinho.js"></script>
+  <script src="js/online.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

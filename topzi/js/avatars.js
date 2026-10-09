@@ -654,3 +654,44 @@ const PRESETS = [
 function presetById(id) {
   return PRESETS.find((p) => p.id === id);
 }
+
+// ───────────── nomes em outros idiomas ─────────────
+// Usados também pelo Cravazi (que carrega este arquivo). Leem a variável global lang de cada jogo.
+
+// Nomes de skins prontas que mudam de idioma: [en, es] (os outros são iguais nos três).
+const SKIN_NAMES = {
+  aranha: ["Spider-Man", "Hombre Araña"], maravilha: ["Wonder Woman", "Mujer Maravilla"], ferro: ["Iron Man", "Iron Man"],
+  capitao: ["Captain America", "Capitán América"], pantera: ["Black Panther", "Pantera Negra"], viuva: ["Black Widow", "Viuda Negra"],
+  capita: ["Captain Marvel", "Capitana Marvel"], estranho: ["Doctor Strange", "Doctor Strange"], chapolin: ["El Chapulín Colorado", "El Chapulín Colorado"],
+  coringa: ["Joker", "Guasón"], arlequina: ["Harley Quinn", "Harley Quinn"], malevola: ["Maleficent", "Maléfica"], duende: ["Green Goblin", "Duende Verde"],
+  wandinha: ["Wednesday", "Merlina"], onze: ["Eleven", "Once"], jedi: ["Jedi Master", "Maestro Jedi"], joel: ["Survivor", "Superviviente"],
+  peach: ["Princess Peach", "Princesa Peach"], geralt: ["Witcher", "Brujo"], ronaldo: ["Ronaldo Nazário", "Ronaldo Nazário"],
+  astronauta: ["Astronaut", "Astronauta"], bombeiro: ["Firefighter", "Bombero"], medica: ["Doctor", "Médica"], robo: ["Robot", "Robot"],
+  pirata: ["Pirate", "Pirata"], realeza: ["King/Queen", "Rey/Reina"], policial: ["Police officer", "Policía"], professora: ["Teacher", "Profesora"],
+  cientista: ["Scientist", "Científica"], magico: ["Magician", "Mago"], palhaco: ["Clown", "Payaso"], detetive: ["Detective", "Detective"],
+  fazendeiro: ["Farmer", "Granjero"], skatista: ["Skater", "Skater"], surfista: ["Surfer", "Surfista"],
+  monica: ["Monica", "Mónica"], cebolinha: ["Jimmy Five", "Cebollita"], cascao: ["Smudge", "Cascarón"], magali: ["Maggy", "Magali"],
+  picapau: ["Woody Woodpecker", "El Pájaro Loco"], chaves: ["El Chavo", "El Chavo del 8"],
+};
+
+function presetName(preset) {
+  const tr = SKIN_NAMES[preset.id];
+  return tr && lang !== "pt" ? tr[lang === "en" ? 0 : 1] : preset.name;
+}
+
+// Peças do editor: [en, es] por valor (o português é o rótulo original em avatars.js).
+const PART_NAMES = {
+  hair: { none: ["Bald", "Calvo"], buzz: ["Buzz cut", "Rapado"], short: ["Short", "Corto"], spiky: ["Spiky", "De punta"], messy: ["Messy", "Despeinado"], slick: ["Slicked", "Peinado"], side: ["Side fringe", "Flequillo de lado"], bob: ["Bob", "Melena corta"], long: ["Long", "Largo"], ponytail: ["Ponytail", "Coleta"], pigtails: ["Pigtails", "Dos coletas"], bun: ["Bun", "Moño"], curly: ["Curly", "Rizado"], afro: ["Afro", "Afro"], buns: ["Space buns", "Moñitos"], braids: ["Braids", "Trenzas"], dreads: ["Dreads", "Rastas"], mohawk: ["Mohawk", "Cresta"], fivehairs: ["Five hairs", "Cinco pelos"] },
+  eyes: { normal: ["Normal", "Normal"], happy: ["Happy", "Feliz"], angry: ["Angry", "Enojado"], sleepy: ["Sleepy", "Dormido"], wide: ["Wide", "Abiertos"], lashes: ["Lashes", "Pestañas"], wink: ["Wink", "Guiño"], glasses: ["Glasses", "Lentes"], shades: ["Sunglasses", "Lentes de sol"] },
+  mouth: { smile: ["Smile", "Sonrisa"], grin: ["Big grin", "Sonrisota"], smirk: ["Smirk", "Media sonrisa"], teeth: ["Buck teeth", "Dientón"], open: ["Surprised", "Sorprendido"], line: ["Serious", "Serio"], sad: ["Sad", "Triste"], tongue: ["Tongue out", "Lengua"], lips: ["Lipstick", "Labial"], evil: ["Evil", "Malvado"] },
+  beard: { none: ["No beard", "Sin barba"], mustache: ["Mustache", "Bigote"], goatee: ["Goatee", "Perilla"], sideburns: ["Sideburns", "Patillas"], stubble: ["Stubble", "Barba de días"], beard: ["Beard", "Barba"], long: ["Long beard", "Barba larga"] },
+  head: { none: ["Nothing", "Nada"], cap: ["Cap", "Gorra"], beanie: ["Beanie", "Gorro"], headband: ["Headband", "Cinta"], headphones: ["Headphones", "Auriculares"], bow: ["Bow", "Moño"], flowers: ["Flower crown", "Corona de flores"], crown: ["Crown", "Corona"], tiara: ["Tiara", "Tiara"], halo: ["Halo", "Aureola"], devil: ["Devil horns", "Cuernitos"], bighorns: ["Big horns", "Cuernos grandes"], antennae: ["Antennae", "Antenitas"], mouse: ["Mouse ears", "Orejas de ratón"], bunny: ["Bunny ears", "Orejas de conejo"], cat: ["Cat ears", "Orejas de gato"], fedora: ["Fedora", "Sombrero"], tophat: ["Top hat", "Galera"], straw: ["Straw hat", "Sombrero de paja"], cowboy: ["Cowboy hat", "Sombrero vaquero"], party: ["Party hat", "Gorro de fiesta"], bandana: ["Bandana", "Pañuelo"], pirate: ["Pirate hat", "Sombrero pirata"], wizard: ["Wizard hat", "Sombrero de mago"], chef: ["Chef hat", "Gorro de chef"], hardhat: ["Hard hat", "Casco de obra"], firehat: ["Firefighter helmet", "Casco de bombero"], viking: ["Viking helmet", "Casco vikingo"], knight: ["Knight helmet", "Yelmo"], astro: ["Space helmet", "Casco espacial"], robot: ["Robot head", "Cabeza de robot"], heromask: ["Hero mask", "Máscara de héroe"], ninja: ["Ninja mask", "Máscara ninja"], hood: ["Hood", "Capucha"] },
+  pattern: { plain: ["Plain", "Lisa"], stripes: ["Stripes", "Rayas"], hoops: ["Hoops", "Franjas"], sash: ["Sash", "Banda diagonal"], dots: ["Polka dots", "Lunares"], plaid: ["Plaid", "Cuadros"], camo: ["Camo", "Camuflaje"], number: ["Number", "Número"], star: ["Star", "Estrella"], heart: ["Heart", "Corazón"], bolt: ["Lightning", "Rayo"], hoodie: ["Hoodie", "Sudadera"], tank: ["Tank top", "Musculosa"], suit: ["Suit", "Traje"], jacket: ["Jacket", "Chaqueta"], overalls: ["Overalls", "Overol"], armor: ["Armor", "Armadura"], robe: ["Robe", "Túnica"], scarf: ["Scarf", "Bufanda"] },
+  extra: { none: ["Nothing", "Nada"], cheeks: ["Blush", "Mejillas"], freckles: ["Freckles", "Pecas"], mole: ["Mole", "Lunar"], scar: ["Scar", "Cicatriz"], bandaid: ["Band-aid", "Curita"], warpaint: ["War paint", "Pintura de guerra"], whiskers: ["Whiskers", "Bigotes"], nose: ["Clown nose", "Nariz de payaso"], domino: ["Eye mask", "Antifaz"], tattoo: ["Tattoo", "Tatuaje"], eyepatch: ["Eye patch", "Parche"] },
+  item: { none: ["Nothing", "Nada"], ball: ["Ball", "Pelota"], mic: ["Microphone", "Micrófono"], phone: ["Phone", "Celular"], trophy: ["Trophy", "Trofeo"], sword: ["Sword", "Espada"], shield: ["Shield", "Escudo"], wand: ["Wand", "Varita"], balloon: ["Balloon", "Globo"], guitar: ["Guitar", "Guitarra"], pokeball: ["Poké Ball", "Poké Ball"], hammer: ["Hammer", "Martillo"], bat: ["Bat", "Bate"], book: ["Book", "Libro"], flask: ["Flask", "Frasco"], magnifier: ["Magnifier", "Lupa"], watch: ["Watch", "Reloj"] },
+};
+
+function partName(key, value, fallback) {
+  const tr = PART_NAMES[key] && PART_NAMES[key][value];
+  return tr && lang !== "pt" ? tr[lang === "en" ? 0 : 1] : fallback;
+}

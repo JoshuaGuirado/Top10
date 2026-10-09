@@ -122,7 +122,8 @@ function erroDoBanco(error) {
 // ranking. Banco sem o tempo (schema.sql antigo): registra sem ele; sem a função: grava direto, como antes.
 async function enviarDiario(dia, reg) {
   await ensureOnline();
-  const nick = (store("nick") || "").trim().slice(0, 16) || "Pato";
+  const nick = gameziNick(store("nick"));
+  if (!nick) return; // sem nome não entra no ranking (o nome é pedido antes do Pato do dia)
   const chutes = pzDiarioCartas(dia).map((carta, k) => ({ carta, chute: reg.chutes[k] }));
   const semFuncao = (error) => error && (error.code === "PGRST202" || /could not find the function/i.test(error.message || ""));
   let { error } = await sb.rpc("patozi_registrar_diario", { p_dia: dia, p_nick: nick, p_chutes: chutes, p_tempo: gameziTempoValido(reg.ms) });

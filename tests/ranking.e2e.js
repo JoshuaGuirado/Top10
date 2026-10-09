@@ -33,9 +33,17 @@ const server = http.createServer((req, res) => {
   const step = (name) => console.log("ok -", name);
   const db = () => P.evaluate(() => ({ datazi_diario: [], maisoumenozi_diario: [], ...JSON.parse(localStorage.getItem("__fakedb") || "{}") }));
 
-  // Datazi do dia sem nome em nenhum jogo: o ranking pede o nome antes de mandar.
+  // Datazi do dia sem nome em nenhum jogo: o nome é pedido antes de começar (nada de "Jogador" no ranking).
   await P.goto(site + "/datazi/index.html");
   await P.click("#daily-btn");
+  await P.waitForSelector("dialog.gamezi-nome[open]");
+  assert.equal(await P.evaluate(() => document.body.dataset.screen), "home", "não começa sem o nome");
+  await P.click("dialog.gamezi-nome .gamezi-nome-nao");
+  assert.equal(await P.$("dialog.gamezi-nome"), null, "\"Agora não\" fecha sem começar");
+  await P.click("#daily-btn");
+  await P.fill("dialog.gamezi-nome input", "Nina");
+  await P.click("dialog.gamezi-nome .gamezi-nome-sim");
+  await P.waitForSelector("#screen-game:not([hidden])");
   await P.evaluate(async () => {
     while (partida && !partida.fim) {
       await new Promise((r) => setTimeout(r, 30)); // um tempinho pensando
@@ -45,10 +53,6 @@ const server = http.createServer((req, res) => {
     proximo();
   });
   await P.waitForSelector("#screen-results:not([hidden])");
-  await P.waitForSelector("#leaderboard .lb-form");
-  assert.equal((await db()).datazi_diario.length, 0, "sem nome, ainda não mandou");
-  await P.fill("#leaderboard .lb-input", "Nina");
-  await P.click("#leaderboard .lb-form button");
   await P.waitForSelector("#leaderboard .lb-row.me");
   assert.match(await P.textContent("#leaderboard .lb-row.me"), /Nina/);
   assert.match(await P.textContent("#leaderboard .lb-pos"), /1º de 1/);
@@ -56,7 +60,7 @@ const server = http.createServer((req, res) => {
   assert.equal(linhas.length, 1);
   assert.ok(linhas[0].tempo_ms > 0, "o tempo vai junto com o resultado");
   assert.equal(await P.evaluate(() => diarios()[dzDiaNumero()].enviado), true);
-  step("Datazi do dia: pede o nome, manda o resultado com o tempo e mostra o ranking");
+  step("Datazi do dia: pede o nome antes de jogar, manda o resultado com o tempo e mostra o ranking");
 
   // Voltar para o resultado de hoje não manda de novo.
   await P.click("#res-home");

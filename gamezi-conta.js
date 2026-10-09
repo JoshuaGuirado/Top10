@@ -53,7 +53,7 @@ function gameziDadosLocais() {
     patozi: { stats: gameziLer("pz:stats") || {}, diario: gameziLer("pz:diario") || {} },
     datazi: { stats: gameziLer("dz:stats") || {}, diario: gameziLer("dz:diario") || {} },
     maisoumenozi: { stats: gameziLer("mm:stats") || {}, diario: gameziLer("mm:diario") || {} },
-    cravazi: { stats: gameziLer("cz:stats") || {} },
+    cravazi: { stats: gameziLer("cz:stats") || {}, diario: gameziLer("cz:diario") || {} },
   };
 }
 
@@ -96,15 +96,16 @@ function gameziProgresso(d) {
   });
   var diasDatazi = Object.keys((d.datazi && d.datazi.diario) || {});
   var diasMais = Object.keys((d.maisoumenozi && d.maisoumenozi.diario) || {});
+  var diasCravazi = Object.keys((d.cravazi && d.cravazi.diario) || {});
   var p = {
     partidas: (tz.games || 0) + (pz.partidas || 0) + (dz.partidas || 0) + (mm.partidas || 0) + (cz.partidas || 0),
-    desafios: diasTopzi.length + diasPatozi.length + diasDatazi.length + diasMais.length,
-    sequencia: Math.max(gameziSequencia(diasTopzi), gameziSequencia(diasPatozi), gameziSequencia(diasDatazi), gameziSequencia(diasMais)),
+    desafios: diasTopzi.length + diasPatozi.length + diasDatazi.length + diasMais.length + diasCravazi.length,
+    sequencia: Math.max(gameziSequencia(diasTopzi), gameziSequencia(diasPatozi), gameziSequencia(diasDatazi), gameziSequencia(diasMais), gameziSequencia(diasCravazi)),
     listaCompleta: tz.perfect || 0,
     venceuLista: (tz.vsWins || 0) + diasTopzi.filter(function (k) { var r = d.topzi.diaria[k]; return r && r.score > r.total / 2; }).length,
     escapou: pz.escapou || 0,
     duvidasCertas: pz.duvidasCertas || 0,
-    jogos: [tz.games || diasTopzi.length, pz.partidas || diasPatozi.length, dz.partidas || diasDatazi.length, mm.partidas || diasMais.length, cz.partidas || 0].filter(Boolean).length,
+    jogos: [tz.games || diasTopzi.length, pz.partidas || diasPatozi.length, dz.partidas || diasDatazi.length, mm.partidas || diasMais.length, cz.partidas || diasCravazi.length].filter(Boolean).length,
   };
   p.xp = p.partidas * 10 + p.desafios * 15 + (tz.hits || 0) + (pz.escapou || 0) * 5;
   p.nivel = Math.floor((1 + Math.sqrt(1 + (8 * p.xp) / 100)) / 2);

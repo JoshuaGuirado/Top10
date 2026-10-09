@@ -1,8 +1,8 @@
-// Ranking do dia de todos os jogos do Gamezi (Topzi, Patozi, Datazi e Maisoumenozi) e do portal (ranking.html).
+// Ranking do dia de todos os jogos do Gamezi (Topzi, Patozi, Datazi, Maisoumenozi e Cravazi) e do portal (ranking.html).
 // Quem faz mais pontos no desafio do dia fica na frente; no empate, quem levou menos tempo. Quem ordena é o
 // banco (gamezi_ranking_dia, em supabase/schema.sql); aqui só buscamos e desenhamos.
 // Precisa de SUPABASE_URL e SUPABASE_ANON_KEY (topzi/js/config.js). O Topzi e o Patozi já têm o próprio
-// cliente do Supabase e o passam para cá; o Datazi, o Maisoumenozi e o portal usam gameziCliente().
+// cliente do Supabase e o passam para cá; o Datazi, o Maisoumenozi, o Cravazi e o portal usam gameziCliente().
 
 var GAMEZI_SUPABASE_CDN = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
 var GAMEZI_RANKING_LIMITE = 10;
@@ -20,6 +20,10 @@ var GAMEZI_RANKING_TEXTOS = {
   nome: ["Seu nome no ranking", "Your name in the ranking", "Tu nombre en el ranking"],
   entrar: ["Entrar no ranking", "Join the ranking", "Entrar al ranking"],
   erro: ["Não deu para carregar o ranking.", "Couldn't load the ranking.", "No se pudo cargar el ranking."],
+  antesTitulo: ["Qual é o seu nome?", "What's your name?", "¿Cómo te llamas?"],
+  antesSub: ["É ele que aparece no ranking do dia.", "It's the name shown in the daily ranking.", "Es el nombre que aparece en el ranking del día."],
+  jogar: ["Jogar", "Play", "Jugar"],
+  cancelar: ["Agora não", "Not now", "Ahora no"],
 };
 
 function gameziRankingTexto(chave, l, vars) {
@@ -52,7 +56,7 @@ function gameziTempoValido(ms) {
 
 // Nome para o ranking: o do próprio jogo ou o usado em outro jogo do Gamezi neste aparelho.
 function gameziNick(proprio) {
-  var lidos = [proprio, gameziRankingLer("pz:nick"), gameziRankingLer("dz:nick"), gameziRankingLer("mm:nick")];
+  var lidos = [proprio, gameziRankingLer("pz:nick"), gameziRankingLer("dz:nick"), gameziRankingLer("mm:nick"), gameziRankingLer("cz:nick")];
   var jogadores = gameziRankingLer("tt:players");
   if (jogadores && jogadores[0]) lidos.push(jogadores[0].nick);
   for (var i = 0; i < lidos.length; i++) {
@@ -66,7 +70,7 @@ function gameziRankingLer(chave) {
   try { return JSON.parse(localStorage.getItem(chave)); } catch (e) { return null; }
 }
 
-// ───────────── conexão (Datazi, Maisoumenozi e portal) ─────────────
+// ───────────── conexão (Datazi, Maisoumenozi, Cravazi e portal) ─────────────
 
 var gameziSb = null;
 var gameziSbPronto = null;
@@ -190,7 +194,7 @@ function gameziRankingDesenhar(box, cliente, jogo, dia, l) {
   });
 }
 
-// ───────────── Datazi e Maisoumenozi: mandar o resultado do dia ─────────────
+// ───────────── Datazi, Maisoumenozi e Cravazi: mandar o resultado do dia ─────────────
 
 // Manda o resultado de hoje (uma vez: reg.enviado) e desenha o ranking do dia em box. Sem nome para o ranking,
 // pede um antes (fica guardado no jogo). Resultado de outro dia só mostra o ranking (não conta).
@@ -233,4 +237,56 @@ function gameziRankingPedirNome(o) {
       ok(gameziRankingDoDia(o));
     };
   });
+}
+
+// ───────────── nome antes do desafio do dia (todos os jogos) ─────────────
+
+// Antes de começar o desafio de hoje: quem ainda não tem nome para o ranking (em nenhum jogo deste aparelho)
+// escreve o nome primeiro, para não aparecer no ranking como "Jogador" ou "Pato". Com nome, começa direto.
+// o: { nick (o do jogo), guardarNick(nome), lang, comecar() }
+function gameziNomeAntesDoDia(o) {
+  if (!gameziRankingLigado() || gameziNick(o.nick) || typeof document === "undefined" || !document.createElement("dialog").showModal) return o.comecar();
+  var l = o.lang;
+  var d = document.createElement("dialog");
+  d.className = "gamezi-nome";
+  d.innerHTML = '<form method="dialog"><h2>' + gameziEsc(gameziRankingTexto("antesTitulo", l)) + "</h2><p>" + gameziEsc(gameziRankingTexto("antesSub", l)) + "</p>" +
+    '<input maxlength="16" autocomplete="nickname" required placeholder="' + gameziEsc(gameziRankingTexto("nome", l)) + '" aria-label="' + gameziEsc(gameziRankingTexto("nome", l)) + '">' +
+    '<div class="gamezi-nome-acoes"><button type="button" class="gamezi-nome-nao">' + gameziEsc(gameziRankingTexto("cancelar", l)) + "</button>" +
+    '<button type="submit" class="gamezi-nome-sim">' + gameziEsc(gameziRankingTexto("jogar", l)) + "</button></div></form>";
+  gameziNomeEstilo();
+  document.body.appendChild(d);
+  var campo = d.querySelector("input");
+  var fechar = function () { if (d.open) d.close(); d.remove(); };
+  d.querySelector(".gamezi-nome-nao").onclick = fechar;
+  d.addEventListener("cancel", function () { setTimeout(fechar, 0); });
+  d.querySelector("form").onsubmit = function (e) {
+    e.preventDefault();
+    var nome = campo.value.trim().slice(0, 16);
+    if (!nome) return campo.focus();
+    o.guardarNick(nome);
+    fechar();
+    o.comecar();
+  };
+  d.showModal();
+  campo.focus();
+}
+
+// Visual do pedido de nome, com as cores do jogo (variáveis --bg, --fg, --surface… de cada style.css).
+function gameziNomeEstilo() {
+  if (document.getElementById("gamezi-nome-css")) return;
+  var css = document.createElement("style");
+  css.id = "gamezi-nome-css";
+  css.textContent =
+    ".gamezi-nome{border:0;padding:0;border-radius:22px;background:var(--bg,#FFF4DE);color:var(--fg,#171717);width:min(420px,calc(100vw - 32px));box-shadow:0 20px 60px rgba(0,0,0,.35)}" +
+    ".gamezi-nome::backdrop{background:rgba(10,10,10,.6)}" +
+    ".gamezi-nome form{display:grid;gap:12px;padding:22px}" +
+    ".gamezi-nome h2{margin:0;font-stretch:75%;font-weight:800;font-size:1.9rem;line-height:1}" +
+    ".gamezi-nome p{margin:0;color:var(--muted,#6B6151)}" +
+    ".gamezi-nome input{font:inherit;font-weight:700;color:var(--fg,#171717);background:var(--surface,#F7E7C8);border:2px solid var(--line,#E8D5B0);border-radius:12px;padding:12px 14px;min-width:0}" +
+    ".gamezi-nome input:focus{outline:none;border-color:var(--fg,#171717)}" +
+    ".gamezi-nome-acoes{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}" +
+    ".gamezi-nome-acoes button{font:inherit;font-weight:700;border:0;border-radius:999px;padding:12px 22px;cursor:pointer}" +
+    ".gamezi-nome-nao{background:var(--surface,#F7E7C8);color:var(--fg,#171717)}" +
+    ".gamezi-nome-sim{background:var(--accent,#FF4D3D);color:var(--on-accent,#171717)}";
+  document.head.appendChild(css);
 }

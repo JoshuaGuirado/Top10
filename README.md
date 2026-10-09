@@ -136,16 +136,21 @@ Arquivos:
 
 # Cravazi
 
-Jogo de 2 a 8 pessoas num celular só, passando de mão em mão. Cada rodada tem uma pergunta com resposta em número ("Com quantos anos Mozart morreu?"). Um de cada vez, cada jogador chuta; o jogo responde **É MAIS** ou **É MENOS** e a faixa vai fechando ("Está entre 20 e 40"). Quem **cravar** o número exato leva 1 ponto; a rodada só acaba quando alguém crava. Quem começa muda a cada rodada. Depois de 5, 10 ou 15 rodadas, ganha quem tiver mais pontos (empate fica empatado).
+Cada rodada tem uma pergunta com resposta em número ("Com quantos anos Mozart morreu?"). Quem chuta ouve **É MAIS** ou **É MENOS** e a faixa vai fechando ("Está entre 20 e 40"). Quem **cravar** o número exato pontua. Chute fora da faixa conhecida não vale. São três jeitos de jogar:
 
-A tela é de cima para baixo: rodada e placar, o tema em letra pequena, a pergunta, a dica do último chute, de quem é a vez com o campo do número (com a unidade ao lado) e os chutes da rodada. Chute fora da faixa conhecida não vale e não passa a vez.
+- **Cravazi do dia** (sozinho, com ranking): 5 perguntas, as mesmas para todo mundo, e até 10 chutes em cada. Cravou no 1º chute vale 10 pontos, no 10º vale 1; sem cravar, 0 (máximo de 50). O resultado vai uma vez para o ranking do dia (`cravazi_diario`, também no `ranking.html`), com o tempo pensando para desempatar. Depois dá para **treinar** com perguntas sorteadas, sem ranking.
+- **Com a turma**: de 2 a 8 pessoas num celular só, passando de mão em mão. Um de cada vez; quem cravar leva 1 ponto e a rodada só acaba quando alguém crava. Quem começa muda a cada rodada. Depois de 5, 10 ou 15 rodadas, ganha quem tiver mais pontos.
+- **Online**: as mesmas regras, cada um no seu celular. Sala com código de 5 letras e link de convite, até 8 pessoas. Como no Patozi, o aparelho do anfitrião roda a partida e manda o estado pelo Realtime; os outros mandam só o chute (ou "próxima rodada"). Quem sai na própria vez tem a vez passada; se o anfitrião sai, quem entrou primeiro assume.
+
+Cada jogador tem uma **skin**, as mesmas do Topzi (as prontas por grupo e o editor "Personalizar"). Elas aparecem no placar, na vez, em quem cravou, no resultado e na sala online.
 
 São 13 temas e mais de 230 perguntas difíceis, diferentes das do Patozi (o teste acusa pergunta com a mesma resposta e o mesmo assunto de uma carta do Patozi). O aparelho lembra as últimas 150 perguntas para não repetir logo.
 
 Arquivos:
 - `cravazi/data/perguntas-*.js`: os temas (`czTema({ id, nome, unidade, itens })`, cada item `[resposta inteira, "português", "English", "español", unidade?]`). Cada pergunta precisa fazer sentido sozinha (nada de "E a altura…?") e dizer como arredondar
-- Perguntas novas: no fim de um tema ou em arquivo novo carregado depois dos outros (e no `sw.js`)
-- `cravazi/js/jogo.js`: regras e placar, sem tela (testado em `tests/cravazi.test.js`); `textos.js` (três idiomas); `app.js` (telas)
+- Perguntas novas: no fim de um tema ou em arquivo novo carregado depois dos outros (e no `sw.js`), com uma linha nova em `CZ_DIARIO_POOLS` (`cravazi/js/jogo.js`) valendo a partir de amanhã
+- `cravazi/js/jogo.js`: regras, placar e Cravazi do dia, sem tela (testado em `tests/cravazi.test.js`); `textos.js` (três idiomas); `skins.js` (escolha de skin, com os bonecos de `topzi/js/avatars.js`); `sozinho.js` (Cravazi do dia, treino e ranking); `online.js` (salas); `app.js` (telas)
+- Banco: `cravazi_salas`, `cravazi_sala_jogadores`, `cravazi_partidas` e `cravazi_diario` em `supabase/schema.sql`; teste de ponta a ponta em `tests/cravazi-online.e2e.js`
 - Marca: `brand/cravazi-logo*.svg` e `brand/cravazi-simbolo*.svg` (um alvo)
 
 ## Nível e conquistas do Gamezi
