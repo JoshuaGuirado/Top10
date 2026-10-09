@@ -161,8 +161,23 @@ function openHelp() {
   store("ajuda", true);
   const d = $("help-dialog");
   if (!d.open) d.showModal();
-  d.scrollTop = 0;
+  d.querySelector(".help-scroll").scrollTop = 0;
 }
+
+// Janelas: botões [data-close] fecham, e no celular o "voltar" do aparelho fecha a janela aberta em vez
+// de sair do jogo (cada janela aberta ganha um passo no histórico).
+document.querySelectorAll("dialog").forEach((d) => {
+  d.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => d.close()));
+  new MutationObserver(() => {
+    if (d.open && !(history.state && history.state.janela)) history.pushState({ ...(history.state || {}), janela: d.id }, "");
+  }).observe(d, { attributes: true, attributeFilter: ["open"] });
+  d.addEventListener("close", () => {
+    if (history.state && history.state.janela === d.id) history.back();
+  });
+});
+addEventListener("popstate", () => {
+  document.querySelectorAll("dialog[open]").forEach((d) => d.close());
+});
 function renderHelpBtn() {
   $("help-btn").title = t("help.title");
 }

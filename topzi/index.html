@@ -333,11 +333,11 @@
 
   <!-- Como jogar (abre sozinho na primeira visita; sem barra de rolagem à vista) -->
   <dialog id="help-dialog" class="avatar-dialog help-dialog" aria-labelledby="help-title">
-    <div class="dialog-inner" tabindex="-1" autofocus>
-      <div class="dialog-head">
-        <h2 id="help-title" data-i18n="help.title">Como jogar</h2>
-        <form method="dialog"><button type="submit" class="text-btn" data-i18n="btn.close">Fechar</button></form>
-      </div>
+    <div class="dialog-head">
+      <h2 id="help-title" data-i18n="help.title">Como jogar</h2>
+      <button type="button" class="icon-btn dialog-x" data-close data-i18n-aria="btn.close" aria-label="Fechar"><svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="dialog-inner help-scroll" tabindex="-1" autofocus>
       <p data-i18n="help.intro">Descubra os itens de uma lista que está em ordem, do mais óbvio ao mais difícil. O número de cada item é a pontuação dele.</p>
       <p class="help-list"><span class="tag" data-i18n="help.exCat">Geografia</span><b data-i18n="help.exTitle">Os 10 países mais populosos do mundo</b></p>
 
@@ -374,6 +374,7 @@
       <h3 data-i18n="help.dailyTitle">Lista do dia e online</h3>
       <p data-i18n="help.daily">Todo dia tem uma lista nova, igual para todo mundo, com 3 vidas e resultado para compartilhar. No “Jogar online”, cada um usa o próprio celular: crie uma sala e mande o código para a turma.</p>
 
+      <button type="button" class="btn help-ok" data-close data-i18n="help.ok">Entendi</button>
       <p class="help-foot"><a href="../termos.html" data-i18n="foot.terms">Termos de uso</a><a href="../privacidade.html" data-i18n="foot.privacy">Privacidade</a></p>
     </div>
   </dialog>

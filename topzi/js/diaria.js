@@ -121,7 +121,7 @@ function renderDailyCard() {
     <div class="daily-top">
       <b class="daily-name">${escapeHtml(t("daily.title"))}</b>
       <span class="daily-date">${escapeHtml(new Date().toLocaleDateString(loc))}</span>
-      <button type="button" class="btn" id="daily-btn">${escapeHtml(t(res ? "results.share" : "btn.play"))}</button>
+      <button type="button" class="btn ${res ? "ghost" : ""}" id="daily-btn">${escapeHtml(t(res ? "btn.share" : "btn.play"))}</button>
     </div>
     ${weekHtml()}
     ${res ? `<p class="daily-status">${escapeHtml(t("daily.ptsOf", { a: res.score, b: res.total }))}${current > 1 ? ` · ${escapeHtml(t("daily.streak", { n: current }))}` : ""}</p>` : ""}`;
@@ -134,6 +134,6 @@ function renderDailyCard() {
       }
     });
   }
-  $("daily-btn").onclick = (e) => (res ? shareText(dailyShareText(num, res), e.currentTarget, t("results.share")) : startDaily(num));
+  $("daily-btn").onclick = (e) => (res ? shareText(dailyShareText(num, res), e.currentTarget, t("btn.share")) : startDaily(num));
   card.querySelectorAll("[data-dia]").forEach((b) => (b.onclick = () => startDaily(Number(b.dataset.dia))));
 }

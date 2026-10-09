@@ -794,15 +794,19 @@ body[data-screen="game"] .profile-btn, body[data-screen="profile"] .profile-btn 
 .avatar-dialog::-webkit-scrollbar { display: none; }
 
 /* ── como jogar ── */
-.help-dialog { width: min(560px, calc(100vw - 24px)); }
-.help-dialog .dialog-inner { gap: 12px; padding-top: 0; }
-.help-dialog .dialog-head {
-  position: sticky; top: 0; z-index: 1; background: var(--bg);
-  margin: 0 -20px; padding: 18px 20px 12px; border-bottom: 1.5px solid var(--line);
-}
+/* O topo com o X fica fora da parte que rola (no celular, "sticky" dentro de janela rolando falha no toque),
+   e a altura usa a tela visível (dvh), sem esconder nada atrás da barra do navegador. */
+.help-dialog { width: min(560px, calc(100vw - 24px)); max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px); overflow: hidden; }
+.help-dialog[open] { display: flex; flex-direction: column; }
+.help-dialog .dialog-head { flex: none; padding: 14px 14px 12px 20px; border-bottom: 1.5px solid var(--line); }
+.help-dialog .help-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; gap: 12px; padding-top: 0; scrollbar-width: none; }
+.help-dialog .help-scroll::-webkit-scrollbar { display: none; }
+.dialog-x { width: 44px; height: 44px; flex: none; }
+.dialog-x .ui-ico { width: 22px; height: 22px; }
+.help-ok { justify-self: center; margin-top: 18px; }
 .help-dialog p { margin: 0; }
 .help-dialog h3 { margin: 18px 0 0; font-size: 1.35rem; }
-.help-dialog .dialog-inner > p:first-of-type { margin-top: 6px; }
+.help-dialog .dialog-inner > p:first-of-type { margin-top: 16px; }
 .help-list { display: grid; gap: 2px; padding: 12px 14px; background: var(--surface); border-radius: var(--r); margin-top: 4px !important; }
 .help-list b { font-stretch: 85%; font-size: 1.1rem; line-height: 1.15; }
 .help-board { margin-top: 10px; }
@@ -839,6 +843,12 @@ body[data-screen="game"] .profile-btn, body[data-screen="profile"] .profile-btn 
 .home-row span { color: var(--muted); font-size: .85rem; }
 .daily { border: 2px solid var(--accent); display: grid; gap: 12px; }
 .daily-top { display: flex; align-items: center; gap: 10px; }
+.daily-top .btn { flex: none; white-space: nowrap; }
+.daily-top .btn.ghost { background: var(--bg); }
+.daily-name { white-space: nowrap; }
+.daily, .daily > * { min-width: 0; }
+.daily-top .daily-date { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 360px) { .daily-top .daily-date { display: none; } .daily-top .daily-name { margin-right: auto; } }
 .daily-date { margin-right: auto; color: var(--muted); font-size: .9rem; font-weight: 600; }
 .daily-status { margin: 0; font-size: .88rem; color: var(--muted); text-align: center; }
 .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }

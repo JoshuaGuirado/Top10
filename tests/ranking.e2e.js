@@ -104,6 +104,19 @@ const server = http.createServer((req, res) => {
   assert.match(await P.textContent("#rank .lb-row:nth-of-type(1) .lb-time"), /\d/);
   step("portal: ranking do Maisoumenozi com desempate pelo tempo");
 
+  // Banco sem a função nova (schema.sql ainda não rodou): lê a tabela e ordena do mesmo jeito.
+  const direto = await P.evaluate(async (dia) => {
+    const sb = await gameziCliente(false);
+    const rpc = sb.rpc;
+    sb.rpc = (nome, a) => (nome === "gamezi_ranking_dia" ? Promise.resolve({ data: null, error: { code: "PGRST202", message: "Could not find the function" } }) : rpc(nome, a));
+    const res = await gameziRankingBuscar(sb, "maisoumenozi", dia);
+    sb.rpc = rpc;
+    return { nomes: res.linhas.map((l) => l.nick), eu: res.eu };
+  }, dia);
+  assert.deepEqual(direto.nomes, ["Craque", "Rápido", "Nina", "Lento", "Sem tempo"]);
+  assert.deepEqual(direto.eu, { posicao: 3, total: 5 });
+  step("banco sem a função nova: o ranking ainda aparece, na mesma ordem");
+
   await P.click('[data-jogo="datazi"]');
   await P.waitForSelector("#rank .lb-row.me");
   assert.match(await P.textContent("#rank .lb-row.me"), /Nina/);

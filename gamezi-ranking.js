@@ -117,6 +117,8 @@ function gameziCliente(login) {
 function gameziRankingBuscar(sb, jogo, dia, limite) {
   limite = limite || GAMEZI_RANKING_LIMITE;
   return sb.rpc("gamezi_ranking_dia", { p_jogo: jogo, p_dia: dia, p_limite: limite }).then(function (r) {
+    // Banco sem a função (schema.sql novo ainda não rodou no Supabase): lê a tabela direto e ordena aqui.
+    if (r.error && gameziSemFuncao(r.error)) return gameziRankingDireto(sb, jogo, dia, limite);
     if (r.error) throw new Error(r.error.message || "erro");
     var todas = (r.data || []).map(function (x) {
       return { posicao: Number(x.posicao), nick: x.nick, pontos: Number(x.pontos), tempo_ms: x.tempo_ms == null ? null : Number(x.tempo_ms), eu: !!x.eu, total: Number(x.total) };
@@ -127,6 +129,33 @@ function gameziRankingBuscar(sb, jogo, dia, limite) {
       eu: minha ? { posicao: minha.posicao, total: minha.total } : null,
       total: todas.length ? todas[0].total : 0,
     };
+  });
+}
+
+function gameziSemFuncao(e) {
+  return e.code === "PGRST202" || /could not find the function|does not exist/i.test(e.message || "");
+}
+
+// Mesmo resultado de gamezi_ranking_dia, montado aqui com as linhas da tabela do dia (só quem está conectado
+// consegue ler; sem login, a lista vem vazia). Mais pontos na frente; no empate, menos tempo; sem tempo, atrás.
+function gameziRankingDireto(sb, jogo, dia, limite) {
+  return Promise.all([sb.from(jogo + "_diario").select("*").eq("dia", dia).limit(1000), sb.auth.getSession()]).then(function (res) {
+    var r = res[0];
+    if (r.error) throw new Error(r.error.message || "erro");
+    var sessao = res[1] && res[1].data && res[1].data.session;
+    var uid = sessao && sessao.user ? sessao.user.id : null;
+    var sem = GAMEZI_TEMPO_MAX + 1;
+    var tempo = function (x) { return x.tempo_ms == null ? sem : Number(x.tempo_ms); };
+    var rows = (r.data || []).slice().sort(function (a, b) {
+      return b.pontos - a.pontos || tempo(a) - tempo(b) || String(a.created_at).localeCompare(String(b.created_at));
+    });
+    var linhas = rows.map(function (x) {
+      var pos = 1;
+      while (pos <= rows.length && (rows[pos - 1].pontos !== x.pontos || tempo(rows[pos - 1]) !== tempo(x))) pos++;
+      return { posicao: pos, nick: x.nick, pontos: Number(x.pontos), tempo_ms: x.tempo_ms == null ? null : Number(x.tempo_ms), eu: !!uid && x.user_id === uid, total: rows.length };
+    });
+    var minha = linhas.filter(function (x) { return x.eu; })[0];
+    return { linhas: linhas.slice(0, limite), eu: minha ? { posicao: minha.posicao, total: minha.total } : null, total: rows.length };
   });
 }
 

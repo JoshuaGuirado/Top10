@@ -346,6 +346,7 @@ Object.assign(TEXTS, {
   "and": ["e", "and", "y"],
   "results.fullList": ["A lista completa", "The full list", "La lista completa"],
   "results.share": ["Compartilhar resultado", "Share result", "Compartir resultado"],
+  "btn.share": ["Compartilhar", "Share", "Compartir"],
   "results.changePlayers": ["Trocar jogadores", "Change players", "Cambiar jugadores"],
   "results.changeMode": ["Trocar modo", "Change mode", "Cambiar modo"],
   "rs.rematch": ["Revanche (outra lista)", "Rematch (another list)", "Revancha (otra lista)"],
@@ -628,6 +629,7 @@ Object.assign(TEXTS, {
 // ───────────── como jogar e rodapé ─────────────
 Object.assign(TEXTS, {
   "help.title": ["Como jogar", "How to play", "Cómo jugar"],
+  "help.ok": ["Entendi, vamos jogar", "Got it, let's play", "Entendido, a jugar"],
   "help.intro": [
     "Descubra os itens de uma lista que está em ordem, do mais óbvio ao mais difícil. O número de cada item é a pontuação dele.",
     "Find the items of a ranked list, from the most obvious to the hardest. Each item's number is how many points it's worth.",
