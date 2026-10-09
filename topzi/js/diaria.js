@@ -14,6 +14,7 @@ const DAILY_POOLS = [
   { from: 1, size: 294 },
   { from: 8, size: 490 },
   { from: 9, size: 547 }, // listas populares e Bíblia (data/listas-populares.js)
+  { from: 10, size: 647 }, // 100 listas novas de 10 (data/listas-n7.js e listas-n8.js)
 ];
 
 function dailyPool(num = todayNumber()) {
