@@ -52,47 +52,94 @@ test("assuntos: textos nos 3 idiomas, frases variadas e itens que dá para compa
   }
 });
 
+// Resposta certa para a rodada atual (comum: "mais"/"menos"; maluca: "a"/"b").
+r(`function certaDe(rd) { const [va, vb] = mmValores(rd); return rd.uau ? (vb > va ? "b" : "a") : (vb > va ? "mais" : "menos"); }
+   function erradaDe(rd) { return { mais: "menos", menos: "mais", a: "b", b: "a" }[certaDe(rd)]; }`);
+
 test("rodada: certo, errado e o de baixo vira o de cima", () => {
-  r("var s = mmNovaPartida({ modo: 'livre', rnd: mmRng(3) });");
+  r("var s = mmNovaPartida({ modo: 'livre', rnd: mmRng(3), uaus: [] });");
   const r1 = r("s.atual");
-  const certa = r(`mmItem("${r1.b}").valor > mmItem("${r1.a}").valor ? "mais" : "menos"`);
-  assert.equal(r(`mmResponder(s, "${certa}").certo`), true);
+  assert.equal(r("mmResponder(s, certaDe(s.atual)).certo"), true);
   assert.equal(r("s.acertos"), 1);
   assert.equal(r("mmResponder(s, 'mais')"), null, "não responde duas vezes a mesma rodada");
   assert.equal(r("mmProxima(s)"), true);
   const r2 = r("s.atual");
   if (!r2.novo) assert.equal(r2.a, r1.b, "o de baixo sobe");
-  const errada = r(`mmItem("${r2.b}").valor > mmItem("${r2.a}").valor ? "menos" : "mais"`);
-  assert.equal(r(`mmResponder(s, "${errada}").certo`), false);
-  assert.equal(r("s.fim"), true, "na partida livre, o primeiro erro acaba");
+  assert.equal(r("mmResponder(s, erradaDe(s.atual)).certo"), false);
+  assert.equal(r("s.fim"), true, "no modo sem errar, o primeiro erro acaba");
   assert.equal(r("mmProxima(s)"), false);
 });
 
-test("partida livre: nunca repete item e troca de assunto", () => {
+test("partida: nunca repete, mistura assuntos da mesma grandeza e traz comparações malucas", () => {
   const res = r(`(() => {
-    const s = mmNovaPartida({ modo: "livre", rnd: mmRng(11) });
+    const s = mmNovaPartida({ modo: "relogio", rnd: mmRng(11) });
     const vistos = new Set();
-    const temas = new Set();
-    let n = 0;
-    while (!s.fim && n < 1000) {
-      const { a, b, tema } = s.atual;
-      if (vistos.has(b)) return "repetiu " + b;
-      vistos.add(a); vistos.add(b); temas.add(tema);
-      const A = mmItem(a), B = mmItem(b);
-      if (A.tema !== B.tema) return "assuntos diferentes";
-      if (!mmComparaveis(A, B)) return "par sem diferença: " + a + " " + b;
-      mmResponder(s, B.valor > A.valor ? "mais" : "menos");
+    const grandezas = new Set();
+    let misturou = 0, uaus = 0, n = 0;
+    while (!s.fim && n < 600) {
+      const rd = s.atual;
+      if (rd.uau) {
+        if (vistos.has(rd.uau)) return "uau repetido " + rd.uau;
+        vistos.add(rd.uau); uaus++;
+      } else {
+        const A = mmItem(rd.a), B = mmItem(rd.b);
+        if (vistos.has(B.id)) return "repetiu " + B.id;
+        vistos.add(A.id); vistos.add(B.id); grandezas.add(rd.tema);
+        if (mmGrupoDoItem(A) !== mmGrupoDoItem(B)) return "grandezas diferentes: " + A.id + " " + B.id;
+        if (A.tema !== B.tema) misturou++;
+        if (!mmComparaveis(A, B)) return "par sem diferença: " + A.id + " " + B.id;
+      }
+      mmResponder(s, certaDe(rd));
       mmProxima(s);
       n++;
     }
-    return { n, temas: temas.size };
+    return { n, grandezas: grandezas.size, misturou, uaus };
   })()`);
   assert.equal(typeof res, "object", res);
   assert.ok(res.n >= 150, `uma partida perfeita teve só ${res.n} rodadas`);
-  assert.ok(res.temas >= 20, "passa por vários assuntos");
+  assert.ok(res.grandezas >= 15, "passa por várias grandezas");
+  assert.ok(res.misturou >= 10, "cruza assuntos diferentes da mesma grandeza");
+  assert.ok(res.uaus >= 20, "traz comparações malucas");
 });
 
-test("desafio do dia: 10 rodadas iguais para todos, muda no dia seguinte e o dia 1 não muda", () => {
+test("relógio: pontos, combo que multiplica e erro que zera o combo", () => {
+  r("var sr = mmNovaPartida({ modo: 'relogio', rnd: mmRng(21), uaus: [] });");
+  const ganhos = [];
+  for (let k = 0; k < 7; k++) {
+    ganhos.push(r("mmResponder(sr, certaDe(sr.atual)).ganhou"));
+    r("mmProxima(sr)");
+  }
+  assert.deepEqual(ganhos, [10, 10, 10, 20, 20, 20, 30], "×2 a partir do 3º acerto seguido (o 4º já vale dobrado), ×3 a partir do 6º");
+  assert.equal(r("sr.pontos"), 120);
+  assert.equal(r("mmResponder(sr, erradaDe(sr.atual)).ganhou"), 0);
+  assert.equal(r("sr.combo"), 0, "errar zera o combo");
+  assert.equal(r("sr.fim"), false, "no relógio, errar não acaba a partida");
+  assert.equal(r("sr.maiorCombo"), 7);
+  r("mmProxima(sr); mmTempoAcabou(sr)");
+  assert.equal(r("sr.fim"), true);
+  assert.equal(r("mmMultiplicador(100)"), 5, "o combo vai até ×5");
+});
+
+test("comparações malucas: textos nos 3 idiomas e uma diferença clara", () => {
+  const uaus = r("MM_UAU");
+  assert.ok(uaus.length >= 50);
+  for (const u of uaus) {
+    for (const campo of ["pergunta", "unidade", "fato"]) assert.equal(u[campo].length, 3, `${u.id}: ${campo}`);
+    assert.ok(u.unidade.every((x) => x.includes("{n}")), `${u.id}: unidade`);
+    for (const lado of [u.a, u.b]) {
+      assert.equal(lado.length, 4, `${u.id}: lado`);
+      assert.ok(typeof lado[0] === "number" && lado[0] > 0, `${u.id}: valor`);
+    }
+    const razao = Math.max(u.a[0], u.b[0]) / Math.min(u.a[0], u.b[0]);
+    assert.ok(razao >= 1.07, `${u.id}: números perto demais (${u.a[1]} × ${u.b[1]})`);
+  }
+  r("var su = mmNovaPartida({ modo: 'diario', rodadas: [{ uau: 'u1', novo: true }] });");
+  assert.equal(r("mmResponder(su, 'mais')"), null, "na maluca, responde tocando num dos dois");
+  assert.equal(r("mmResponder(su, 'b').certo"), true, "30 elefantes pesam mais que uma baleia-azul");
+  assert.equal(r("su.ultimo.ganhou"), 20, "a maluca vale o dobro");
+});
+
+test("desafio do dia: 10 rodadas iguais para todos, 3 malucas a partir do dia 2 e o dia 1 não muda", () => {
   const d1 = r("JSON.stringify(mmDiarioRodadas(1))");
   assert.equal(r("mmDiarioRodadas(1).length"), r("MM_DIARIO_QTD"));
   assert.equal(r("JSON.stringify(mmDiarioRodadas(1))"), d1);
@@ -103,8 +150,9 @@ test("desafio do dia: 10 rodadas iguais para todos, muda no dia seguinte e o dia
     JSON.stringify(["atletas-altura-1>atletas-altura-10", "atletas-altura-10>atletas-altura-11", "atletas-altura-11>atletas-altura-5", "filmes-bilheteria-10>filmes-bilheteria-14", "filmes-bilheteria-14>filmes-bilheteria-1", "filmes-bilheteria-1>filmes-bilheteria-4", "filmes-bilheteria-4>filmes-bilheteria-7", "animais-coracao-6>animais-coracao-4", "animais-coracao-4>animais-coracao-2", "animais-coracao-2>animais-coracao-3"]),
     "o desafio do dia 1 não pode mudar",
   );
+  for (const dia of [2, 3, 30]) assert.equal(r(`mmDiarioRodadas(${dia}).filter((x) => x.uau).length`), 3, `dia ${dia}: 3 malucas`);
   r(`var sd = mmNovaPartida({ modo: "diario", rodadas: mmDiarioRodadas(5) });
-     for (let k = 0; k < 10; k++) { mmResponder(sd, "mais"); mmProxima(sd); }`);
+     for (let k = 0; k < 10; k++) { mmResponder(sd, erradaDe(sd.atual)); mmProxima(sd); }`);
   assert.equal(r("sd.fim"), true);
   assert.equal(r("sd.marcas.length"), 10, "no desafio do dia, errar não acaba: são sempre 10");
 });
@@ -114,6 +162,7 @@ test("desafio do dia: itens novos não mudam os dias que já passaram", () => {
   assert.equal(pools[0].desde, 1);
   for (let i = 1; i < pools.length; i++) assert.ok(pools[i].desde > pools[i - 1].desde && pools[i].itens >= pools[i - 1].itens);
   assert.equal(pools[pools.length - 1].itens, r("MM_ITENS.length"), "a última linha de MM_DIARIO_POOLS precisa contar todos os itens");
+  assert.equal(pools[pools.length - 1].uau, r("MM_UAU.length"), "a última linha de MM_DIARIO_POOLS precisa contar todas as malucas");
 });
 
 test("textos: toda chave e toda frase de acerto e erro nos 3 idiomas", () => {

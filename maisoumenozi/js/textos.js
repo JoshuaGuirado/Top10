@@ -1,8 +1,8 @@
 // Textos do Maisoumenozi em [português, inglês, espanhol], idioma, armazenamento e utilidades de tela.
-// O idioma e o tema são os mesmos do Gamezi (tt:lang, tt:theme); o resto fica em mm:…
+// O idioma, o tema e o som são os mesmos do Gamezi (tt:lang, tt:theme, tt:sound); o resto fica em mm:…
 
 const LANGS = ["pt", "en", "es"];
-const MM_COMPARTILHADO = ["lang", "theme"];
+const MM_COMPARTILHADO = ["lang", "theme", "sound"];
 
 function store(key, value) {
   const k = (MM_COMPARTILHADO.includes(key) ? "tt:" : "mm:") + key;
@@ -18,6 +18,20 @@ let lang = store("lang");
 if (!LANGS.includes(lang)) lang = LANGS.includes((navigator.language || "pt").slice(0, 2)) ? navigator.language.slice(0, 2) : "pt";
 
 const MM_T = {
+  "res.shareClock": ["Fiz {n} pontos em 60 segundos no Maisoumenozi. Você bate? {url}", "I scored {n} points in 60 seconds on Maisoumenozi. Can you beat it? {url}", "Hice {n} puntos en 60 segundos en Maisoumenozi. ¿Me superas? {url}"],
+  "res.clockSub": ["{a} acertos de {b} · maior combo ×{c}", "{a} right out of {b} · best combo ×{c}", "{a} aciertos de {b} · mejor combo ×{c}"],
+  "res.clock": ["{n} pontos", "{n} points", "{n} puntos"],
+  "game.timeUp": ["Tempo!", "Time's up!", "¡Tiempo!"],
+  "game.penalty": ["−3 s", "−3 s", "−3 s"],
+  "game.pts": ["{n} pts", "{n} pts", "{n} pts"],
+  "game.uau": ["Comparação maluca", "Wild comparison", "Comparación loca"],
+  "game.clock": ["Contra o relógio", "Beat the clock", "Contra el reloj"],
+  "nav.soundOff": ["Som desligado", "Sound off", "Sonido desactivado"],
+  "nav.soundOn": ["Som ligado", "Sound on", "Sonido activado"],
+  "nav.sound": ["Som", "Sound", "Sonido"],
+  "home.clockSubNew": ["60 segundos. Acertos seguidos multiplicam os pontos.", "60 seconds. Answers in a row multiply your points.", "60 segundos. Los aciertos seguidos multiplican los puntos."],
+  "home.clockSub": ["60 segundos. Acertos seguidos multiplicam os pontos. Recorde: {n}", "60 seconds. Answers in a row multiply your points. Best: {n}", "60 segundos. Los aciertos seguidos multiplican los puntos. Récord: {n}"],
+  "home.clock": ["Contra o relógio", "Beat the clock", "Contra el reloj"],
   "nav.back": ["Voltar para o Gamezi", "Back to Gamezi", "Volver a Gamezi"],
   "nav.home": ["Início", "Home", "Inicio"],
   "nav.settings": ["Configurações", "Settings", "Ajustes"],
@@ -31,21 +45,21 @@ const MM_T = {
   "btn.again": ["Jogar de novo", "Play again", "Jugar de nuevo"],
   "btn.home": ["Início", "Home", "Inicio"],
   "copied": ["Copiado!", "Copied!", "¡Copiado!"],
-  "home.tag": ["Tem mais ou tem menos? Compare números do mundo todo, um atrás do outro.", "Is it more or less? Compare numbers from all over the world, one after another.", "¿Hay más o hay menos? Compara números de todo el mundo, uno tras otro."],
-  "home.free": ["Partida livre", "Free play", "Partida libre"],
+  "home.tag": ["Tem mais ou tem menos? Responda rápido.", "More or less? Answer fast.", "¿Más o menos? Responde rápido."],
+  "home.free": ["Sem errar", "No mistakes", "Sin fallar"],
   "home.freeSub": ["Até errar a primeira. Recorde: {n}", "Until your first miss. Best: {n}", "Hasta el primer error. Récord: {n}"],
   "home.freeSubNew": ["Até errar a primeira", "Until your first miss", "Hasta el primer error"],
   "home.more": ["Mais jogos", "More games", "Más juegos"],
   "help.title": ["Como jogar", "How to play", "Cómo jugar"],
   "help.html": [
-    "<ol class=\"help-steps\"><li>Em cima aparece um item com o número dele (por exemplo, quantos habitantes tem um país).</li><li>Embaixo, outro item do mesmo assunto, com o número escondido.</li><li>Responda: o de baixo tem <b>mais</b> ou <b>menos</b>? (às vezes é mais alto, mais pesado, mais rápido…)</li><li>Acertou? O de baixo sobe e chega um novo. De tempos em tempos, o assunto muda.</li></ol><p><b>Desafio do dia:</b> as mesmas 10 comparações para todo mundo, todo dia. <b>Partida livre:</b> vai até o primeiro erro. Quantas você acerta seguidas?</p>",
-    "<ol class=\"help-steps\"><li>At the top there's an item with its number (for example, how many people live in a country).</li><li>Below, another item on the same topic, with its number hidden.</li><li>Answer: does the one below have <b>more</b> or <b>less</b>? (sometimes it's taller, heavier, faster…)</li><li>Right? The bottom one moves up and a new one arrives. Every so often, the topic changes.</li></ol><p><b>Daily challenge:</b> the same 10 comparisons for everyone, every day. <b>Free play:</b> goes until your first miss. How many in a row can you get?</p>",
-    "<ol class=\"help-steps\"><li>Arriba aparece un ítem con su número (por ejemplo, cuántos habitantes tiene un país).</li><li>Abajo, otro ítem del mismo tema, con el número escondido.</li><li>Responde: ¿el de abajo tiene <b>más</b> o <b>menos</b>? (a veces es más alto, más pesado, más rápido…)</li><li>¿Acertaste? El de abajo sube y llega uno nuevo. Cada tanto, el tema cambia.</li></ol><p><b>Desafío del día:</b> las mismas 10 comparaciones para todos, cada día. <b>Partida libre:</b> hasta el primer error. ¿Cuántas aciertas seguidas?</p>",
+    "<p>Duas coisas, um número escondido: <b>tem mais ou tem menos?</b></p><ol class=\"help-steps\"><li>Em cima vem um item com o número. Embaixo, outro com o número escondido. Diga se o de baixo tem <b>mais</b> ou <b>menos</b> (ou é mais alto, mais pesado, mais rápido…).</li><li>Os assuntos se misturam: o Monte Fuji contra o Burj Khalifa, a Lagoa dos Patos contra um país. Olhe a unidade!</li><li>Às vezes cai uma <b>comparação maluca</b>: os dois números escondidos (uma baleia ou 30 elefantes?). Toque no que tem mais. Depois vem uma curiosidade.</li></ol><p><b>Contra o relógio:</b> 60 segundos. Cada acerto vale 10 pontos (20 na maluca) e acertos seguidos multiplicam: ×2 a partir do 3º, ×3 do 6º, até ×5. Errar zera o combo e tira 3 segundos.</p><p><b>Desafio do dia:</b> as mesmas 10 comparações para todo mundo. <b>Sem errar:</b> até o primeiro erro.</p>",
+    "<p>Two things, one hidden number: <b>more or less?</b></p><ol class=\"help-steps\"><li>On top, an item with its number. Below, another with the number hidden. Say whether the one below has <b>more</b> or <b>less</b> (or is taller, heavier, faster…).</li><li>Topics get mixed: Mount Fuji against the Burj Khalifa, a lake against a country. Mind the units!</li><li>Sometimes a <b>wild comparison</b> shows up: both numbers hidden (one whale or 30 elephants?). Tap the bigger one. Then you get a fun fact.</li></ol><p><b>Beat the clock:</b> 60 seconds. Each right answer is worth 10 points (20 for wild ones) and streaks multiply: ×2 from the 3rd, ×3 from the 6th, up to ×5. A miss resets the combo and costs 3 seconds.</p><p><b>Daily challenge:</b> the same 10 comparisons for everyone. <b>No mistakes:</b> until your first miss.</p>",
+    "<p>Dos cosas, un número escondido: <b>¿más o menos?</b></p><ol class=\"help-steps\"><li>Arriba, un ítem con su número. Abajo, otro con el número escondido. Di si el de abajo tiene <b>más</b> o <b>menos</b> (o es más alto, más pesado, más rápido…).</li><li>Los temas se mezclan: el monte Fuji contra el Burj Khalifa, un lago contra un país. ¡Ojo con la unidad!</li><li>A veces aparece una <b>comparación loca</b>: los dos números escondidos (¿una ballena o 30 elefantes?). Toca el que tiene más. Después viene una curiosidad.</li></ol><p><b>Contra el reloj:</b> 60 segundos. Cada acierto vale 10 puntos (20 en la loca) y las rachas multiplican: ×2 desde el 3.º, ×3 desde el 6.º, hasta ×5. Fallar reinicia el combo y quita 3 segundos.</p><p><b>Desafío del día:</b> las mismas 10 comparaciones para todos. <b>Sin fallar:</b> hasta el primer error.</p>",
   ],
   "daily.name": ["Desafio do dia", "Daily challenge", "Desafío del día"],
   "daily.kicker": ["Maisoumenozi do dia #{n}", "Daily Maisoumenozi #{n}", "Maisoumenozi del día #{n}"],
   "daily.done": ["{a} de {b} certas", "{a} of {b} right", "{a} de {b} correctas"],
-  "game.free": ["Partida livre", "Free play", "Partida libre"],
+  "game.free": ["Sem errar", "No mistakes", "Sin fallar"],
   "game.streak": ["{n} seguidas", "{n} in a row", "{n} seguidas"],
   "game.streak1": ["1 seguida", "1 in a row", "1 seguida"],
   "game.hidden": ["?", "?", "?"],

@@ -1,16 +1,21 @@
 // Regras do Maisoumenozi, sem tela (testadas em tests/maisoumenozi.test.js).
-// Aparecem dois itens do mesmo assunto: o primeiro com o número à mostra, o segundo escondido. A pessoa diz se o
-// segundo tem mais ou menos. Depois, o segundo vira o primeiro da próxima rodada; a cada 3 a 5 rodadas, o assunto
-// muda. Na partida livre, o primeiro erro acaba com tudo; no desafio do dia, são sempre 10 rodadas.
+// Rodada comum: dois itens da mesma grandeza (o de cima com o número, o de baixo escondido) e a pessoa diz se o de
+// baixo tem mais ou menos. O de baixo vira o de cima da próxima. Assuntos da mesma grandeza se misturam (montanha
+// contra prédio contra atleta, todos em altura), e a cada 2 ou 3 rodadas muda a grandeza.
+// Rodada "uau": um par escolhido a dedo, com os dois números escondidos ("Qual pesa mais?"), e uma curiosidade.
+// Modos: "relogio" (60 segundos, acerto vale 10 × combo), "livre" (até o primeiro erro) e "diario" (10 rodadas).
 
 const MM_DIARIO_QTD = 10;
+const MM_RELOGIO_SEG = 60;
 const MM_MARGEM = 1.1; // os dois números precisam ter pelo menos 10% de diferença (o assunto pode pedir mais)
 
 // Desafio do dia: o dia 1 é 9/10/2026. Itens novos só entram no sorteio a partir do dia da linha nova,
 // para não mudar o desafio de quem já jogou hoje (a conta é pela ordem em MM_ITENS).
 const MM_DIARIO_INICIO = Date.UTC(2026, 9, 9);
+// versao 1: o jeito do primeiro dia (só assuntos, sem mistura); versao 2: mistura e rodadas "uau".
 const MM_DIARIO_POOLS = [
-  { desde: 1, itens: 441 },
+  { desde: 1, itens: 441, versao: 1 },
+  { desde: 2, itens: 441, uau: 58, versao: 2 },
 ];
 
 // ───────────── assuntos e itens ─────────────
@@ -60,6 +65,45 @@ function mmTemaDe(id) {
   return MM_TEMAS.find((x) => x.id === id) || null;
 }
 
+// Grandezas que juntam assuntos: { id, titulo, perguntas, botoes, temas: { idDoAssunto: fator } }.
+// O fator leva o número do assunto para a mesma medida (ex.: cm → m é 0,01), para comparar um com o outro.
+const MM_GRUPOS = [];
+
+function mmGrupo(def) {
+  MM_GRUPOS.push(def);
+  for (const [id, fator] of Object.entries(def.temas)) {
+    const tema = mmTemaDe(id);
+    if (tema) Object.assign(tema, { grupo: def.id, fator });
+  }
+}
+
+// O "assunto" de uma rodada: a grandeza (se o assunto faz parte de uma) ou o próprio assunto.
+function mmAssunto(id) {
+  return MM_GRUPOS.find((g) => g.id === id) || mmTemaDe(id);
+}
+
+function mmGrupoDoItem(item) {
+  const tema = mmTemaDe(item.tema);
+  return tema.grupo || tema.id;
+}
+
+// Número na medida comum da grandeza.
+function mmBase(item) {
+  const tema = mmTemaDe(item.tema);
+  return item.valor * (tema.fator || 1);
+}
+
+// Pares "uau": { pergunta, unidade, a: [valor, pt, en, es], b: [...], fato } (textos em [pt, en, es]).
+const MM_UAU = [];
+
+function mmUau(lista) {
+  for (const u of lista) MM_UAU.push({ id: "u" + (MM_UAU.length + 1), ...u });
+}
+
+function mmUauDe(id) {
+  return MM_UAU.find((u) => u.id === id) || null;
+}
+
 function mmNome(item, l) {
   return item.nome[l] || item.nome[0];
 }
@@ -95,14 +139,20 @@ function mmEscolher(lista, rnd) {
 
 // Dá para comparar: números diferentes o bastante para não ter dúvida (dados aproximados não viram pegadinha).
 function mmComparaveis(a, b) {
+  const margem = Math.max(mmTemaDe(a.tema).margem, mmTemaDe(b.tema).margem);
+  const [x, y] = [mmBase(a), mmBase(b)];
+  const [min, max] = x < y ? [x, y] : [y, x];
+  return min > 0 && max / min >= margem;
+}
+
+// Jeito do primeiro dia (versao 1): um assunto por vez, sem mistura. Fica só para o desafio do dia 1 não mudar.
+function mmComparaveisV1(a, b) {
   const tema = mmTemaDe(a.tema);
   const [min, max] = a.valor < b.valor ? [a.valor, b.valor] : [b.valor, a.valor];
   return min > 0 && max / min >= tema.margem;
 }
 
-// Gera as rodadas de uma partida: { tema, a, b, p (frase), novo (assunto novo) }.
-// ids: os itens que podem aparecer. Nenhum item repete na mesma partida.
-function mmGerador(ids, rnd) {
+function mmGeradorV1(ids, rnd) {
   const livres = new Set(ids);
   const recentes = []; // últimos assuntos, para não voltar logo
   const frases = {}; // última frase de cada assunto
@@ -110,7 +160,7 @@ function mmGerador(ids, rnd) {
   let a = null;
   let falta = 0;
 
-  const candidatos = (t, base) => [...livres].map(mmItem).filter((i) => i.tema === t && i.id !== base.id && mmComparaveis(base, i));
+  const candidatos = (t, base) => [...livres].map(mmItem).filter((i) => i.tema === t && i.id !== base.id && mmComparaveisV1(base, i));
 
   function trocarAssunto() {
     const temas = [...new Set([...livres].map((id) => mmItem(id).tema))];
@@ -153,15 +203,85 @@ function mmGerador(ids, rnd) {
   };
 }
 
+// Gera as rodadas de uma partida. Rodada comum: { tema (grandeza ou assunto), a, b, p (frase), novo }.
+// Rodada uau: { uau: id, novo: true }. ids: itens que podem aparecer; uaus: pares uau. Nada repete na partida.
+function mmGerador(ids, rnd, uaus = [], uauNas = null) {
+  const livres = new Set(ids);
+  const uauFila = mmEmbaralhar(uaus, rnd);
+  const recentes = []; // últimas grandezas, para não voltar logo
+  const frases = {};
+  let grupo = null;
+  let a = null;
+  let falta = 0;
+  let desdeUau = 0;
+  let geradas = 0;
+
+  const itensDo = (g) => [...livres].map(mmItem).filter((i) => mmGrupoDoItem(i) === g);
+  const candidatos = (g, base) => itensDo(g).filter((i) => i.id !== base.id && mmComparaveis(base, i));
+
+  function trocarGrandeza() {
+    const grupos = [...new Set([...livres].map((id) => mmGrupoDoItem(mmItem(id))))];
+    const opcoes = grupos.filter((g) => !recentes.includes(g));
+    for (const g of mmEmbaralhar(opcoes.length ? opcoes : grupos, rnd)) {
+      const base = mmEscolher(itensDo(g), rnd);
+      if (base && candidatos(g, base).length) {
+        grupo = g;
+        a = base;
+        livres.delete(base.id);
+        falta = 2 + Math.floor(rnd() * 2);
+        recentes.push(g);
+        if (recentes.length > 6) recentes.shift();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function rodadaUau() {
+    grupo = null;
+    desdeUau = 0;
+    return { uau: uauFila.shift(), novo: true };
+  }
+
+  return function proxima() {
+    geradas += 1;
+    // uauNas (desafio do dia): o par uau cai sempre nas mesmas rodadas. Senão, de tempos em tempos.
+    if (uauNas && uauFila.length && uauNas.includes(geradas)) return rodadaUau();
+    const trocar = !grupo || falta <= 0 || !candidatos(grupo, a).length;
+    if (!uauNas && uauFila.length && trocar && desdeUau >= 2 && rnd() < 0.55) return rodadaUau();
+    let novo = false;
+    if (trocar) {
+      if (!trocarGrandeza()) return uauFila.length ? rodadaUau() : null;
+      novo = true;
+    }
+    const base = mmBase(a);
+    const cs = candidatos(grupo, a).sort((x, y) => Math.abs(Math.log(mmBase(x) / base)) - Math.abs(Math.log(mmBase(y) / base)));
+    const b = rnd() < 0.6 ? mmEscolher(cs.slice(0, Math.max(1, Math.ceil(cs.length / 3))), rnd) : mmEscolher(cs, rnd);
+    livres.delete(b.id);
+    const n = mmAssunto(grupo).perguntas.length;
+    let p = Math.floor(rnd() * n);
+    if (n > 1 && p === frases[grupo]) p = (p + 1) % n;
+    frases[grupo] = p;
+    const rodada = { tema: grupo, a: a.id, b: b.id, p, novo };
+    a = b;
+    falta -= 1;
+    desdeUau += 1;
+    return rodada;
+  };
+}
+
 // ───────────── partida ─────────────
 
-// rodadas: lista pronta (desafio do dia) ou null (partida livre: gera na hora, até errar).
+// rodadas: lista pronta (desafio do dia) ou nada (gera na hora: "livre" até errar, "relogio" até o tempo acabar).
 function mmNovaPartida(opts) {
-  const s = { modo: opts.modo || "livre", rodadas: [], atual: null, acertos: 0, marcas: [], fim: false, ultimo: null, respondida: false };
+  const s = {
+    modo: opts.modo || "livre", rodadas: [], atual: null, acertos: 0, marcas: [], fim: false, ultimo: null, respondida: false,
+    pontos: 0, combo: 0, maiorCombo: 0,
+  };
   if (opts.rodadas) {
     s.fila = opts.rodadas.slice();
   } else {
-    s.proxima = mmGerador(opts.ids || MM_ITENS.map((i) => i.id), opts.rnd || Math.random);
+    s.proxima = mmGerador(opts.ids || MM_ITENS.map((i) => i.id), opts.rnd || Math.random, opts.uaus || MM_UAU.map((u) => u.id));
   }
   mmAvancar(s);
   return s;
@@ -178,16 +298,39 @@ function mmAvancar(s) {
   s.rodadas.push(r);
 }
 
-// resposta: "mais" ou "menos". Devolve { certo, a, b } ou null se não dá para responder agora.
+// Multiplicador do combo: x1 nos 2 primeiros acertos seguidos, x2 do 3º, x3 do 6º… até x5.
+function mmMultiplicador(combo) {
+  return Math.min(5, 1 + Math.floor(combo / 3));
+}
+
+// Os dois números da rodada (comum: na medida comum; uau: os do par).
+function mmValores(r) {
+  if (r.uau) {
+    const u = mmUauDe(r.uau);
+    return [u.a[0], u.b[0]];
+  }
+  return [mmBase(mmItem(r.a)), mmBase(mmItem(r.b))];
+}
+
+// resposta: "mais"/"menos" (rodada comum, sobre o de baixo) ou "a"/"b" (rodada uau, qual tem mais).
+// Devolve { certo, ganhou, ... } ou null se não dá para responder agora.
 function mmResponder(s, resposta) {
-  if (s.fim || !s.atual || s.respondida || (resposta !== "mais" && resposta !== "menos")) return null;
+  if (s.fim || !s.atual || s.respondida) return null;
+  const uau = !!s.atual.uau;
+  if (uau ? !["a", "b"].includes(resposta) : !["mais", "menos"].includes(resposta)) return null;
   s.respondida = true;
-  const a = mmItem(s.atual.a);
-  const b = mmItem(s.atual.b);
-  const certo = (b.valor > a.valor) === (resposta === "mais");
+  const [va, vb] = mmValores(s.atual);
+  const certo = uau ? (resposta === "b") === (vb > va) : (vb > va) === (resposta === "mais");
   s.marcas.push(certo);
-  if (certo) s.acertos += 1;
-  s.ultimo = { ...s.atual, certo, resposta };
+  let ganhou = 0;
+  if (certo) {
+    s.acertos += 1;
+    s.combo += 1;
+    s.maiorCombo = Math.max(s.maiorCombo, s.combo);
+    ganhou = (uau ? 20 : 10) * mmMultiplicador(s.combo - 1);
+    s.pontos += ganhou;
+  } else s.combo = 0;
+  s.ultimo = { ...s.atual, certo, resposta, ganhou };
   if (s.modo === "livre" && !certo) {
     s.fim = true;
     s.atual = null;
@@ -196,6 +339,12 @@ function mmResponder(s, resposta) {
     s.atual = null;
   }
   return s.ultimo;
+}
+
+// O tempo do modo relógio acabou (quem conta o tempo é a tela).
+function mmTempoAcabou(s) {
+  s.fim = true;
+  s.atual = null;
 }
 
 // Depois de mostrar se acertou: a próxima rodada.
@@ -215,7 +364,9 @@ function mmDiaNumero(d = new Date()) {
 function mmDiarioRodadas(dia) {
   const pool = MM_DIARIO_POOLS.filter((p) => p.desde <= Math.max(dia, 1)).pop();
   const ids = MM_ITENS.slice(0, pool.itens).map((i) => i.id);
-  const proxima = mmGerador(ids, mmRng(dia * 7919 + 41));
+  const proxima = pool.versao === 1
+    ? mmGeradorV1(ids, mmRng(dia * 7919 + 41))
+    : mmGerador(ids, mmRng(dia * 7919 + 41), MM_UAU.slice(0, pool.uau).map((u) => u.id), [3, 6, 9]);
   const out = [];
   for (let k = 0; k < MM_DIARIO_QTD; k++) out.push(proxima());
   return out;

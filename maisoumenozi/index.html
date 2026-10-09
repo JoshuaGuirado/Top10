@@ -38,16 +38,23 @@
   </div>
 
   <main>
-    <!-- Início -->
+    <!-- Início: contra o relógio (o principal), o desafio do dia e o modo sem errar -->
     <section id="screen-home" class="screen home">
       <div class="home-head">
         <img class="home-symbol logo-light" src="../brand/maisoumenozi-simbolo.svg" alt="" aria-hidden="true">
         <img class="home-symbol logo-dark" src="../brand/maisoumenozi-simbolo-escuro.svg" alt="" aria-hidden="true">
-        <h1 class="home-tag" data-i18n="home.tag">Tem mais ou tem menos? Compare números do mundo todo, um atrás do outro.</h1>
+        <h1 class="home-tag" data-i18n="home.tag">Tem mais ou tem menos? Responda rápido.</h1>
+      </div>
+      <div class="home-card clock-card">
+        <div class="clock-top">
+          <span class="clock-ico" aria-hidden="true"></span>
+          <div><b data-i18n="home.clock">Contra o relógio</b><span id="clock-sub"></span></div>
+        </div>
+        <button type="button" class="btn big" id="clock-btn" data-i18n="btn.play">Jogar</button>
       </div>
       <div class="home-card daily" id="daily-card"></div>
       <div class="home-card home-row">
-        <div><b data-i18n="home.free">Partida livre</b><span id="free-sub"></span></div>
+        <div><b data-i18n="home.free">Sem errar</b><span id="free-sub"></span></div>
         <button type="button" class="btn dark" id="free-btn" data-i18n="btn.play">Jogar</button>
       </div>
       <nav class="home-links">
@@ -61,25 +68,45 @@
       </footer>
     </section>
 
-    <!-- Partida: o assunto e o placar no alto; o item conhecido; o escondido, com a pergunta e os botões dentro dele -->
+    <!-- Partida: placar no alto (tempo, combo e pontos no relógio); rodada comum (um cartão com o número e o outro
+         com a pergunta) ou rodada uau (dois cartões para tocar) -->
     <section id="screen-game" class="screen game" hidden>
-      <div class="game-head">
-        <p class="topic" id="game-topic"></p>
-        <span class="game-score" id="game-score"></span>
+      <div class="hud">
+        <span class="hud-left" id="hud-left"></span>
+        <span class="combo" id="hud-combo" hidden></span>
+        <span class="hud-right" id="hud-right"></span>
+        <span class="float" id="float" aria-hidden="true"></span>
       </div>
+      <div class="timebar" id="timebar" hidden><i id="timebar-fill"></i></div>
       <div class="dots" id="game-dots" aria-hidden="true"></div>
-      <article class="item-card known" id="card-a"></article>
-      <span class="vs" aria-hidden="true">×</span>
-      <article class="item-card ask" id="card-b">
-        <div id="card-b-item"></div>
-        <p class="question" id="game-question"></p>
-        <div class="answers" id="game-answers">
-          <button type="button" class="btn answer up" id="btn-up"></button>
-          <button type="button" class="btn answer down" id="btn-down"></button>
+      <p class="topic" id="game-topic"></p>
+
+      <div class="stage" id="stage">
+        <div id="round-normal">
+          <article class="item-card known" id="card-a"></article>
+          <span class="vs" aria-hidden="true">×</span>
+          <article class="item-card ask" id="card-b">
+            <div id="card-b-item"></div>
+            <p class="question" id="game-question"></p>
+            <div class="answers" id="game-answers">
+              <button type="button" class="btn answer up" id="btn-up"></button>
+              <button type="button" class="btn answer down" id="btn-down"></button>
+            </div>
+          </article>
         </div>
-      </article>
+        <div id="round-uau" hidden>
+          <p class="uau-question" id="uau-question"></p>
+          <div class="uau-cards">
+            <button type="button" class="item-card choice" id="uau-a"></button>
+            <span class="vs" aria-hidden="true">×</span>
+            <button type="button" class="item-card choice" id="uau-b"></button>
+          </div>
+        </div>
+      </div>
+
       <div class="feedback-box" id="game-feedback" hidden>
         <p class="verdict" id="game-verdict"></p>
+        <p class="fact" id="game-fact" hidden></p>
         <button type="button" class="btn big" id="game-next"></button>
       </div>
     </section>
@@ -90,9 +117,10 @@
         <p class="kicker" id="res-kicker"></p>
         <p class="result-score" id="res-score"></p>
         <p class="muted" id="res-sub"></p>
+        <p class="record" id="res-record" hidden></p>
         <div class="actions center">
-          <button type="button" class="btn" id="res-share" data-i18n="btn.share">Compartilhar</button>
           <button type="button" class="btn" id="res-again" data-i18n="btn.again">Jogar de novo</button>
+          <button type="button" class="btn dark" id="res-share" data-i18n="btn.share">Compartilhar</button>
           <button type="button" class="btn ghost" id="res-home" data-i18n="btn.home">Início</button>
         </div>
       </div>
@@ -100,6 +128,8 @@
       <ol class="pairs" id="res-list"></ol>
     </section>
   </main>
+
+  <canvas id="fx" aria-hidden="true"></canvas>
 
   <!-- Como jogar -->
   <dialog class="dialog" id="help-dialog">
@@ -119,6 +149,7 @@
         </select>
       </label>
       <div class="setting-row"><span data-i18n="nav.theme">Tema</span><button type="button" class="icon-btn" id="theme-btn"></button></div>
+      <div class="setting-row"><span data-i18n="nav.sound">Som</span><button type="button" class="icon-btn" id="sound-btn"></button></div>
     </div>
   </dialog>
 
@@ -126,6 +157,8 @@
   <script src="data/assuntos-1.js"></script>
   <script src="data/assuntos-2.js"></script>
   <script src="data/assuntos-3.js"></script>
+  <script src="data/grupos.js"></script>
+  <script src="data/uau-1.js"></script>
   <script src="../gamezi-conta.js"></script>
   <script src="js/textos.js"></script>
   <script src="js/app.js"></script>

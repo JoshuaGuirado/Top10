@@ -163,6 +163,13 @@ function medir(W) {
     await tentar("mais-inicio", () => page.goto(base + "/maisoumenozi/index.html"));
     await tentar("mais-ajuda", () => page.click("#help-btn"));
     await fechar();
+    await tentar("mais-relogio", () => page.click("#clock-btn"));
+    await tentar("mais-relogio-maluca", async () => {
+      await page.evaluate(() => { partida.atual = { uau: "u3", novo: true }; renderJogo(); });
+      await page.click("#uau-a");
+    });
+    await tentar("mais-relogio-fim", async () => { await page.evaluate(() => { fimDoTempo = performance.now(); }); await page.waitForSelector("#screen-results:not([hidden])"); });
+    await tentar("mais-inicio-2", () => page.click("#res-home"));
     await tentar("mais-partida", () => page.click("#daily-btn"));
     await tentar("mais-respondeu", () => page.click("#btn-up"));
     await tentar("mais-resultado", async () => {

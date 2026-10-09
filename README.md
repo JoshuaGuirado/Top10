@@ -118,15 +118,21 @@ Jogo de linha do tempo: coloque os acontecimentos na ordem em que aconteceram. A
 
 # Maisoumenozi
 
-Jogo de "mais ou menos": em cima aparece um item com o número dele (habitantes de um país, altura de um prédio, peso de um animal…), embaixo outro do mesmo assunto com o número escondido. Você diz se o de baixo tem mais ou menos (ou é mais alto, mais pesado, mais rápido…). O de baixo sobe e chega um novo; a cada 3 a 5 rodadas o assunto muda.
+Jogo de "tem mais ou tem menos?". Na rodada comum, em cima aparece um item com o número e embaixo outro com o número escondido: o de baixo tem mais ou menos (é mais alto, mais pesado, mais rápido…)? O de baixo sobe e chega um novo. Assuntos da mesma grandeza se misturam (o Monte Fuji contra o Burj Khalifa contra o Yao Ming, tudo em altura; a Lagoa dos Patos contra um país), e a grandeza muda a cada 2 ou 3 rodadas.
 
-São 30 assuntos e 441 itens (mais de 3 mil comparações diferentes), cada assunto com pelo menos 3 jeitos de perguntar e botões próprios, e frases de acerto e de erro sorteadas, para não repetir. Dois itens só caem juntos se a diferença entre eles passar da margem do assunto (10% no geral), para dado aproximado não virar pegadinha. Na mesma partida, nenhum item repete.
+De vez em quando cai uma **comparação maluca**: um par escolhido a dedo, com os dois números escondidos ("Uma baleia-azul ou 30 elefantes: qual pesa mais?"). Toca-se no que tem mais e aparece uma curiosidade.
 
-**Desafio do dia**: as mesmas 10 comparações para todo mundo, com a semana e o resultado em quadradinhos para compartilhar. **Partida livre**: vai até o primeiro erro, valendo recorde.
+- **Contra o relógio** (o modo principal): 60 segundos; cada acerto vale 10 pontos (20 na maluca) e acertos seguidos multiplicam (×2 a partir do 3º, ×3 do 6º, até ×5). Errar zera o combo e tira 3 segundos. Tem barra de tempo, combo pulando, pontos voando, tremida no erro, som (dá para desligar nas Configurações) e confete no recorde.
+- **Desafio do dia**: as mesmas 10 comparações para todo mundo (3 delas malucas, a partir do dia 2), com a semana e quadradinhos para compartilhar.
+- **Sem errar**: até o primeiro erro, valendo recorde.
+
+São 30 assuntos e 441 itens, 4 grandezas que misturam assuntos e 58 comparações malucas. Dois itens só caem juntos se a diferença passar da margem dos assuntos (10% no geral), e nada repete na mesma partida.
 
 - `maisoumenozi/data/assuntos-*.js`: os assuntos (`mmTema({ id, titulo, unidade, perguntas, botoes, margem, itens })`, cada item `[valor, "português", "English", "español"]`). As perguntas não citam os nomes (falam "o de baixo", "esse"), para sempre concordar nos três idiomas
-- Itens ou assuntos novos: arquivo novo carregado depois dos outros (`mmTema` ou `mmMais`), no `sw.js`, e uma linha nova em `MM_DIARIO_POOLS` (`maisoumenozi/js/jogo.js`) valendo a partir de amanhã
-- `maisoumenozi/js/jogo.js`: regras, sem tela (testado em `tests/maisoumenozi.test.js`); `textos.js` (três idiomas e frases); `app.js` (telas)
+- `maisoumenozi/data/grupos.js`: grandezas que misturam assuntos (`mmGrupo({ id, titulo, perguntas, botoes, temas: { assunto: fator } })`; o fator põe tudo na mesma medida, ex.: cm → m = 0,01)
+- `maisoumenozi/data/uau-1.js`: as comparações malucas (`{ pergunta, unidade, a: [valor, pt, en, es], b: [...], fato }`)
+- Itens, assuntos ou malucas novos: arquivo novo carregado depois dos outros, no `sw.js`, e uma linha nova em `MM_DIARIO_POOLS` (`maisoumenozi/js/jogo.js`) com os totais, valendo a partir de amanhã
+- `maisoumenozi/js/jogo.js`: regras, pontos e combo, sem tela (testado em `tests/maisoumenozi.test.js`); `textos.js` (três idiomas e frases); `app.js` (telas, relógio, som e efeitos)
 - Marca: `brand/maisoumenozi-logo*.svg` e `brand/maisoumenozi-simbolo*.svg`
 
 ## Nível e conquistas do Gamezi

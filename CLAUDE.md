@@ -44,5 +44,7 @@
 - Maisoumenozi (`maisoumenozi/`): scripts comuns, ordem no fim do `maisoumenozi/index.html` (`js/jogo.js` antes de `data/`);
   script novo vai no `FILES` do `sw.js` com o caminho `maisoumenozi/…` (o `tests/maisoumenozi.test.js` acusa). Assunto ou item novo:
   arquivo novo em `maisoumenozi/data/` carregado depois dos outros (`mmTema`/`mmMais`), textos nos 3 idiomas, pelo menos 3 perguntas
-  por assunto que não citem os nomes, e linha nova em `MM_DIARIO_POOLS` valendo a partir de amanhã (o dia 1 está fixado no teste).
+  por assunto que não citem os nomes, e linha nova em `MM_DIARIO_POOLS` valendo a partir de amanhã (o dia 1 está fixado no teste
+  e usa o gerador antigo `mmGeradorV1`, que não pode mudar). Comparação maluca nova: no fim de `data/uau-1.js` (ou arquivo novo),
+  os dois valores na mesma unidade e com diferença clara, e o total novo em `uau` na linha nova de `MM_DIARIO_POOLS`.
   Número que muda com o tempo leva o ano no título do assunto ("(2024)").
