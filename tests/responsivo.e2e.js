@@ -1,4 +1,4 @@
-// Teste de celular: abre as telas do portal, da conta e dos três jogos em larguras de celular e acusa
+// Teste de celular: abre as telas do portal, da conta e dos jogos em larguras de celular e acusa
 // o que sai da tela na horizontal (página com rolagem para o lado ou elemento passando da borda).
 // Rode com: npm run test:mobile (fotos de cada tela em tests/fotos-celular/ com FOTOS=1).
 const http = require("http");
@@ -156,6 +156,19 @@ function medir(W) {
       for (let i = 0; i < 12 && (await page.isVisible("#screen-game")); i++) {
         if (await page.isVisible("#game-next")) await page.click("#game-next");
         else await page.click("#timeline .slot button >> nth=-1");
+        await page.waitForTimeout(150);
+      }
+    });
+    // ── Maisoumenozi ──
+    await tentar("mais-inicio", () => page.goto(base + "/maisoumenozi/index.html"));
+    await tentar("mais-ajuda", () => page.click("#help-btn"));
+    await fechar();
+    await tentar("mais-partida", () => page.click("#daily-btn"));
+    await tentar("mais-respondeu", () => page.click("#btn-up"));
+    await tentar("mais-resultado", async () => {
+      for (let i = 0; i < 30 && (await page.isVisible("#screen-game")); i++) {
+        if (await page.isVisible("#game-next")) await page.click("#game-next").catch(() => {});
+        else await page.click("#btn-down").catch(() => {});
         await page.waitForTimeout(150);
       }
     });

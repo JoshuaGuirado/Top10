@@ -136,6 +136,7 @@
       topziStats: ["{n} partidas · {pts} pontos", "{n} games · {pts} points", "{n} partidas · {pts} puntos"],
       patoziStats: ["{n} partidas · escapou {e} vezes", "{n} games · escaped {e} times", "{n} partidas · se salvó {e} veces"],
       dataziStats: ["{n} partidas neste aparelho", "{n} games on this device", "{n} partidas en este dispositivo"],
+      maisStats: ["{n} partidas neste aparelho · recorde {r}", "{n} games on this device · best {r}", "{n} partidas en este dispositivo · récord {r}"],
       notYet: ["Ainda não jogou com esta conta", "Not played with this account yet", "Aún no jugaste con esta cuenta"],
       play: ["Jogar", "Play", "Jugar"],
       level: ["Nível {n}", "Level {n}", "Nivel {n}"],
@@ -159,6 +160,7 @@
       topzi: { nome: "Topzi", icone: "brand/simbolo.svg", iconeEscuro: "brand/simbolo-escuro.svg" },
       patozi: { nome: "Patozi", icone: "brand/patozi-simbolo.svg", iconeEscuro: "brand/patozi-simbolo-escuro.svg" },
       datazi: { nome: "Datazi", icone: "brand/datazi-simbolo.svg", iconeEscuro: "brand/datazi-simbolo-escuro.svg" },
+      maisoumenozi: { nome: "Maisoumenozi", icone: "brand/maisoumenozi-simbolo.svg", iconeEscuro: "brand/maisoumenozi-simbolo-escuro.svg" },
     };
     var SUPABASE_CDN = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
     var LANGS = ["pt", "en", "es"];
@@ -304,6 +306,8 @@
         resumo.topzi = { nick: linhas[0] && linhas[0].nick, texto: tz && tz.games ? t("topziStats", { n: tz.games, pts: tz.points || 0 }) : t("notYet") };
         var dz = gameziDadosLocais().datazi.stats;
         resumo.datazi = { texto: dz.partidas ? t("dataziStats", { n: dz.partidas }) : t("notYet") };
+        var mm = gameziDadosLocais().maisoumenozi.stats;
+        resumo.maisoumenozi = { texto: mm.partidas ? t("maisStats", { n: mm.partidas, r: mm.recorde || 0 }) : t("notYet") };
         resumo.patozi = { nick: linhas[1] && linhas[1].nick, texto: pz && pz.partidas ? t("patoziStats", { n: pz.partidas, e: pz.escapou || 0 }) : t("notYet") };
         if (modo === "logged") renderJogos();
       });

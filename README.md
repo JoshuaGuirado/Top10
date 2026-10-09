@@ -116,6 +116,19 @@ Jogo de linha do tempo: coloque os acontecimentos na ordem em que aconteceram. A
 - `datazi/js/jogo.js`: regras, sem tela (testado em `tests/datazi.test.js`); `textos.js` (três idiomas); `app.js` (telas)
 - Marca: `brand/datazi-logo*.svg` e `brand/datazi-simbolo*.svg`
 
+# Maisoumenozi
+
+Jogo de "mais ou menos": em cima aparece um item com o número dele (habitantes de um país, altura de um prédio, peso de um animal…), embaixo outro do mesmo assunto com o número escondido. Você diz se o de baixo tem mais ou menos (ou é mais alto, mais pesado, mais rápido…). O de baixo sobe e chega um novo; a cada 3 a 5 rodadas o assunto muda.
+
+São 30 assuntos e 441 itens (mais de 3 mil comparações diferentes), cada assunto com pelo menos 3 jeitos de perguntar e botões próprios, e frases de acerto e de erro sorteadas, para não repetir. Dois itens só caem juntos se a diferença entre eles passar da margem do assunto (10% no geral), para dado aproximado não virar pegadinha. Na mesma partida, nenhum item repete.
+
+**Desafio do dia**: as mesmas 10 comparações para todo mundo, com a semana e o resultado em quadradinhos para compartilhar. **Partida livre**: vai até o primeiro erro, valendo recorde.
+
+- `maisoumenozi/data/assuntos-*.js`: os assuntos (`mmTema({ id, titulo, unidade, perguntas, botoes, margem, itens })`, cada item `[valor, "português", "English", "español"]`). As perguntas não citam os nomes (falam "o de baixo", "esse"), para sempre concordar nos três idiomas
+- Itens ou assuntos novos: arquivo novo carregado depois dos outros (`mmTema` ou `mmMais`), no `sw.js`, e uma linha nova em `MM_DIARIO_POOLS` (`maisoumenozi/js/jogo.js`) valendo a partir de amanhã
+- `maisoumenozi/js/jogo.js`: regras, sem tela (testado em `tests/maisoumenozi.test.js`); `textos.js` (três idiomas e frases); `app.js` (telas)
+- Marca: `brand/maisoumenozi-logo*.svg` e `brand/maisoumenozi-simbolo*.svg`
+
 ## Nível e conquistas do Gamezi
 
 `gamezi-conta.js` soma o que se joga em todos os jogos (partidas, desafios do dia, acertos) em XP e nível, e confere 12 conquistas. Algumas liberam itens do guarda-roupa do pato. Aparecem na página da conta e no portal (testado em `tests/gamezi.test.js`).

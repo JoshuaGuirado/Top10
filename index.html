@@ -87,6 +87,19 @@
         <span class="play" data-t="play">Jogar</span>
       </a>
 
+      <a class="game-row" href="maisoumenozi/">
+        <span class="game-icon">
+          <img class="logo-light" src="brand/maisoumenozi-simbolo.svg" alt="" aria-hidden="true">
+          <img class="logo-dark" src="brand/maisoumenozi-simbolo-escuro.svg" alt="" aria-hidden="true">
+        </span>
+        <span class="game-text">
+          <b>Maisoumenozi</b>
+          <small data-t="maisKind">Tem mais ou tem menos?</small>
+          <small class="game-daily" id="mais-tag"></small>
+        </span>
+        <span class="play" data-t="play">Jogar</span>
+      </a>
+
       <p class="soon" data-t="soon">Mais jogos em breve.</p>
 
       <nav class="portal-links">
@@ -116,6 +129,8 @@
       patoDaily: ["Pato do dia #{n}", "Daily duck #{n}", "Pato del día #{n}"],
       dataziKind: ["Coloque os acontecimentos em ordem", "Put the events in order", "Pon los acontecimientos en orden"],
       dataDaily: ["Datazi do dia #{n}", "Daily Datazi #{n}", "Datazi del día #{n}"],
+      maisKind: ["Tem mais ou tem menos?", "Is it more or less?", "¿Hay más o hay menos?"],
+      maisDaily: ["Desafio do dia #{n}", "Daily challenge #{n}", "Desafío del día #{n}"],
       play: ["Jogar", "Play", "Jugar"],
       soon: ["Mais jogos em breve.", "More games coming soon.", "Más juegos muy pronto."],
       terms: ["Termos de uso", "Terms of use", "Términos de uso"],
@@ -167,6 +182,11 @@
       var dtag = document.getElementById("data-tag");
       dtag.hidden = pn < 1;
       dtag.textContent = t("dataDaily").replace("{n}", pn);
+      // Desafio do dia do Maisoumenozi (mesma conta de maisoumenozi/js/jogo.js: o dia 1 é 9/10/2026).
+      var mn = pn - 1;
+      var mtag = document.getElementById("mais-tag");
+      mtag.hidden = mn < 1;
+      mtag.textContent = t("maisDaily").replace("{n}", mn);
       // Nível do Gamezi (soma o que se joga em todos os jogos neste aparelho).
       var prog = gameziProgresso();
       var nivel = document.getElementById("portal-level");
