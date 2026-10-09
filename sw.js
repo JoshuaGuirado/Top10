@@ -2,7 +2,7 @@
 // Cada jogo fica numa pasta (topzi/…, patozi/…); os arquivos dele entram na lista com o caminho da pasta.
 // Online, busca sempre a versão nova (rede primeiro); sem internet, usa a cópia guardada.
 
-const CACHE = "gamezi-v12";
+const CACHE = "gamezi-v13";
 const FILES = [
   "./",
   "index.html",
@@ -23,6 +23,15 @@ const FILES = [
   "topzi/data/listas-extra.js",
   "topzi/data/listas-grandes-3.js",
   "topzi/data/listas-populares.js",
+  "topzi/data/listas-n1.js",
+  "topzi/data/listas-n2.js",
+  "topzi/data/listas-n3.js",
+  "topzi/data/listas-n4.js",
+  "topzi/data/listas-n5.js",
+  "topzi/data/listas-n6.js",
+  "topzi/data/listas-n7.js",
+  "topzi/data/listas-n8.js",
+  "topzi/data/listas-n9.js",
   "topzi/data/traducoes.js",
   "topzi/data/traducoes-titulos.js",
   "topzi/data/traducoes-itens-1.js",
@@ -35,6 +44,15 @@ const FILES = [
   "topzi/data/traducoes-itens-8.js",
   "topzi/data/traducoes-itens-9.js",
   "topzi/data/traducoes-itens-10.js",
+  "topzi/data/traducoes-n1.js",
+  "topzi/data/traducoes-n2.js",
+  "topzi/data/traducoes-n3.js",
+  "topzi/data/traducoes-n4.js",
+  "topzi/data/traducoes-n5.js",
+  "topzi/data/traducoes-n6.js",
+  "topzi/data/traducoes-n7.js",
+  "topzi/data/traducoes-n8.js",
+  "topzi/data/traducoes-n9.js",
   "topzi/js/icons.js",
   "topzi/js/avatars.js",
   "topzi/js/util.js",
@@ -47,6 +65,7 @@ const FILES = [
   "topzi/js/jogadores.js",
   "topzi/js/skins.js",
   "topzi/js/partida.js",
+  "topzi/js/ideias.js",
   "topzi/js/resultado.js",
   "topzi/js/estatisticas.js",
   "topzi/js/diaria.js",
@@ -73,6 +92,7 @@ const FILES = [
   "patozi/data/cartas-4.js",
   "patozi/data/cartas-5.js",
   "patozi/data/cartas-6.js",
+  "patozi/data/cartas-7.js",
   "patozi/js/jogo.js",
   "patozi/js/textos.js",
   "patozi/js/visual.js",

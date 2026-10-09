@@ -72,6 +72,8 @@ const PZ_T = {
   "setup.you": ["Você", "You", "Tú"],
   "setup.player": ["Jogador {n}", "Player {n}", "Jugador {n}"],
   "setup.bot": ["Computador", "Computer", "Computadora"],
+  "start.who": ["Quem começa", "Who goes first", "Quién empieza"],
+  "start.random": ["Sortear", "Random", "Sortear"],
   "setup.botTag": ["computador", "computer", "computadora"],
   "setup.remove": ["Remover", "Remove", "Quitar"],
   "setup.color": ["Trocar cor", "Change color", "Cambiar color"],

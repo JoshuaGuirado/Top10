@@ -68,12 +68,26 @@ function renderSetup() {
       <button type="button" class="remove" data-act="tirar" aria-label="${escapeHtml(t("setup.remove"))}" title="${escapeHtml(t("setup.remove"))}" ${jogadores.length <= 1 ? "disabled" : ""}>×</button>
     </div>`).join("");
   $("add-human").disabled = $("add-bot").disabled = jogadores.length >= PZ_MAX_JOGADORES;
+  renderStarter();
   renderOptions($("local-options"), config, jogadores.length, true, (c) => {
     config = c;
     store("config", config);
     renderSetup();
   });
   $("setup-error").textContent = "";
+}
+
+// Quem começa: "random" (sorteia) ou o índice do jogador na lista.
+function comecaEscolhido() {
+  const c = store("comeca");
+  return Number.isInteger(c) && c >= 0 && c < jogadores.length ? c : "random";
+}
+
+function renderStarter() {
+  const atual = comecaEscolhido();
+  const chip = (valor, nome, icone = "") => `<button type="button" class="chip plain ${atual === valor ? "active" : ""}" data-comeca="${valor}">${icone}${escapeHtml(nome)}</button>`;
+  $("starter-chips").innerHTML = chip("random", t("start.random"), UI_ICONS.dice || "") +
+    jogadores.map((p, i) => chip(i, (p.nome || "").trim() || nomePadrao(i))).join("");
 }
 
 function setupClick(e) {
@@ -93,6 +107,8 @@ function setupClick(e) {
     });
   } else if (btn.dataset.act === "tirar") {
     jogadores.splice(i, 1);
+    const c = store("comeca");
+    if (Number.isInteger(c)) store("comeca", c === i ? "random" : c > i ? c - 1 : c);
   }
   salvarJogadores();
   renderSetup();
@@ -103,6 +119,7 @@ function setupInput(e) {
   if (!row || e.target.tagName !== "INPUT") return;
   jogadores[Number(row.dataset.i)].nome = e.target.value;
   salvarJogadores();
+  renderStarter();
 }
 
 function addJogador(bot) {
@@ -179,7 +196,8 @@ function comecarLocal() {
     bot: p.bot,
   }));
   modo = "local";
-  iniciarPartida(pzNovaPartida({ jogadores: lista, ...config }));
+  const comeca = comecaEscolhido();
+  iniciarPartida(pzNovaPartida({ jogadores: lista, ...config, comeca: comeca === "random" ? null : comeca }));
 }
 
 // ───────────── partida ─────────────

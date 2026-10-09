@@ -81,6 +81,10 @@
       <div class="count-picker" id="count-picker"></div>
       <p class="mode-label" id="mode-label"></p>
       <div class="player-grid" id="player-grid"></div>
+      <div class="starter" id="starter-box">
+        <p class="ctrl-label" data-i18n="start.who">Quem começa</p>
+        <div class="chips" id="starter-chips"></div>
+      </div>
       <details class="more-opts">
         <summary><span data-i18n="opt.more">Mais opções</span><small id="opts-summary"></small></summary>
       <div class="match-options">
@@ -165,6 +169,15 @@
         <button type="button" class="link-btn" id="end-btn" data-i18n="game.end">Encerrar partida</button>
       </div>
       <p id="feedback" class="feedback" role="status"></p>
+
+      <details class="ideas" id="ideas" hidden>
+        <summary><span id="ideas-title" data-i18n="ideas.title">Ideias para chutar</span><b id="ideas-count"></b></summary>
+        <form class="ideas-form" id="ideas-form" autocomplete="off">
+          <input id="ideas-input" type="text" maxlength="40" data-i18n-ph="ideas.ph" placeholder="Anote uma ideia para não esquecer" data-i18n-aria="ideas.ph" aria-label="Anote uma ideia para não esquecer" enterkeyhint="done">
+          <button type="submit" class="btn dark" data-i18n="ideas.add">Anotar</button>
+        </form>
+        <div class="ideas-list" id="ideas-list"></div>
+      </details>
 
       <ol class="board" id="board"></ol>
       <p class="muted small" id="wrong-guesses"></p>
@@ -380,6 +393,15 @@
   <script src="data/listas-extra.js"></script>
   <script src="data/listas-grandes-3.js"></script>
   <script src="data/listas-populares.js"></script>
+  <script src="data/listas-n1.js"></script>
+  <script src="data/listas-n2.js"></script>
+  <script src="data/listas-n3.js"></script>
+  <script src="data/listas-n4.js"></script>
+  <script src="data/listas-n5.js"></script>
+  <script src="data/listas-n6.js"></script>
+  <script src="data/listas-n7.js"></script>
+  <script src="data/listas-n8.js"></script>
+  <script src="data/listas-n9.js"></script>
   <script src="data/traducoes.js"></script>
   <script src="data/traducoes-titulos.js"></script>
   <script src="data/traducoes-itens-1.js"></script>
@@ -392,6 +414,15 @@
   <script src="data/traducoes-itens-8.js"></script>
   <script src="data/traducoes-itens-9.js"></script>
   <script src="data/traducoes-itens-10.js"></script>
+  <script src="data/traducoes-n1.js"></script>
+  <script src="data/traducoes-n2.js"></script>
+  <script src="data/traducoes-n3.js"></script>
+  <script src="data/traducoes-n4.js"></script>
+  <script src="data/traducoes-n5.js"></script>
+  <script src="data/traducoes-n6.js"></script>
+  <script src="data/traducoes-n7.js"></script>
+  <script src="data/traducoes-n8.js"></script>
+  <script src="data/traducoes-n9.js"></script>
   <script src="js/icons.js"></script>
   <script src="js/avatars.js"></script>
   <script src="js/util.js"></script>
@@ -404,6 +435,7 @@
   <script src="js/jogadores.js"></script>
   <script src="js/skins.js"></script>
   <script src="js/partida.js"></script>
+  <script src="js/ideias.js"></script>
   <script src="js/resultado.js"></script>
   <script src="js/estatisticas.js"></script>
   <script src="js/diaria.js"></script>

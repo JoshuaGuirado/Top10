@@ -73,7 +73,7 @@ LISTS.push(
     items: [
       "Pelé", "Messi", "Cristiano Ronaldo|CR7|Cristiano", "Maradona", "Ronaldo|Ronaldo Fenômeno", "Neymar", "Ronaldinho|Ronaldinho Gaúcho", "Zidane", "Mbappé", "Romário",
       "Zico", "Kaká", "Beckham", "Garrincha", "Cruyff", "Beckenbauer", "Haaland", "Vini Jr.|Vinícius Júnior|Vini", "Rivaldo", "Roberto Carlos",
-      "Cafu", "Ibrahimović|Ibrahimovic|Ibra", "Thierry Henry|Henry", "Iniesta", "Modrić|Modric", "Salah", "Lewandowski", "Buffon", "Marta", "Puskás|Puskas",
+      "Cafu", "Ibrahimović|Ibrahimovic|Ibra", "Thierry Henry|Henry", "Iniesta", "Modrić|Modric", "Salah", "Lewandowski", "Buffon", "Eusébio|Eusebio", "Puskás|Puskas",
     ] },
   { id: "30-viloes", cat: "personagens", title: "Os 30 vilões mais famosos", source: "Curadoria Topzi: do mais lembrado ao menos óbvio",
     items: [

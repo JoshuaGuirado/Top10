@@ -141,6 +141,13 @@ function ligar() {
   $("online-btn").onclick = () => abrirOnline();
   $("player-list").addEventListener("click", setupClick);
   $("player-list").addEventListener("input", setupInput);
+  $("starter-chips").onclick = (e) => {
+    const b = e.target.closest("[data-comeca]");
+    if (!b) return;
+    store("comeca", b.dataset.comeca === "random" ? "random" : Number(b.dataset.comeca));
+    sfx.tick();
+    renderStarter();
+  };
   $("add-human").onclick = () => addJogador(false);
   $("add-bot").onclick = () => addJogador(true);
   $("setup-back").onclick = irInicio;

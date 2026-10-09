@@ -5,6 +5,7 @@ function teamName(i) {
   return t("team." + i);
 }
 const TIMER_OPTIONS = [0, 15, 30, 60];
+const DICE_ICON = '<svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>';
 
 let playerCount = store("count") || 2;
 let players = store("players") || [];
@@ -129,6 +130,33 @@ function renderOptsSummary() {
   $("opts-summary").textContent = `${turnTime ? t("opt.seconds", { n: turnTime }) : t("opt.noLimit")} · ${t(mode().sudden ? "opt.oneLife" : livesOn() ? "opt.withLives" : "opt.noLives")}`;
 }
 
+// Quem começa a partida: "random" (sorteia na hora) ou o número do jogador (0 = Jogador 1).
+function starterChoice() {
+  const s = store("starter");
+  return s === "random" || (Number.isInteger(s) && s >= 0 && s < playerCount) ? s : 0;
+}
+
+function renderStarterChips() {
+  const box = $("starter-box");
+  box.hidden = playerCount < 2;
+  if (box.hidden) return;
+  const wrap = $("starter-chips");
+  wrap.innerHTML = "";
+  const atual = starterChoice();
+  const escolher = (v) => () => {
+    store("starter", v);
+    renderStarterChips();
+  };
+  wrap.appendChild(chipButton(t("start.random"), null, atual === "random", escolher("random"), DICE_ICON));
+  players.slice(0, playerCount).forEach((p, i) => wrap.appendChild(chipButton(playerName(p, i), null, atual === i, escolher(i))));
+}
+
+// Índice de quem começa, já sorteado se for o caso.
+function pickStarter(n) {
+  const s = starterChoice();
+  return s === "random" ? Math.floor(Math.random() * n) : Math.min(s, n - 1);
+}
+
 function renderPlayersScreen() {
   ensurePlayers();
   renderModeBars();
@@ -154,6 +182,7 @@ function renderPlayersScreen() {
     card.querySelector("input").addEventListener("input", (e) => {
       p.nick = e.target.value;
       savePlayers();
+      renderStarterChips();
     });
     const toggle = card.querySelector(".team-toggle");
     if (toggle) toggle.addEventListener("click", () => {
@@ -163,6 +192,7 @@ function renderPlayersScreen() {
     });
     grid.appendChild(card);
   });
+  renderStarterChips();
 }
 
 // Depois de trocar skin: atualiza a tela de jogadores e a do modo online.

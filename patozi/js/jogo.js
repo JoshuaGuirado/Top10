@@ -93,7 +93,8 @@ function pzNovaPartida(opts, rnd = Math.random) {
     config: { temas, duracao, meta: pzMeta(jogadores.length, duracao), dobrei: opts.dobrei !== false, mosca: opts.mosca !== false },
     baralho: pzEmbaralhar(pzCartasDosTemas(temas), rnd),
     usadas: [],
-    vez: Math.floor(rnd() * jogadores.length),
+    // opts.comeca: índice de quem abre a primeira rodada; sem ele, sorteia.
+    vez: ((sorteio) => (Number.isInteger(opts.comeca) && opts.comeca >= 0 && opts.comeca < jogadores.length ? opts.comeca : sorteio))(Math.floor(rnd() * jogadores.length)),
     rodada: 0,
     carta: null,
     lances: [],

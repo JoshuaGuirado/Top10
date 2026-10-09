@@ -62,10 +62,18 @@ function startGame(list, opts = {}) {
     me: 0,
   };
   if (online) game.me = gamePlayers.findIndex((p) => p.uid === myId());
-  if (teams) game.turn = takeNext(0);
+  // Quem começa: escolhido na tela de jogadores ou sorteado (no Times, o time dele começa e ele abre a vez).
+  const first = !daily && !online && gamePlayers.length > 1 ? pickStarter(gamePlayers.length) : 0;
+  if (teams) {
+    const team = gamePlayers[first].team;
+    game.nextOf[team] = Math.max(0, game.members[team].indexOf(first));
+    game.turn = takeNext(team);
+  } else game.turn = first;
 
+  resetIdeas();
   setupGameScreen();
-  setFeedback("", "");
+  const drawn = !daily && !online && gamePlayers.length > 1 && starterChoice() === "random";
+  setFeedback(drawn ? [["start.drawn", { name: gamePlayers[game.turn].name }]] : "", "info");
   show("game");
   renderGame();
   startTurnTimer();
@@ -227,6 +235,7 @@ function renderGame() {
   $("hint-btn").disabled = !myTurn() || (!game.hintMode && !canHint());
   $("hint-btn").textContent = game.hintMode ? t("game.hintCancel") : t("game.hintBtn");
   $("end-btn").hidden = game.online && !game.isHost;
+  renderIdeas();
   if (game.online) onlineAfterRender();
 }
 

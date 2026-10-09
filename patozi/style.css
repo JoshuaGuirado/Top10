@@ -121,6 +121,8 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .remove { border: 0; background: var(--bg); border-radius: 50%; width: 32px; height: 32px; flex: none; font-size: 1.2rem; line-height: 1; color: var(--muted); }
 .remove:hover { background: var(--bad); color: #fff; }
 .add-row { margin-top: 10px; }
+.starter { margin-top: 18px; display: grid; gap: 8px; }
+.starter .chip .ui-ico { margin-right: 4px; }
 .nick { display: grid; gap: 4px; }
 .nick span { font-size: .75rem; color: var(--muted); font-weight: 700; }
 
