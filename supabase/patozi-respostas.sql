@@ -1,4 +1,4 @@
--- Respostas das cartas do Patozi (831), para o banco calcular os pontos do Pato do dia.
+-- Respostas das cartas do Patozi (931), para o banco calcular os pontos do Pato do dia.
 -- Gerado por supabase/gerar-respostas.js. Pode rodar de novo: atualiza o que mudou.
 insert into public.patozi_respostas (carta, resposta) values
   ('corpo-1',206),('corpo-2',32),('corpo-3',20),('corpo-4',46),('corpo-5',24),('corpo-6',27),('corpo-7',26),('corpo-8',4),
@@ -104,5 +104,18 @@ insert into public.patozi_respostas (carta, resposta) values
   ('musica-33',3500000),('musica-34',1380000),('musica-35',70),('musica-36',639),('musica-37',33114),('cinema-34',300000),('tecnologia-28',16),('tecnologia-29',790),
   ('tecnologia-30',72),('numeros-38',43),('numeros-39',604800),('numeros-40',255168),('numeros-41',2598960),('numeros-42',168),('numeros-43',41024320),('dinheiro-17',50063860),
   ('dinheiro-18',450),('dinheiro-19',150),('dinheiro-20',7200000),('dinheiro-21',15000000),('jogos-34',60000),('jogos-35',3333360),('desenhos-18',220),('arte-17',77),
-  ('arte-18',2100),('arte-19',8900000),('arte-20',776),('palavras-18',228500),('palavras-19',600000),('palavras-20',7168),('palavras-21',85568)
+  ('arte-18',2100),('arte-19',8900000),('arte-20',776),('palavras-18',228500),('palavras-19',600000),('palavras-20',7168),('palavras-21',85568),('corpo-43',180),
+  ('corpo-44',248),('corpo-45',46),('animais-51',20),('animais-52',13560),('animais-53',219),('animais-54',38),('animais-55',363),('animais-56',300),
+  ('animais-57',564),('espaco-43',55),('espaco-44',6779),('espaco-45',5268),('espaco-46',40),('espaco-47',15),('espaco-48',4000),('espaco-49',1500),
+  ('ciencia-38',196),('ciencia-39',602),('ciencia-40',4500),('ciencia-41',27),('mundo-48',6300),('mundo-49',82100),('mundo-50',9984),('mundo-51',634),
+  ('mundo-52',1708),('mundo-53',5642),('mundo-54',82),('mundo-55',4300),('brasil-51',1559),('brasil-52',2891),('brasil-53',155),('brasil-54',6211),
+  ('brasil-55',1693),('brasil-56',14000),('brasil-57',636),('brasil-58',2817),('historia-44',15),('historia-45',50),('historia-46',155),('historia-47',156),
+  ('futebol-44',732),('futebol-45',131),('futebol-46',172),('esporte-50',243),('esporte-51',7680),('esporte-52',296),('cinema-35',2799),('cinema-36',34),
+  ('cinema-37',14),('musica-38',440),('musica-39',50),('musica-40',149),('jogos-36',225),('jogos-37',17),('jogos-38',32),('comida-31',289),
+  ('comida-32',4250),('comida-33',150000),('numeros-44',5050),('numeros-45',479001600),('numeros-46',68),('tecnologia-31',1440),('tecnologia-32',200),('tecnologia-33',7089),
+  ('biblia-35',300),('biblia-36',1000),('biblia-37',777),('curiosidades-47',267570),('curiosidades-48',533),('curiosidades-49',12),('curiosidades-50',354),('curiosidades-51',7351),
+  ('curiosidades-52',240),('transporte-37',269),('transporte-38',245),('transporte-39',55),('transporte-40',53),('transporte-41',3940),('transporte-42',3529),('transporte-43',7274),
+  ('natureza-24',91),('natureza-25',20),('natureza-26',524),('natureza-27',11872),('natureza-28',14),('natureza-29',6000),('natureza-30',23600),('arte-21',182),
+  ('arte-22',517),('arte-23',18),('desenhos-19',114240),('desenhos-20',742),('desenhos-21',153),('palavras-22',85),('palavras-23',58),('palavras-24',1102),
+  ('dinheiro-22',333),('dinheiro-23',135),('dinheiro-24',64)
 on conflict (carta) do update set resposta = excluded.resposta;

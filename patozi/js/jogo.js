@@ -21,6 +21,7 @@ const PZ_DIARIO_QTD = 5;
 const PZ_DIARIO_POOLS = [
   { desde: 1, cartas: 437 },
   { desde: 2, cartas: 831, semAposentadas: true }, // 9/10/2026: temas novos e cartas-6 (km, tamanhos, quantidades); só cartas difíceis
+  { desde: 3, cartas: 931, semAposentadas: true }, // 10/10/2026: cartas-7 (mais 100 difíceis)
 ];
 
 // ───────────── sorte ─────────────
