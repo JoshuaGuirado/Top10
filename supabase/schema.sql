@@ -524,6 +524,124 @@ create policy "cravazi partidas: anfitrião registra" on public.cravazi_partidas
     exists (select 1 from public.cravazi_salas s where s.code = sala_code and s.host_id = auth.uid())
   );
 
+-- ═════════════════════════════ Tamanhozi ═════════════════════════════
+-- Mesmo projeto e mesma conta (auth.users). Tabelas próprias:
+--   tamanhozi_salas          salas online (código de 5 letras, anfitrião, tema e estado da partida)
+--   tamanhozi_sala_jogadores quem está em cada sala (até 10)
+--   tamanhozi_partidas       histórico das partidas online (cada um vê só as suas)
+--   tamanhozi_diario         resultado de cada um no Tamanhozi do dia (lá embaixo, com os outros rankings)
+
+create table if not exists public.tamanhozi_salas (
+  code text primary key check (code ~ '^[A-Z0-9]{5}$'),
+  host_id uuid not null references auth.users (id) on delete cascade,
+  status text not null default 'lobby' check (status in ('lobby', 'playing', 'finished')),
+  settings jsonb not null default '{}'::jsonb,
+  state jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.tamanhozi_sala_jogadores (
+  sala_code text not null references public.tamanhozi_salas (code) on delete cascade,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  nick text not null check (char_length(nick) between 1 and 16),
+  joined_at timestamptz not null default now(),
+  primary key (sala_code, user_id)
+);
+
+create table if not exists public.tamanhozi_partidas (
+  id bigint generated always as identity primary key,
+  sala_code text not null,
+  rodadas integer,
+  players jsonb not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists tamanhozi_partidas_players_idx on public.tamanhozi_partidas using gin (players jsonb_path_ops);
+create index if not exists tamanhozi_salas_updated_idx on public.tamanhozi_salas (updated_at);
+
+drop trigger if exists tamanhozi_salas_updated on public.tamanhozi_salas;
+create trigger tamanhozi_salas_updated before update on public.tamanhozi_salas
+  for each row execute function public.tocar_updated_at();
+
+-- No máximo 10 jogadores por sala do Tamanhozi.
+create or replace function public.tamanhozi_limitar_jogadores()
+returns trigger language plpgsql as $$
+begin
+  if (select count(*) from public.tamanhozi_sala_jogadores where sala_code = new.sala_code) >= 10 then
+    raise exception 'A sala está cheia';
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists tamanhozi_sala_jogadores_limite on public.tamanhozi_sala_jogadores;
+create trigger tamanhozi_sala_jogadores_limite before insert on public.tamanhozi_sala_jogadores
+  for each row execute function public.tamanhozi_limitar_jogadores();
+
+-- Salas paradas há mais de um dia somem (chamada por quem cria uma sala).
+create or replace function public.tamanhozi_limpar_salas()
+returns void language sql security definer set search_path = public as $$
+  delete from public.tamanhozi_salas where updated_at < now() - interval '1 day';
+$$;
+grant execute on function public.tamanhozi_limpar_salas() to authenticated;
+
+alter table public.tamanhozi_salas enable row level security;
+alter table public.tamanhozi_sala_jogadores enable row level security;
+alter table public.tamanhozi_partidas enable row level security;
+
+-- Salas: quem tem o código consegue ver; só o anfitrião cria, muda e apaga.
+drop policy if exists "tamanhozi salas: ler" on public.tamanhozi_salas;
+create policy "tamanhozi salas: ler" on public.tamanhozi_salas
+  for select to authenticated using (true);
+
+drop policy if exists "tamanhozi salas: criar como anfitrião" on public.tamanhozi_salas;
+create policy "tamanhozi salas: criar como anfitrião" on public.tamanhozi_salas
+  for insert to authenticated with check (host_id = auth.uid());
+
+drop policy if exists "tamanhozi salas: anfitrião edita" on public.tamanhozi_salas;
+create policy "tamanhozi salas: anfitrião edita" on public.tamanhozi_salas
+  for update to authenticated using (host_id = auth.uid()) with check (host_id = auth.uid());
+
+drop policy if exists "tamanhozi salas: anfitrião apaga" on public.tamanhozi_salas;
+create policy "tamanhozi salas: anfitrião apaga" on public.tamanhozi_salas
+  for delete to authenticated using (host_id = auth.uid());
+
+-- Jogadores: cada um entra e edita a própria linha; sai sozinho ou o anfitrião remove.
+drop policy if exists "tamanhozi jogadores: ler" on public.tamanhozi_sala_jogadores;
+create policy "tamanhozi jogadores: ler" on public.tamanhozi_sala_jogadores
+  for select to authenticated using (true);
+
+drop policy if exists "tamanhozi jogadores: entrar" on public.tamanhozi_sala_jogadores;
+create policy "tamanhozi jogadores: entrar" on public.tamanhozi_sala_jogadores
+  for insert to authenticated with check (
+    user_id = auth.uid()
+    and exists (select 1 from public.tamanhozi_salas s where s.code = sala_code and s.status <> 'playing')
+  );
+
+drop policy if exists "tamanhozi jogadores: editar a própria linha" on public.tamanhozi_sala_jogadores;
+create policy "tamanhozi jogadores: editar a própria linha" on public.tamanhozi_sala_jogadores
+  for update to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+drop policy if exists "tamanhozi jogadores: sair ou ser removido" on public.tamanhozi_sala_jogadores;
+create policy "tamanhozi jogadores: sair ou ser removido" on public.tamanhozi_sala_jogadores
+  for delete to authenticated using (
+    user_id = auth.uid()
+    or exists (select 1 from public.tamanhozi_salas s where s.code = sala_code and s.host_id = auth.uid())
+  );
+
+-- Histórico: o anfitrião registra; cada um vê as partidas em que jogou.
+drop policy if exists "tamanhozi partidas: ver as minhas" on public.tamanhozi_partidas;
+create policy "tamanhozi partidas: ver as minhas" on public.tamanhozi_partidas
+  for select to authenticated using (
+    players @> jsonb_build_array(jsonb_build_object('uid', auth.uid()::text))
+  );
+
+drop policy if exists "tamanhozi partidas: anfitrião registra" on public.tamanhozi_partidas;
+create policy "tamanhozi partidas: anfitrião registra" on public.tamanhozi_partidas
+  for insert to authenticated with check (
+    exists (select 1 from public.tamanhozi_salas s where s.code = sala_code and s.host_id = auth.uid())
+  );
+
 -- ═════════════════════════════ Gamezi: descrições e visões ═════════════════════════════
 -- Cada tabela tem uma descrição dizendo de qual jogo é; ela aparece no painel do Supabase (Description).
 
@@ -540,6 +658,9 @@ comment on table public.patozi_partidas is 'Patozi: histórico das partidas onli
 comment on table public.cravazi_salas is 'Cravazi: salas online';
 comment on table public.cravazi_sala_jogadores is 'Cravazi: jogadores de cada sala online (com a skin)';
 comment on table public.cravazi_partidas is 'Cravazi: histórico das partidas online';
+comment on table public.tamanhozi_salas is 'Tamanhozi: salas online';
+comment on table public.tamanhozi_sala_jogadores is 'Tamanhozi: jogadores de cada sala online';
+comment on table public.tamanhozi_partidas is 'Tamanhozi: histórico das partidas online';
 
 -- Visões para o dono do site olhar os dois jogos juntos no painel (Table Editor), com a coluna "jogo".
 -- Ficam fechadas para o site (sem acesso pela API); security_invoker faz valer as regras (RLS) de quem consulta.
@@ -558,7 +679,12 @@ create view public.gamezi_salas with (security_invoker = true) as
   select 'cravazi'::text, c.code, c.status, c.host_id,
          (select count(*) from public.cravazi_sala_jogadores j where j.sala_code = c.code),
          c.created_at, c.updated_at
-    from public.cravazi_salas c;
+    from public.cravazi_salas c
+  union all
+  select 'tamanhozi'::text, z.code, z.status, z.host_id,
+         (select count(*) from public.tamanhozi_sala_jogadores j where j.sala_code = z.code),
+         z.created_at, z.updated_at
+    from public.tamanhozi_salas z;
 
 drop view if exists public.gamezi_jogadores_nas_salas;
 create view public.gamezi_jogadores_nas_salas with (security_invoker = true) as
@@ -569,9 +695,12 @@ create view public.gamezi_jogadores_nas_salas with (security_invoker = true) as
     from public.patozi_sala_jogadores j
   union all
   select 'cravazi'::text, c.sala_code, c.nick, c.user_id, c.joined_at
-    from public.cravazi_sala_jogadores c;
+    from public.cravazi_sala_jogadores c
+  union all
+  select 'tamanhozi'::text, z.sala_code, z.nick, z.user_id, z.joined_at
+    from public.tamanhozi_sala_jogadores z;
 
-comment on view public.gamezi_salas is 'Gamezi: salas online dos jogos (coluna jogo = topzi, patozi ou cravazi)';
+comment on view public.gamezi_salas is 'Gamezi: salas online dos jogos (coluna jogo = topzi, patozi, cravazi ou tamanhozi)';
 comment on view public.gamezi_jogadores_nas_salas is 'Gamezi: quem está em cada sala, de todos os jogos (coluna jogo)';
 
 revoke all on public.gamezi_salas, public.gamezi_jogadores_nas_salas from anon, authenticated;
@@ -632,7 +761,7 @@ do $$
 declare
   tabela text;
 begin
-  foreach tabela in array array['topzi_perfis', 'topzi_sala_jogadores', 'patozi_perfis', 'patozi_sala_jogadores', 'patozi_diario', 'cravazi_sala_jogadores'] loop
+  foreach tabela in array array['topzi_perfis', 'topzi_sala_jogadores', 'patozi_perfis', 'patozi_sala_jogadores', 'patozi_diario', 'cravazi_sala_jogadores', 'tamanhozi_sala_jogadores'] loop
     execute format('drop trigger if exists %I on public.%I', tabela || '_nick_limpo', tabela);
     execute format('create trigger %I before insert or update of nick on public.%I for each row execute function public.gamezi_limpar_nick()', tabela || '_nick_limpo', tabela);
   end loop;
@@ -732,8 +861,12 @@ create table if not exists public.cravazi_diario (
   primary key (dia, user_id)
 );
 
--- Mapazi do dia (o dia 1 é 13/10/2026): 10 rodadas, de 0 a 100 pontos cada.
-create table if not exists public.mapazi_diario (
+-- O Mapazi (só países) virou Tamanhozi no mesmo dia em que saiu: as peças antigas dele saem.
+drop function if exists public.mapazi_registrar_diario(integer, text, integer, integer);
+drop table if exists public.mapazi_diario;
+
+-- Tamanhozi do dia (o dia 1 é 13/10/2026): 10 rodadas, de 0 a 100 pontos cada.
+create table if not exists public.tamanhozi_diario (
   dia integer not null check (dia >= 1),
   user_id uuid not null references auth.users (id) on delete cascade,
   nick text not null default '' check (char_length(nick) <= 16),
@@ -743,7 +876,7 @@ create table if not exists public.mapazi_diario (
   primary key (dia, user_id)
 );
 
-comment on table public.mapazi_diario is 'Mapazi: resultado de cada um no Mapazi do dia (ranking)';
+comment on table public.tamanhozi_diario is 'Tamanhozi: resultado de cada um no Tamanhozi do dia (ranking)';
 comment on table public.datazi_diario is 'Datazi: resultado de cada um no Datazi do dia (ranking)';
 comment on table public.cravazi_diario is 'Cravazi: resultado de cada um no Cravazi do dia (ranking)';
 comment on table public.maisoumenozi_diario is 'Maisoumenozi: resultado de cada um no desafio do dia (ranking)';
@@ -752,10 +885,10 @@ do $$
 declare
   tabela text;
 begin
-  foreach tabela in array array['topzi_diario', 'patozi_diario', 'datazi_diario', 'maisoumenozi_diario', 'cravazi_diario', 'mapazi_diario'] loop
+  foreach tabela in array array['topzi_diario', 'patozi_diario', 'datazi_diario', 'maisoumenozi_diario', 'cravazi_diario', 'tamanhozi_diario'] loop
     execute format('create index if not exists %I on public.%I (dia, pontos desc, tempo_ms)', tabela || '_tempo_idx', tabela);
   end loop;
-  foreach tabela in array array['datazi_diario', 'maisoumenozi_diario', 'cravazi_diario', 'mapazi_diario'] loop
+  foreach tabela in array array['datazi_diario', 'maisoumenozi_diario', 'cravazi_diario', 'tamanhozi_diario'] loop
     execute format('drop trigger if exists %I on public.%I', tabela || '_nick_limpo', tabela);
     execute format('create trigger %I before insert or update of nick on public.%I for each row execute function public.gamezi_limpar_nick()', tabela || '_nick_limpo', tabela);
     execute format('alter table public.%I enable row level security', tabela); -- sem regras: só as funções leem e gravam
@@ -860,8 +993,8 @@ end $$;
 
 grant execute on function public.cravazi_registrar_diario(integer, text, integer, integer) to authenticated;
 
--- Mapazi do dia (o dia 1 é 13/10/2026): p_acertos são os pontos (de 0 a 1000).
-create or replace function public.mapazi_registrar_diario(p_dia integer, p_nick text, p_acertos integer, p_tempo integer default null)
+-- Tamanhozi do dia (o dia 1 é 13/10/2026): p_acertos são os pontos (de 0 a 1000).
+create or replace function public.tamanhozi_registrar_diario(p_dia integer, p_nick text, p_acertos integer, p_tempo integer default null)
 returns void language plpgsql security definer set search_path = public as $$
 declare
   hoje integer := ((now() at time zone 'utc')::date - date '2026-10-13') + 1;
@@ -869,12 +1002,12 @@ begin
   if auth.uid() is null then raise exception 'Entre para registrar o resultado.'; end if;
   if p_dia is null or p_dia not between hoje - 1 and hoje + 1 then raise exception 'Esse dia já passou.'; end if;
   if p_acertos is null or p_acertos not between 0 and 1000 then raise exception 'Resultado inválido.'; end if;
-  insert into public.mapazi_diario (dia, user_id, nick, pontos, tempo_ms)
+  insert into public.tamanhozi_diario (dia, user_id, nick, pontos, tempo_ms)
   values (p_dia, auth.uid(), left(coalesce(p_nick, ''), 16), p_acertos, case when p_tempo between 0 and 86400000 then p_tempo end)
   on conflict (dia, user_id) do nothing;
 end $$;
 
-grant execute on function public.mapazi_registrar_diario(integer, text, integer, integer) to authenticated;
+grant execute on function public.tamanhozi_registrar_diario(integer, text, integer, integer) to authenticated;
 
 -- Ranking do dia de um jogo: os primeiros (p_limite) e, se a pessoa conectada ficou fora deles, a linha dela no fim.
 -- posicao: empate em pontos e tempo divide o lugar. total: quantos jogaram no dia. eu: é a pessoa conectada.
@@ -882,7 +1015,7 @@ create or replace function public.gamezi_ranking_dia(p_jogo text, p_dia integer,
 returns table (posicao bigint, nick text, pontos integer, tempo_ms integer, eu boolean, total bigint)
 language plpgsql stable security definer set search_path = public as $$
 begin
-  if p_jogo is null or p_jogo not in ('topzi', 'patozi', 'datazi', 'maisoumenozi', 'cravazi', 'mapazi') then raise exception 'Jogo desconhecido.'; end if;
+  if p_jogo is null or p_jogo not in ('topzi', 'patozi', 'datazi', 'maisoumenozi', 'cravazi', 'tamanhozi') then raise exception 'Jogo desconhecido.'; end if;
   return query execute format($q$
     with r as (
       select d.nick, d.pontos::integer as pontos, d.tempo_ms, d.user_id,
@@ -929,7 +1062,7 @@ declare
   jogo text;
   col text;
 begin
-  foreach jogo in array array['topzi', 'patozi', 'cravazi'] loop
+  foreach jogo in array array['topzi', 'patozi', 'cravazi', 'tamanhozi'] loop
     col := case jogo when 'topzi' then 'room_code' else 'sala_code' end;
 
     execute format($f$

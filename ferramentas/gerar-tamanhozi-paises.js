@@ -1,5 +1,6 @@
-// Uso: npm i world-atlas@2.0.2 topojson-client@3.1.0 numa pasta à parte e, de lá, node gerar-mapazi.js <caminho>/mapazi/data/paises.js
-// Gera mapazi/data/paises.js: contorno de cada país numa projeção de área igual (Lambert azimutal),
+// Uso: npm i world-atlas@2.0.2 topojson-client@3.1.0 numa pasta à parte e rode
+// NODE_PATH=<pasta>/node_modules node ferramentas/gerar-tamanhozi-paises.js tamanhozi/data/paises.js
+// Gera tamanhozi/data/paises.js: contorno de cada país numa projeção de área igual (Lambert azimutal),
 // centrada no próprio país, para os tamanhos serem comparáveis entre si.
 const topojson = require("topojson-client");
 const topo = require("world-atlas/countries-50m.json");
@@ -147,13 +148,13 @@ for (const [id, pt, en, es] of NOMES) {
   }).join("");
   linhas.push(`  ["${id}", ${JSON.stringify(pt)}, ${JSON.stringify(en)}, ${JSON.stringify(es)}, ${Math.round(total)}, ${+u.toFixed(4)}, ${Math.round((maxX - minX) / u)}, ${Math.round((maxY - minY) / u)}, "${d}"],`);
 }
-fs.writeFileSync(process.argv[2], `// Países do Mapazi: [id ISO, "português", "English", "español", área em km², km por unidade do desenho, largura, altura, contorno SVG].
+fs.writeFileSync(process.argv[2], `// Países do Tamanhozi: [id ISO, "português", "English", "español", área em km², km por unidade do desenho, largura, altura, contorno SVG].
 // Gerado de Natural Earth (domínio público, via world-atlas 50m) numa projeção de área igual (Lambert azimutal)
 // centrada em cada país, então desenhar dois países na mesma escala (km por pixel) mostra o tamanho real de um
 // perto do outro. Territórios longe do corpo do país ficam de fora (Havaí, Guiana Francesa, Canárias, Svalbard…).
-// Países novos entram no FIM (a ordem é usada pelo sorteio do dia) e precisam de uma linha nova em MP_DIARIO_POOLS.
+// Países novos entram no FIM (a ordem é usada pelo sorteio do dia) e precisam de uma linha nova em TZ_DIARIO_POOLS.
 
-mpPaises([
+tzPaises([
 ${linhas.join("\n")}
 ]);
 `);

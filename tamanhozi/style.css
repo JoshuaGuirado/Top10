@@ -1,4 +1,4 @@
-/* Mapazi — mesmas cores, fonte e peças do Topzi e do Gamezi: vermelho, preto e creme. Ver brand.html */
+/* Tamanhozi — mesmas cores, fonte e peças do Topzi e do Gamezi: vermelho, preto e creme. Ver brand.html */
 :root {
   --accent: #FF4D3D; --accent-ink: #D93A2B; --accent-soft: #FFE1D4; --on-accent: #171717;
   --bad: #B8261A; --good: #1F8A4C; --duck: #FFC93C;
@@ -145,35 +145,98 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .gamezi-back { flex: none; text-decoration: none; }
 body[data-screen]:not([data-screen="home"]) .gamezi-back { display: none; }
 
-/* ── partida: os dois países lado a lado (cinza = referência, vermelho = o que a pessoa ajusta) e a barra ── */
-.game-head { display: flex; align-items: center; gap: 12px; margin: 8px 0 8px; }
-.game-head b { flex: 1; min-width: 0; font-stretch: 75%; font-weight: 800; font-size: 1.4rem; line-height: 1.05; }
-.game-round, .game-score { font-weight: 800; color: var(--muted); white-space: nowrap; font-size: .9rem; }
-.game-score { color: var(--accent-ink); }
-.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 0 0 6px; }
-.legend span { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 1.05rem; line-height: 1.1; }
-.legend small { font-weight: 600; font-size: .78rem; color: var(--muted); }
-.legend i { width: 14px; height: 14px; border-radius: 4px; flex: none; }
-.legend .ref i { background: var(--map-ref); }
-.legend .alvo i { background: var(--accent); }
-.legend .real i { background: transparent; border: 2.5px dashed var(--good); }
-.game-ask { margin: 0 0 8px; color: var(--muted); font-weight: 600; font-size: .92rem; }
-.stage { width: 100%; aspect-ratio: 1 / 0.82; max-height: 56vh; background: var(--surface); border-radius: var(--r); display: block; touch-action: none; }
+/* ── partida: cartões (referência e o que se ajusta), o quadro com os dois em pé no mesmo chão e os controles ── */
+.game { max-width: 760px; margin: 0 auto; }
+.game-head { display: flex; align-items: center; gap: 10px; margin: 6px 0 10px; flex-wrap: wrap; }
+.game-head b { flex: 1; min-width: 0; font-stretch: 75%; font-weight: 800; font-size: 1.35rem; line-height: 1.05; }
+.game-round { font-weight: 800; white-space: nowrap; font-size: .9rem; }
+.game-dots { display: inline-flex; gap: 3px; }
+.game-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--line); }
+.game-dots i.done { background: var(--fg); }
+.game-dots i.now { background: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.game-score { font-weight: 800; color: var(--accent-ink); white-space: nowrap; background: var(--accent-soft); border-radius: 999px; padding: 3px 10px; font-size: .85rem; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.pair-card { background: var(--surface); border-radius: var(--r-sm); padding: 10px 12px; border-left: 4px solid var(--map-ref); display: grid; gap: 1px; min-width: 0; }
+.pair-card.alvo { border-left-color: var(--accent); }
+.pair-card small { font-size: .66rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.pair-card.alvo small { color: var(--accent-ink); }
+.pair-card b { font-size: 1rem; line-height: 1.15; overflow-wrap: anywhere; }
+.pair-card span { font-size: .82rem; color: var(--muted); font-weight: 600; }
+.board { position: relative; width: 100%; height: min(58vh, 460px); min-height: 300px; background: var(--surface); border-radius: var(--r); overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; cursor: ns-resize; }
+.stage { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.stage .chao { stroke: var(--line); stroke-width: 2; }
 .stage .ref { fill: var(--map-ref); }
 .stage .alvo { fill: var(--accent); }
-.stage .alvo.palpite { fill: var(--accent); opacity: .45; }
+.stage .alvo.palpite { opacity: .45; }
 .stage .real { fill: none; stroke: var(--good); stroke-width: 3; stroke-dasharray: 7 5; }
-.size-row { display: flex; align-items: center; gap: 10px; margin: 14px 0 10px; }
-.size-btn { flex: none; width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--fg); color: var(--bg); font: inherit; font-size: 1.6rem; font-weight: 800; line-height: 1; cursor: pointer; }
+.stage .caixa { fill: none; stroke: var(--accent); stroke-opacity: .55; stroke-width: 1.5; stroke-dasharray: 5 4; }
+.stage .regua { fill: none; stroke-width: 2; }
+.stage .regua.ref { stroke: var(--map-ref); }
+.stage .regua.real { stroke: var(--good); }
+.labels { position: absolute; inset: 0; pointer-events: none; }
+.label { position: absolute; transform: translate(-50%, -100%); text-align: center; display: grid; line-height: 1.15; white-space: nowrap; max-width: 48%; }
+.label b { font-size: .82rem; font-weight: 800; overflow: hidden; text-overflow: ellipsis; color: var(--fg); }
+.label span { font-size: .72rem; font-weight: 700; color: var(--muted); }
+.label.alvo b { color: var(--accent-ink); }
+.handle { position: absolute; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%; border: 3px solid var(--surface); background: var(--accent); color: var(--on-accent); padding: 5px; cursor: nesw-resize; touch-action: none; box-shadow: 0 2px 6px rgba(0, 0, 0, .25); }
+.handle svg { width: 100%; height: 100%; display: block; pointer-events: none; }
+.board-hint { position: absolute; left: 10px; right: 10px; bottom: 8px; margin: 0; padding: 8px 12px; border-radius: 12px; background: var(--fg); color: var(--bg); font-size: .78rem; font-weight: 600; text-align: center; opacity: .88; pointer-events: none; }
+.timer { position: absolute; right: 10px; top: 10px; font-weight: 800; font-variant-numeric: tabular-nums; background: var(--fg); color: var(--bg); border-radius: 999px; padding: 3px 10px; font-size: .85rem; }
+.timer.pouco { background: var(--accent); color: var(--on-accent); }
+.controls { display: flex; align-items: center; gap: 8px; margin: 12px 0 8px; }
+.size-btn { flex: none; width: 52px; height: 52px; border-radius: 14px; border: 0; background: var(--fg); color: var(--bg); font: inherit; font-size: 1.7rem; font-weight: 800; line-height: 1; cursor: pointer; touch-action: none; }
 .size-btn:active { transform: scale(.94); }
-.size-row input[type="range"] { flex: 1; min-width: 0; height: 46px; accent-color: var(--accent); cursor: pointer; }
-#game-confirm, #game-next { display: block; width: 100%; max-width: 420px; margin: 0 auto; }
-.reveal { text-align: center; display: grid; gap: 4px; margin: 10px 0 12px; }
-.reveal-pts { margin: 0; font-stretch: 75%; font-weight: 800; font-size: 2.4rem; line-height: 1; color: var(--accent-ink); }
+.controls .confirm { flex: 1; margin-left: 4px; text-transform: uppercase; letter-spacing: .04em; }
+.sent { text-align: center; font-weight: 700; color: var(--muted); margin: 14px 0; }
+.reveal { text-align: center; display: grid; gap: 8px; margin: 10px 0 8px; justify-items: center; }
+.reveal #reveal { display: grid; gap: 2px; }
+.reveal-pts { margin: 0; font-stretch: 75%; font-weight: 800; font-size: 2.2rem; line-height: 1; color: var(--accent-ink); }
 .reveal-pts.top { color: var(--good); }
 .reveal p { margin: 0; }
 .reveal .how { font-weight: 700; }
-.reveal .areas { color: var(--muted); font-size: .88rem; }
+#game-next { min-width: min(100%, 320px); }
+.players { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.player { display: inline-flex; align-items: center; gap: 6px; background: var(--surface); border-radius: 999px; padding: 4px 10px; font-size: .82rem; font-weight: 700; }
+.player small { color: var(--muted); font-weight: 600; }
+.player.ok small { color: var(--good); }
+.player.ganhou { background: var(--good); color: #fff; }
+.player.ganhou small { color: #fff; opacity: .9; }
+.player.away { opacity: .5; }
+.player .pts { background: var(--fg); color: var(--bg); border-radius: 999px; padding: 0 7px; font-size: .75rem; }
+@media (max-width: 420px) { .pair-card b { font-size: .92rem; } .board { height: 52vh; } }
+
+/* ── online e sala ── */
+.narrow { max-width: 560px; margin: 0 auto; }
+.feedback.bad { color: var(--bad); }
+.nick { display: grid; gap: 4px; margin-top: 16px; }
+.nick span { font-size: .78rem; color: var(--muted); font-weight: 700; }
+.nick input, .code-input { font: inherit; font-weight: 700; width: 100%; min-width: 0; color: var(--fg); background: var(--bg); border: 2px solid var(--line); border-radius: var(--r-sm); padding: 10px 12px; }
+.nick input:focus, .code-input:focus { outline: none; border-color: var(--fg); }
+.code-input { text-transform: uppercase; letter-spacing: .2em; font-size: 1.3rem; text-align: center; }
+.online-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+.online-box { display: grid; gap: 10px; align-content: start; margin: 0; }
+.online-box .card-label, .online-box p { margin: 0; }
+.card-label { font-weight: 800; margin: 0 0 8px; }
+@media (max-width: 560px) { .online-grid { grid-template-columns: 1fr; } }
+.lobby-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+.lobby-top p { margin: 0; }
+.room-code { font-stretch: 75%; font-weight: 800; font-size: clamp(3rem, 16vw, 5rem); letter-spacing: .12em; line-height: 1; color: var(--accent-ink); }
+.lobby-players { display: grid; gap: 6px; margin-bottom: 16px; }
+.lobby-player { display: flex; align-items: center; gap: 10px; background: var(--surface); border-radius: var(--r); padding: 8px 8px 8px 12px; }
+.lobby-player b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lobby-player b small { color: var(--muted); font-weight: 600; }
+.lobby-player i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); flex: none; }
+.lobby-player.here i { background: var(--good); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 0; background: var(--bg); color: var(--fg); font: inherit; font-weight: 700; font-size: .82rem; padding: 7px 12px; border-radius: 999px; cursor: pointer; }
+.chip.active { background: var(--fg); color: var(--bg); }
+.chip:disabled { cursor: default; }
+.home-card .chips { margin-top: 12px; }
+.ranking { list-style: none; margin: 16px auto; padding: 0; display: grid; gap: 4px; max-width: 520px; }
+.ranking li { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--surface); border-radius: var(--r-sm); font-weight: 700; }
+.ranking li.first { box-shadow: inset 0 0 0 2px var(--accent); }
+.ranking li .pos { font-stretch: 75%; font-weight: 800; font-size: 1.2rem; color: var(--muted); width: 2em; }
+.ranking li b { flex: 1; }
 
 /* ── resultado ── */
 .rounds { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }

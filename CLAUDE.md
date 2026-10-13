@@ -1,4 +1,4 @@
-# Gamezi (plataforma), Topzi, Patozi, Datazi, Maiorzi, Cravazi e Mapazi (jogos) — instruções para o Claude
+# Gamezi (plataforma), Topzi, Patozi, Datazi, Maiorzi, Cravazi e Tamanhozi (jogos) — instruções para o Claude
 
 - Responder em português.
 - Ao terminar uma mudança: commit na branch de trabalho e, em seguida, levar o mesmo commit para a `main`
@@ -66,8 +66,12 @@
   6 chutes por pergunta a partir do dia 6 (`czChutesDoDia`; os dias antigos continuam com 10).
 - Datazi: 2 vidas (`DZ_VIDAS`); o Datazi do dia usa `dzVidasDoDia` (3 até o dia 6). Mudou regra de desafio do dia? Vale a partir
   de amanhã, como as listas.
-- Mapazi (`mapazi/`): ajustar o tamanho de um país perto de outro (o tamanho de verdade). Scripts comuns, ordem no fim do
-  `mapazi/index.html` (`js/jogo.js` antes de `data/paises.js`); script novo vai no `FILES` do `sw.js` (o `tests/mapazi.test.js` acusa).
-  `data/paises.js` é gerado por `ferramentas/gerar-mapazi.js` (Natural Earth, projeção de área igual; precisa de `world-atlas` e
-  `topojson-client` do npm). País novo: no fim da lista `NOMES` do gerador, gerar de novo e linha nova em `MP_DIARIO_POOLS`
-  valendo a partir de amanhã (o dia 1 está fixado no teste). Chaves `mp:*`, tabela `mapazi_diario`.
+- Tamanhozi (`tamanhozi/`, antigo Mapazi; `mapazi/` só redireciona): ajustar o tamanho de uma coisa perto de outra (monumentos,
+  pessoas e monstros, animais, veículos, objetos e países). Sozinho (desafio do dia com ranking e partida livre por tema) e online
+  (todo mundo ajusta a mesma coisa; quem chegar mais perto leva 1 ponto; tabelas `tamanhozi_*`, rode `npm run test:online`).
+  Scripts comuns, ordem no fim do `tamanhozi/index.html` (`js/jogo.js` antes de `data/`); script novo vai no `FILES` do `sw.js`
+  (o `tests/tamanhozi.test.js` acusa). Dados gerados: `data/itens.js` por `ferramentas/gerar-tamanhozi.js` (silhuetas do
+  game-icons.net, CC BY 3.0, e do Material Design Icons; medida de verdade em metros) e `data/paises.js` por
+  `ferramentas/gerar-tamanhozi-paises.js` (Natural Earth, projeção de área igual). Item novo: no fim da lista `ITENS` do gerador
+  (medida que todo mundo encontra; personagem com a obra no nome), gerar de novo e linha nova em `TZ_DIARIO_POOLS` valendo a partir
+  de amanhã (o dia 1 está fixado no teste). Chaves `tm:*`.

@@ -112,15 +112,15 @@
         <span class="play" data-t="play">Jogar</span>
       </a>
 
-      <a class="game-row" href="mapazi/">
+      <a class="game-row" href="tamanhozi/">
         <span class="game-icon">
-          <img class="logo-light" src="brand/mapazi-simbolo.svg" alt="" aria-hidden="true">
-          <img class="logo-dark" src="brand/mapazi-simbolo-escuro.svg" alt="" aria-hidden="true">
+          <img class="logo-light" src="brand/tamanhozi-simbolo.svg" alt="" aria-hidden="true">
+          <img class="logo-dark" src="brand/tamanhozi-simbolo-escuro.svg" alt="" aria-hidden="true">
         </span>
         <span class="game-text">
-          <b>Mapazi</b>
-          <small data-t="mapaziKind">O tamanho de verdade dos países</small>
-          <small class="game-daily" id="mapa-tag"></small>
+          <b>Tamanhozi</b>
+          <small data-t="tamanhoziKind">Qual o tamanho de verdade? Sozinho ou online</small>
+          <small class="game-daily" id="tamanho-tag"></small>
         </span>
         <span class="play" data-t="play">Jogar</span>
       </a>
@@ -159,8 +159,8 @@
       maisKind: ["Tem mais ou tem menos?", "Is it more or less?", "¿Hay más o hay menos?"],
       cravaziKind: ["Quem crava o número exato? Sozinho, com a turma ou online", "Who nails the exact number? Solo, with friends or online", "¿Quién clava el número exacto? Solo, con amigos u online"],
       maisDaily: ["Desafio do dia #{n}", "Daily challenge #{n}", "Desafío del día #{n}"],
-      mapaziKind: ["O tamanho de verdade dos países", "The real size of countries", "El tamaño real de los países"],
-      mapaDaily: ["Mapazi do dia #{n}", "Daily Mapazi #{n}", "Mapazi del día #{n}"],
+      tamanhoziKind: ["Qual o tamanho de verdade? Sozinho ou online", "How big is it, really? Solo or online", "¿Qué tamaño tiene de verdad? Solo u online"],
+      tamanhoDaily: ["Tamanhozi do dia #{n}", "Daily Tamanhozi #{n}", "Tamanhozi del día #{n}"],
       play: ["Jogar", "Play", "Jugar"],
       ranking: ["Ranking do dia", "Daily ranking", "Ranking del día"],
       soon: ["Mais jogos em breve.", "More games coming soon.", "Más juegos muy pronto."],
@@ -218,11 +218,11 @@
       var mtag = document.getElementById("mais-tag");
       mtag.hidden = mn < 1;
       mtag.textContent = t("maisDaily").replace("{n}", mn);
-      // Mapazi do dia (mesma conta de mapazi/js/jogo.js: o dia 1 é 13/10/2026).
+      // Tamanhozi do dia (mesma conta de tamanhozi/js/jogo.js: o dia 1 é 13/10/2026).
       var an = pn - 5;
-      var atag = document.getElementById("mapa-tag");
+      var atag = document.getElementById("tamanho-tag");
       atag.hidden = an < 1;
-      atag.textContent = t("mapaDaily").replace("{n}", an);
+      atag.textContent = t("tamanhoDaily").replace("{n}", an);
       // Nível do Gamezi (soma o que se joga em todos os jogos neste aparelho).
       var prog = gameziProgresso();
       var nivel = document.getElementById("portal-level");

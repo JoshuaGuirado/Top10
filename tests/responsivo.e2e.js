@@ -179,8 +179,8 @@ function medir(W) {
         await page.waitForTimeout(150);
       }
     });
-    // ── Mapazi ──
-    await tentar("mapa-inicio", () => page.goto(base + "/mapazi/index.html"));
+    // ── Tamanhozi ──
+    await tentar("mapa-inicio", () => page.goto(base + "/tamanhozi/index.html"));
     await tentar("mapa-ajuda", () => page.click("#help-btn"));
     await fechar();
     await tentar("mapa-partida", () => page.click("#free-btn"));

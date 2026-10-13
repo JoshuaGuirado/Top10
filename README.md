@@ -171,14 +171,19 @@ Arquivos:
 
 Crie um arquivo novo em `patozi/data/` (por exemplo `cartas-4.js`), carregado no `patozi/index.html` depois dos outros e incluído no `FILES` do `sw.js` (`patozi/data/cartas-4.js`). Dentro, use `pzCartas("tema", [[patos, resposta, "pergunta", "question", "pregunta"], ...])`; quando a resposta for um ano, ponha `"ano"` no fim. Depois, acrescente uma linha em `PZ_DIARIO_POOLS` (`patozi/js/jogo.js`) valendo a partir de amanhã, com o novo total de cartas, para o Pato do dia de hoje não mudar. O `npm test` confere tudo isso.
 
-# Mapazi
+# Tamanhozi
 
-O tamanho de verdade dos países. Aparece um país no tamanho certo (cinza) e outro do lado (vermelho) num tamanho errado;
-a pessoa aumenta ou diminui o vermelho até achar que está certo, e aí aparece o contorno do tamanho real. Em cheio vale 100;
-cada vez que a área erra pelo dobro (ou pela metade), perde 50. Dez rodadas: Mapazi do dia (igual para todos, com ranking) e partida livre.
+Qual o tamanho de verdade? Aparece uma coisa de referência no tamanho certo (escura, com a medida) e outra do lado (vermelha)
+num tamanho errado: monumentos, pessoas e monstros, animais, veículos, objetos e países. A pessoa aumenta ou diminui a vermelha
+(alça do canto, arrastar no quadro, pinça, rodinha ou − e +) e confirma; aparece o contorno do tamanho real. Sozinho, em cheio vale
+100 e cada vez que a área erra pelo dobro (ou pela metade) perde 50; dez rodadas no desafio do dia (igual para todos, com ranking)
+ou na partida livre (com tema). Online, todo mundo ajusta a mesma coisa ao mesmo tempo (40 segundos por rodada) e quem chegar
+mais perto leva 1 ponto.
 
-- `mapazi/data/paises.js`: contornos gerados por `ferramentas/gerar-mapazi.js` a partir do Natural Earth (domínio público, pelo
-  pacote `world-atlas`), cada país numa projeção de área igual (Lambert azimutal) centrada nele, então dois países desenhados na
-  mesma escala mostram o tamanho real um perto do outro
-- `mapazi/js/jogo.js`: regras, sem tela (testado em `tests/mapazi.test.js`); `textos.js` (três idiomas); `app.js` (telas)
-- Marca: `brand/mapazi-logo*.svg` e `brand/mapazi-simbolo*.svg`
+- `tamanhozi/data/itens.js`: gerado por `ferramentas/gerar-tamanhozi.js` (silhuetas do game-icons.net, CC BY 3.0, e do Material
+  Design Icons; algumas desenhadas à mão), com a medida de verdade em metros
+- `tamanhozi/data/paises.js`: gerado por `ferramentas/gerar-tamanhozi-paises.js` a partir do Natural Earth (domínio público), cada
+  país numa projeção de área igual centrada nele
+- `tamanhozi/js/jogo.js`: regras, sem tela (testado em `tests/tamanhozi.test.js`); `textos.js`, `app.js` (telas) e `online.js`
+  (salas, como no Cravazi; testado em `tests/tamanhozi-online.e2e.js`)
+- Marca: `brand/tamanhozi-logo*.svg` e `brand/tamanhozi-simbolo*.svg`. O endereço antigo `mapazi/` leva para `tamanhozi/`
