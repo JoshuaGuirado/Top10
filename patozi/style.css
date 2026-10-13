@@ -147,22 +147,29 @@ button { font: inherit; cursor: pointer; color: inherit; }
 /* ── partida ── */
 .game-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 4px 0 10px; }
 .game-top .link-btn { white-space: nowrap; }
-.scoreboard { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 6px; padding: 4px 0 8px; }
+.scoreboard { display: grid; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 6px; padding: 4px 0 4px; }
 .score-chip {
-  min-width: 0; display: grid; grid-template-columns: 30px minmax(0, 1fr); column-gap: 6px; align-items: center;
-  background: var(--surface); border-radius: var(--r-sm); padding: 5px 8px 5px 5px; transition: background .2s, transform .2s;
+  min-width: 0; display: grid; grid-template-columns: 38px minmax(0, 1fr); column-gap: 8px; row-gap: 2px; align-items: center;
+  background: var(--surface); border: 2px solid transparent; border-radius: var(--r-sm); padding: 6px 10px 7px 6px; transition: background .2s, border-color .2s;
 }
-.score-chip .pato { grid-row: span 2; width: 30px; }
-.score-chip b { font-size: .82rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.score-chip span { font-size: .75rem; color: var(--muted); font-weight: 700; display: flex; align-items: center; gap: 4px; }
-.score-chip span .ui-ico { width: 13px; height: 13px; }
-.score-chip.current { background: var(--accent); color: var(--on-accent); transform: translateY(-2px); }
-.score-chip.current span { color: var(--on-accent); opacity: .8; }
+.score-chip .pato { grid-row: span 3; width: 38px; }
+.sc-name { font-size: .9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+.sc-name em { font-style: normal; font-size: .62rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; background: var(--fg); color: var(--bg); border-radius: 999px; padding: 2px 7px; flex: none; }
+.sc-ducks { font-size: .95rem; font-weight: 800; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; line-height: 1.1; }
+.sc-ducks .pato-mini { width: 17px; height: 17px; fill: currentColor; flex: none; }
+.sc-ducks small { display: inline-flex; align-items: center; gap: 2px; font-size: .7rem; font-weight: 700; color: var(--muted); }
+.sc-ducks small .ui-ico { width: 12px; height: 12px; }
+.sc-cards { font-size: .78rem; font-weight: 700; color: var(--muted); display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sc-cards .ui-ico { width: 14px; height: 14px; flex: none; }
+.sc-cards.near { color: var(--accent-ink); }
+.score-chip.current { background: var(--accent-soft); border-color: var(--accent); }
 .score-chip.away { opacity: .55; }
+.score-goal { margin: 2px 0 8px; font-size: .8rem; font-weight: 600; color: var(--muted); }
 
 .card { position: relative; background: var(--fg); color: var(--bg); border-radius: 22px; padding: 22px 22px 18px; margin-top: 6px; animation: deal .45s cubic-bezier(.2, .9, .3, 1.2) both; }
 .card-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .card-theme { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: var(--accent); }
+.card-ducks { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; flex: none; font-size: .78rem; font-weight: 800; opacity: .9; }
 .card-ducks .pato-mini { width: 22px; height: 22px; fill: currentColor; }
 .card-q { margin: 14px 0 18px; font-stretch: 75%; font-weight: 800; font-size: clamp(1.6rem, 6vw, 2.3rem); line-height: 1.08; }
 .bid { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; border-top: 1.5px solid rgba(255, 244, 222, .18); padding-top: 14px; }
@@ -183,8 +190,27 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .guess-row { display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap; }
 .guess-row .answer-input { flex: 1 1 180px; font-size: 1.4rem; font-weight: 800; padding: 12px 16px; }
 .guess-row .btn { flex: none; }
-.nem { font-stretch: 75%; font-weight: 800; font-size: 1.5rem; letter-spacing: .01em; padding: 14px 28px; background: var(--fg); color: var(--bg); text-transform: uppercase; }
-.nem:not(:disabled):hover { background: var(--accent); color: var(--on-accent); filter: none; }
+/* Subir o chute: um bloco com borda; o "Nem a pato!" fica fora dele, depois do "ou", em amarelo e com outro formato. */
+.move { display: grid; gap: 8px; border: 2px solid var(--line); border-radius: 18px; padding: 14px; }
+.move-title { margin: 0; display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--accent-ink); }
+.move-title .ui-ico { width: 16px; height: 16px; }
+.move .input-error:empty { display: none; }
+.guess-btn { font-size: 1.05rem; padding-left: 26px; padding-right: 26px; }
+.move-or { margin: -2px 0; display: flex; align-items: center; gap: 12px; color: var(--muted); font-weight: 700; font-size: .85rem; text-transform: uppercase; letter-spacing: .08em; }
+.move-or::before, .move-or::after { content: ""; flex: 1; height: 1.5px; background: var(--line); }
+.nem-card {
+  display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; border: 2.5px solid #171717; border-radius: 18px;
+  padding: 12px 16px; background: var(--duck); color: #171717; font: inherit; cursor: pointer; box-shadow: 0 4px 0 #171717; transition: transform .08s, box-shadow .08s;
+}
+.nem-card:active { transform: translateY(3px); box-shadow: 0 1px 0 #171717; }
+.nem-ico { flex: none; width: 46px; height: 46px; border-radius: 50%; background: #171717; display: grid; place-items: center; }
+.nem-ico .pato-mini { width: 30px; height: 30px; fill: var(--duck); }
+.nem-txt { display: grid; gap: 2px; min-width: 0; }
+.nem-txt b { font-stretch: 75%; font-weight: 800; font-size: 1.7rem; line-height: 1; text-transform: uppercase; }
+.nem-txt small { font-size: .85rem; font-weight: 600; line-height: 1.25; }
+.nem-confirm { border-radius: 18px; padding: 14px; background: var(--surface); text-align: center; }
+.nem-confirm p { margin: 0 0 10px; font-weight: 700; }
+.nem-small { background: var(--duck); color: #171717; }
 .thinking { display: flex; align-items: center; gap: 12px; color: var(--muted); font-weight: 700; }
 .dots { display: inline-flex; gap: 5px; }
 .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); animation: hop .5s ease-in-out infinite alternate; }

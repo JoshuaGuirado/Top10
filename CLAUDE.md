@@ -1,4 +1,4 @@
-# Gamezi (plataforma), Topzi, Patozi, Datazi, Maisoumenozi e Cravazi (jogos) — instruções para o Claude
+# Gamezi (plataforma), Topzi, Patozi, Datazi, Maiorzi e Cravazi (jogos) — instruções para o Claude
 
 - Responder em português.
 - Ao terminar uma mudança: commit na branch de trabalho e, em seguida, levar o mesmo commit para a `main`
@@ -25,10 +25,12 @@
   `conta.html?volta=<jogo>`. Jogo novo: carregar `../gamezi-conta.js`, pôr a pasta em `GAMEZI_JOGOS` e em `JOGOS` da `conta.html`.
 - Patozi: scripts comuns como no Topzi (ordem no fim do `patozi/index.html`); script novo também vai no `FILES` do
   `sw.js` com o caminho `patozi/…` (o `tests/patozi.test.js` acusa). Regras e computador ficam em `patozi/js/jogo.js`, sem tela.
+  Cada chute sobe pelo menos 10% (`PZ_SUBIDA`; carta de ano, 1). Na partida, "Chutar" e "Nem a pato!" ficam separados
+  (bloco do chute, "ou", botão amarelo) e o placar escreve "X patos" e "N de M cartas": o dono pediu por causa de confusão.
 - Cartas do Patozi precisam ser **difíceis**: recorde, peso, altura, distância, quantidade que ninguém sabe de cabeça
   (nada de "quantas patas tem a aranha" ou "quantas estrelas tem a bandeira"). As óbvias antigas ficam em
   `patozi/data/aposentadas.js` (fora do sorteio; não apague linhas dos `cartas-*.js`, os ids mudariam).
-- Cartas novas do Patozi (a última é `cartas-6.js`): arquivo novo em `patozi/data/` carregado depois dos outros, pergunta em português, inglês e
+- Cartas novas do Patozi (a última é `cartas-7.js`): arquivo novo em `patozi/data/` carregado depois dos outros, pergunta em português, inglês e
   espanhol, resposta inteira (ano com `"ano"` no fim) e uma linha nova em `PZ_DIARIO_POOLS` valendo a partir de amanhã.
   Número que muda com o tempo leva a data na pergunta ("até 2022").
 - Mudou carta do Patozi (nova ou resposta)? Rode `node supabase/gerar-respostas.js` e mande o `supabase/patozi-respostas.sql`
@@ -43,7 +45,8 @@
 - Nível e conquistas (todos os jogos) ficam em `gamezi-conta.js`; jogo novo precisa entrar em `gameziDadosLocais`.
 - O Patozi usa o mesmo Supabase do Topzi (chaves em `topzi/js/config.js`) e tabelas próprias `patozi_*`. Nunca mexa no
   `topzi/` por causa do Patozi.
-- Maisoumenozi (`maisoumenozi/`): scripts comuns, ordem no fim do `maisoumenozi/index.html` (`js/jogo.js` antes de `data/`);
+- Maiorzi (antigo Maisoumenozi): a pasta `maisoumenozi/`, os arquivos `brand/maisoumenozi-*`, as tabelas `maisoumenozi_*`, o id
+  `maisoumenozi` e as chaves `mm:*` continuam com o nome antigo (não quebra links, contas nem ranking); na tela é Maiorzi. Scripts comuns, ordem no fim do `maisoumenozi/index.html` (`js/jogo.js` antes de `data/`);
   script novo vai no `FILES` do `sw.js` com o caminho `maisoumenozi/…` (o `tests/maisoumenozi.test.js` acusa). Assunto ou item novo:
   arquivo novo em `maisoumenozi/data/` carregado depois dos outros (`mmTema`/`mmMais`), textos nos 3 idiomas, pelo menos 3 perguntas
   por assunto que não citem os nomes, e linha nova em `MM_DIARIO_POOLS` valendo a partir de amanhã (o dia 1 está fixado no teste
@@ -59,3 +62,7 @@
   (tabelas `cravazi_*`, rode `npm run test:online`). Pergunta nova: resposta inteira, nos 3 idiomas, difícil, que faça sentido sozinha
   (as perguntas são sorteadas), que não repita carta do Patozi e uma linha nova em `CZ_DIARIO_POOLS` valendo a partir de amanhã (o dia 1
   está fixado no teste). Tela simples: pergunta, "É MAIS"/"É MENOS", de quem é a vez e o campo do chute.
+  Com a turma/online: 3 chutes de cada por rodada (`CZ_CHUTES_POR_JOGADOR`); ninguém cravou, ninguém pontua. Cravazi do dia:
+  6 chutes por pergunta a partir do dia 6 (`czChutesDoDia`; os dias antigos continuam com 10).
+- Datazi: 2 vidas (`DZ_VIDAS`); o Datazi do dia usa `dzVidasDoDia` (3 até o dia 6). Mudou regra de desafio do dia? Vale a partir
+  de amanhã, como as listas.

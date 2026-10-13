@@ -1,4 +1,4 @@
-// Teste de ponta a ponta do ranking do dia (gamezi-ranking.js) no Datazi, no Maisoumenozi e no portal
+// Teste de ponta a ponta do ranking do dia (gamezi-ranking.js) no Datazi, no Maiorzi e no portal
 // (ranking.html), com o Supabase falso de tests/supabase-falso.js. Confere o nome pedido para o ranking,
 // o tempo guardado com o resultado e o desempate pelo tempo.
 // Rode com: npm run test:online
@@ -69,7 +69,7 @@ const server = http.createServer((req, res) => {
   assert.equal((await db()).datazi_diario.length, 1);
   step("resultado salvo mostra o ranking sem mandar de novo");
 
-  // Maisoumenozi: o nome já é conhecido (o do Datazi), então manda direto.
+  // Maiorzi: o nome já é conhecido (o do Datazi), então manda direto.
   await P.goto(site + "/maisoumenozi/index.html");
   await P.click("#daily-btn");
   await P.evaluate(async () => {
@@ -85,7 +85,7 @@ const server = http.createServer((req, res) => {
   linhas = (await db()).maisoumenozi_diario;
   assert.equal(linhas.length, 1);
   assert.ok(linhas[0].tempo_ms > 0);
-  step("Maisoumenozi do dia: manda com o nome já usado e mostra o ranking");
+  step("Maiorzi do dia: manda com o nome já usado e mostra o ranking");
 
   // Desempate: mesmos pontos, quem levou menos tempo fica na frente; sem tempo fica atrás.
   const dia = await P.evaluate(() => mmDiaNumero());
@@ -106,7 +106,7 @@ const server = http.createServer((req, res) => {
   assert.deepEqual(nomes, ["Craque", "Rápido", "Nina", "Lento", "Sem tempo"]);
   assert.match(await P.textContent("#rank .lb-pos"), /3º de 5/);
   assert.match(await P.textContent("#rank .lb-row:nth-of-type(1) .lb-time"), /\d/);
-  step("portal: ranking do Maisoumenozi com desempate pelo tempo");
+  step("portal: ranking do Maiorzi com desempate pelo tempo");
 
   // Banco sem a função nova (schema.sql ainda não rodou): lê a tabela e ordena do mesmo jeito.
   const direto = await P.evaluate(async (dia) => {

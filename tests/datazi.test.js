@@ -53,6 +53,13 @@ test("linha do tempo: lugar certo, errado e fim", () => {
   assert.equal(r("dzColocar(s, 0)"), null, "depois do fim, nada muda");
 });
 
+test("vidas: 2 na partida livre e no Datazi do dia a partir do dia 7 (antes eram 3)", () => {
+  assert.equal(r("dzNovaPartida(['e1', 'e2']).vidas"), 2);
+  assert.equal(r("dzVidasDoDia(6)"), 3, "dias antigos não mudam");
+  assert.equal(r("dzVidasDoDia(7)"), 2);
+  assert.equal(r("dzNovaPartida(['e1', 'e2'], dzVidasDoDia(1)).vidasMax"), 3);
+});
+
 test("Datazi do dia: igual para todo mundo, anos diferentes e o dia 1 não muda", () => {
   const d1 = r("dzDiarioEventos(1)");
   assert.equal(d1.length, r("DZ_DIARIO_QTD") + 1);

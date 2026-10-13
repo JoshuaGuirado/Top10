@@ -159,7 +159,7 @@ function medir(W) {
         await page.waitForTimeout(150);
       }
     });
-    // ── Maisoumenozi ──
+    // ── Maiorzi ──
     await tentar("mais-inicio", () => page.goto(base + "/maisoumenozi/index.html"));
     await tentar("mais-ajuda", () => page.click("#help-btn"));
     await fechar();

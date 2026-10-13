@@ -217,7 +217,7 @@ async function conferirAnfitriao() {
 
 // O anfitrião passa a vez de quem saiu da sala (senão a rodada ficaria parada esperando).
 function passarVezDeQuemSaiu() {
-  if (!noOnline() || !isHost() || !partida || partida.fim || partida.atual.vencedor !== null) return;
+  if (!noOnline() || !isHost() || !partida || partida.fim || czRodadaAcabou(partida)) return;
   if (!onlineAusente(partida.atual.vez)) return;
   czPassarVez(partida);
   onlineTransmitir();
@@ -342,7 +342,7 @@ function receberEstado(estado, forcar = false) {
   renderJogo();
   // Mostra a dica nova com a mesma animação de quem chutou.
   if (antes && antes.rodada === estado.rodada && estado.atual.chutes.length > antes.atual.chutes.length) {
-    animar(estado.atual.vencedor !== null ? $("nailed") : $("hint"));
+    animar(czRodadaAcabou(estado) ? $("nailed") : $("hint"));
     if (estado.atual.vencedor !== null && navigator.vibrate) navigator.vibrate([40, 40, 80]);
   }
   if (souDaVez()) focarCampo("guess");

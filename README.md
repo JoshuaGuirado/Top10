@@ -116,7 +116,7 @@ Jogo de linha do tempo: coloque os acontecimentos na ordem em que aconteceram. A
 - `datazi/js/jogo.js`: regras, sem tela (testado em `tests/datazi.test.js`); `textos.js` (três idiomas); `app.js` (telas)
 - Marca: `brand/datazi-logo*.svg` e `brand/datazi-simbolo*.svg`
 
-# Maisoumenozi
+# Maiorzi
 
 Jogo de "tem mais ou tem menos?". A tela é de cima para baixo: o placar, a referência ("Comparado com: Carro popular, 1.000 kg"), a pergunta com o nome do outro item em letra grande ("Girafa — pesa mais ou menos?") e os dois botões embaixo. Depois de responder, o número aparece e o item vira a referência da próxima.
 

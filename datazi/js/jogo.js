@@ -1,9 +1,11 @@
 // Regras do Datazi, sem tela (testadas em tests/datazi.test.js).
 // A linha do tempo começa com um acontecimento já colocado (com o ano à mostra). A cada rodada aparece outro, e
 // a pessoa escolhe onde ele entra na linha. Lugar certo: ponto. Lugar errado: perde uma vida, e o acontecimento
-// vai para o lugar certo mesmo assim. Acaba quando acabam os acontecimentos ou as vidas.
+// vai para o lugar certo mesmo assim. Acaba quando acabam os acontecimentos ou as vidas (2; até o dia 6 eram 3).
 
-const DZ_VIDAS = 3;
+const DZ_VIDAS = 2;
+const DZ_VIDAS_ANTES = 3; // o Datazi do dia teve 3 vidas até o dia 6 (13/10/2026)
+const DZ_VIDAS_DESDE = 7; // dia a partir do qual valem as 2 vidas
 const DZ_DIARIO_QTD = 8; // acontecimentos para colocar no Datazi do dia (fora o primeiro, que já vem na linha)
 
 // Datazi do dia: o dia 1 é 8/10/2026. Acontecimentos novos só entram no sorteio a partir do dia da linha nova,
@@ -62,7 +64,12 @@ function dzSortear(ids, n, rnd) {
 
 // ids: o primeiro já começa na linha; os outros aparecem um por um.
 function dzNovaPartida(ids, vidas = DZ_VIDAS) {
-  return { linha: [ids[0]], fila: ids.slice(1), atual: ids[1] || null, acertos: 0, erros: 0, vidas, marcas: [], fim: ids.length < 2, ultimo: null };
+  return { linha: [ids[0]], fila: ids.slice(1), atual: ids[1] || null, acertos: 0, erros: 0, vidas, vidasMax: vidas, marcas: [], fim: ids.length < 2, ultimo: null };
+}
+
+// Vidas no Datazi do dia de um dia (os dias antigos continuam com as regras de antes).
+function dzVidasDoDia(dia) {
+  return dia && dia < DZ_VIDAS_DESDE ? DZ_VIDAS_ANTES : DZ_VIDAS;
 }
 
 // Posições certas para o acontecimento: entre os que vieram antes e os que vieram depois (ano igual vale dos dois lados).

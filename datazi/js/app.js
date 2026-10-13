@@ -99,7 +99,7 @@ function comecarDiario(dia = dzDiaNumero()) {
   }
   modo = "diario";
   diaAtual = dia;
-  partida = dzNovaPartida(dzDiarioEventos(dia));
+  partida = dzNovaPartida(dzDiarioEventos(dia), dzVidasDoDia(dia));
   esperando = false;
   show("game");
   renderJogo();
@@ -124,8 +124,9 @@ function comecarTempo() {
 function renderJogo() {
   const s = partida;
   $("game-title").textContent = modo === "diario" ? t("daily.kicker", { n: diaAtual }) : t("game.free");
-  $("game-lives").innerHTML = Array.from({ length: DZ_VIDAS }, (_, i) => `<span class="heart ${i < s.vidas ? "" : "lost"}">${ICONES.heart}</span>`).join("");
-  $("game-lives").setAttribute("aria-label", t("game.lives", { n: s.vidas }));
+  $("game-lives").innerHTML = Array.from({ length: s.vidasMax || DZ_VIDAS }, (_, i) => `<span class="heart ${i < s.vidas ? "" : "lost"}">${ICONES.heart}</span>`).join("") +
+    `<small>${escapeHtml(s.vidas === 1 ? t("game.lives1") : t("game.lives", { n: s.vidas }))}</small>`;
+  $("game-lives").setAttribute("aria-label", s.vidas === 1 ? t("game.lives1") : t("game.lives", { n: s.vidas }));
   $("game-score").textContent = s.acertos === 1 ? t("game.score1") : t("game.score", { n: s.acertos });
 
   const ultimo = esperando ? s.ultimo : null;
@@ -137,8 +138,11 @@ function renderJogo() {
   $("game-next").hidden = !ultimo;
   $("game-next").textContent = t(s.fim ? "game.finish" : "game.next");
 
-  // Linha do tempo: um "Aqui" entre cada acontecimento (e antes do primeiro e depois do último).
-  const slot = (pos) => `<li class="slot"><button type="button" data-pos="${pos}" ${ultimo ? "disabled" : ""}>${escapeHtml(t("game.here"))}</button></li>`;
+  // Linha do tempo: um botão entre cada acontecimento (e antes do primeiro e depois do último), dizendo onde fica:
+  // "Antes de 1953", "Entre 1953 e 1973", "Depois de 2017".
+  const ano = (i) => dzEvento(s.linha[i]).ano;
+  const onde = (pos) => (pos === 0 ? t("game.before", { a: ano(0) }) : pos === s.linha.length ? t("game.after", { a: ano(pos - 1) }) : t("game.between", { a: ano(pos - 1), b: ano(pos) }));
+  const slot = (pos) => `<li class="slot"><button type="button" data-pos="${pos}" ${ultimo ? "disabled" : ""}>${escapeHtml(onde(pos))}</button></li>`;
   let html = slot(0);
   s.linha.forEach((id, i) => {
     const e = dzEvento(id);

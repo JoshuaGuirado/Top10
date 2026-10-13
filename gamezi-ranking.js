@@ -1,8 +1,8 @@
-// Ranking do dia de todos os jogos do Gamezi (Topzi, Patozi, Datazi, Maisoumenozi e Cravazi) e do portal (ranking.html).
+// Ranking do dia de todos os jogos do Gamezi (Topzi, Patozi, Datazi, Maiorzi e Cravazi) e do portal (ranking.html).
 // Quem faz mais pontos no desafio do dia fica na frente; no empate, quem levou menos tempo. Quem ordena é o
 // banco (gamezi_ranking_dia, em supabase/schema.sql); aqui só buscamos e desenhamos.
 // Precisa de SUPABASE_URL e SUPABASE_ANON_KEY (topzi/js/config.js). O Topzi e o Patozi já têm o próprio
-// cliente do Supabase e o passam para cá; o Datazi, o Maisoumenozi, o Cravazi e o portal usam gameziCliente().
+// cliente do Supabase e o passam para cá; o Datazi, o Maiorzi, o Cravazi e o portal usam gameziCliente().
 
 var GAMEZI_SUPABASE_CDN = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
 var GAMEZI_RANKING_LIMITE = 10;
@@ -70,7 +70,7 @@ function gameziRankingLer(chave) {
   try { return JSON.parse(localStorage.getItem(chave)); } catch (e) { return null; }
 }
 
-// ───────────── conexão (Datazi, Maisoumenozi, Cravazi e portal) ─────────────
+// ───────────── conexão (Datazi, Maiorzi, Cravazi e portal) ─────────────
 
 var gameziSb = null;
 var gameziSbPronto = null;
@@ -194,7 +194,7 @@ function gameziRankingDesenhar(box, cliente, jogo, dia, l) {
   });
 }
 
-// ───────────── Datazi, Maisoumenozi e Cravazi: mandar o resultado do dia ─────────────
+// ───────────── Datazi, Maiorzi e Cravazi: mandar o resultado do dia ─────────────
 
 // Manda o resultado de hoje (uma vez: reg.enviado) e desenha o ranking do dia em box. Sem nome para o ranking,
 // pede um antes (fica guardado no jogo). Resultado de outro dia só mostra o ranking (não conta).

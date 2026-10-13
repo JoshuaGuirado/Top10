@@ -1,4 +1,4 @@
-// Regras do Maisoumenozi, sem tela (testadas em tests/maisoumenozi.test.js).
+// Regras do Maiorzi, sem tela (testadas em tests/maisoumenozi.test.js).
 // Rodada comum: dois itens da mesma grandeza (o de cima com o número, o de baixo escondido) e a pessoa diz se o de
 // baixo tem mais ou menos. O de baixo vira o de cima da próxima. Assuntos da mesma grandeza se misturam (montanha
 // contra prédio contra atleta, todos em altura), e a cada 2 ou 3 rodadas muda a grandeza.

@@ -1,4 +1,4 @@
-// Textos do Maisoumenozi em [português, inglês, espanhol], idioma, armazenamento e utilidades de tela.
+// Textos do Maiorzi em [português, inglês, espanhol], idioma, armazenamento e utilidades de tela.
 // O idioma, o tema e o som são os mesmos do Gamezi (tt:lang, tt:theme, tt:sound); o resto fica em mm:…
 
 const LANGS = ["pt", "en", "es"];
@@ -19,7 +19,7 @@ if (!LANGS.includes(lang)) lang = LANGS.includes((navigator.language || "pt").sl
 
 const MM_T = {
   "game.compared": ["Comparado com", "Compared with", "Comparado con"],
-  "res.shareClock": ["Fiz {n} pontos em 60 segundos no Maisoumenozi. Você bate? {url}", "I scored {n} points in 60 seconds on Maisoumenozi. Can you beat it? {url}", "Hice {n} puntos en 60 segundos en Maisoumenozi. ¿Me superas? {url}"],
+  "res.shareClock": ["Fiz {n} pontos em 60 segundos no Maiorzi. Você bate? {url}", "I scored {n} points in 60 seconds on Maiorzi. Can you beat it? {url}", "Hice {n} puntos en 60 segundos en Maiorzi. ¿Me superas? {url}"],
   "res.clockSub": ["{a} acertos de {b} · maior combo ×{c}", "{a} right out of {b} · best combo ×{c}", "{a} aciertos de {b} · mejor combo ×{c}"],
   "res.clock": ["{n} pontos", "{n} points", "{n} puntos"],
   "game.timeUp": ["Tempo!", "Time's up!", "¡Tiempo!"],
@@ -58,7 +58,7 @@ const MM_T = {
     "<p>Dos cosas, un número escondido: <b>¿más o menos?</b></p><ol class=\"help-steps\"><li>Arriba, un ítem con su número. Abajo, otro con el número escondido. Di si el de abajo tiene <b>más</b> o <b>menos</b> (o es más alto, más pesado, más rápido…).</li><li>Los temas se mezclan: el monte Fuji contra el Burj Khalifa, un lago contra un país. ¡Ojo con la unidad!</li><li>A veces aparece una <b>comparación loca</b>: los dos números escondidos (¿una ballena o 30 elefantes?). Toca el que tiene más. Después viene una curiosidad.</li></ol><p><b>Contra el reloj:</b> 60 segundos. Cada acierto vale 10 puntos (20 en la loca) y las rachas multiplican: ×2 desde el 3.º, ×3 desde el 6.º, hasta ×5. Fallar reinicia el combo y quita 3 segundos.</p><p><b>Desafío del día:</b> las mismas 10 comparaciones para todos. <b>Sin fallar:</b> hasta el primer error.</p>",
   ],
   "daily.name": ["Desafio do dia", "Daily challenge", "Desafío del día"],
-  "daily.kicker": ["Maisoumenozi do dia #{n}", "Daily Maisoumenozi #{n}", "Maisoumenozi del día #{n}"],
+  "daily.kicker": ["Maiorzi do dia #{n}", "Daily Maiorzi #{n}", "Maiorzi del día #{n}"],
   "daily.done": ["{a} de {b} certas", "{a} of {b} right", "{a} de {b} correctas"],
   "game.free": ["Sem errar", "No mistakes", "Sin fallar"],
   "game.streak": ["{n} seguidas", "{n} in a row", "{n} seguidas"],
@@ -73,8 +73,8 @@ const MM_T = {
   "res.best": ["Recorde: {n}", "Best: {n}", "Récord: {n}"],
   "res.sub": ["{n} dias seguidos", "{n} days in a row", "{n} días seguidos"],
   "res.list": ["As comparações", "The comparisons", "Las comparaciones"],
-  "res.shareText": ["Maisoumenozi · dia #{n}: {a}/{b}\n{linha}\n{url}", "Maisoumenozi · day #{n}: {a}/{b}\n{linha}\n{url}", "Maisoumenozi · día #{n}: {a}/{b}\n{linha}\n{url}"],
-  "res.shareFree": ["Fiz {n} seguidas no Maisoumenozi. Você bate? {url}", "I got {n} in a row on Maisoumenozi. Can you beat it? {url}", "Hice {n} seguidas en Maisoumenozi. ¿Me superas? {url}"],
+  "res.shareText": ["Maiorzi · dia #{n}: {a}/{b}\n{linha}\n{url}", "Maiorzi · day #{n}: {a}/{b}\n{linha}\n{url}", "Maiorzi · día #{n}: {a}/{b}\n{linha}\n{url}"],
+  "res.shareFree": ["Fiz {n} seguidas no Maiorzi. Você bate? {url}", "I got {n} in a row on Maiorzi. Can you beat it? {url}", "Hice {n} seguidas en Maiorzi. ¿Me superas? {url}"],
 };
 
 // Frases de acerto e de erro: sorteadas a cada rodada, para não ficar repetindo.

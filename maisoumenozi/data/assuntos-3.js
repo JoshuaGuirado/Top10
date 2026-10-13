@@ -1,4 +1,4 @@
-// Assuntos do Maisoumenozi (3): veículos, ilhas, desertos, lagos, corpo humano, municípios, músicas e cafeína.
+// Assuntos do Maiorzi (3): veículos, ilhas, desertos, lagos, corpo humano, municípios, músicas e cafeína.
 
 mmTema({
   id: "veiculos",

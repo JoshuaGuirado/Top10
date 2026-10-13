@@ -39,7 +39,7 @@ function gameziRetornoDoLogin(raiz) {
 
 // ═════════════════════════════ nível e conquistas ═════════════════════════════
 // Contam o que a pessoa joga em todos os jogos do Gamezi. Vêm do que cada jogo guarda neste aparelho
-// (e que a conta leva para outros aparelhos): tt:* (Topzi), pz:* (Patozi), dz:* (Datazi), mm:* (Maisoumenozi), cz:* (Cravazi).
+// (e que a conta leva para outros aparelhos): tt:* (Topzi), pz:* (Patozi), dz:* (Datazi), mm:* (Maiorzi), cz:* (Cravazi).
 // Algumas conquistas liberam itens do guarda-roupa do pato (ver GAMEZI_CONQUISTAS[].item e o Patozi).
 
 function gameziLer(chave) {

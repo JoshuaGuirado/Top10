@@ -1,4 +1,4 @@
-// Maisoumenozi: assuntos, regras do "mais ou menos" e desafio do dia.
+// Maiorzi: assuntos, regras do "mais ou menos" e desafio do dia.
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("fs");

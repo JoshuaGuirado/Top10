@@ -49,7 +49,7 @@ function renderDiarioCard() {
   const feito = diarios()[dia];
   const loc = { pt: "pt-BR", en: "en", es: "es" }[lang];
   const seq = sequenciaDiaria();
-  const max = CZ_DIARIO_QTD * CZ_SOLO_CHUTES;
+  const max = CZ_DIARIO_QTD * (feito && feito.max ? feito.max : czChutesDoDia(dia));
   $("daily-card").innerHTML = `
     <div class="daily-top">
       <b class="daily-name">${escapeHtml(t("daily.name"))}</b>
@@ -91,7 +91,7 @@ function comecarTreino() {
 
 function comecarSolo(modo, perguntas) {
   soloModo = modo;
-  solo = czNovoSolo({ perguntas });
+  solo = czNovoSolo({ perguntas, chutes: modo === "diario" ? czChutesDoDia(soloDia) : CZ_SOLO_CHUTES });
   soloTempoMs = 0;
   show("solo");
   renderSolo();
@@ -129,7 +129,7 @@ function renderSolo() {
   $("solo-play").hidden = r.acabou;
   $("solo-end").hidden = !r.acabou;
   if (!r.acabou) {
-    const restam = CZ_SOLO_CHUTES - r.chutes.length;
+    const restam = s.max - r.chutes.length;
     $("solo-left").textContent = restam === 1 ? t("solo.left1") : t("solo.left", { n: restam });
     $("solo-unit").textContent = p.unidade ? tr(p.unidade) : "";
     $("solo-unit").hidden = !p.unidade;
@@ -184,7 +184,7 @@ function terminarSolo() {
   st.partidas += 1;
   st.rodadas += solo.perguntas.length;
   store("stats", st);
-  const reg = { pontos: solo.pontos, rodadas: solo.rodadas, ms: Math.round(soloTempoMs) };
+  const reg = { pontos: solo.pontos, rodadas: solo.rodadas, ms: Math.round(soloTempoMs), max: solo.max };
   if (soloModo === "diario" && !diarios()[soloDia]) store("diario", { ...diarios(), [soloDia]: reg });
   renderSoloResultado(soloModo === "diario" ? diarios()[soloDia] : reg);
   show("solo-results");
@@ -200,7 +200,7 @@ function mostrarSoloSalvo(dia, reg) {
 
 function renderSoloResultado(reg) {
   const diario = soloModo === "diario";
-  const max = (reg.rodadas.length || CZ_DIARIO_QTD) * CZ_SOLO_CHUTES;
+  const max = (reg.rodadas.length || CZ_DIARIO_QTD) * maxChutes(reg);
   $("solo-res-skin").innerHTML = czBoneco(minhaSkin(), "body");
   $("solo-res-kicker").textContent = diario ? t("daily.kicker", { n: soloDia }) : t("solo.train");
   $("solo-res-score").textContent = reg.pontos === 1 ? t("res.pts1") : t("res.pts", { n: reg.pontos });
@@ -229,9 +229,14 @@ function mostrarRanking(dia, reg) {
   });
 }
 
+// Chutes por pergunta de um resultado salvo (os antigos, sem "max", são do Cravazi do dia de antes ou do treino).
+function maxChutes(reg) {
+  return reg.max || (soloModo === "diario" ? czChutesDoDia(soloDia) : CZ_SOLO_CHUTES);
+}
+
 function compartilharDia(dia, reg, btn) {
   const linha = reg.rodadas.map((r) => (r.cravou ? "🎯" + r.chutes : "❌")).join(" ");
-  copiar(t("res.shareText", { n: dia, p: reg.pontos, max: reg.rodadas.length * CZ_SOLO_CHUTES, linha, url: location.origin + location.pathname }), btn);
+  copiar(t("res.shareText", { n: dia, p: reg.pontos, max: reg.rodadas.length * maxChutes(reg), linha, url: location.origin + location.pathname }), btn);
 }
 
 function ligarSozinho() {

@@ -90,10 +90,20 @@ test("rodada: é mais, é menos, a faixa fecha e quem crava leva o ponto", () =>
   assert.equal(r("czVencedores(s).length"), 2, "empate");
 });
 
-test("a rodada não avança sem alguém cravar", () => {
-  r(`var s2 = czNovaPartida({ jogadores: ["A", "B"], perguntas: [pq[0]] });`);
+test("a rodada não avança sem alguém cravar; com 3 chutes de cada sem cravar, acaba sem ponto", () => {
+  r(`var s2 = czNovaPartida({ jogadores: ["A", "B"], perguntas: [pq[0], pq[1]] });`);
   assert.equal(r("czProxima(s2)"), false);
   assert.equal(r("s2.rodada"), 0);
+  assert.equal(r("czLimiteRodada(s2)"), 6, "3 chutes para cada um");
+  for (let i = 0; i < 5; i++) assert.equal(r(`czChutar(s2, ${100 + i})`), "mais");
+  assert.equal(r("czRodadaAcabou(s2)"), false);
+  assert.equal(r("czChutar(s2, 200)"), "mais", "o último chute ainda dá a dica");
+  assert.equal(r("czRodadaAcabou(s2)"), true, "acabaram os chutes");
+  assert.equal(r("s2.atual.vencedor"), null);
+  assert.equal(r("czChutar(s2, 8849)"), null, "rodada encerrada");
+  assert.equal(r("s2.jogadores[0].pontos + s2.jogadores[1].pontos"), 0, "ninguém pontua");
+  assert.equal(r("czProxima(s2)"), false, "segue para a próxima");
+  assert.equal(r("s2.rodadas[0].vencedor"), null);
 });
 
 test("sorteio: perguntas diferentes, prefere as não vistas e não repete tema seguido", () => {
@@ -125,8 +135,8 @@ test("Cravazi está no Gamezi: portal, conta e nível", () => {
   assert.equal(vm.runInContext("gameziProgresso().partidas", g), 3, "partidas do Cravazi contam no nível");
 });
 
-test("sozinho: até 10 chutes, pontos de 10 a 1 e 0 se não cravar", () => {
-  r(`var so = czNovoSolo({ perguntas: [pq[0], pq[1]] });`);
+test("sozinho (como era até o dia 5): até 10 chutes, pontos de 10 a 1 e 0 se não cravar", () => {
+  r(`var so = czNovoSolo({ perguntas: [pq[0], pq[1]], chutes: czChutesDoDia(5) });`);
   assert.equal(r("czSoloChutar(so, 5000)"), "mais");
   assert.equal(r("czSoloChutar(so, 4000)"), null, "fora da faixa não vale nem gasta chute");
   assert.equal(r("so.atual.chutes.length"), 1);
@@ -143,8 +153,20 @@ test("sozinho: até 10 chutes, pontos de 10 a 1 e 0 se não cravar", () => {
   assert.equal(r("czSoloProxima(so)"), true);
   assert.equal(r("so.pontos"), 9);
   assert.deepEqual(JSON.parse(r("JSON.stringify(so.rodadas.map((x) => [x.chutes, x.cravou, x.pontos]))")), [[2, true, 9], [10, false, 0]]);
-  assert.equal(r("czSoloPontos(1, true)"), 10);
-  assert.equal(r("czSoloPontos(10, true)"), 1);
+  assert.equal(r("czSoloPontos(1, true, 10)"), 10);
+  assert.equal(r("czSoloPontos(10, true, 10)"), 1);
+});
+
+test("sozinho a partir do dia 6: até 6 chutes, pontos de 6 a 1", () => {
+  assert.equal(r("czChutesDoDia(6)"), 6);
+  assert.equal(r("czChutesDoDia(30)"), 6);
+  r(`var so6 = czNovoSolo({ perguntas: [pq[0]], chutes: czChutesDoDia(6) });`);
+  for (let i = 0; i < 5; i++) assert.equal(r(`czSoloChutar(so6, ${100 + i})`), "mais");
+  assert.equal(r("so6.atual.acabou"), false);
+  assert.equal(r("czSoloChutar(so6, 8849)"), "cravou");
+  assert.equal(r("so6.atual.pontos"), 1, "cravou no 6º chute: 1 ponto");
+  assert.equal(r("czSoloPontos(1, true)"), 6);
+  assert.equal(r("czNovoSolo({ perguntas: [pq[0]] }).max"), 6, "treino também tem 6 chutes");
 });
 
 test("Cravazi do dia: 5 perguntas, iguais em todo aparelho, e o dia 1 não muda", () => {
@@ -160,7 +182,7 @@ test("Cravazi do dia: 5 perguntas, iguais em todo aparelho, e o dia 1 não muda"
     assert.equal(new Set(ids).size, 5, `dia ${dia}: sem repetir`);
     for (let i = 1; i < 5; i++) assert.notEqual(ids[i].split("|")[0], ids[i - 1].split("|")[0], `dia ${dia}: tema seguido`);
   }
-  assert.equal(r("CZ_DIARIO_QTD * CZ_SOLO_CHUTES"), 50, "o banco aceita de 0 a 50 pontos");
+  assert.ok(r("CZ_DIARIO_QTD * Math.max(CZ_SOLO_CHUTES, CZ_SOLO_CHUTES_ANTES)") <= 50, "o banco aceita de 0 a 50 pontos");
   const schema = fs.readFileSync(path.join(SITE, "supabase", "schema.sql"), "utf8");
   assert.match(schema, /cravazi_registrar_diario[\s\S]*date '2026-10-09'[\s\S]*not between 0 and 50/);
   assert.match(schema, /p_jogo not in \([^)]*'cravazi'/);

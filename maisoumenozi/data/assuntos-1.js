@@ -1,4 +1,4 @@
-// Assuntos do Maisoumenozi (1): mundo, Brasil e natureza.
+// Assuntos do Maiorzi (1): mundo, Brasil e natureza.
 // Cada item é [valor, "português", "English", "español"]. Valores aproximados vêm da fonte do título; dois itens só
 // aparecem juntos se tiverem pelo menos 10% de diferença (ou a margem do assunto), então arredondar não vira pegadinha.
 // Itens novos: num arquivo novo carregado depois deste (mmMais ou mmTema), e uma linha em MM_DIARIO_POOLS.

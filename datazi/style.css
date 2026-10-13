@@ -148,7 +148,8 @@ body[data-screen]:not([data-screen="home"]) .gamezi-back { display: none; }
 /* ── partida: o acontecimento da vez fica no alto; a linha do tempo, com um "Aqui" entre cada um ── */
 .game-head { display: flex; align-items: center; gap: 12px; margin: 8px 0 12px; }
 .game-head b { flex: 1; min-width: 0; font-stretch: 75%; font-weight: 800; font-size: 1.4rem; line-height: 1.05; }
-.lives { display: flex; gap: 2px; }
+.lives { display: flex; gap: 2px; align-items: center; }
+.lives small { margin-left: 4px; font-size: .8rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
 .heart svg { width: 22px; height: 22px; fill: var(--accent); }
 .heart.lost svg { fill: var(--line); }
 .game-score { font-weight: 800; color: var(--muted); white-space: nowrap; }

@@ -142,8 +142,8 @@ function renderJogo() {
   $("game-quit").hidden = !online;
   $("round").textContent = t("game.round", { a: s.rodada + 1, b: s.perguntas.length });
   $("score").innerHTML = s.jogadores.map((j, i) => {
-    const cls = ["chip", i === r.vez && r.vencedor === null ? "now" : "", i === r.vencedor ? "win" : "", online && j.id && !onlinePresente(j.id) ? "away" : ""].filter(Boolean).join(" ");
-    return `<span class="${cls}">${czBoneco(j.skin)}<b>${escapeHtml(j.nome)}</b> ${j.pontos}</span>`;
+    const cls = ["chip", i === r.vez && !czRodadaAcabou(s) ? "now" : "", i === r.vencedor ? "win" : "", online && j.id && !onlinePresente(j.id) ? "away" : ""].filter(Boolean).join(" ");
+    return `<span class="${cls}">${czBoneco(j.skin)}<b>${escapeHtml(j.nome)}</b><span class="pts">${escapeHtml(j.pontos === 1 ? t("res.pts1") : t("res.pts", { n: j.pontos }))}</span></span>`;
   }).join("");
   const tema = czTemaPorId(p.tema);
   $("theme").textContent = tema ? tr(tema.nome) : "";
@@ -159,12 +159,12 @@ function renderJogo() {
     $("hint-big").innerHTML = `${escapeHtml(t(dica.dica === "mais" ? "game.more" : "game.less"))} <span aria-hidden="true">${dica.dica === "mais" ? "↑" : "↓"}</span>`;
   }
   const temFaixa = r.baixo > 0 || r.alto !== null;
-  $("range").hidden = !temFaixa || r.vencedor !== null;
+  const acabou = czRodadaAcabou(s);
+  $("range").hidden = !temFaixa || acabou;
   if (temFaixa) {
     $("range").textContent = r.alto === null ? t("game.above", { a: fmt(r.baixo) }) : t("game.between", { a: fmt(r.baixo), b: fmt(r.alto) });
   }
 
-  const acabou = r.vencedor !== null;
   $("play").hidden = acabou;
   $("nailed").hidden = !acabou;
   if (!acabou) {
@@ -172,17 +172,20 @@ function renderJogo() {
     const minha = souDaVez();
     $("turn-skin").innerHTML = czBoneco(daVez.skin);
     $("turn").textContent = online && minha ? t("game.yourTurn") : t("game.turn", { nome: daVez.nome });
+    const restam = czLimiteRodada(s) - r.chutes.length;
+    $("left").textContent = restam === 1 ? t("game.left1") : t("game.left", { n: restam });
     $("guess-row").hidden = !minha;
     $("wait-msg").hidden = minha;
     $("guess-btn").disabled = false;
     $("unit").textContent = p.unidade ? tr(p.unidade) : "";
     $("unit").hidden = !p.unidade;
   } else {
-    const venc = s.jogadores[r.vencedor];
-    $("nailed-skin").innerHTML = czBoneco(venc.skin, "body");
-    $("nailed-who").textContent = t("game.nailed", { nome: venc.nome });
-    $("nailed-answer").textContent = fmt(p.resposta) + (p.unidade ? " " + tr(p.unidade) : "");
-    $("nailed-tries").textContent = r.chutes.length === 1 ? t("game.tries1") : t("game.tries", { n: r.chutes.length });
+    const venc = r.vencedor !== null ? s.jogadores[r.vencedor] : null;
+    $("nailed").classList.toggle("missed", !venc);
+    $("nailed-skin").innerHTML = venc ? czBoneco(venc.skin, "body") : "";
+    $("nailed-who").textContent = venc ? t("game.nailed", { nome: venc.nome }) : t("game.nobody");
+    $("nailed-answer").textContent = (venc ? "" : t("game.wasIt") + " ") + fmt(p.resposta) + (p.unidade ? " " + tr(p.unidade) : "");
+    $("nailed-tries").textContent = !venc ? t("game.nobodySub") : r.chutes.length === 1 ? t("game.tries1") : t("game.tries", { n: r.chutes.length });
     $("next-btn").textContent = t(s.rodada + 1 >= s.perguntas.length ? "game.finish" : "game.next");
     $("next-btn").disabled = false;
   }
@@ -201,7 +204,7 @@ function lerChute(texto) {
 function chutar(e) {
   e.preventDefault();
   const s = partida;
-  if (!s || s.fim || s.atual.vencedor !== null || !souDaVez()) return;
+  if (!s || s.fim || czRodadaAcabou(s) || !souDaVez()) return;
   const r = s.atual;
   const fmt = (n) => num(n, r.pergunta.ano);
   const valor = lerChute($("guess").value);
@@ -222,9 +225,10 @@ function aplicarChute(valor) {
   if (!dica) return;
   if (modo === "online") onlineTransmitir();
   renderJogo();
-  animar(dica === "cravou" ? $("nailed") : $("hint"));
-  if (dica === "cravou") {
-    if (navigator.vibrate) navigator.vibrate([40, 40, 80]);
+  const fim = czRodadaAcabou(partida);
+  animar(fim ? $("nailed") : $("hint"));
+  if (fim) {
+    if (dica === "cravou" && navigator.vibrate) navigator.vibrate([40, 40, 80]);
     $("next-btn").focus();
   } else if (souDaVez()) {
     focarCampo("guess");
@@ -248,7 +252,7 @@ function avisar(formId, msgId, msg, campoId) {
 }
 
 function proxima() {
-  if (!partida || partida.atual.vencedor === null) return;
+  if (!partida || !czRodadaAcabou(partida)) return;
   if (modo === "online" && !isHost()) return enviarAcao({ tipo: "proxima" });
   aplicarProxima();
 }
@@ -297,7 +301,7 @@ function renderResultado() {
     `<li class="${j.pos === 1 ? "first" : ""}"><span class="pos">${j.pos}º</span>${czBoneco(j.skin)}<b>${escapeHtml(j.nome)}</b><span>${escapeHtml(j.pontos === 1 ? t("res.pts1") : t("res.pts", { n: j.pontos }))}</span></li>`).join("");
   $("res-rounds").innerHTML = s.rodadas.map((r, i) => {
     const p = s.perguntas[i];
-    return `<li><p>${escapeHtml(tr(p.texto))}</p><b>${escapeHtml(num(p.resposta, p.ano) + (p.unidade ? " " + tr(p.unidade) : ""))}</b><span>${escapeHtml(s.jogadores[r.vencedor].nome)}</span></li>`;
+    return `<li><p>${escapeHtml(tr(p.texto))}</p><b>${escapeHtml(num(p.resposta, p.ano) + (p.unidade ? " " + tr(p.unidade) : ""))}</b><span>${escapeHtml(r.vencedor !== null ? s.jogadores[r.vencedor].nome : t("res.nobody"))}</span></li>`;
   }).join("");
   $("res-again").textContent = t(modo === "online" ? "res.backRoom" : "btn.again");
 }

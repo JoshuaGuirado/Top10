@@ -235,15 +235,21 @@ function nomeDe(i) {
   return partida.jogadores[i].nome;
 }
 
+// Placar: cada um com os patos (o que conta no fim) e as cartas que já juntou (quando alguém chega na meta, acaba).
 function renderScoreboard() {
+  const meta = partida.config.meta;
   $("scoreboard").innerHTML = partida.jogadores.map((p, i) => {
     const ausente = modo === "online" && typeof onlinePresente === "function" && !onlinePresente(p.id);
-    return `<div class="score-chip ${partida.fase === "lance" && i === partida.vez ? "current" : ""} ${ausente ? "away" : ""}">
+    const vez = partida.fase === "lance" && i === partida.vez;
+    const n = p.cartas.length;
+    return `<div class="score-chip ${vez ? "current" : ""} ${ausente ? "away" : ""}">
       ${patoSvg(p.cor, "", p.pato)}
-      <b>${escapeHtml(p.nome)}</b>
-      <span title="${escapeHtml(tn("game.ducks", pzPatos(p)) + " · " + tn("game.cards", p.cartas.length))}">${PATO_MINI}${pzPatos(p)} · ${p.cartas.length}/${partida.config.meta}${p.dobreis ? ` · ${UI_ICONS.shield}${p.dobreis}` : ""}</span>
+      <b class="sc-name">${escapeHtml(p.nome)}${vez ? `<em>${escapeHtml(t("score.turn"))}</em>` : ""}</b>
+      <span class="sc-ducks">${PATO_MINI}${escapeHtml(tn("game.ducks", pzPatos(p)))}${p.dobreis ? `<small title="${escapeHtml(t("opt.dobrei"))}">${UI_ICONS.shield}${escapeHtml(tn("game.shields", p.dobreis))}</small>` : ""}</span>
+      <span class="sc-cards ${n && n >= meta - 1 ? "near" : ""}">${UI_ICONS.card}${escapeHtml(t("score.cards", { n, meta }))}</span>
     </div>`;
   }).join("");
+  $("score-goal").textContent = t("game.goal", { meta });
 }
 
 function renderCard() {
@@ -256,7 +262,7 @@ function renderCard() {
     card.style.animation = "";
   }
   $("card-theme").innerHTML = themeIcon(carta.tema) + escapeHtml(temaNome(carta.tema));
-  $("card-ducks").innerHTML = patosHtml(carta.patos);
+  $("card-ducks").innerHTML = escapeHtml(tn("card.worth", carta.patos)) + patosHtml(carta.patos);
   $("card-q").textContent = tr(carta.q);
   $("card-unit").hidden = !unidade(carta);
   $("card-unit").textContent = t("card.unit", { u: unidade(carta) });
@@ -285,23 +291,55 @@ function renderTurn() {
   const carta = pzCarta(partida.carta);
   if (controlo(i)) {
     const meu = modo === "online" || partida.jogadores.filter((x) => !x.bot).length === 1;
+    // Duas jogadas bem separadas: subir o chute (campo + "Chutar") ou, embaixo, depois do "ou", o "Nem a pato!".
     box.innerHTML = `
       <p class="turn-name">${patoSvg(p.cor, "", p.pato)}${escapeHtml(t(meu ? "game.yourTurn" : "game.turnOf", { nome: p.nome }))}</p>
-      <p class="turn-hint">${escapeHtml(u ? t("game.raise", { min: fmtU(minimo, carta) }) : t("game.first"))}</p>
-      <form class="guess-row" id="guess-form">
-        ${campoChute("guess", t("game.guessPh"), carta)}
-        <button type="submit" class="btn">${escapeHtml(t("game.guess"))}</button>
-      </form>
-      <button type="button" class="btn nem" id="nem-btn" ${u ? "" : "disabled"}>${escapeHtml(t("game.nemApato"))}</button>
-      <p class="input-error" id="guess-error"></p>`;
-    $("guess-form").onsubmit = (e) => {
-      e.preventDefault();
-      const v = lerNumero($("guess").value);
+      <div class="move">
+        <p class="move-title">${UI_ICONS.up || ""}${escapeHtml(t(u ? "game.raiseTitle" : "game.openTitle"))}</p>
+        <p class="turn-hint">${escapeHtml(u ? t(carta.ano ? "game.raiseYear" : "game.raise", { min: fmtU(minimo, carta) }) : t("game.first"))}</p>
+        <form class="guess-row" id="guess-form">
+          ${campoChute("guess", u ? fmt(minimo, carta.ano) + "+" : t("game.guessPh"), carta)}
+          <button type="submit" class="btn guess-btn">${escapeHtml(t("game.guess"))}</button>
+        </form>
+        <p class="input-error" id="guess-error"></p>
+      </div>
+      ${u ? `<p class="move-or"><span>${escapeHtml(t("game.or"))}</span></p>
+      <button type="button" class="nem-card" id="nem-btn">
+        <span class="nem-ico">${PATO_MINI}</span>
+        <span class="nem-txt"><b>${escapeHtml(t("game.nemApato"))}</b><small>${escapeHtml(t("game.nemSub", { valor: fmtU(u.valor, carta) }))}</small></span>
+      </button>
+      <div class="nem-confirm" id="nem-confirm" hidden></div>` : ""}`;
+    const chutar = (v) => {
       if (!Number.isFinite(v)) return ($("guess-error").textContent = t("game.errNum"));
       if (v < minimo) return ($("guess-error").textContent = t("game.errLow", { min: fmtU(minimo, carta) }));
       agir({ tipo: "chutar", valor: v });
     };
-    $("nem-btn").onclick = () => agir({ tipo: "duvidar" });
+    $("guess-form").onsubmit = (e) => {
+      e.preventDefault();
+      chutar(lerNumero($("guess").value));
+    };
+    if (u) {
+      // Digitou um número e apertou "Nem a pato!"? Pergunta o que a pessoa quis fazer antes de duvidar.
+      $("nem-btn").onclick = () => {
+        const digitado = lerNumero($("guess").value);
+        if (!$("guess").value.trim() || !Number.isFinite(digitado)) return agir({ tipo: "duvidar" });
+        const c = $("nem-confirm");
+        c.hidden = false;
+        c.innerHTML = `<p>${escapeHtml(t("game.typedConfirm", { valor: fmtU(digitado, carta) }))}</p>
+          <div class="actions center">
+            <button type="button" class="btn guess-btn" data-c="chutar">${escapeHtml(t("game.guessThis", { valor: fmtU(digitado, carta) }))}</button>
+            <button type="button" class="btn nem-small" data-c="nem">${escapeHtml(t("game.nemApato"))}</button>
+          </div>`;
+        c.onclick = (e) => {
+          const b = e.target.closest("button[data-c]");
+          if (!b) return;
+          c.hidden = true;
+          if (b.dataset.c === "nem") agir({ tipo: "duvidar" });
+          else chutar(digitado);
+        };
+        c.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      };
+    }
     if (matchMedia("(hover: hover)").matches) $("guess").focus({ preventScroll: true });
   } else {
     const pensando = jogaComputador(i) || p.bot;
@@ -392,7 +430,7 @@ function contarAte(el, alvo, ano) {
 
 function renderGame() {
   if (!partida || document.body.dataset.screen !== "game") return;
-  $("game-round").textContent = t("game.round", { n: partida.rodada, meta: partida.config.meta });
+  $("game-round").textContent = t("game.round", { n: partida.rodada });
   renderScoreboard();
   renderCard();
   renderTurn();

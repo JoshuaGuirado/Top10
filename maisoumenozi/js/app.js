@@ -1,4 +1,4 @@
-// Maisoumenozi na tela: início (contra o relógio, desafio do dia e sem errar), partida e resultado.
+// Maiorzi na tela: início (contra o relógio, desafio do dia e sem errar), partida e resultado.
 // As regras ficam em jogo.js; os assuntos em data/; os textos em textos.js.
 
 let partida = null; // estado de jogo.js

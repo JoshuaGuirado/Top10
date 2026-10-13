@@ -171,6 +171,9 @@ body[data-screen]:not([data-screen="home"]) .gamezi-back { display: none; }
 .chip b { font-weight: 700; }
 .chip.now { background: var(--fg); color: var(--bg); }
 .chip.win { background: var(--accent); color: var(--on-accent); }
+.chip .pts { font-weight: 600; font-size: .8rem; opacity: .75; }
+.chip .pts::before { content: "·"; margin-right: 6px; }
+.left { margin: -4px 0 0; font-size: .85rem; font-weight: 700; color: var(--muted); }
 .theme { margin: 10px 0 0; font-size: .8rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-ink); }
 .question { margin: 0; font-size: clamp(1.7rem, 6.4vw, 2.3rem); line-height: 1.08; text-wrap: balance; }
 

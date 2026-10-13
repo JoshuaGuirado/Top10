@@ -1,4 +1,4 @@
-// Assuntos do Maisoumenozi (4): coisas do dia a dia que todo mundo conhece, para comparações mais divertidas.
+// Assuntos do Maiorzi (4): coisas do dia a dia que todo mundo conhece, para comparações mais divertidas.
 // Peso de coisas (junto com os animais), distância de São Paulo, idade de monumentos, tamanho de animais,
 // quanto custou fazer filmes e alturas do dia a dia (junto com montanhas, prédios e atletas).
 

@@ -1,8 +1,8 @@
 // Regras do Patozi, sem tela (dá para testar no Node). O estado da partida é um objeto simples
 // (só números, textos e ids de carta), então o modo online manda ele inteiro pelo Realtime.
 //
-// Rodada: uma carta com pergunta de resposta numérica. Cada um, na sua vez, chuta um número MAIOR que o
-// último chute ou grita "Nem a pato!", duvidando de que o último chute ainda caiba na resposta.
+// Rodada: uma carta com pergunta de resposta numérica. Cada um, na sua vez, chuta um número pelo menos 10%
+// MAIOR que o último chute (carta de ano: pelo menos 1 a mais) ou grita "Nem a pato!", duvidando de que o último chute ainda caiba na resposta.
 // Revela: se o último chute passou da resposta, quem chutou fica com a carta; se não passou, fica quem
 // duvidou. Quem ficou com a carta começa a próxima rodada. Quando alguém junta a meta de cartas, o jogo
 // acaba e quem tiver mais patos perde; todo o resto ganha.
@@ -12,6 +12,7 @@
 
 const PZ_MAX_JOGADORES = 10;
 const PZ_MAX_CHUTE = 1e12;
+const PZ_SUBIDA = 0.1; // cada chute sobe pelo menos 10% do anterior: ninguém fica subindo de 1 em 1
 
 // Pato do dia: o dia 1 é 8/10/2026. Cartas novas só entram no sorteio a partir do dia da linha nova,
 // para não mudar o desafio de quem já jogou hoje. semAposentadas: a partir dessa linha, as cartas óbvias
@@ -192,7 +193,9 @@ function pzUltimo(s) {
 
 function pzMinimo(s) {
   const u = pzUltimo(s);
-  return u ? u.valor + 1 : 1;
+  if (!u) return 1;
+  const carta = pzCarta(s.carta);
+  return u.valor + (carta && carta.ano ? 1 : Math.max(1, Math.ceil(u.valor * PZ_SUBIDA)));
 }
 
 function pzProximo(s, j) {
@@ -255,13 +258,14 @@ function pzPlacar(s) {
 // ───────────── computador ─────────────
 
 // Cada computador tem um "palpite interno" por carta: perto da resposta, mais longe nas difíceis.
+// (Ficaram mais afiados: erram em média uns 9% nas cartas de 1 pato e uns 33% nas de 3.)
 function pzBotPalpite(carta, rnd = Math.random) {
   const g = pzGauss(rnd);
   if (carta.ano) {
-    const s = [5, 18, 45][carta.patos - 1] || 18;
+    const s = [3, 10, 25][carta.patos - 1] || 10;
     return { ano: true, est: carta.resposta + g * s, s };
   }
-  const sig = [0.15, 0.32, 0.55][carta.patos - 1] || 0.32;
+  const sig = [0.09, 0.2, 0.33][carta.patos - 1] || 0.2;
   return { ano: false, est: carta.resposta * Math.exp(g * sig), s: sig };
 }
 
@@ -285,16 +289,22 @@ function pzSubir(v, ano) {
   return (Math.floor(v / p) + 1) * p;
 }
 
+// Duvida quando acha que o último chute já passou; se ainda cabe mas o próximo chute possível já é arriscado
+// demais, também duvida (às vezes), em vez de subir para um número que provavelmente passa.
 function pzBotJogada(s, b, rnd = Math.random) {
   const u = pzUltimo(s);
-  const ousadia = (rnd() - 0.5) * 0.12;
-  if (u && pzBotChance(b, u.valor) < 0.42 + ousadia) return { tipo: "duvidar" };
+  const ousadia = (rnd() - 0.5) * 0.1;
   const minimo = pzMinimo(s);
+  if (u) {
+    const cabe = pzBotChance(b, u.valor);
+    if (cabe < 0.5 + ousadia) return { tipo: "duvidar" };
+    if (pzBotChance(b, minimo) < 0.3 && cabe < 0.7 + ousadia) return { tipo: "duvidar" };
+  }
   const alvo = b.ano ? Math.round(b.est - b.s * (0.2 + 0.7 * rnd())) : pzRedondo(b.est * Math.exp(-b.s * (0.2 + 0.8 * rnd())));
   let valor = Math.max(minimo, pzSubir(u ? u.valor : 0, b.ano));
   if (alvo > valor && (!u || rnd() < 0.55)) valor = alvo;
   if (!u) valor = Math.max(1, alvo);
-  if (u && pzBotChance(b, valor) < 0.36) return { tipo: "duvidar" };
+  if (u && pzBotChance(b, valor) < 0.4) return { tipo: "duvidar" };
   return { tipo: "chutar", valor: Math.max(valor, minimo) };
 }
 

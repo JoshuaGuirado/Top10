@@ -1,4 +1,4 @@
-// Assuntos do Maisoumenozi (2): animais, ciência, filmes, séries, comida e esporte.
+// Assuntos do Maiorzi (2): animais, ciência, filmes, séries, comida e esporte.
 
 mmTema({
   id: "animais-velocidade",

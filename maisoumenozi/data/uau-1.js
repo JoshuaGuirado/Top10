@@ -1,4 +1,4 @@
-// Comparações "uau" do Maisoumenozi: pares escolhidos a dedo, misturando coisas que ninguém compara, com os dois
+// Comparações "uau" do Maiorzi: pares escolhidos a dedo, misturando coisas que ninguém compara, com os dois
 // números escondidos e uma curiosidade depois da resposta. Cada um: { pergunta, unidade, a, b, fato }, com
 // a e b como [valor, "português", "English", "español"] e os textos em [pt, en, es]. Os dois valores na mesma unidade.
 // Novos pares: no fim (ou num arquivo novo carregado depois) e o total novo em MM_DIARIO_POOLS, valendo a partir de amanhã.

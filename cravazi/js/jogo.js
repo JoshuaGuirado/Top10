@@ -1,9 +1,10 @@
 // Cravazi: regras, sem tela (testado em tests/cravazi.test.js).
 // Cada rodada tem uma pergunta com resposta inteira. Os jogadores chutam um de cada vez; o jogo diz
 // "é mais" ou "é menos" e a faixa vai fechando. Quem cravar o número exato leva o ponto da rodada.
-// A rodada só acaba quando alguém crava. Depois de N rodadas, ganha quem tiver mais pontos.
-// Sozinho (Cravazi do dia): 5 perguntas iguais para todo mundo, até 10 chutes em cada; quanto menos
-// chutes para cravar, mais pontos (de 10 a 1). O resultado vai para o ranking do dia.
+// Cada um tem 3 chutes por rodada: se ninguém cravar até lá, a rodada acaba sem ponto para ninguém.
+// Depois de N rodadas, ganha quem tiver mais pontos.
+// Sozinho (Cravazi do dia): 5 perguntas iguais para todo mundo, até 6 chutes em cada (até o dia 5 eram 10);
+// quanto menos chutes para cravar, mais pontos (de 6 a 1). O resultado vai para o ranking do dia.
 
 var CZ_TEMAS = [];
 var CZ_PERGUNTAS = []; // { id, tema, resposta, texto: [pt, en, es], unidade: [pt, en, es] | null, ano }
@@ -65,6 +66,18 @@ function czNovaPartida(opcoes) {
   return s;
 }
 
+var CZ_CHUTES_POR_JOGADOR = 3; // chutes de cada um por rodada (com a turma e online)
+
+// Quantos chutes a rodada tem no total (somando todo mundo).
+function czLimiteRodada(s) {
+  return CZ_CHUTES_POR_JOGADOR * s.jogadores.length;
+}
+
+// A rodada acabou? (alguém cravou ou acabaram os chutes)
+function czRodadaAcabou(s) {
+  return s.atual.vencedor !== null || !!s.atual.esgotou;
+}
+
 function czComecarRodada(s) {
   s.atual = {
     pergunta: s.perguntas[s.rodada],
@@ -73,6 +86,7 @@ function czComecarRodada(s) {
     vez: s.rodada % s.jogadores.length, // quem começa muda a cada rodada
     chutes: [], // { jogador, valor, dica: "mais" | "menos" | "cravou" }
     vencedor: null,
+    esgotou: false, // acabaram os chutes sem ninguém cravar
   };
 }
 
@@ -86,7 +100,7 @@ function czChuteValido(s, valor) {
 // Chute de quem está na vez. Devolve "mais", "menos", "cravou" ou null (chute fora da faixa ou rodada encerrada).
 function czChutar(s, valor) {
   var r = s.atual;
-  if (s.fim || r.vencedor !== null || !czChuteValido(s, valor)) return null;
+  if (s.fim || czRodadaAcabou(s) || !czChuteValido(s, valor)) return null;
   var certa = r.pergunta.resposta;
   var dica = valor === certa ? "cravou" : valor < certa ? "mais" : "menos";
   s.seq = (s.seq || 0) + 1;
@@ -100,20 +114,24 @@ function czChutar(s, valor) {
     return dica;
   }
   r.vez = (r.vez + 1) % s.jogadores.length;
+  if (r.chutes.length >= czLimiteRodada(s)) {
+    r.esgotou = true;
+    s.rodadas.push({ pergunta: r.pergunta.id, vencedor: null, chutes: r.chutes.length });
+  }
   return dica;
 }
 
 // Online: quem está na vez saiu da sala. Passa a vez sem chutar (a rodada continua com os outros).
 function czPassarVez(s) {
-  if (s.fim || s.atual.vencedor !== null) return false;
+  if (s.fim || czRodadaAcabou(s)) return false;
   s.seq = (s.seq || 0) + 1;
   s.atual.vez = (s.atual.vez + 1) % s.jogadores.length;
   return true;
 }
 
-// Depois de alguém cravar: próxima rodada ou fim da partida. Devolve true se acabou.
+// Depois de alguém cravar (ou de acabarem os chutes): próxima rodada ou fim da partida. Devolve true se acabou.
 function czProxima(s) {
-  if (s.atual.vencedor === null) return false;
+  if (!czRodadaAcabou(s)) return false;
   s.seq = (s.seq || 0) + 1;
   s.rodada += 1;
   if (s.rodada >= s.perguntas.length) {
@@ -140,7 +158,9 @@ function czVencedores(s) {
 
 // ───────────── sozinho: Cravazi do dia e treino ─────────────
 
-var CZ_SOLO_CHUTES = 10; // chutes por pergunta
+var CZ_SOLO_CHUTES = 6; // chutes por pergunta
+var CZ_SOLO_CHUTES_ANTES = 10; // o Cravazi do dia teve 10 chutes por pergunta até o dia 5 (13/10/2026)
+var CZ_SOLO_CHUTES_DESDE = 6; // dia a partir do qual valem os 6 chutes
 var CZ_DIARIO_QTD = 5; // perguntas do Cravazi do dia
 var CZ_DIARIO_INICIO = Date.UTC(2026, 9, 9); // dia 1 do Cravazi do dia
 
@@ -150,13 +170,19 @@ var CZ_DIARIO_POOLS = [
   { desde: 1, perguntas: 239 },
 ];
 
-// Pontos de uma pergunta: cravou no 1º chute vale 10, no 10º vale 1; não cravou, 0.
-function czSoloPontos(chutes, cravou) {
-  return cravou ? Math.max(0, CZ_SOLO_CHUTES + 1 - chutes) : 0;
+// Chutes por pergunta no Cravazi do dia de um dia (os dias antigos continuam com as regras de antes).
+function czChutesDoDia(dia) {
+  return dia && dia < CZ_SOLO_CHUTES_DESDE ? CZ_SOLO_CHUTES_ANTES : CZ_SOLO_CHUTES;
 }
 
+// Pontos de uma pergunta: cravou no 1º chute vale o máximo de chutes (6), no último vale 1; não cravou, 0.
+function czSoloPontos(chutes, cravou, max) {
+  return cravou ? Math.max(0, (max || CZ_SOLO_CHUTES) + 1 - chutes) : 0;
+}
+
+// opcoes.chutes: chutes por pergunta (o Cravazi do dia usa czChutesDoDia).
 function czNovoSolo(opcoes) {
-  var s = { perguntas: opcoes.perguntas, rodada: 0, fim: false, pontos: 0, rodadas: [] };
+  var s = { perguntas: opcoes.perguntas, rodada: 0, fim: false, pontos: 0, rodadas: [], max: opcoes.chutes || CZ_SOLO_CHUTES };
   czComecarSolo(s);
   return s;
 }
@@ -174,10 +200,10 @@ function czSoloChutar(s, valor) {
   r.chutes.push({ valor: valor, dica: dica });
   if (dica === "mais") r.baixo = valor;
   if (dica === "menos") r.alto = valor;
-  if (dica === "cravou" || r.chutes.length >= CZ_SOLO_CHUTES) {
+  if (dica === "cravou" || r.chutes.length >= s.max) {
     r.acabou = true;
     r.cravou = dica === "cravou";
-    r.pontos = czSoloPontos(r.chutes.length, r.cravou);
+    r.pontos = czSoloPontos(r.chutes.length, r.cravou, s.max);
     s.pontos += r.pontos;
     s.rodadas.push({ pergunta: r.pergunta.id, chutes: r.chutes.length, cravou: r.cravou, pontos: r.pontos });
   }
