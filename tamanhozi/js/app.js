@@ -194,7 +194,8 @@ function ajustarVista(c, W, H) {
 
 function pathHtml(it, x, yTopo, escala, cls) {
   const tr = `translate(${x.toFixed(1)} ${yTopo.toFixed(1)}) scale(${(escala * it.k).toPrecision(5)}) translate(${-it.x} ${-it.y})`;
-  return `<path class="${cls}" fill-rule="evenodd" transform="${tr}" d="${it.d}"${cls === "real" ? ' vector-effect="non-scaling-stroke"' : ""}/>`;
+  // Países: buracos pela regra "evenodd" (Lesoto dentro da África do Sul); os desenhos usam "nonzero" (peças sobrepostas).
+  return `<path class="${cls}" fill-rule="${it.cat === "paises" ? "evenodd" : "nonzero"}" transform="${tr}" d="${it.d}"${cls === "real" ? ' vector-effect="non-scaling-stroke"' : ""}/>`;
 }
 
 // Régua da medida: na vertical ao lado (altura) ou embaixo (comprimento, largura, diâmetro). Países não têm.
@@ -244,14 +245,17 @@ function desenhar() {
   stage.setAttribute("aria-label", tr(c.ref.nome) + " · " + tr(c.alvo.nome));
 
   // Rótulos em cima de cada um: nome e a medida (a do vermelho só aparece depois de revelar).
-  const rotulo = (it, cx, topo, cls, medida) => {
-    const x = Math.min(W - 60, Math.max(60, cx));
-    return `<div class="label ${cls}" style="left:${x.toFixed(0)}px;top:${Math.max(4, topo - 6).toFixed(0)}px"><b>${escapeHtml(tr(it.nome))}</b><span>${escapeHtml(t("m." + it.medida))}: ${escapeHtml(medida)}</span></div>`;
-  };
+  const rotulo = (it, cx, topo, cls, medida) =>
+    `<div class="label ${cls}" style="left:${cx.toFixed(0)}px;top:${Math.max(4, topo - 6).toFixed(0)}px"><b>${escapeHtml(tr(it.nome))}</b><span>${escapeHtml(t("m." + it.medida))}: ${escapeHtml(medida)}</span></div>`;
   const alvoTopo = fim ? chao - Math.max(gh, ahPx) : chao - gh;
   const alvoMeio = X(c.x2) + (fim ? Math.max(gw, awPx) : gw) / 2;
   $("labels").innerHTML = rotulo(c.ref, X(0) + (c.rw * s) / 2, refTopo, "ref", medidaTexto(c.ref)) +
     rotulo(c.alvo, alvoMeio, alvoTopo, "alvo", fim ? medidaTexto(c.alvo) : "?");
+  // Cada rótulo inteiro dentro do quadro (perto da borda ele anda para dentro, em vez de ser cortado).
+  $("labels").querySelectorAll(".label").forEach((el) => {
+    const meio = el.offsetWidth / 2 + 6;
+    el.style.left = Math.min(W - meio, Math.max(meio, parseFloat(el.style.left))).toFixed(0) + "px";
+  });
 
   // Alça no canto de cima do vermelho (enquanto dá para ajustar).
   const h = $("handle");

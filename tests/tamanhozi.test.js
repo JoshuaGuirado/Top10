@@ -13,7 +13,7 @@ const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
 const ctx = vm.createContext({ console });
 for (const f of ["js/jogo.js", "data/itens.js", "data/paises.js"]) vm.runInContext(fs.readFileSync(path.join(PASTA, f), "utf8"), ctx);
 const r = (e) => vm.runInContext(e, ctx);
-const DIA1 = "pe-grande>tv coelho>dois-andares canguru>touro-wall-street big-ben>cachalote sequoia>bagger partenon>tubarao-branco celular>formiga notebook>bicicleta bola-basquete>caneca p246>p840";
+const DIA1 = "cachorro>wadlow moai>flamingo cartao>camundongo tv>cadeira hagrid>quetzalcoatlus p894>p716 pessoa>bisao mulher>bola-basquete onibus>godzilla king-kong>tanque";
 
 test("os scripts da página existem e estão no modo offline", () => {
   const sw = fs.readFileSync(path.join(SITE, "sw.js"), "utf8");
@@ -51,6 +51,12 @@ test("itens e países: nome nos 3 idiomas, categoria, medida, contorno e sem rep
     assert.ok(Math.abs(r(`tzItem("${id}").valor`) / km2 - 1) < 0.06, `${id}`);
   }
   for (const it of itens.filter((i) => i.cat !== "paises")) assert.ok(it.valor > 0.001 && it.valor < 10000, `${it.id}: ${it.valor} m`);
+  // A proporção também é a de verdade (largura × altura em metros, com uns 3% de folga).
+  const caixa = (id) => r(`(() => { const it = tzItem("${id}"); return [it.w * it.k, it.h * it.k]; })()`);
+  for (const [id, w, h] of [["torre-eiffel", 125, 330], ["cristo", 28, 38], ["queops", 230, 138.5], ["burj-khalifa", 100, 828], ["fusca", 4.08, 1.5], ["boeing-747", 70.7, 19.4], ["titanic", 269, 62], ["cartao", 0.0856, 0.054], ["celular", 0.0716, 0.1476]]) {
+    const [cw, ch] = caixa(id);
+    assert.ok(Math.abs(cw / w - 1) < 0.03 && Math.abs(ch / h - 1) < 0.03, `${id}: ${cw.toFixed(3)} × ${ch.toFixed(3)} m`);
+  }
 });
 
 test("rodada sozinho: pontos pelo erro de área e partida de 10 rodadas", () => {

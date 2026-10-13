@@ -70,8 +70,9 @@
   pessoas e monstros, animais, veículos, objetos e países). Sozinho (desafio do dia com ranking e partida livre por tema) e online
   (todo mundo ajusta a mesma coisa; quem chegar mais perto leva 1 ponto; tabelas `tamanhozi_*`, rode `npm run test:online`).
   Scripts comuns, ordem no fim do `tamanhozi/index.html` (`js/jogo.js` antes de `data/`); script novo vai no `FILES` do `sw.js`
-  (o `tests/tamanhozi.test.js` acusa). Dados gerados: `data/itens.js` por `ferramentas/gerar-tamanhozi.js` (silhuetas do
-  game-icons.net, CC BY 3.0, e do Material Design Icons; medida de verdade em metros) e `data/paises.js` por
+  (o `tests/tamanhozi.test.js` acusa). Dados gerados: `data/itens.js` por `ferramentas/gerar-tamanhozi.js` (animais do acervo
+  de domínio público github.com/kazuhito84455/qgissvganimals; o resto desenhado no gerador com as medidas reais, para a proporção
+  largura × altura ser a de verdade — o dono reclamou de proporção errada; nada de ícone de enfeite) e `data/paises.js` por
   `ferramentas/gerar-tamanhozi-paises.js` (Natural Earth, projeção de área igual). Item novo: no fim da lista `ITENS` do gerador
   (medida que todo mundo encontra; personagem com a obra no nome), gerar de novo e linha nova em `TZ_DIARIO_POOLS` valendo a partir
   de amanhã (o dia 1 está fixado no teste). Chaves `tm:*`.

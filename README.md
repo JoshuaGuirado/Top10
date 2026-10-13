@@ -180,8 +180,8 @@ num tamanho errado: monumentos, pessoas e monstros, animais, veículos, objetos 
 ou na partida livre (com tema). Online, todo mundo ajusta a mesma coisa ao mesmo tempo (40 segundos por rodada) e quem chegar
 mais perto leva 1 ponto.
 
-- `tamanhozi/data/itens.js`: gerado por `ferramentas/gerar-tamanhozi.js` (silhuetas do game-icons.net, CC BY 3.0, e do Material
-  Design Icons; algumas desenhadas à mão), com a medida de verdade em metros
+- `tamanhozi/data/itens.js`: gerado por `ferramentas/gerar-tamanhozi.js`: animais do acervo "QGIS svg icons - Animal silhouettes"
+  (domínio público); monumentos, veículos, objetos e pessoas desenhados no próprio gerador com as medidas reais (largura e altura)
 - `tamanhozi/data/paises.js`: gerado por `ferramentas/gerar-tamanhozi-paises.js` a partir do Natural Earth (domínio público), cada
   país numa projeção de área igual centrada nele
 - `tamanhozi/js/jogo.js`: regras, sem tela (testado em `tests/tamanhozi.test.js`); `textos.js`, `app.js` (telas) e `online.js`

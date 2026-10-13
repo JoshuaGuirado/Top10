@@ -12,7 +12,7 @@ const TZ_RODADAS = 10;
 const TZ_FAIXA = Math.log(10); // de ponta a ponta da barra, o tamanho muda 10 vezes (para cada lado da resposta, até onde der)
 const TZ_CATEGORIAS = ["monumentos", "personagens", "animais", "veiculos", "objetos", "paises"];
 const TZ_PAR_MIN = 1.3; // um item é pelo menos 1,3 vez maior que o outro…
-const TZ_PAR_MAX = 20; // …e no máximo 20 vezes (senão um some na tela)
+const TZ_PAR_MAX = 12; // …e no máximo 12 vezes (senão um some na tela)
 const TZ_MAX_JOGADORES = 10;
 const TZ_ONLINE_SEGUNDOS = 40; // tempo de cada rodada online (depois disso revela com quem respondeu)
 
@@ -20,7 +20,7 @@ const TZ_ONLINE_SEGUNDOS = 40; // tempo de cada rodada online (depois disso reve
 // para não mudar o desafio de quem já jogou hoje.
 const TZ_DIARIO_INICIO = Date.UTC(2026, 9, 13);
 const TZ_DIARIO_POOLS = [
-  { desde: 1, itens: 100, paises: 129 },
+  { desde: 1, itens: 105, paises: 129 },
 ];
 
 function tzItens(lista) {
