@@ -110,8 +110,7 @@ const PZ_T = {
   "game.turnOf": ["Vez de {nome}", "{nome}'s turn", "Turno de {nome}"],
   "game.yourTurn": ["Sua vez, {nome}", "Your turn, {nome}", "Tu turno, {nome}"],
   "game.first": ["Abra a rodada com um chute. Qualquer número a partir de 1.", "Open the round with a guess. Any number from 1 up.", "Abre la ronda con un número. Cualquiera desde 1."],
-  "game.raise": ["Tem que subir pelo menos 10%: {min} ou mais.", "You must raise at least 10%: {min} or more.", "Hay que subir al menos un 10%: {min} o más."],
-  "game.raiseYear": ["Tem que ser {min} ou mais.", "It must be {min} or more.", "Tiene que ser {min} o más."],
+  "game.raise": ["Tem que ser {min} ou mais.", "It must be {min} or more.", "Tiene que ser {min} o más."],
   "game.raiseTitle": ["Subir o chute", "Raise the guess", "Subir el número"],
   "game.openTitle": ["Abrir a rodada", "Open the round", "Abrir la ronda"],
   "game.or": ["ou", "or", "o"],
@@ -219,39 +218,39 @@ const PZ_T = {
   "help.html": [
     `<p>Uma carta, uma pergunta com resposta em número. Ninguém sabe a resposta: o jogo é chutar sem passar dela.</p>
      <ol class="help-steps">
-       <li><b>Chute.</b> Na sua vez, diga um número <b>maior</b> que o último chute: pelo menos <b>10% a mais</b> (nas cartas de ano, 1 a mais).</li>
+       <li><b>Chute.</b> Na sua vez, diga um número <b>maior</b> que o último chute.</li>
        <li><b>Ou duvide.</b> Achou que o último chute já passou da resposta? Grite <b>"Nem a pato!"</b>.</li>
        <li><b>Revela.</b> Se o chute passou da resposta, quem chutou fica com a carta. Se não passou, quem duvidou fica com ela.</li>
        <li><b>Patos.</b> Cada carta tem de 1 a 3 patos. Quem ficou com a carta começa a próxima rodada.</li>
        <li><b>Fim.</b> Quando alguém junta as cartas da meta, acaba. Quem tiver <b>mais patos perde</b>; todo o resto ganha.</li>
      </ol>
-     <p class="help-example">Exemplo: "Quantos ossos tem o corpo humano adulto?" Ana chuta 150, Beto sobe para 200 (o mínimo era 165), Caio grita <b>Nem a pato!</b> A resposta é 206: 200 cabia, então Caio fica com a carta.</p>
+     <p class="help-example">Exemplo: "Quantos ossos tem o corpo humano adulto?" Ana chuta 150, Beto sobe para 200, Caio grita <b>Nem a pato!</b> A resposta é 206: 200 cabia, então Caio fica com a carta.</p>
      <h3>Regras extras</h3>
      <p><b>Dobrei:</b> chutou o dobro (ou mais) do chute anterior? Ganha um escudo que tira 1 pato no fim.<br><b>Na mosca:</b> duvidou de um chute exato? A carta vem com patos em dobro.</p>
      <h3>Pato do dia</h3>
      <p>Todo dia, as mesmas 5 perguntas para todo mundo. Chegue o mais perto possível sem passar: até 100 pontos por pergunta.</p>`,
     `<p>One card, one question with a number for an answer. Nobody knows it: the game is guessing without going over.</p>
      <ol class="help-steps">
-       <li><b>Guess.</b> On your turn, say a number <b>higher</b> than the last guess: at least <b>10% more</b> (on year cards, 1 more).</li>
+       <li><b>Guess.</b> On your turn, say a number <b>higher</b> than the last guess.</li>
        <li><b>Or call it.</b> Think the last guess already went past the answer? Shout <b>"No way, duck!"</b>.</li>
        <li><b>Reveal.</b> If the guess went over, whoever guessed takes the card. If not, whoever called it takes the card.</li>
        <li><b>Ducks.</b> Each card has 1 to 3 ducks. Whoever took the card starts the next round.</li>
        <li><b>End.</b> When someone reaches the card goal, the game ends. <b>Most ducks loses</b>; everyone else wins.</li>
      </ol>
-     <p class="help-example">Example: "How many bones are in the adult human body?" Ana guesses 150, Ben raises to 200 (165 was the minimum), Cal shouts <b>No way, duck!</b> The answer is 206: 200 fit, so Cal takes the card.</p>
+     <p class="help-example">Example: "How many bones are in the adult human body?" Ana guesses 150, Ben raises to 200, Cal shouts <b>No way, duck!</b> The answer is 206: 200 fit, so Cal takes the card.</p>
      <h3>Extra rules</h3>
      <p><b>Doubled:</b> guessed double (or more) the previous guess? You earn a shield that removes 1 duck at the end.<br><b>Bullseye:</b> called an exact guess? The card comes with double ducks.</p>
      <h3>Daily duck</h3>
      <p>Every day, the same 5 questions for everyone. Get as close as you can without going over: up to 100 points per question.</p>`,
     `<p>Una carta, una pregunta con respuesta numérica. Nadie sabe la respuesta: el juego es acercarse sin pasarse.</p>
      <ol class="help-steps">
-       <li><b>Di un número.</b> En tu turno, di un número <b>mayor</b> que el último: al menos un <b>10% más</b> (en las cartas de año, 1 más).</li>
+       <li><b>Di un número.</b> En tu turno, di un número <b>mayor</b> que el último.</li>
        <li><b>O duda.</b> ¿Crees que el último ya se pasó de la respuesta? Grita <b>"¡Ni de pato!"</b>.</li>
        <li><b>Se revela.</b> Si el número se pasó, quien lo dijo se queda la carta. Si no, se la queda quien dudó.</li>
        <li><b>Patos.</b> Cada carta tiene de 1 a 3 patos. Quien se quedó la carta empieza la siguiente ronda.</li>
        <li><b>Final.</b> Cuando alguien junta las cartas de la meta, termina. Quien tenga <b>más patos pierde</b>; todos los demás ganan.</li>
      </ol>
-     <p class="help-example">Ejemplo: "¿Cuántos huesos tiene el cuerpo humano adulto?" Ana dice 150, Beto sube a 200 (el mínimo era 165), Caio grita <b>¡Ni de pato!</b> La respuesta es 206: 200 cabía, así que Caio se queda la carta.</p>
+     <p class="help-example">Ejemplo: "¿Cuántos huesos tiene el cuerpo humano adulto?" Ana dice 150, Beto sube a 200, Caio grita <b>¡Ni de pato!</b> La respuesta es 206: 200 cabía, así que Caio se queda la carta.</p>
      <h3>Reglas extra</h3>
      <p><b>Doblé:</b> ¿dijiste el doble (o más) del número anterior? Ganas un escudo que quita 1 pato al final.<br><b>En el blanco:</b> ¿dudaste de un número exacto? La carta viene con patos dobles.</p>
      <h3>Pato del día</h3>

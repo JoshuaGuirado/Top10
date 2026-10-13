@@ -25,7 +25,7 @@
   `conta.html?volta=<jogo>`. Jogo novo: carregar `../gamezi-conta.js`, pôr a pasta em `GAMEZI_JOGOS` e em `JOGOS` da `conta.html`.
 - Patozi: scripts comuns como no Topzi (ordem no fim do `patozi/index.html`); script novo também vai no `FILES` do
   `sw.js` com o caminho `patozi/…` (o `tests/patozi.test.js` acusa). Regras e computador ficam em `patozi/js/jogo.js`, sem tela.
-  Cada chute sobe pelo menos 10% (`PZ_SUBIDA`; carta de ano, 1). Na partida, "Chutar" e "Nem a pato!" ficam separados
+  Na partida, "Chutar" e "Nem a pato!" ficam separados
   (bloco do chute, "ou", botão amarelo) e o placar escreve "X patos" e "N de M cartas": o dono pediu por causa de confusão.
 - Cartas do Patozi precisam ser **difíceis**: recorde, peso, altura, distância, quantidade que ninguém sabe de cabeça
   (nada de "quantas patas tem a aranha" ou "quantas estrelas tem a bandeira"). As óbvias antigas ficam em

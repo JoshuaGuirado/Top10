@@ -1,8 +1,8 @@
 // Regras do Patozi, sem tela (dá para testar no Node). O estado da partida é um objeto simples
 // (só números, textos e ids de carta), então o modo online manda ele inteiro pelo Realtime.
 //
-// Rodada: uma carta com pergunta de resposta numérica. Cada um, na sua vez, chuta um número pelo menos 10%
-// MAIOR que o último chute (carta de ano: pelo menos 1 a mais) ou grita "Nem a pato!", duvidando de que o último chute ainda caiba na resposta.
+// Rodada: uma carta com pergunta de resposta numérica. Cada um, na sua vez, chuta um número MAIOR que o
+// último chute ou grita "Nem a pato!", duvidando de que o último chute ainda caiba na resposta.
 // Revela: se o último chute passou da resposta, quem chutou fica com a carta; se não passou, fica quem
 // duvidou. Quem ficou com a carta começa a próxima rodada. Quando alguém junta a meta de cartas, o jogo
 // acaba e quem tiver mais patos perde; todo o resto ganha.
@@ -12,7 +12,6 @@
 
 const PZ_MAX_JOGADORES = 10;
 const PZ_MAX_CHUTE = 1e12;
-const PZ_SUBIDA = 0.1; // cada chute sobe pelo menos 10% do anterior: ninguém fica subindo de 1 em 1
 
 // Pato do dia: o dia 1 é 8/10/2026. Cartas novas só entram no sorteio a partir do dia da linha nova,
 // para não mudar o desafio de quem já jogou hoje. semAposentadas: a partir dessa linha, as cartas óbvias
@@ -193,9 +192,7 @@ function pzUltimo(s) {
 
 function pzMinimo(s) {
   const u = pzUltimo(s);
-  if (!u) return 1;
-  const carta = pzCarta(s.carta);
-  return u.valor + (carta && carta.ano ? 1 : Math.max(1, Math.ceil(u.valor * PZ_SUBIDA)));
+  return u ? u.valor + 1 : 1;
 }
 
 function pzProximo(s, j) {

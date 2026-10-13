@@ -296,7 +296,7 @@ function renderTurn() {
       <p class="turn-name">${patoSvg(p.cor, "", p.pato)}${escapeHtml(t(meu ? "game.yourTurn" : "game.turnOf", { nome: p.nome }))}</p>
       <div class="move">
         <p class="move-title">${UI_ICONS.up || ""}${escapeHtml(t(u ? "game.raiseTitle" : "game.openTitle"))}</p>
-        <p class="turn-hint">${escapeHtml(u ? t(carta.ano ? "game.raiseYear" : "game.raise", { min: fmtU(minimo, carta) }) : t("game.first"))}</p>
+        <p class="turn-hint">${escapeHtml(u ? t("game.raise", { min: fmtU(minimo, carta) }) : t("game.first"))}</p>
         <form class="guess-row" id="guess-form">
           ${campoChute("guess", u ? fmt(minimo, carta.ano) + "+" : t("game.guessPh"), carta)}
           <button type="submit" class="btn guess-btn">${escapeHtml(t("game.guess"))}</button>
