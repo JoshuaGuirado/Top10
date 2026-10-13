@@ -179,6 +179,19 @@ function medir(W) {
         await page.waitForTimeout(150);
       }
     });
+    // ── Mapazi ──
+    await tentar("mapa-inicio", () => page.goto(base + "/mapazi/index.html"));
+    await tentar("mapa-ajuda", () => page.click("#help-btn"));
+    await fechar();
+    await tentar("mapa-partida", () => page.click("#free-btn"));
+    await tentar("mapa-ajustou", async () => { for (let i = 0; i < 5; i++) await page.click("#size-up"); });
+    await tentar("mapa-revelou", () => page.click("#game-confirm"));
+    await tentar("mapa-resultado", async () => {
+      for (let i = 0; i < 25 && (await page.isVisible("#screen-game")); i++) {
+        if (await page.isVisible("#game-next")) await page.click("#game-next");
+        else await page.click("#game-confirm");
+      }
+    });
     // ── Cravazi ──
     await tentar("crava-inicio", () => page.goto(base + "/cravazi/index.html"));
     await tentar("crava-ajuda", () => page.click("#help-btn"));

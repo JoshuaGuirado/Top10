@@ -732,6 +732,18 @@ create table if not exists public.cravazi_diario (
   primary key (dia, user_id)
 );
 
+-- Mapazi do dia (o dia 1 é 13/10/2026): 10 rodadas, de 0 a 100 pontos cada.
+create table if not exists public.mapazi_diario (
+  dia integer not null check (dia >= 1),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  nick text not null default '' check (char_length(nick) <= 16),
+  pontos smallint not null check (pontos between 0 and 1000),
+  tempo_ms integer check (tempo_ms between 0 and 86400000),
+  created_at timestamptz not null default now(),
+  primary key (dia, user_id)
+);
+
+comment on table public.mapazi_diario is 'Mapazi: resultado de cada um no Mapazi do dia (ranking)';
 comment on table public.datazi_diario is 'Datazi: resultado de cada um no Datazi do dia (ranking)';
 comment on table public.cravazi_diario is 'Cravazi: resultado de cada um no Cravazi do dia (ranking)';
 comment on table public.maisoumenozi_diario is 'Maisoumenozi: resultado de cada um no desafio do dia (ranking)';
@@ -740,10 +752,10 @@ do $$
 declare
   tabela text;
 begin
-  foreach tabela in array array['topzi_diario', 'patozi_diario', 'datazi_diario', 'maisoumenozi_diario', 'cravazi_diario'] loop
+  foreach tabela in array array['topzi_diario', 'patozi_diario', 'datazi_diario', 'maisoumenozi_diario', 'cravazi_diario', 'mapazi_diario'] loop
     execute format('create index if not exists %I on public.%I (dia, pontos desc, tempo_ms)', tabela || '_tempo_idx', tabela);
   end loop;
-  foreach tabela in array array['datazi_diario', 'maisoumenozi_diario', 'cravazi_diario'] loop
+  foreach tabela in array array['datazi_diario', 'maisoumenozi_diario', 'cravazi_diario', 'mapazi_diario'] loop
     execute format('drop trigger if exists %I on public.%I', tabela || '_nick_limpo', tabela);
     execute format('create trigger %I before insert or update of nick on public.%I for each row execute function public.gamezi_limpar_nick()', tabela || '_nick_limpo', tabela);
     execute format('alter table public.%I enable row level security', tabela); -- sem regras: só as funções leem e gravam
@@ -848,13 +860,29 @@ end $$;
 
 grant execute on function public.cravazi_registrar_diario(integer, text, integer, integer) to authenticated;
 
+-- Mapazi do dia (o dia 1 é 13/10/2026): p_acertos são os pontos (de 0 a 1000).
+create or replace function public.mapazi_registrar_diario(p_dia integer, p_nick text, p_acertos integer, p_tempo integer default null)
+returns void language plpgsql security definer set search_path = public as $$
+declare
+  hoje integer := ((now() at time zone 'utc')::date - date '2026-10-13') + 1;
+begin
+  if auth.uid() is null then raise exception 'Entre para registrar o resultado.'; end if;
+  if p_dia is null or p_dia not between hoje - 1 and hoje + 1 then raise exception 'Esse dia já passou.'; end if;
+  if p_acertos is null or p_acertos not between 0 and 1000 then raise exception 'Resultado inválido.'; end if;
+  insert into public.mapazi_diario (dia, user_id, nick, pontos, tempo_ms)
+  values (p_dia, auth.uid(), left(coalesce(p_nick, ''), 16), p_acertos, case when p_tempo between 0 and 86400000 then p_tempo end)
+  on conflict (dia, user_id) do nothing;
+end $$;
+
+grant execute on function public.mapazi_registrar_diario(integer, text, integer, integer) to authenticated;
+
 -- Ranking do dia de um jogo: os primeiros (p_limite) e, se a pessoa conectada ficou fora deles, a linha dela no fim.
 -- posicao: empate em pontos e tempo divide o lugar. total: quantos jogaram no dia. eu: é a pessoa conectada.
 create or replace function public.gamezi_ranking_dia(p_jogo text, p_dia integer, p_limite integer default 10)
 returns table (posicao bigint, nick text, pontos integer, tempo_ms integer, eu boolean, total bigint)
 language plpgsql stable security definer set search_path = public as $$
 begin
-  if p_jogo is null or p_jogo not in ('topzi', 'patozi', 'datazi', 'maisoumenozi', 'cravazi') then raise exception 'Jogo desconhecido.'; end if;
+  if p_jogo is null or p_jogo not in ('topzi', 'patozi', 'datazi', 'maisoumenozi', 'cravazi', 'mapazi') then raise exception 'Jogo desconhecido.'; end if;
   return query execute format($q$
     with r as (
       select d.nick, d.pontos::integer as pontos, d.tempo_ms, d.user_id,

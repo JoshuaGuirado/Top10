@@ -1,4 +1,4 @@
-// Teste de ponta a ponta do ranking do dia (gamezi-ranking.js) no Datazi, no Maiorzi e no portal
+// Teste de ponta a ponta do ranking do dia (gamezi-ranking.js) no Datazi, no Maiorzi, no Mapazi e no portal
 // (ranking.html), com o Supabase falso de tests/supabase-falso.js. Confere o nome pedido para o ranking,
 // o tempo guardado com o resultado e o desempate pelo tempo.
 // Rode com: npm run test:online
@@ -86,6 +86,26 @@ const server = http.createServer((req, res) => {
   assert.equal(linhas.length, 1);
   assert.ok(linhas[0].tempo_ms > 0);
   step("Maiorzi do dia: manda com o nome já usado e mostra o ranking");
+
+  // Mapazi: ajusta o tamanho e confirma em todas as rodadas; manda direto com o nome já usado.
+  await P.goto(site + "/mapazi/index.html");
+  await P.click("#daily-btn");
+  await P.waitForSelector("#screen-game:not([hidden])");
+  for (let i = 0; i < 10; i++) {
+    await P.click("#size-up");
+    await P.waitForTimeout(20);
+    await P.click("#game-confirm");
+    await P.click("#game-next");
+  }
+  await P.waitForSelector("#screen-results:not([hidden])");
+  await P.waitForSelector("#leaderboard .lb-row.me");
+  assert.match(await P.textContent("#leaderboard .lb-row.me"), /Nina/);
+  linhas = (await db()).mapazi_diario || [];
+  assert.equal(linhas.length, 1);
+  assert.ok(linhas[0].pontos >= 0 && linhas[0].pontos <= 1000 && linhas[0].tempo_ms > 0);
+  step("Mapazi do dia: 10 rodadas, manda os pontos com o tempo e mostra o ranking");
+  await P.goto(site + "/maisoumenozi/index.html");
+  linhas = (await db()).maisoumenozi_diario;
 
   // Desempate: mesmos pontos, quem levou menos tempo fica na frente; sem tempo fica atrás.
   const dia = await P.evaluate(() => mmDiaNumero());

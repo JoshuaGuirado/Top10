@@ -170,3 +170,15 @@ Arquivos:
 ## Adicionar cartas
 
 Crie um arquivo novo em `patozi/data/` (por exemplo `cartas-4.js`), carregado no `patozi/index.html` depois dos outros e incluído no `FILES` do `sw.js` (`patozi/data/cartas-4.js`). Dentro, use `pzCartas("tema", [[patos, resposta, "pergunta", "question", "pregunta"], ...])`; quando a resposta for um ano, ponha `"ano"` no fim. Depois, acrescente uma linha em `PZ_DIARIO_POOLS` (`patozi/js/jogo.js`) valendo a partir de amanhã, com o novo total de cartas, para o Pato do dia de hoje não mudar. O `npm test` confere tudo isso.
+
+# Mapazi
+
+O tamanho de verdade dos países. Aparece um país no tamanho certo (cinza) e outro do lado (vermelho) num tamanho errado;
+a pessoa aumenta ou diminui o vermelho até achar que está certo, e aí aparece o contorno do tamanho real. Em cheio vale 100;
+cada vez que a área erra pelo dobro (ou pela metade), perde 50. Dez rodadas: Mapazi do dia (igual para todos, com ranking) e partida livre.
+
+- `mapazi/data/paises.js`: contornos gerados por `ferramentas/gerar-mapazi.js` a partir do Natural Earth (domínio público, pelo
+  pacote `world-atlas`), cada país numa projeção de área igual (Lambert azimutal) centrada nele, então dois países desenhados na
+  mesma escala mostram o tamanho real um perto do outro
+- `mapazi/js/jogo.js`: regras, sem tela (testado em `tests/mapazi.test.js`); `textos.js` (três idiomas); `app.js` (telas)
+- Marca: `brand/mapazi-logo*.svg` e `brand/mapazi-simbolo*.svg`

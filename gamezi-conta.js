@@ -3,7 +3,7 @@
 // a sessão que o Supabase guarda neste navegador e, para entrar ou mexer na conta, mandam a pessoa
 // para conta.html com ?volta=<pasta do jogo>, que a traz de volta para o jogo depois do login.
 
-var GAMEZI_JOGOS = ["topzi", "patozi", "datazi", "maisoumenozi", "cravazi"];
+var GAMEZI_JOGOS = ["topzi", "patozi", "datazi", "maisoumenozi", "cravazi", "mapazi"];
 
 // Sessão salva pelo Supabase neste navegador: { email, anon } ou null. Não precisa carregar a biblioteca.
 function gameziSessao() {
@@ -39,7 +39,7 @@ function gameziRetornoDoLogin(raiz) {
 
 // ═════════════════════════════ nível e conquistas ═════════════════════════════
 // Contam o que a pessoa joga em todos os jogos do Gamezi. Vêm do que cada jogo guarda neste aparelho
-// (e que a conta leva para outros aparelhos): tt:* (Topzi), pz:* (Patozi), dz:* (Datazi), mm:* (Maiorzi), cz:* (Cravazi).
+// (e que a conta leva para outros aparelhos): tt:* (Topzi), pz:* (Patozi), dz:* (Datazi), mm:* (Maiorzi), cz:* (Cravazi), mp:* (Mapazi).
 // Algumas conquistas liberam itens do guarda-roupa do pato (ver GAMEZI_CONQUISTAS[].item e o Patozi).
 
 function gameziLer(chave) {
@@ -53,6 +53,7 @@ function gameziDadosLocais() {
     patozi: { stats: gameziLer("pz:stats") || {}, diario: gameziLer("pz:diario") || {} },
     datazi: { stats: gameziLer("dz:stats") || {}, diario: gameziLer("dz:diario") || {} },
     maisoumenozi: { stats: gameziLer("mm:stats") || {}, diario: gameziLer("mm:diario") || {} },
+    mapazi: { stats: gameziLer("mp:stats") || {}, diario: gameziLer("mp:diario") || {} },
     cravazi: { stats: gameziLer("cz:stats") || {}, diario: gameziLer("cz:diario") || {} },
   };
 }
@@ -88,7 +89,7 @@ var GAMEZI_CONQUISTAS = [
 function gameziProgresso(d) {
   d = d || gameziDadosLocais();
   var tz = (d.topzi && d.topzi.stats) || {}, pz = (d.patozi && d.patozi.stats) || {}, dz = (d.datazi && d.datazi.stats) || {}, mm = (d.maisoumenozi && d.maisoumenozi.stats) || {};
-  var cz = (d.cravazi && d.cravazi.stats) || {};
+  var cz = (d.cravazi && d.cravazi.stats) || {}, mp = (d.mapazi && d.mapazi.stats) || {};
   var diasTopzi = Object.keys((d.topzi && d.topzi.diaria) || {});
   var diasPatozi = Object.keys((d.patozi && d.patozi.diario) || {}).filter(function (k) {
     var r = d.patozi.diario[k];
@@ -97,15 +98,16 @@ function gameziProgresso(d) {
   var diasDatazi = Object.keys((d.datazi && d.datazi.diario) || {});
   var diasMais = Object.keys((d.maisoumenozi && d.maisoumenozi.diario) || {});
   var diasCravazi = Object.keys((d.cravazi && d.cravazi.diario) || {});
+  var diasMapazi = Object.keys((d.mapazi && d.mapazi.diario) || {});
   var p = {
-    partidas: (tz.games || 0) + (pz.partidas || 0) + (dz.partidas || 0) + (mm.partidas || 0) + (cz.partidas || 0),
-    desafios: diasTopzi.length + diasPatozi.length + diasDatazi.length + diasMais.length + diasCravazi.length,
-    sequencia: Math.max(gameziSequencia(diasTopzi), gameziSequencia(diasPatozi), gameziSequencia(diasDatazi), gameziSequencia(diasMais), gameziSequencia(diasCravazi)),
+    partidas: (tz.games || 0) + (pz.partidas || 0) + (dz.partidas || 0) + (mm.partidas || 0) + (cz.partidas || 0) + (mp.partidas || 0),
+    desafios: diasTopzi.length + diasPatozi.length + diasDatazi.length + diasMais.length + diasCravazi.length + diasMapazi.length,
+    sequencia: Math.max(gameziSequencia(diasTopzi), gameziSequencia(diasPatozi), gameziSequencia(diasDatazi), gameziSequencia(diasMais), gameziSequencia(diasCravazi), gameziSequencia(diasMapazi)),
     listaCompleta: tz.perfect || 0,
     venceuLista: (tz.vsWins || 0) + diasTopzi.filter(function (k) { var r = d.topzi.diaria[k]; return r && r.score > r.total / 2; }).length,
     escapou: pz.escapou || 0,
     duvidasCertas: pz.duvidasCertas || 0,
-    jogos: [tz.games || diasTopzi.length, pz.partidas || diasPatozi.length, dz.partidas || diasDatazi.length, mm.partidas || diasMais.length, cz.partidas || diasCravazi.length].filter(Boolean).length,
+    jogos: [tz.games || diasTopzi.length, pz.partidas || diasPatozi.length, dz.partidas || diasDatazi.length, mm.partidas || diasMais.length, cz.partidas || diasCravazi.length, mp.partidas || diasMapazi.length].filter(Boolean).length,
   };
   p.xp = p.partidas * 10 + p.desafios * 15 + (tz.hits || 0) + (pz.escapou || 0) * 5;
   p.nivel = Math.floor((1 + Math.sqrt(1 + (8 * p.xp) / 100)) / 2);

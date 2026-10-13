@@ -1,4 +1,4 @@
-# Gamezi (plataforma), Topzi, Patozi, Datazi, Maiorzi e Cravazi (jogos) — instruções para o Claude
+# Gamezi (plataforma), Topzi, Patozi, Datazi, Maiorzi, Cravazi e Mapazi (jogos) — instruções para o Claude
 
 - Responder em português.
 - Ao terminar uma mudança: commit na branch de trabalho e, em seguida, levar o mesmo commit para a `main`
@@ -66,3 +66,8 @@
   6 chutes por pergunta a partir do dia 6 (`czChutesDoDia`; os dias antigos continuam com 10).
 - Datazi: 2 vidas (`DZ_VIDAS`); o Datazi do dia usa `dzVidasDoDia` (3 até o dia 6). Mudou regra de desafio do dia? Vale a partir
   de amanhã, como as listas.
+- Mapazi (`mapazi/`): ajustar o tamanho de um país perto de outro (o tamanho de verdade). Scripts comuns, ordem no fim do
+  `mapazi/index.html` (`js/jogo.js` antes de `data/paises.js`); script novo vai no `FILES` do `sw.js` (o `tests/mapazi.test.js` acusa).
+  `data/paises.js` é gerado por `ferramentas/gerar-mapazi.js` (Natural Earth, projeção de área igual; precisa de `world-atlas` e
+  `topojson-client` do npm). País novo: no fim da lista `NOMES` do gerador, gerar de novo e linha nova em `MP_DIARIO_POOLS`
+  valendo a partir de amanhã (o dia 1 está fixado no teste). Chaves `mp:*`, tabela `mapazi_diario`.

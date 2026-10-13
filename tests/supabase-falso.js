@@ -7,7 +7,7 @@
     topzi_salas: ["code"], topzi_sala_jogadores: ["room_code", "user_id"], topzi_perfis: ["id"], topzi_partidas: ["id"],
     patozi_salas: ["code"], patozi_sala_jogadores: ["sala_code", "user_id"], patozi_perfis: ["id"], patozi_partidas: ["id"],
     patozi_diario: ["dia", "user_id"], patozi_sugestoes: ["id"], topzi_diario: ["dia", "user_id"],
-    datazi_diario: ["dia", "user_id"], maisoumenozi_diario: ["dia", "user_id"],
+    datazi_diario: ["dia", "user_id"], maisoumenozi_diario: ["dia", "user_id"], mapazi_diario: ["dia", "user_id"],
     cravazi_salas: ["code"], cravazi_sala_jogadores: ["sala_code", "user_id"], cravazi_partidas: ["id"], cravazi_diario: ["dia", "user_id"],
   };
   const empty = () => Object.fromEntries(Object.keys(PK).map((k) => [k, []]));
@@ -148,7 +148,7 @@
         save(db);
         return { data: null, error: null };
       }
-      if (nome === "datazi_registrar_diario" || nome === "maisoumenozi_registrar_diario" || nome === "cravazi_registrar_diario") {
+      if (nome === "datazi_registrar_diario" || nome === "maisoumenozi_registrar_diario" || nome === "cravazi_registrar_diario" || nome === "mapazi_registrar_diario") {
         const tabela = nome.replace("_registrar_diario", "_diario");
         if (!uid) return { data: null, error: { message: "Entre para registrar o resultado." } };
         if (!db[tabela].some((x) => x.dia === a.p_dia && x.user_id === uid)) db[tabela].push({ dia: a.p_dia, user_id: uid, nick: a.p_nick, pontos: a.p_acertos, tempo_ms: a.p_tempo ?? null, created_at: now() });
