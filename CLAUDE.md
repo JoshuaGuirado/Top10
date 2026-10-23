@@ -1,4 +1,4 @@
-# Gamezi (plataforma), Topzi, Patozi, Datazi, Maiorzi, Cravazi e Tamanhozi (jogos) — instruções para o Claude
+# Gamezi (plataforma), Topzi, Patozi, Datazi, Maiorzi, Cravazi, Tamanhozi, Emojizi, Contazi e Memorizi (jogos) — instruções para o Claude
 
 - Responder em português.
 - Ao terminar uma mudança: commit na branch de trabalho e, em seguida, levar o mesmo commit para a `main`
@@ -84,3 +84,10 @@
   `<jogo>_sala_jogadores`). Jogo novo precisa de online com skin. Mudanças do banco para quem já rodou o schema: `supabase/online-novo.sql`.
 - Maiorzi online (`maisoumenozi/js/online.js`, tabelas `maisoumenozi_*`): todo mundo responde a mesma comparação (15 s), acertou
   vale 1 (a maluca, 2); 10 rodadas sorteadas por `mmNovaOnline`. Usa os cartões da partida sozinho (`renderNormal`/`renderUau`).
+- Emojizi (`emojizi/`), Contazi (`contazi/`) e Memorizi (`memorizi/`) são "jogos do kit": as telas (início, partida, resultado,
+  online e sala), o desafio do dia com ranking, a partida livre (3 vidas) e o online com skin são de `gamezi-kit.js` +
+  `gamezi-kit.css` (raiz); as rodadas (pontos de 50 a 100 pelo tempo) são de `gamezi-rodadas.js`. Cada jogo só tem `js/jogo.js`
+  (regras, sem tela), `js/app.js` (desenha a rodada e chama `gzIniciar`) e `style.css`. O dia 1 dos três é 23/10/2026 e está fixado
+  em `tests/jogos-novos.test.js`. Chaves: `ej:*`, `ct:*`, `mz:*`. Item novo no Emojizi: no fim de `emojizi/data/itens.js`, nos 3
+  idiomas, e linha nova em `EJ_DIARIO_POOLS` valendo a partir de amanhã. Banco: tabelas `<jogo>_salas`, `_sala_jogadores`,
+  `_partidas` e `_diario` (para quem já rodou o schema: `supabase/jogos-novos.sql`). Jogo novo do mesmo tipo: copiar um dos três.

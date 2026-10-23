@@ -13,6 +13,10 @@
     datazi_salas: ["code"], datazi_sala_jogadores: ["sala_code", "user_id"], datazi_partidas: ["id"],
     maisoumenozi_salas: ["code"], maisoumenozi_sala_jogadores: ["sala_code", "user_id"], maisoumenozi_partidas: ["id"],
   };
+  // Jogos do kit (gamezi-kit.js): as mesmas tabelas com o nome de cada um.
+  const KIT = ["emojizi", "contazi", "memorizi"];
+  KIT.forEach((j) => Object.assign(PK, { [j + "_salas"]: ["code"], [j + "_sala_jogadores"]: ["sala_code", "user_id"], [j + "_partidas"]: ["id"], [j + "_diario"]: ["dia", "user_id"] }));
+
   const empty = () => Object.fromEntries(Object.keys(PK).map((k) => [k, []]));
   const load = () => ({ ...empty(), ...(JSON.parse(localStorage.getItem(DB_KEY) || "null") || {}) });
   const save = (db) => localStorage.setItem(DB_KEY, JSON.stringify(db));
@@ -37,7 +41,7 @@
       const hit = (r) => this.filters.every(([c, v]) => r[c] === v);
       if (this.op === "insert" || this.op === "upsert") {
         const r = { created_at: now(), joined_at: now(), updated_at: now(), ...this.payload };
-        if (this.t === "topzi_partidas" || this.t === "patozi_partidas" || this.t === "patozi_sugestoes" || this.t === "cravazi_partidas" || this.t === "tamanhozi_partidas" || this.t === "datazi_partidas" || this.t === "maisoumenozi_partidas") r.id = rows.length + 1;
+        if (this.t === "topzi_partidas" || this.t === "patozi_partidas" || this.t === "patozi_sugestoes" || this.t === "cravazi_partidas" || this.t === "tamanhozi_partidas" || this.t === "datazi_partidas" || this.t === "maisoumenozi_partidas" || KIT.some((j) => this.t === j + "_partidas")) r.id = rows.length + 1;
         const old = rows.find((x) => key(x) === key(r));
         if (old && this.op === "insert") return { data: null, error: { code: "23505", message: "duplicate key" } };
         if (old) Object.assign(old, this.payload, { updated_at: now() });
@@ -46,6 +50,7 @@
           if (this.t === "patozi_sala_jogadores" && rows.filter((x) => x.sala_code === r.sala_code).length >= 10) return { data: null, error: { message: "A sala está cheia" } };
           if (this.t === "cravazi_sala_jogadores" && rows.filter((x) => x.sala_code === r.sala_code).length >= 8) return { data: null, error: { message: "A sala está cheia" } };
           if (this.t === "tamanhozi_sala_jogadores" && rows.filter((x) => x.sala_code === r.sala_code).length >= 10) return { data: null, error: { message: "A sala está cheia" } };
+          if (KIT.some((j) => this.t === j + "_sala_jogadores") && rows.filter((x) => x.sala_code === r.sala_code).length >= 10) return { data: null, error: { message: "A sala está cheia" } };
           if (this.t === "maisoumenozi_sala_jogadores" && rows.filter((x) => x.sala_code === r.sala_code).length >= 10) return { data: null, error: { message: "A sala está cheia" } };
           if (this.t === "datazi_sala_jogadores" && rows.filter((x) => x.sala_code === r.sala_code).length >= 10) return { data: null, error: { message: "A sala está cheia" } };
           rows.push(r);
@@ -65,6 +70,7 @@
         if (this.t === "patozi_salas") gone.forEach((g) => (db.patozi_sala_jogadores = db.patozi_sala_jogadores.filter((p) => p.sala_code !== g.code)));
         if (this.t === "cravazi_salas") gone.forEach((g) => (db.cravazi_sala_jogadores = db.cravazi_sala_jogadores.filter((p) => p.sala_code !== g.code)));
         if (this.t === "tamanhozi_salas") gone.forEach((g) => (db.tamanhozi_sala_jogadores = db.tamanhozi_sala_jogadores.filter((p) => p.sala_code !== g.code)));
+        KIT.forEach((j) => { if (this.t === j + "_salas") gone.forEach((g) => (db[j + "_sala_jogadores"] = db[j + "_sala_jogadores"].filter((p) => p.sala_code !== g.code))); });
         if (this.t === "maisoumenozi_salas") gone.forEach((g) => (db.maisoumenozi_sala_jogadores = db.maisoumenozi_sala_jogadores.filter((p) => p.sala_code !== g.code)));
         if (this.t === "datazi_salas") gone.forEach((g) => (db.datazi_sala_jogadores = db.datazi_sala_jogadores.filter((p) => p.sala_code !== g.code)));
         save(db);
@@ -157,7 +163,7 @@
         save(db);
         return { data: null, error: null };
       }
-      if (nome === "datazi_registrar_diario" || nome === "maisoumenozi_registrar_diario" || nome === "cravazi_registrar_diario" || nome === "tamanhozi_registrar_diario") {
+      if (nome === "datazi_registrar_diario" || nome === "maisoumenozi_registrar_diario" || nome === "cravazi_registrar_diario" || nome === "tamanhozi_registrar_diario" || KIT.some((j) => nome === j + "_registrar_diario")) {
         const tabela = nome.replace("_registrar_diario", "_diario");
         if (!uid) return { data: null, error: { message: "Entre para registrar o resultado." } };
         if (!db[tabela].some((x) => x.dia === a.p_dia && x.user_id === uid)) db[tabela].push({ dia: a.p_dia, user_id: uid, nick: a.p_nick, pontos: a.p_acertos, tempo_ms: a.p_tempo ?? null, created_at: now() });
@@ -165,7 +171,7 @@
         return { data: null, error: null };
       }
       // Salas: quem sai passa o comando para quem entrou primeiro; quem fica assume se o anfitrião sumiu.
-      if (/^(topzi|patozi|cravazi|tamanhozi|datazi|maisoumenozi)_(sair_da_sala|assumir_sala)$/.test(nome)) {
+      if (/^(topzi|patozi|cravazi|tamanhozi|datazi|maisoumenozi|emojizi|contazi|memorizi)_(sair_da_sala|assumir_sala)$/.test(nome)) {
         const jogo = nome.split("_")[0];
         const col = jogo === "topzi" ? "room_code" : "sala_code";
         const salas = db[jogo + "_salas"];

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Contazi">
+  <rect fill="#FFF4DE" x="8" y="8" width="84" height="84" rx="20"/>
+  <path fill="none" stroke="#FF4D3D" stroke-width="8" stroke-linecap="round" d="M23 33 H43 M33 23 V43"/>
+  <path fill="none" stroke="#171717" stroke-width="8" stroke-linecap="round" d="M60 26 L74 40 M74 26 L60 40"/>
+  <path fill="none" stroke="#171717" stroke-width="8" stroke-linecap="round" d="M23 67 H43"/>
+  <path fill="none" stroke="#FF4D3D" stroke-width="8" stroke-linecap="round" d="M57 61 H77 M57 73 H77"/>
+</svg>

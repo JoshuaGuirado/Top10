@@ -206,3 +206,15 @@ mais perto leva 1 ponto.
 - `gamezi-musica.js`: música de fundo feita no navegador (Web Audio), baixinha; liga/desliga em Configurações → Música.
 - `gamezi-skins.js`: as skins prontas do Topzi no online do Datazi, do Tamanhozi e do Maiorzi (Topzi, Cravazi e Patozi já
   tinham as suas). A skin escolhida vale para os três.
+
+# Emojizi, Contazi e Memorizi (jogos do kit)
+
+- **Emojizi**: aparecem uns emojis e quatro alternativas; qual filme, desenho, série, história ou lugar eles contam?
+- **Contazi**: contas de cabeça contra o relógio, digitando no teclado da tela; ficam mais difíceis a cada rodada.
+- **Memorizi**: os quatro botões coloridos acendem numa sequência e você repete; a sequência cresce a cada rodada.
+
+Nos três: acertou, de 50 a 100 pontos (quanto mais rápido, mais). **Desafio do dia** com 10 rodadas iguais para todo mundo,
+semana e ranking; **partida livre** até errar 3 vezes, com recorde; **online** com salas, skin e todo mundo respondendo a mesma
+rodada. As telas e o online são de `gamezi-kit.js`/`gamezi-kit.css`; as rodadas, de `gamezi-rodadas.js`; cada jogo só tem as
+regras (`js/jogo.js`), a rodada na tela (`js/app.js`) e o estilo dela. Testes: `tests/jogos-novos.test.js` e
+`tests/jogos-novos-online.e2e.js`. Banco: `supabase/jogos-novos.sql` (para quem já rodou o schema).

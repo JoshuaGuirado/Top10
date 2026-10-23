@@ -125,6 +125,45 @@
         <span class="play" data-t="play">Jogar</span>
       </a>
 
+      <a class="game-row" href="emojizi/">
+        <span class="game-icon">
+          <img class="logo-light" src="brand/emojizi-simbolo.svg" alt="" aria-hidden="true">
+          <img class="logo-dark" src="brand/emojizi-simbolo-escuro.svg" alt="" aria-hidden="true">
+        </span>
+        <span class="game-text">
+          <b>Emojizi</b>
+          <small data-t="emojiziKind"></small>
+          <small class="game-daily" id="emoji-tag"></small>
+        </span>
+        <span class="play" data-t="play">Jogar</span>
+      </a>
+
+      <a class="game-row" href="contazi/">
+        <span class="game-icon">
+          <img class="logo-light" src="brand/contazi-simbolo.svg" alt="" aria-hidden="true">
+          <img class="logo-dark" src="brand/contazi-simbolo-escuro.svg" alt="" aria-hidden="true">
+        </span>
+        <span class="game-text">
+          <b>Contazi</b>
+          <small data-t="contaziKind"></small>
+          <small class="game-daily" id="conta-tag"></small>
+        </span>
+        <span class="play" data-t="play">Jogar</span>
+      </a>
+
+      <a class="game-row" href="memorizi/">
+        <span class="game-icon">
+          <img class="logo-light" src="brand/memorizi-simbolo.svg" alt="" aria-hidden="true">
+          <img class="logo-dark" src="brand/memorizi-simbolo-escuro.svg" alt="" aria-hidden="true">
+        </span>
+        <span class="game-text">
+          <b>Memorizi</b>
+          <small data-t="memoriziKind"></small>
+          <small class="game-daily" id="memo-tag"></small>
+        </span>
+        <span class="play" data-t="play">Jogar</span>
+      </a>
+
       <a class="portal-rank" href="ranking.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/></svg><span data-t="ranking">Ranking do dia</span></a>
 
       <p class="soon" data-t="soon">Mais jogos em breve.</p>
@@ -161,6 +200,10 @@
       maisDaily: ["Desafio do dia #{n}", "Daily challenge #{n}", "Desafío del día #{n}"],
       tamanhoziKind: ["Qual o tamanho de verdade? Sozinho ou online", "How big is it, really? Solo or online", "¿Qué tamaño tiene de verdad? Solo u online"],
       tamanhoDaily: ["Tamanhozi do dia #{n}", "Daily Tamanhozi #{n}", "Tamanhozi del día #{n}"],
+      emojiziKind: ["Adivinhe o filme ou o lugar pelos emojis", "Guess the movie or place from the emojis", "Adivina la película o el lugar por los emojis"],
+      contaziKind: ["Contas de cabeça contra o relógio", "Mental math against the clock", "Cuentas de cabeza contra el reloj"],
+      memoriziKind: ["Memorize a sequência de cores e repita", "Memorize the color sequence and repeat it", "Memoriza la secuencia de colores y repítela"],
+      novoDaily: ["{jogo} do dia #{n}", "Daily {jogo} #{n}", "{jogo} del día #{n}"],
       play: ["Jogar", "Play", "Jugar"],
       ranking: ["Ranking do dia", "Daily ranking", "Ranking del día"],
       soon: ["Mais jogos em breve.", "More games coming soon.", "Más juegos muy pronto."],
@@ -223,6 +266,13 @@
       var atag = document.getElementById("tamanho-tag");
       atag.hidden = an < 1;
       atag.textContent = t("tamanhoDaily").replace("{n}", an);
+      // Emojizi, Contazi e Memorizi do dia (mesma conta de gamezi-kit.js: o dia 1 é 23/10/2026).
+      var nn = pn - 15;
+      [["emoji-tag", "Emojizi"], ["conta-tag", "Contazi"], ["memo-tag", "Memorizi"]].forEach(function (x) {
+        var el = document.getElementById(x[0]);
+        el.hidden = nn < 1;
+        el.textContent = t("novoDaily").replace("{jogo}", x[1]).replace("{n}", nn);
+      });
       // Nível do Gamezi (soma o que se joga em todos os jogos neste aparelho).
       var prog = gameziProgresso();
       var nivel = document.getElementById("portal-level");

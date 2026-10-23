@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 450 108" role="img" aria-label="Emojizi">
+  <g fill="#171717" stroke="#171717" stroke-width="5" stroke-linejoin="round" fill-rule="evenodd"><path d="M 0 0 H 60 V 22 H 24 V 39 H 52 V 61 H 24 V 78 H 60 V 100 H 0 Z"/><path d="M 68 100 V 0 H 92 L 112 46 L 132 0 H 156 V 100 H 132 V 48 L 120 76 H 104 L 92 48 V 100 Z"/><path d="M 164 61 A 32 39 0 1 0 228 61 A 32 39 0 1 0 164 61 Z M 186 61 A 10 17 0 1 1 206 61 A 10 17 0 1 1 186 61 Z"/><path d="M 272 0 H 296 V 68 A 30 32 0 0 1 236 68 V 60 H 260 V 68 A 6 9 0 0 0 272 68 Z"/><path d="M 304 0 H 328 V 100 H 304 Z"/><path d="M 418 0 H 442 V 100 H 418 Z"/></g>
+  <g fill="#FF4D3D" stroke="#FF4D3D" stroke-width="5" stroke-linejoin="round"><path d="M 338 0 H 408 V 22 L 370 78 H 410 V 100 H 336 V 78 L 374 22 H 338 Z"/></g>
+</svg>

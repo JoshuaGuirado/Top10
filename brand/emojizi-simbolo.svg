@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Emojizi">
+  <rect fill="#171717" x="8" y="8" width="84" height="84" rx="20"/>
+  <circle fill="#FFC93C" cx="50" cy="50" r="30"/>
+  <ellipse fill="#171717" cx="39" cy="43" rx="4.5" ry="6.5"/>
+  <ellipse fill="#171717" cx="61" cy="43" rx="4.5" ry="6.5"/>
+  <path fill="#FF4D3D" d="M33 55 H67 A17 17 0 0 1 33 55 Z"/>
+</svg>

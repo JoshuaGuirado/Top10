@@ -1,0 +1,12 @@
+/* Contazi: a conta no alto e o teclado de números (o resto vem de ../gamezi-kit.css) */
+.conta { background: var(--fg); color: var(--bg); border-radius: var(--r); padding: 20px; display: grid; gap: 6px; justify-items: center; text-align: center; }
+.conta p { margin: 0; font-stretch: 75%; font-weight: 800; font-size: clamp(2.2rem, 11vw, 3.4rem); line-height: 1; font-variant-numeric: tabular-nums; }
+.conta b { min-width: 3ch; padding: 4px 18px; border-radius: 12px; background: var(--bg); color: var(--fg); font-stretch: 75%; font-weight: 800; font-size: clamp(2rem, 10vw, 3rem); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.conta.right { background: var(--good); color: #fff; }
+.conta.wrong { background: var(--bad); color: #fff; }
+.ct-sua { margin: 0; text-align: center; font-weight: 700; color: var(--muted); }
+.teclado { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tecla { min-height: 58px; border: 0; border-radius: 14px; background: var(--surface); color: var(--fg); font: inherit; font-weight: 800; font-size: 1.6rem; cursor: pointer; touch-action: manipulation; }
+.tecla:active { transform: scale(.96); background: var(--line); }
+.tecla.ok { background: var(--accent); color: var(--on-accent); font-size: 1.2rem; }
+.tecla.apagar { font-size: 1.3rem; }

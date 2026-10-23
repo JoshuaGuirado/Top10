@@ -1,0 +1,22 @@
+/* Memorizi: os quatro botões coloridos e as bolinhas da sequência (o resto vem de ../gamezi-kit.css) */
+.mz-msg { margin: 0; text-align: center; font-weight: 800; font-size: 1.15rem; }
+.mz-msg.small { font-size: .95rem; color: var(--muted); }
+.pads { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: min(100%, 360px); margin: 0 auto; aspect-ratio: 1; }
+.pad { border: 0; cursor: pointer; opacity: .42; transition: opacity .08s, transform .08s, filter .08s; touch-action: manipulation; }
+.pad:nth-child(1) { border-radius: 60% 14px 14px 14px; }
+.pad:nth-child(2) { border-radius: 14px 60% 14px 14px; }
+.pad:nth-child(3) { border-radius: 14px 14px 14px 60%; }
+.pad:nth-child(4) { border-radius: 14px 14px 60% 14px; }
+.pad:not(:disabled) { opacity: .75; }
+.pad:not(:disabled):active, .pad.on { opacity: 1; transform: scale(.97); filter: brightness(1.25) saturate(1.2); }
+.pad:disabled { cursor: default; }
+.p0 { background: #FF4D3D; }
+.p1 { background: #FFC93C; }
+.p2 { background: #4C8BF5; }
+.p3 { background: #2BA84A; }
+.mz-dots { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; min-height: 22px; }
+.mz-dots .dot { width: 18px; height: 18px; border-radius: 50%; display: inline-block; }
+.mz-dots.big .dot { width: 28px; height: 28px; }
+.mz-dots .dot.x { outline: 3px solid var(--fg); outline-offset: 2px; opacity: .55; }
+.mz-dots.small { display: inline-flex; gap: 3px; min-height: 0; vertical-align: middle; }
+.mz-dots.small .dot { width: 12px; height: 12px; }

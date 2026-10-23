@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Memorizi">
+  <rect fill="#FFF4DE" x="8" y="8" width="84" height="84" rx="20"/>
+  <path fill="#FF4D3D" d="M17 47 V30 A13 13 0 0 1 30 17 H47 V47 Z"/>
+  <path fill="#FFC93C" d="M53 17 H70 A13 13 0 0 1 83 30 V47 H53 Z"/>
+  <path fill="#4C8BF5" d="M17 53 H47 V83 H30 A13 13 0 0 1 17 70 Z"/>
+  <path fill="#2BA84A" d="M53 53 H83 V70 A13 13 0 0 1 70 83 H53 Z"/>
+  <circle fill="#FFF4DE" cx="50" cy="50" r="12"/>
+  <circle fill="#171717" cx="50" cy="50" r="5"/>
+</svg>

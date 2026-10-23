@@ -165,6 +165,9 @@
       maisoumenozi: { nome: "Maiorzi", icone: "brand/maisoumenozi-simbolo.svg", iconeEscuro: "brand/maisoumenozi-simbolo-escuro.svg" },
       cravazi: { nome: "Cravazi", icone: "brand/cravazi-simbolo.svg", iconeEscuro: "brand/cravazi-simbolo-escuro.svg" },
       tamanhozi: { nome: "Tamanhozi", icone: "brand/tamanhozi-simbolo.svg", iconeEscuro: "brand/tamanhozi-simbolo-escuro.svg" },
+      emojizi: { nome: "Emojizi", icone: "brand/emojizi-simbolo.svg", iconeEscuro: "brand/emojizi-simbolo-escuro.svg" },
+      contazi: { nome: "Contazi", icone: "brand/contazi-simbolo.svg", iconeEscuro: "brand/contazi-simbolo-escuro.svg" },
+      memorizi: { nome: "Memorizi", icone: "brand/memorizi-simbolo.svg", iconeEscuro: "brand/memorizi-simbolo-escuro.svg" },
     };
     var SUPABASE_CDN = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
     var LANGS = ["pt", "en", "es"];
@@ -316,6 +319,10 @@
         resumo.cravazi = { texto: cz.partidas ? t("cravaziStats", { n: cz.partidas }) : t("notYet") };
         var tm = gameziDadosLocais().tamanhozi.stats;
         resumo.tamanhozi = { texto: tm.partidas ? t("tamanhoziStats", { n: tm.partidas, r: tm.recorde || 0 }) : t("notYet") };
+        ["emojizi", "contazi", "memorizi"].forEach(function (j) {
+          var st = gameziDadosLocais()[j].stats;
+          resumo[j] = { texto: st.partidas ? t("tamanhoziStats", { n: st.partidas, r: st.recorde || 0 }) : t("notYet") };
+        });
         resumo.patozi = { nick: linhas[1] && linhas[1].nick, texto: pz && pz.partidas ? t("patoziStats", { n: pz.partidas, e: pz.escapou || 0 }) : t("notYet") };
         if (modo === "logged") renderJogos();
       });
