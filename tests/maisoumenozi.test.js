@@ -185,3 +185,29 @@ test("textos: toda chave e toda frase de acerto e erro nos 3 idiomas", () => {
   for (const f of [...c.C, ...c.E]) assert.equal(f.length, 3, f[0]);
   assert.ok(c.C.length >= 8 && c.E.length >= 6, "várias frases de acerto e de erro");
 });
+
+test("online: todo mundo responde a mesma comparação, acertou pontua e o placar sai certo", () => {
+  const rr = (e) => vm.runInContext(e, ctx);
+  rr('var o = mmNovaOnline({ jogadores: [{ id: "a", nome: "Ana", skin: { presetId: "x", avatar: {} } }, { id: "b", nome: "Beto" }], rnd: mmRng(7) });');
+  assert.equal(rr("o.rodadas.length"), rr("MM_ONLINE_RODADAS"));
+  assert.ok(rr("o.rodadas.some((r) => r.uau)"), "tem comparação maluca");
+  assert.equal(rr("o.jogadores[0].skin.presetId"), "x", "a skin vai junto");
+  for (let i = 0; i < rr("MM_ONLINE_RODADAS"); i++) {
+    rr(`var r = o.rodadas[o.n]; var [va, vb] = mmValores(r); var certa = r.uau ? (vb > va ? "b" : "a") : (vb > va ? "mais" : "menos");
+        var errada = { a: "b", b: "a", mais: "menos", menos: "mais" }[certa];`);
+    assert.equal(rr('mmOnlineResponder(o, "a", r.uau ? "mais" : "a")'), false, "resposta que não serve para a rodada");
+    assert.equal(rr('mmOnlineResponder(o, "a", certa)'), true);
+    assert.equal(rr('mmOnlineResponder(o, "a", errada)'), false, "só a primeira vale");
+    rr('mmOnlineResponder(o, "b", errada)');
+    assert.equal(rr('mmOnlineTodos(o, ["a", "b"])'), true);
+    rr("mmOnlineRevelar(o)");
+    assert.equal(rr("o.ganhos.a"), rr("r.uau ? 2 : 1"), "maluca vale 2");
+    assert.equal(rr("o.ganhos.b"), 0);
+    assert.equal(rr("mmOnlineProxima(o)"), i === rr("MM_ONLINE_RODADAS") - 1);
+  }
+  assert.equal(JSON.stringify(rr("mmPlacar(o)").map((j) => [j.nome, j.pos])), '[["Ana",1],["Beto",2]]');
+  const schema = fs.readFileSync(path.join(SITE, "supabase", "schema.sql"), "utf8");
+  for (const tabela of ["maisoumenozi_salas", "maisoumenozi_sala_jogadores", "maisoumenozi_partidas"]) assert.match(schema, new RegExp(`create table if not exists public\\.${tabela}`));
+  assert.match(fs.readFileSync(path.join(SITE, "supabase", "online-novo.sql"), "utf8"), /maisoumenozi_sala_jogadores/);
+  assert.match(fs.readFileSync(path.join(SITE, "package.json"), "utf8"), /maiorzi-online\.e2e\.js/);
+});

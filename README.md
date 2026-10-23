@@ -144,6 +144,9 @@ Arquivos:
 - Itens, assuntos ou malucas novos: arquivo novo carregado depois dos outros, no `sw.js`, pergunta em `perguntas.js` e uma linha nova em `MM_DIARIO_POOLS` (`maisoumenozi/js/jogo.js`) com os totais, valendo a partir de amanhã
 - `maisoumenozi/js/jogo.js`: regras, pontos e combo, sem tela (testado em `tests/maisoumenozi.test.js`); `textos.js` (três idiomas e frases); `app.js` (telas, relógio, som e efeitos)
 
+**Online**: salas com código (até 10), cada um no seu celular e com a sua skin; todo mundo responde a mesma comparação
+(15 segundos) e quem acerta pontua (a maluca vale 2). `maisoumenozi/js/online.js`, testado em `tests/maiorzi-online.e2e.js`.
+
 # Cravazi
 
 Cada rodada tem uma pergunta com resposta em número ("Com quantos anos Mozart morreu?"). Quem chuta ouve **É MAIS** ou **É MENOS** e a faixa vai fechando ("Está entre 20 e 40"). Quem **cravar** o número exato pontua. Chute fora da faixa conhecida não vale. São três jeitos de jogar:
@@ -197,3 +200,9 @@ mais perto leva 1 ponto.
 - `tamanhozi/js/jogo.js`: regras, sem tela (testado em `tests/tamanhozi.test.js`); `textos.js`, `app.js` (telas) e `online.js`
   (salas, como no Cravazi; testado em `tests/tamanhozi-online.e2e.js`)
 - Marca: `brand/tamanhozi-logo*.svg` e `brand/tamanhozi-simbolo*.svg`. O endereço antigo `mapazi/` leva para `tamanhozi/`
+
+# Música e skins (todos os jogos)
+
+- `gamezi-musica.js`: música de fundo feita no navegador (Web Audio), baixinha; liga/desliga em Configurações → Música.
+- `gamezi-skins.js`: as skins prontas do Topzi no online do Datazi, do Tamanhozi e do Maiorzi (Topzi, Cravazi e Patozi já
+  tinham as suas). A skin escolhida vale para os três.

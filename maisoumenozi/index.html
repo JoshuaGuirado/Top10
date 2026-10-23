@@ -57,6 +57,10 @@
         <div><b data-i18n="home.free">Sem errar</b><span id="free-sub"></span></div>
         <button type="button" class="btn dark" id="free-btn" data-i18n="btn.play">Jogar</button>
       </div>
+      <div class="home-card home-row">
+        <div><b data-i18n="home.online">Online</b><span data-i18n="home.onlineSub">Com a turma, cada um no seu celular e com a sua skin</span></div>
+        <button type="button" class="btn dark" id="online-btn" data-i18n="btn.play">Jogar</button>
+      </div>
       <nav class="home-links">
         <button type="button" class="link-btn" id="help-link" data-i18n="help.title">Como jogar</button>
         <a href="../" data-i18n="home.more">Mais jogos</a>
@@ -109,6 +113,8 @@
         <p class="fact" id="game-fact" hidden></p>
         <button type="button" class="btn big" id="game-next"></button>
       </div>
+      <p class="sent" id="sent" hidden></p>
+      <div class="players" id="players" hidden></div>
     </section>
 
     <!-- Resultado -->
@@ -124,9 +130,57 @@
           <button type="button" class="btn ghost" id="res-home" data-i18n="btn.home">Início</button>
         </div>
       </div>
+      <ol class="ranking" id="res-ranking" hidden></ol>
       <div class="leaderboard" id="leaderboard" hidden></div>
       <h3 data-i18n="res.list">As comparações</h3>
       <ol class="pairs" id="res-list"></ol>
+    </section>
+
+    <!-- Online: entrar ou criar sala -->
+    <section id="screen-online" class="screen narrow" hidden>
+      <h2 data-i18n="on.title">Jogar online</h2>
+      <p class="muted" data-i18n="on.sub">Cada um no seu celular.</p>
+      <div class="online-setup feedback" id="online-setup" hidden></div>
+      <div id="online-main">
+        <div class="gz-nick-row">
+          <button type="button" id="online-skin"></button>
+          <label class="nick"><span data-i18n="on.nick">Seu nome</span>
+            <input id="online-nick" maxlength="16" autocomplete="nickname" data-i18n-ph="on.nickPh" placeholder="Como te chamam?">
+          </label>
+        </div>
+        <div class="online-grid">
+          <div class="home-card online-box">
+            <p class="card-label" data-i18n="on.create">Criar sala</p>
+            <p class="small muted" data-i18n="on.createSub">Você começa quando a turma chegar.</p>
+            <button type="button" class="btn" id="create-room-btn" data-i18n="on.create">Criar sala</button>
+          </div>
+          <form class="home-card online-box" id="join-form">
+            <p class="card-label" data-i18n="on.join">Entrar numa sala</p>
+            <input class="code-input" id="join-code" maxlength="5" autocomplete="off" autocapitalize="characters" placeholder="ABCDE" data-i18n-aria="on.code" aria-label="Código da sala">
+            <button type="submit" class="btn dark" id="join-room-btn" data-i18n="on.joinBtn">Entrar</button>
+          </form>
+        </div>
+      </div>
+      <p class="feedback bad" id="online-error" aria-live="polite"></p>
+      <div class="actions"><button type="button" class="btn ghost" id="online-back" data-i18n="btn.back">Voltar</button></div>
+    </section>
+
+    <!-- Online: sala de espera -->
+    <section id="screen-lobby" class="screen narrow" hidden>
+      <div class="lobby-top">
+        <div>
+          <p class="small muted" data-i18n="on.code">Código da sala</p>
+          <p class="room-code" id="room-code"></p>
+        </div>
+        <button type="button" class="btn dark" id="share-room" data-i18n="lobby.share">Convidar</button>
+      </div>
+      <h3 data-i18n="lobby.players">Na sala</h3>
+      <div class="lobby-players" id="lobby-players"></div>
+      <p class="small muted" id="lobby-status" aria-live="polite"></p>
+      <div class="actions end">
+        <button type="button" class="btn ghost" id="leave-room" data-i18n="lobby.leave">Sair da sala</button>
+        <button type="button" class="btn big" id="lobby-start" data-i18n="btn.start">Começar</button>
+      </div>
     </section>
   </main>
 
@@ -167,6 +221,10 @@
   <script src="../gamezi-conta.js"></script>
   <script src="../gamezi-ranking.js"></script>
   <script src="js/textos.js"></script>
+  <script src="../topzi/js/avatars.js"></script>
+  <script src="../gamezi-skins.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/online.js"></script>
+  <script src="../gamezi-musica.js"></script>
 </body>
 </html>

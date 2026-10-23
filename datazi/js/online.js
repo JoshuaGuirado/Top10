@@ -98,6 +98,24 @@ function abrirOnline(codigo) {
   if (codigo) $("join-code").value = codigo;
   $("online-error").textContent = "";
   if (ok) ensureOnline().catch(() => {});
+  gameziBotaoSkin($("online-skin"), mudouMinhaSkin);
+}
+
+// Troquei de skin: a sala (se estou numa) fica sabendo.
+function mudouMinhaSkin(skin) {
+  if (!sala || !me) return;
+  const eu = salaJogadores.find((p) => p.user_id === me.id);
+  if (eu) eu.skin = skin;
+  if (document.body.dataset.screen === "lobby") renderSala();
+  sb.from("datazi_sala_jogadores").update({ skin }).eq("sala_code", sala.code).eq("user_id", me.id).then(() => enviar("sala"), () => {});
+}
+
+// Skin de quem está na sala (a minha vem do aparelho).
+function skinDe(id) {
+  if (me && id === me.id) return gameziMinhaSkin();
+  const p = salaJogadores.find((x) => x.user_id === id);
+  const j = partida && partida.jogadores && partida.jogadores.find((x) => x.id === id);
+  return (p && p.skin) || (j && j.skin) || null;
 }
 
 function nickOnline() {
@@ -121,7 +139,7 @@ async function criarSala() {
     else if (error.code !== "23505") throw erroDoBanco(error);
   }
   if (!codigo) throw new Error(t("on.errNet"));
-  const { error } = await sb.from("datazi_sala_jogadores").insert({ sala_code: codigo, user_id: me.id, nick });
+  const { error } = await sb.from("datazi_sala_jogadores").insert({ sala_code: codigo, user_id: me.id, nick, skin: gameziMinhaSkin() });
   if (error) throw erroDoBanco(error);
   sb.rpc("datazi_limpar_salas").then(() => {}, () => {});
   await entrarNaSala(codigo);
@@ -142,10 +160,10 @@ async function entrarComCodigo(bruto, silencioso = false) {
   if (!dentro) {
     if (r.status === "playing") throw new Error(t("on.errPlaying"));
     if (lista.length >= DZ_MAX_JOGADORES) throw new Error(t("on.errFull"));
-    const { error } = await sb.from("datazi_sala_jogadores").insert({ sala_code: codigo, user_id: me.id, nick });
+    const { error } = await sb.from("datazi_sala_jogadores").insert({ sala_code: codigo, user_id: me.id, nick, skin: gameziMinhaSkin() });
     if (error) throw /cheia|full/i.test(error.message || "") ? new Error(t("on.errFull")) : erroDoBanco(error);
   } else if (!silencioso) {
-    sb.from("datazi_sala_jogadores").update({ nick }).eq("sala_code", codigo).eq("user_id", me.id).then(() => {}, () => {});
+    sb.from("datazi_sala_jogadores").update({ nick, skin: gameziMinhaSkin() }).eq("sala_code", codigo).eq("user_id", me.id).then(() => {}, () => {});
   }
   await entrarNaSala(codigo);
 }
@@ -379,7 +397,7 @@ function renderJogadoresOnline() {
     else if (s.tipo === "ano") nota = j.v + " · +" + j.ganho;
     else nota = t(j.ganho ? "on.right" : "on.wrong");
     const cls = ["player", fim && j.ganho ? "ganhou" : "", !fim && j.v !== undefined ? "ok" : "", onlinePresente(j.id) ? "" : "away"].filter(Boolean).join(" ");
-    return `<span class="${cls}">${escapeHtml(j.nome)}${j.id === meuId() ? " (" + escapeHtml(t("lobby.you")) + ")" : ""} <small>${escapeHtml(nota)}</small><span class="pts">${j.pontos}</span></span>`;
+    return `<span class="${cls}">${gameziBoneco(j.skin || skinDe(j.id))}${escapeHtml(j.nome)}${j.id === meuId() ? " (" + escapeHtml(t("lobby.you")) + ")" : ""} <small>${escapeHtml(nota)}</small><span class="pts">${j.pontos}</span></span>`;
   }).join("");
 }
 
@@ -403,7 +421,7 @@ function renderSala() {
   const host = isHost();
   $("lobby-players").innerHTML = salaJogadores.map((p) => {
     const eu = p.user_id === me.id;
-    return `<div class="lobby-player ${onlinePresente(p.user_id) ? "here" : ""}"><i></i>
+    return `<div class="lobby-player ${onlinePresente(p.user_id) ? "here" : ""}"><i></i>${eu ? `<button type="button" class="skin-mini" data-minha-skin aria-label="${escapeHtml(t("lobby.you"))}">${gameziBoneco(gameziMinhaSkin())}</button>` : gameziBoneco(p.skin)}
       <b>${escapeHtml(p.nick)}${p.user_id === sala.host_id ? ` <small>· ${escapeHtml(t("lobby.host"))}</small>` : ""}${eu ? ` <small>· ${escapeHtml(t("lobby.you"))}</small>` : ""}</b>
       ${host && !eu ? `<button type="button" class="icon-btn" data-tirar="${escapeHtml(p.user_id)}" title="${escapeHtml(t("lobby.kick"))}" aria-label="${escapeHtml(t("lobby.kick"))}">${ICONES.x}</button>` : ""}
     </div>`;
@@ -440,7 +458,7 @@ async function comecarOnline() {
   modo = "online";
   partidaRegistrada = false;
   partidaContada = false;
-  partida = dzNovaOnline({ jogadores: salaJogadores.map((p) => ({ id: p.user_id, nome: p.nick })), tipo: salaTipo() });
+  partida = dzNovaOnline({ jogadores: salaJogadores.map((p) => ({ id: p.user_id, nome: p.nick, skin: p.user_id === me.id ? gameziMinhaSkin() : gameziSkinValida(p.skin) })), tipo: salaTipo() });
   show("game");
   renderJogo();
   onlineTransmitir();
@@ -466,7 +484,7 @@ function terminarOnline() {
   $("res-again").textContent = t("res.backRoom");
   $("res-ranking").hidden = false;
   $("res-ranking").innerHTML = placar.map((j) =>
-    `<li class="${j.pos === 1 ? "first" : ""}"><span class="pos">${j.pos}º</span><b>${escapeHtml(j.nome)}</b><span>${escapeHtml(j.pontos === 1 ? t("res.pts1") : t("res.pts", { n: j.pontos }))}</span></li>`).join("");
+    `<li class="${j.pos === 1 ? "first" : ""}"><span class="pos">${j.pos}º</span>${gameziBoneco(skinDe(j.id))}<b>${escapeHtml(j.nome)}</b><span>${escapeHtml(j.pontos === 1 ? t("res.pts1") : t("res.pts", { n: j.pontos }))}</span></li>`).join("");
   const nome = (id) => (s.jogadores.find((j) => j.id === id) || {}).nome;
   if (s.tipo === "linha") {
     $("res-timeline").innerHTML = s.linha.map((id) => {
@@ -546,6 +564,7 @@ function ligarOnline() {
   $("lobby-players").onclick = (e) => {
     const b = e.target.closest("[data-tirar]");
     if (b && isHost()) tirarDaSala(b.dataset.tirar).catch(onlineErro);
+    if (e.target.closest("[data-minha-skin]")) gameziEscolherSkin(mudouMinhaSkin);
   };
 }
 

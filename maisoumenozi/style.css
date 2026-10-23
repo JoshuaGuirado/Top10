@@ -277,3 +277,52 @@ body[data-screen]:not([data-screen="home"]) .gamezi-back { display: none; }
 .lb-form { display: flex; gap: 8px; }
 .lb-input { flex: 1; min-width: 0; font: inherit; color: var(--fg); background: var(--surface); border: 1.5px solid var(--line); border-radius: 999px; padding: 10px 16px; }
 .lb-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* ── online (como no Tamanhozi) ── */
+.sent { text-align: center; font-weight: 700; color: var(--muted); margin: 12px 0 0; }
+.players { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.player { display: inline-flex; align-items: center; gap: 6px; background: var(--surface); border-radius: 999px; padding: 4px 10px; font-size: .82rem; font-weight: 700; }
+.player small { color: var(--muted); font-weight: 600; }
+.player.ok small { color: var(--good); }
+.player.ganhou { background: var(--good); color: #fff; }
+.player.ganhou small { color: #fff; opacity: .9; }
+.player.away { opacity: .5; }
+.player .pts { background: var(--fg); color: var(--bg); border-radius: 999px; padding: 0 7px; font-size: .75rem; }
+/* ── online e sala ── */
+.narrow { max-width: 560px; margin: 0 auto; }
+.feedback.bad { color: var(--bad); }
+.nick { display: grid; gap: 4px; margin-top: 16px; }
+.nick span { font-size: .78rem; color: var(--muted); font-weight: 700; }
+.nick input, .code-input { font: inherit; font-weight: 700; width: 100%; min-width: 0; color: var(--fg); background: var(--bg); border: 2px solid var(--line); border-radius: var(--r-sm); padding: 10px 12px; }
+.nick input:focus, .code-input:focus { outline: none; border-color: var(--fg); }
+.code-input { text-transform: uppercase; letter-spacing: .2em; font-size: 1.3rem; text-align: center; }
+.online-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+.online-box { display: grid; gap: 10px; align-content: start; margin: 0; }
+.online-box .card-label, .online-box p { margin: 0; }
+.card-label { font-weight: 800; margin: 0 0 8px; }
+@media (max-width: 560px) { .online-grid { grid-template-columns: 1fr; } }
+.lobby-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+.lobby-top p { margin: 0; }
+.room-code { font-stretch: 75%; font-weight: 800; font-size: clamp(3rem, 16vw, 5rem); letter-spacing: .12em; line-height: 1; color: var(--accent-ink); }
+.lobby-players { display: grid; gap: 6px; margin-bottom: 16px; }
+.lobby-player { display: flex; align-items: center; gap: 10px; background: var(--surface); border-radius: var(--r); padding: 8px 8px 8px 12px; }
+.lobby-player b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lobby-player b small { color: var(--muted); font-weight: 600; }
+.lobby-player i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); flex: none; }
+.lobby-player.here i { background: var(--good); }
+
+.ranking { list-style: none; margin: 16px auto; padding: 0; display: grid; gap: 4px; max-width: 520px; }
+.ranking li { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--surface); border-radius: var(--r-sm); font-weight: 700; }
+.ranking li.first { box-shadow: inset 0 0 0 2px var(--accent); }
+.ranking li .pos { font-stretch: 75%; font-weight: 800; font-size: 1.2rem; color: var(--muted); width: 2em; }
+.ranking li b { flex: 1; }
+
+/* ── resultado ── */
+.answer.chosen, .choice.chosen { box-shadow: inset 0 0 0 3px var(--fg); }
+.answer:disabled:not(.chosen), .choice:disabled:not(.chosen):not(.revealed) { opacity: .5; }
+.player .gz-face { width: 22px; height: 22px; margin-left: -6px; }
+.lobby-player .gz-face { width: 30px; height: 30px; }
+.ranking li .gz-face { width: 28px; height: 28px; }
+.skin-mini { flex: none; border: 2px solid var(--line); background: var(--bg); border-radius: 50%; padding: 0; line-height: 0; cursor: pointer; }
+.skin-mini:hover { border-color: var(--fg); }
+.ranking li span:last-child { color: var(--muted); }

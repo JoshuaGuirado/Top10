@@ -360,6 +360,80 @@ function mmProxima(s) {
   return !s.fim;
 }
 
+// ───────────── online: todo mundo responde a mesma comparação ─────────────
+// Estado (o anfitrião roda e manda inteiro pelo Realtime): jogadores [{ id, nome, skin, pontos }], rodadas (10, já
+// sorteadas), n (a rodada da vez), fase ("jogando" ou "revelado"), respostas { id: "mais"/"menos"/"a"/"b" },
+// ganhos { id: pontos }, hist, fim e seq. Acertou: 1 ponto (na comparação maluca, 2).
+
+const MM_ONLINE_RODADAS = 10;
+const MM_ONLINE_SEGUNDOS = 15; // tempo de cada rodada online (depois disso revela com quem respondeu)
+const MM_MAX_JOGADORES = 10;
+
+function mmNovaOnline({ jogadores, rnd = Math.random, agora = Date.now() }) {
+  const proxima = mmGerador(MM_ITENS.map((i) => i.id), rnd, MM_UAU.map((u) => u.id), [4, 8]);
+  const rodadas = [];
+  for (let k = 0; k < MM_ONLINE_RODADAS; k++) rodadas.push(proxima());
+  return {
+    v: 1, online: true, jogadores: jogadores.slice(0, MM_MAX_JOGADORES).map((j) => ({ id: j.id, nome: j.nome, skin: j.skin || null, pontos: 0 })),
+    rodadas, n: 0, fase: "jogando", respostas: {}, ganhos: {}, hist: [], fim: false, seq: 1, comecou: agora,
+  };
+}
+
+// A resposta está certa? ("mais"/"menos" na comum, sobre o de baixo; "a"/"b" na maluca, qual tem mais)
+function mmCerta(r, resposta) {
+  const [va, vb] = mmValores(r);
+  return r.uau ? (resposta === "b") === (vb > va) : (vb > va) === (resposta === "mais");
+}
+
+function mmOnlineResponder(s, id, resposta) {
+  if (s.fim || s.fase !== "jogando" || !s.jogadores.some((j) => j.id === id) || id in s.respostas) return false;
+  if (!(s.rodadas[s.n].uau ? ["a", "b"] : ["mais", "menos"]).includes(resposta)) return false;
+  s.respostas[id] = resposta;
+  s.seq += 1;
+  return true;
+}
+
+function mmOnlineTodos(s, ids) {
+  return ids.every((id) => id in s.respostas);
+}
+
+function mmOnlineRevelar(s) {
+  if (s.fim || s.fase !== "jogando") return false;
+  const r = s.rodadas[s.n];
+  s.ganhos = {};
+  for (const [id, resp] of Object.entries(s.respostas)) {
+    const pontos = mmCerta(r, resp) ? (r.uau ? 2 : 1) : 0;
+    s.ganhos[id] = pontos;
+    s.jogadores.find((j) => j.id === id).pontos += pontos;
+  }
+  s.hist.push({ r, respostas: { ...s.respostas }, ganhos: { ...s.ganhos } });
+  s.fase = "revelado";
+  s.seq += 1;
+  return true;
+}
+
+// Próxima rodada (depois de revelar). Devolve true se a partida acabou.
+function mmOnlineProxima(s, agora = Date.now()) {
+  if (s.fase !== "revelado" || s.fim) return false;
+  s.n += 1;
+  s.seq += 1;
+  if (s.n >= s.rodadas.length) {
+    s.fim = true;
+    return true;
+  }
+  s.fase = "jogando";
+  s.respostas = {};
+  s.ganhos = {};
+  s.comecou = agora;
+  return false;
+}
+
+function mmPlacar(s) {
+  const ord = s.jogadores.map((j, i) => ({ id: j.id, nome: j.nome, skin: j.skin, pontos: j.pontos, i })).sort((a, b) => b.pontos - a.pontos || a.i - b.i);
+  ord.forEach((j, k) => (j.pos = k && ord[k - 1].pontos === j.pontos ? ord[k - 1].pos : k + 1));
+  return ord;
+}
+
 // ───────────── desafio do dia ─────────────
 
 function mmDiaNumero(d = new Date()) {

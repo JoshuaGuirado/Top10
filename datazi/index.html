@@ -117,9 +117,12 @@
       <p class="muted" data-i18n="on.sub">Cada um no seu celular.</p>
       <div class="online-setup feedback" id="online-setup" hidden></div>
       <div id="online-main">
-        <label class="nick"><span data-i18n="on.nick">Seu nome</span>
-          <input id="online-nick" maxlength="16" autocomplete="nickname" data-i18n-ph="on.nickPh" placeholder="Como te chamam?">
-        </label>
+        <div class="gz-nick-row">
+          <button type="button" id="online-skin"></button>
+          <label class="nick"><span data-i18n="on.nick">Seu nome</span>
+            <input id="online-nick" maxlength="16" autocomplete="nickname" data-i18n-ph="on.nickPh" placeholder="Como te chamam?">
+          </label>
+        </div>
         <div class="online-grid">
           <div class="home-card online-box">
             <p class="card-label" data-i18n="on.create">Criar sala</p>
@@ -187,6 +190,9 @@
   <script src="../topzi/js/config.js"></script>
   <script src="../gamezi-conta.js"></script>
   <script src="../gamezi-ranking.js"></script>
+  <script src="../topzi/js/avatars.js"></script>
+  <script src="../gamezi-skins.js"></script>
+  <script src="../gamezi-musica.js"></script>
   <script src="js/app.js"></script>
   <script src="js/online.js"></script>
 </body>

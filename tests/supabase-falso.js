@@ -11,6 +11,7 @@
     cravazi_salas: ["code"], cravazi_sala_jogadores: ["sala_code", "user_id"], cravazi_partidas: ["id"], cravazi_diario: ["dia", "user_id"],
     tamanhozi_salas: ["code"], tamanhozi_sala_jogadores: ["sala_code", "user_id"], tamanhozi_partidas: ["id"],
     datazi_salas: ["code"], datazi_sala_jogadores: ["sala_code", "user_id"], datazi_partidas: ["id"],
+    maisoumenozi_salas: ["code"], maisoumenozi_sala_jogadores: ["sala_code", "user_id"], maisoumenozi_partidas: ["id"],
   };
   const empty = () => Object.fromEntries(Object.keys(PK).map((k) => [k, []]));
   const load = () => ({ ...empty(), ...(JSON.parse(localStorage.getItem(DB_KEY) || "null") || {}) });
@@ -36,7 +37,7 @@
       const hit = (r) => this.filters.every(([c, v]) => r[c] === v);
       if (this.op === "insert" || this.op === "upsert") {
         const r = { created_at: now(), joined_at: now(), updated_at: now(), ...this.payload };
-        if (this.t === "topzi_partidas" || this.t === "patozi_partidas" || this.t === "patozi_sugestoes" || this.t === "cravazi_partidas" || this.t === "tamanhozi_partidas" || this.t === "datazi_partidas") r.id = rows.length + 1;
+        if (this.t === "topzi_partidas" || this.t === "patozi_partidas" || this.t === "patozi_sugestoes" || this.t === "cravazi_partidas" || this.t === "tamanhozi_partidas" || this.t === "datazi_partidas" || this.t === "maisoumenozi_partidas") r.id = rows.length + 1;
         const old = rows.find((x) => key(x) === key(r));
         if (old && this.op === "insert") return { data: null, error: { code: "23505", message: "duplicate key" } };
         if (old) Object.assign(old, this.payload, { updated_at: now() });
@@ -45,6 +46,7 @@
           if (this.t === "patozi_sala_jogadores" && rows.filter((x) => x.sala_code === r.sala_code).length >= 10) return { data: null, error: { message: "A sala está cheia" } };
           if (this.t === "cravazi_sala_jogadores" && rows.filter((x) => x.sala_code === r.sala_code).length >= 8) return { data: null, error: { message: "A sala está cheia" } };
           if (this.t === "tamanhozi_sala_jogadores" && rows.filter((x) => x.sala_code === r.sala_code).length >= 10) return { data: null, error: { message: "A sala está cheia" } };
+          if (this.t === "maisoumenozi_sala_jogadores" && rows.filter((x) => x.sala_code === r.sala_code).length >= 10) return { data: null, error: { message: "A sala está cheia" } };
           if (this.t === "datazi_sala_jogadores" && rows.filter((x) => x.sala_code === r.sala_code).length >= 10) return { data: null, error: { message: "A sala está cheia" } };
           rows.push(r);
         }
@@ -63,6 +65,7 @@
         if (this.t === "patozi_salas") gone.forEach((g) => (db.patozi_sala_jogadores = db.patozi_sala_jogadores.filter((p) => p.sala_code !== g.code)));
         if (this.t === "cravazi_salas") gone.forEach((g) => (db.cravazi_sala_jogadores = db.cravazi_sala_jogadores.filter((p) => p.sala_code !== g.code)));
         if (this.t === "tamanhozi_salas") gone.forEach((g) => (db.tamanhozi_sala_jogadores = db.tamanhozi_sala_jogadores.filter((p) => p.sala_code !== g.code)));
+        if (this.t === "maisoumenozi_salas") gone.forEach((g) => (db.maisoumenozi_sala_jogadores = db.maisoumenozi_sala_jogadores.filter((p) => p.sala_code !== g.code)));
         if (this.t === "datazi_salas") gone.forEach((g) => (db.datazi_sala_jogadores = db.datazi_sala_jogadores.filter((p) => p.sala_code !== g.code)));
         save(db);
         return { data: null, error: null };
@@ -162,7 +165,7 @@
         return { data: null, error: null };
       }
       // Salas: quem sai passa o comando para quem entrou primeiro; quem fica assume se o anfitrião sumiu.
-      if (/^(topzi|patozi|cravazi|tamanhozi|datazi)_(sair_da_sala|assumir_sala)$/.test(nome)) {
+      if (/^(topzi|patozi|cravazi|tamanhozi|datazi|maisoumenozi)_(sair_da_sala|assumir_sala)$/.test(nome)) {
         const jogo = nome.split("_")[0];
         const col = jogo === "topzi" ? "room_code" : "sala_code";
         const salas = db[jogo + "_salas"];

@@ -152,7 +152,7 @@ function tzProxima(s) {
 // fase ("ajuste" ou "revelado"), respostas da rodada { id: v }, ganhadores da rodada, hist, fim e seq.
 
 function tzNovaOnline(opcoes) {
-  const jogadores = opcoes.jogadores.slice(0, TZ_MAX_JOGADORES).map((j) => ({ id: j.id, nome: j.nome, pontos: 0 }));
+  const jogadores = opcoes.jogadores.slice(0, TZ_MAX_JOGADORES).map((j) => ({ id: j.id, nome: j.nome, skin: j.skin || null, pontos: 0 }));
   const s = { v: 1, online: true, jogadores, rodadas: opcoes.rodadas, atual: 0, fase: "ajuste", respostas: {}, ganhadores: [], hist: [], fim: false, seq: 1, comecou: opcoes.agora || Date.now() };
   return s;
 }

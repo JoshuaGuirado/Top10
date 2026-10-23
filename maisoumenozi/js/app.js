@@ -125,6 +125,7 @@ const ICONES = {
   relogio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.6 1.8M9.5 3h5M12 3v2.5"/></svg>',
   up: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 21 15H15V20H9V15H3Z"/></svg>',
   down: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 3 9H9V4H15V9H21Z"/></svg>',
+  x: '<svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
 };
 
 function semanaHtml(hoje = new Date()) {
@@ -165,6 +166,7 @@ function irInicio() {
   pararRelogio();
   clearTimeout(autoTimer);
   partida = null;
+  if (modo === "online") modo = "livre";
   renderHome();
   show("home");
 }
@@ -282,6 +284,7 @@ function renderHud() {
 }
 
 function renderJogo() {
+  if (partida && partida.online) return renderJogoOnline();
   const s = partida;
   const r = esperando ? s.ultimo : s.atual;
   if (!r) return;
@@ -390,6 +393,7 @@ function flutuar(texto, cls) {
 }
 
 function responder(resposta) {
+  if (partida && partida.online) return onlineResponder(resposta);
   if (!partida || esperando || partida.fim) return;
   tempoMs += performance.now() - pensandoDesde; // conta só o tempo pensando (não o de ver se acertou)
   const antes = mmMultiplicador(partida.combo);
@@ -410,6 +414,7 @@ function responder(resposta) {
 
 function proxima() {
   clearTimeout(autoTimer);
+  if (partida && partida.online) return onlineProxima();
   if (!partida || !esperando) return;
   if (partida.fim) return terminar();
   esperando = false;
@@ -479,12 +484,20 @@ function mostrarResultado(r) {
   $("res-record").textContent = t("res.record");
   $("res-share").onclick = (e) => (modo === "diario" ? compartilhar(diaAtual, r, e.currentTarget) : compartilharPartida(r, e.currentTarget));
   $("res-again").hidden = modo === "diario";
+  $("res-again").textContent = t("btn.again");
+  $("res-share").hidden = false;
+  $("res-ranking").hidden = true;
+  $("res-home").onclick = irInicio;
   $("leaderboard").hidden = true;
   if (modo === "diario") mostrarRanking();
   $("res-again").onclick = modo === "livre" ? comecarLivre : comecarRelogio;
+  $("res-list").innerHTML = listaRodadas(r.rodadas.slice(0, r.marcas.length), r.marcas);
+}
+
+// As comparações da partida (o maior em cima), com ✓ ou ✗ (marcas: acertou cada uma).
+function listaRodadas(rodadas, marcas) {
   const l = LANGS.indexOf(lang);
-  $("res-list").innerHTML = r.rodadas.slice(0, r.marcas.length).map((rd, i) => {
-    const ok = r.marcas[i];
+  return rodadas.map((rd, i) => {    const ok = marcas[i];
     let cima;
     let baixo;
     if (rd.uau) {
@@ -564,8 +577,14 @@ function setLang(l) {
   if (tela === "game" && partida) renderJogo();
 }
 
+// Sair no meio da partida online: pergunta antes e sai da sala.
+function sairDoJogo() {
+  if (!confirm(t("on.quit"))) return;
+  sairDaSala();
+}
+
 function ligar() {
-  $("home-btn").onclick = irInicio;
+  $("home-btn").onclick = () => (partida && partida.online ? sairDoJogo() : irInicio());
   $("help-btn").onclick = () => {
     $("help-body").innerHTML = t("help.html");
     $("help-dialog").showModal();

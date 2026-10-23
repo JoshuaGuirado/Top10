@@ -77,3 +77,10 @@
   `ferramentas/gerar-tamanhozi-paises.js` (Natural Earth, projeção de área igual). Item novo: no fim da lista `ITENS` do gerador
   (medida que todo mundo encontra; personagem com a obra no nome), gerar de novo e linha nova em `TZ_DIARIO_POOLS` valendo a partir
   de amanhã (o dia 1 está fixado no teste). Chaves `tm:*`.
+- Música de fundo: `gamezi-musica.js` (raiz), feita na hora com Web Audio, sem arquivo de áudio; liga/desliga na linha "Música"
+  que ela mesma põe no `#settings-dialog` (chave `tt:musica`, a mesma para todos). Jogo novo: carregar `../gamezi-musica.js`.
+- Todo jogo tem online com skin. Topzi, Cravazi e Patozi têm as próprias; Datazi, Tamanhozi e Maiorzi usam `gamezi-skins.js`
+  (raiz, as skins prontas do Topzi; carregar `../topzi/js/avatars.js` antes; skin guardada em `gz:skin`, coluna `skin` em
+  `<jogo>_sala_jogadores`). Jogo novo precisa de online com skin. Mudanças do banco para quem já rodou o schema: `supabase/online-novo.sql`.
+- Maiorzi online (`maisoumenozi/js/online.js`, tabelas `maisoumenozi_*`): todo mundo responde a mesma comparação (15 s), acertou
+  vale 1 (a maluca, 2); 10 rodadas sorteadas por `mmNovaOnline`. Usa os cartões da partida sozinho (`renderNormal`/`renderUau`).

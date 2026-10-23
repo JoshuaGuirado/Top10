@@ -152,8 +152,8 @@ test("online: todo mundo responde a mesma rodada e cada um leva os seus pontos",
 test("Datazi online está no banco, no Supabase falso e nos testes", () => {
   const schema = fs.readFileSync(path.join(SITE, "supabase", "schema.sql"), "utf8");
   for (const tabela of ["datazi_salas", "datazi_sala_jogadores", "datazi_partidas"]) assert.match(schema, new RegExp(`create table if not exists public\\.${tabela}`));
-  assert.match(schema, /array\[[^\]]*'datazi'\] loop[\s\S]*_sair_da_sala/, "sair e assumir a sala");
-  const novo = fs.readFileSync(path.join(SITE, "supabase", "datazi-online.sql"), "utf8");
+  assert.match(schema, /array\[[^\]]*'datazi'[^\]]*\] loop[\s\S]*_sair_da_sala/, "sair e assumir a sala");
+  const novo = fs.readFileSync(path.join(SITE, "supabase", "online-novo.sql"), "utf8");
   assert.match(novo, /create table if not exists public\.datazi_salas/);
   assert.match(fs.readFileSync(path.join(__dirname, "supabase-falso.js"), "utf8"), /datazi_salas/);
   assert.match(fs.readFileSync(path.join(SITE, "package.json"), "utf8"), /datazi-online\.e2e\.js/);

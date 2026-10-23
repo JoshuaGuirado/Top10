@@ -202,7 +202,7 @@ function dzNovaOnline({ jogadores, tipo = "linha", rnd = Math.random, agora = Da
     if (tipo === "linha") linha = [rodadas.shift()];
   }
   return {
-    v: 1, online: true, tipo, jogadores: jogadores.slice(0, DZ_MAX_JOGADORES).map((j) => ({ id: j.id, nome: j.nome, pontos: 0 })),
+    v: 1, online: true, tipo, jogadores: jogadores.slice(0, DZ_MAX_JOGADORES).map((j) => ({ id: j.id, nome: j.nome, skin: j.skin || null, pontos: 0 })),
     rodadas, linha, atual: 0, fase: "jogando", respostas: {}, ganhos: {}, hist: [], fim: false, seq: 1, comecou: agora,
   };
 }

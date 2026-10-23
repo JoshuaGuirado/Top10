@@ -545,6 +545,7 @@ create table if not exists public.tamanhozi_sala_jogadores (
   sala_code text not null references public.tamanhozi_salas (code) on delete cascade,
   user_id uuid not null references auth.users (id) on delete cascade,
   nick text not null check (char_length(nick) between 1 and 16),
+  skin jsonb check (skin is null or (jsonb_typeof(skin) = 'object' and octet_length(skin::text) <= 1500)),
   joined_at timestamptz not null default now(),
   primary key (sala_code, user_id)
 );
@@ -663,6 +664,7 @@ create table if not exists public.datazi_sala_jogadores (
   sala_code text not null references public.datazi_salas (code) on delete cascade,
   user_id uuid not null references auth.users (id) on delete cascade,
   nick text not null check (char_length(nick) between 1 and 16),
+  skin jsonb check (skin is null or (jsonb_typeof(skin) = 'object' and octet_length(skin::text) <= 1500)),
   joined_at timestamptz not null default now(),
   primary key (sala_code, user_id)
 );
@@ -761,6 +763,130 @@ create policy "datazi partidas: anfitrião registra" on public.datazi_partidas
     exists (select 1 from public.datazi_salas s where s.code = sala_code and s.host_id = auth.uid())
   );
 
+-- ═════════════════════════════ Maiorzi online ═════════════════════════════
+-- Mesmo projeto e mesma conta (auth.users). Tabelas próprias:
+--   maisoumenozi_salas          salas online (código de 5 letras, anfitrião e estado da partida)
+--   maisoumenozi_sala_jogadores quem está em cada sala (até 10), com a skin (as do Topzi)
+--   maisoumenozi_partidas       histórico das partidas online (cada um vê só as suas)
+--   (o Maiorzi do dia fica em maisoumenozi_diario, lá embaixo, com os outros rankings)
+
+create table if not exists public.maisoumenozi_salas (
+  code text primary key check (code ~ '^[A-Z0-9]{5}$'),
+  host_id uuid not null references auth.users (id) on delete cascade,
+  status text not null default 'lobby' check (status in ('lobby', 'playing', 'finished')),
+  settings jsonb not null default '{}'::jsonb,
+  state jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.maisoumenozi_sala_jogadores (
+  sala_code text not null references public.maisoumenozi_salas (code) on delete cascade,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  nick text not null check (char_length(nick) between 1 and 16),
+  skin jsonb check (skin is null or (jsonb_typeof(skin) = 'object' and octet_length(skin::text) <= 1500)),
+  joined_at timestamptz not null default now(),
+  primary key (sala_code, user_id)
+);
+
+create table if not exists public.maisoumenozi_partidas (
+  id bigint generated always as identity primary key,
+  sala_code text not null,
+  tipo text,
+  rodadas integer,
+  players jsonb not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists maisoumenozi_partidas_players_idx on public.maisoumenozi_partidas using gin (players jsonb_path_ops);
+create index if not exists maisoumenozi_salas_updated_idx on public.maisoumenozi_salas (updated_at);
+
+drop trigger if exists maisoumenozi_salas_updated on public.maisoumenozi_salas;
+create trigger maisoumenozi_salas_updated before update on public.maisoumenozi_salas
+  for each row execute function public.tocar_updated_at();
+
+-- No máximo 10 jogadores por sala do Maiorzi.
+create or replace function public.maisoumenozi_limitar_jogadores()
+returns trigger language plpgsql as $$
+begin
+  if (select count(*) from public.maisoumenozi_sala_jogadores where sala_code = new.sala_code) >= 10 then
+    raise exception 'A sala está cheia';
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists maisoumenozi_sala_jogadores_limite on public.maisoumenozi_sala_jogadores;
+create trigger maisoumenozi_sala_jogadores_limite before insert on public.maisoumenozi_sala_jogadores
+  for each row execute function public.maisoumenozi_limitar_jogadores();
+
+-- Salas paradas há mais de um dia somem (chamada por quem cria uma sala).
+create or replace function public.maisoumenozi_limpar_salas()
+returns void language sql security definer set search_path = public as $$
+  delete from public.maisoumenozi_salas where updated_at < now() - interval '1 day';
+$$;
+grant execute on function public.maisoumenozi_limpar_salas() to authenticated;
+
+alter table public.maisoumenozi_salas enable row level security;
+alter table public.maisoumenozi_sala_jogadores enable row level security;
+alter table public.maisoumenozi_partidas enable row level security;
+
+-- Salas: quem tem o código consegue ver; só o anfitrião cria, muda e apaga.
+drop policy if exists "maisoumenozi salas: ler" on public.maisoumenozi_salas;
+create policy "maisoumenozi salas: ler" on public.maisoumenozi_salas
+  for select to authenticated using (true);
+
+drop policy if exists "maisoumenozi salas: criar como anfitrião" on public.maisoumenozi_salas;
+create policy "maisoumenozi salas: criar como anfitrião" on public.maisoumenozi_salas
+  for insert to authenticated with check (host_id = auth.uid());
+
+drop policy if exists "maisoumenozi salas: anfitrião edita" on public.maisoumenozi_salas;
+create policy "maisoumenozi salas: anfitrião edita" on public.maisoumenozi_salas
+  for update to authenticated using (host_id = auth.uid()) with check (host_id = auth.uid());
+
+drop policy if exists "maisoumenozi salas: anfitrião apaga" on public.maisoumenozi_salas;
+create policy "maisoumenozi salas: anfitrião apaga" on public.maisoumenozi_salas
+  for delete to authenticated using (host_id = auth.uid());
+
+-- Jogadores: cada um entra e edita a própria linha; sai sozinho ou o anfitrião remove.
+drop policy if exists "maisoumenozi jogadores: ler" on public.maisoumenozi_sala_jogadores;
+create policy "maisoumenozi jogadores: ler" on public.maisoumenozi_sala_jogadores
+  for select to authenticated using (true);
+
+drop policy if exists "maisoumenozi jogadores: entrar" on public.maisoumenozi_sala_jogadores;
+create policy "maisoumenozi jogadores: entrar" on public.maisoumenozi_sala_jogadores
+  for insert to authenticated with check (
+    user_id = auth.uid()
+    and exists (select 1 from public.maisoumenozi_salas s where s.code = sala_code and s.status <> 'playing')
+  );
+
+drop policy if exists "maisoumenozi jogadores: editar a própria linha" on public.maisoumenozi_sala_jogadores;
+create policy "maisoumenozi jogadores: editar a própria linha" on public.maisoumenozi_sala_jogadores
+  for update to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
+
+drop policy if exists "maisoumenozi jogadores: sair ou ser removido" on public.maisoumenozi_sala_jogadores;
+create policy "maisoumenozi jogadores: sair ou ser removido" on public.maisoumenozi_sala_jogadores
+  for delete to authenticated using (
+    user_id = auth.uid()
+    or exists (select 1 from public.maisoumenozi_salas s where s.code = sala_code and s.host_id = auth.uid())
+  );
+
+-- Histórico: o anfitrião registra; cada um vê as partidas em que jogou.
+drop policy if exists "maisoumenozi partidas: ver as minhas" on public.maisoumenozi_partidas;
+create policy "maisoumenozi partidas: ver as minhas" on public.maisoumenozi_partidas
+  for select to authenticated using (
+    players @> jsonb_build_array(jsonb_build_object('uid', auth.uid()::text))
+  );
+
+drop policy if exists "maisoumenozi partidas: anfitrião registra" on public.maisoumenozi_partidas;
+create policy "maisoumenozi partidas: anfitrião registra" on public.maisoumenozi_partidas
+  for insert to authenticated with check (
+    exists (select 1 from public.maisoumenozi_salas s where s.code = sala_code and s.host_id = auth.uid())
+  );
+
+-- Skin de quem está na sala (Datazi, Tamanhozi e Maiorzi). Entrou depois: add column if not exists.
+alter table public.datazi_sala_jogadores add column if not exists skin jsonb check (skin is null or (jsonb_typeof(skin) = 'object' and octet_length(skin::text) <= 1500));
+alter table public.tamanhozi_sala_jogadores add column if not exists skin jsonb check (skin is null or (jsonb_typeof(skin) = 'object' and octet_length(skin::text) <= 1500));
+
 -- ═════════════════════════════ Gamezi: descrições e visões ═════════════════════════════
 -- Cada tabela tem uma descrição dizendo de qual jogo é; ela aparece no painel do Supabase (Description).
 
@@ -783,6 +909,9 @@ comment on table public.tamanhozi_partidas is 'Tamanhozi: histórico das partida
 comment on table public.datazi_salas is 'Datazi: salas online';
 comment on table public.datazi_sala_jogadores is 'Datazi: jogadores de cada sala online';
 comment on table public.datazi_partidas is 'Datazi: histórico das partidas online (com o modo de jogo)';
+comment on table public.maisoumenozi_salas is 'Maiorzi: salas online';
+comment on table public.maisoumenozi_sala_jogadores is 'Maiorzi: jogadores de cada sala online (com a skin)';
+comment on table public.maisoumenozi_partidas is 'Maiorzi: histórico das partidas online';
 
 -- Visões para o dono do site olhar os dois jogos juntos no painel (Table Editor), com a coluna "jogo".
 -- Ficam fechadas para o site (sem acesso pela API); security_invoker faz valer as regras (RLS) de quem consulta.
@@ -811,7 +940,12 @@ create view public.gamezi_salas with (security_invoker = true) as
   select 'datazi'::text, d.code, d.status, d.host_id,
          (select count(*) from public.datazi_sala_jogadores j where j.sala_code = d.code),
          d.created_at, d.updated_at
-    from public.datazi_salas d;
+    from public.datazi_salas d
+  union all
+  select 'maisoumenozi'::text, m.code, m.status, m.host_id,
+         (select count(*) from public.maisoumenozi_sala_jogadores j where j.sala_code = m.code),
+         m.created_at, m.updated_at
+    from public.maisoumenozi_salas m;
 
 drop view if exists public.gamezi_jogadores_nas_salas;
 create view public.gamezi_jogadores_nas_salas with (security_invoker = true) as
@@ -828,9 +962,12 @@ create view public.gamezi_jogadores_nas_salas with (security_invoker = true) as
     from public.tamanhozi_sala_jogadores z
   union all
   select 'datazi'::text, d.sala_code, d.nick, d.user_id, d.joined_at
-    from public.datazi_sala_jogadores d;
+    from public.datazi_sala_jogadores d
+  union all
+  select 'maisoumenozi'::text, m.sala_code, m.nick, m.user_id, m.joined_at
+    from public.maisoumenozi_sala_jogadores m;
 
-comment on view public.gamezi_salas is 'Gamezi: salas online dos jogos (coluna jogo = topzi, patozi, cravazi, tamanhozi ou datazi)';
+comment on view public.gamezi_salas is 'Gamezi: salas online dos jogos (coluna jogo = topzi, patozi, cravazi, tamanhozi, datazi ou maisoumenozi)';
 comment on view public.gamezi_jogadores_nas_salas is 'Gamezi: quem está em cada sala, de todos os jogos (coluna jogo)';
 
 revoke all on public.gamezi_salas, public.gamezi_jogadores_nas_salas from anon, authenticated;
@@ -891,7 +1028,7 @@ do $$
 declare
   tabela text;
 begin
-  foreach tabela in array array['topzi_perfis', 'topzi_sala_jogadores', 'patozi_perfis', 'patozi_sala_jogadores', 'patozi_diario', 'cravazi_sala_jogadores', 'tamanhozi_sala_jogadores', 'datazi_sala_jogadores'] loop
+  foreach tabela in array array['topzi_perfis', 'topzi_sala_jogadores', 'patozi_perfis', 'patozi_sala_jogadores', 'patozi_diario', 'cravazi_sala_jogadores', 'tamanhozi_sala_jogadores', 'datazi_sala_jogadores', 'maisoumenozi_sala_jogadores'] loop
     execute format('drop trigger if exists %I on public.%I', tabela || '_nick_limpo', tabela);
     execute format('create trigger %I before insert or update of nick on public.%I for each row execute function public.gamezi_limpar_nick()', tabela || '_nick_limpo', tabela);
   end loop;
@@ -1192,7 +1329,7 @@ declare
   jogo text;
   col text;
 begin
-  foreach jogo in array array['topzi', 'patozi', 'cravazi', 'tamanhozi', 'datazi'] loop
+  foreach jogo in array array['topzi', 'patozi', 'cravazi', 'tamanhozi', 'datazi', 'maisoumenozi'] loop
     col := case jogo when 'topzi' then 'room_code' else 'sala_code' end;
 
     execute format($f$
