@@ -108,12 +108,22 @@ Regras extras (ligadas por padrão, dá para desligar): **Dobrei** (chutar o dob
 
 # Datazi
 
-Jogo de linha do tempo: coloque os acontecimentos na ordem em que aconteceram. A linha começa com um acontecimento e o ano; a cada rodada aparece outro, e você toca no lugar onde ele entra. Errou, perde uma vida (são 3), e ele vai para o lugar certo.
+Jogo de datas, em três modos:
 
-**Datazi do dia**: os mesmos 8 acontecimentos para todo mundo, com a semana (dá para jogar os dias que passaram) e o resultado em quadradinhos para compartilhar. **Partida livre**: vai até errar 3 vezes, valendo recorde.
+- **Linha do tempo**: coloque os acontecimentos na ordem em que aconteceram. A linha começa com um acontecimento e o ano; a cada
+  rodada aparece outro, e você toca no lugar onde ele entra. Errou, perde uma vida (são 2), e ele vai para o lugar certo.
+- **Qual veio antes?**: dois acontecimentos de no máximo 40 anos de distância; toque no que veio primeiro. Até errar 2 vezes.
+- **Em que ano?**: digite o ano. Em cheio vale 10; até 2 anos de diferença, 7; até 5, 5; até 10, 3; até 25, 1. Dez rodadas.
+
+**Datazi do dia** (linha do tempo): os mesmos 8 acontecimentos para todo mundo, com a semana (dá para jogar os dias que passaram),
+o resultado em quadradinhos para compartilhar e o ranking. **Partida livre**: escolhe o modo, valendo recorde em cada um.
+**Online**: salas com código (até 10 pessoas, cada uma no seu celular); o anfitrião escolhe o modo e todo mundo joga a mesma
+rodada (30 segundos). Na linha do tempo e no "Qual veio antes?", quem acerta leva 1 ponto; no "Em que ano?", cada um leva os
+pontos do próprio chute. Dez rodadas.
 
 - `datazi/data/eventos.js`: os acontecimentos (`[ano, "português", "English", "español"]`); novos entram no fim, com uma linha nova em `DZ_DIARIO_POOLS` (`datazi/js/jogo.js`) valendo a partir de amanhã
-- `datazi/js/jogo.js`: regras, sem tela (testado em `tests/datazi.test.js`); `textos.js` (três idiomas); `app.js` (telas)
+- `datazi/js/jogo.js`: regras dos três modos e do online, sem tela (testado em `tests/datazi.test.js`); `textos.js` (três idiomas);
+  `app.js` (telas) e `online.js` (salas, como no Tamanhozi; tabelas `datazi_*`; testado em `tests/datazi-online.e2e.js`)
 - Marca: `brand/datazi-logo*.svg` e `brand/datazi-simbolo*.svg`
 
 # Maiorzi

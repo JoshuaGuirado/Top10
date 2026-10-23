@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Datazi · linha do tempo | Gamezi</title>
-  <meta name="description" content="Datazi: coloque os acontecimentos na ordem em que aconteceram. Um desafio por dia, igual para todo mundo, e partida livre.">
+  <meta name="description" content="Datazi: coloque os acontecimentos na ordem em que aconteceram. Um desafio por dia, igual para todo mundo, partida livre em três modos e online com a turma.">
   <meta name="theme-color" content="#FFF4DE" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#171717" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="../brand/favicon.svg" type="image/svg+xml">
@@ -46,9 +46,16 @@
         <h1 class="home-tag" data-i18n="home.tag">Coloque os acontecimentos na ordem em que aconteceram.</h1>
       </div>
       <div class="home-card daily" id="daily-card"></div>
+      <div class="home-card">
+        <div class="home-row">
+          <div><b data-i18n="home.free">Partida livre</b><span id="free-sub"></span></div>
+          <button type="button" class="btn dark" id="free-btn" data-i18n="btn.play">Jogar</button>
+        </div>
+        <div class="chips" id="free-modes" role="radiogroup"></div>
+      </div>
       <div class="home-card home-row">
-        <div><b data-i18n="home.free">Partida livre</b><span id="free-sub"></span></div>
-        <button type="button" class="btn dark" id="free-btn" data-i18n="btn.play">Jogar</button>
+        <div><b data-i18n="home.online">Online</b><span data-i18n="home.onlineSub">Cada um no seu celular, todo mundo joga a mesma rodada</span></div>
+        <button type="button" class="btn dark" id="online-btn" data-i18n="btn.play">Jogar</button>
       </div>
       <nav class="home-links">
         <button type="button" class="link-btn" id="help-link" data-i18n="help.title">Como jogar</button>
@@ -61,20 +68,29 @@
       </footer>
     </section>
 
-    <!-- Partida -->
+    <!-- Partida: linha do tempo (acontecimento no alto, linha embaixo), "Qual veio antes?" (dois botões) ou "Em que ano?" (campo do ano) -->
     <section id="screen-game" class="screen" hidden>
       <div class="game-head">
         <b id="game-title"></b>
+        <span class="game-round" id="game-round" hidden></span>
         <span class="lives" id="game-lives" role="img"></span>
+        <span class="timer" id="timer" hidden></span>
         <span class="game-score" id="game-score"></span>
       </div>
       <div class="game-sticky">
         <article class="event-card" id="game-card"></article>
+        <div class="pair" id="game-pair" hidden></div>
+        <form class="year-form" id="year-form" novalidate hidden>
+          <input class="year-input" id="year-input" type="number" inputmode="numeric" min="1" max="2100" autocomplete="off" data-i18n-ph="game.yearPh" placeholder="Ano" data-i18n-aria="game.year" aria-label="Em que ano foi?">
+          <button type="submit" class="btn big" id="year-btn" data-i18n="game.guess">Chutar</button>
+        </form>
         <p class="game-hint" id="game-hint"></p>
+        <p class="sent" id="sent" data-i18n="on.sent" hidden>Resposta enviada! Esperando os outros…</p>
         <button type="button" class="btn big" id="game-next" hidden></button>
       </div>
+      <div class="players" id="players" hidden></div>
       <ol class="timeline" id="timeline"></ol>
-      <div class="actions center"><button type="button" class="link-btn" id="game-quit" data-i18n="btn.home">Início</button></div>
+      <div class="actions center"><button type="button" class="link-btn" id="game-quit" data-i18n="game.quit">Sair</button></div>
     </section>
 
     <!-- Resultado -->
@@ -89,9 +105,58 @@
           <button type="button" class="btn ghost" id="res-home" data-i18n="btn.home">Início</button>
         </div>
       </div>
+      <ol class="ranking" id="res-ranking" hidden></ol>
       <div class="leaderboard" id="leaderboard" hidden></div>
-      <h3 data-i18n="res.timeline">A linha do tempo</h3>
+      <h3 id="res-list-title">A linha do tempo</h3>
       <ol class="timeline done" id="res-timeline"></ol>
+    </section>
+
+    <!-- Online: entrar ou criar sala -->
+    <section id="screen-online" class="screen narrow" hidden>
+      <h2 data-i18n="on.title">Jogar online</h2>
+      <p class="muted" data-i18n="on.sub">Cada um no seu celular.</p>
+      <div class="online-setup feedback" id="online-setup" hidden></div>
+      <div id="online-main">
+        <label class="nick"><span data-i18n="on.nick">Seu nome</span>
+          <input id="online-nick" maxlength="16" autocomplete="nickname" data-i18n-ph="on.nickPh" placeholder="Como te chamam?">
+        </label>
+        <div class="online-grid">
+          <div class="home-card online-box">
+            <p class="card-label" data-i18n="on.create">Criar sala</p>
+            <p class="small muted" data-i18n="on.createSub">Você escolhe o modo de jogo e começa quando a turma chegar.</p>
+            <button type="button" class="btn" id="create-room-btn" data-i18n="on.create">Criar sala</button>
+          </div>
+          <form class="home-card online-box" id="join-form">
+            <p class="card-label" data-i18n="on.join">Entrar numa sala</p>
+            <input class="code-input" id="join-code" maxlength="5" autocomplete="off" autocapitalize="characters" placeholder="ABCDE" data-i18n-aria="on.code" aria-label="Código da sala">
+            <button type="submit" class="btn dark" id="join-room-btn" data-i18n="on.joinBtn">Entrar</button>
+          </form>
+        </div>
+      </div>
+      <p class="feedback bad" id="online-error" aria-live="polite"></p>
+      <div class="actions"><button type="button" class="btn ghost" id="online-back" data-i18n="btn.back">Voltar</button></div>
+    </section>
+
+    <!-- Online: sala de espera -->
+    <section id="screen-lobby" class="screen narrow" hidden>
+      <div class="lobby-top">
+        <div>
+          <p class="small muted" data-i18n="on.code">Código da sala</p>
+          <p class="room-code" id="room-code"></p>
+        </div>
+        <button type="button" class="btn dark" id="share-room" data-i18n="lobby.share">Convidar</button>
+      </div>
+      <h3 data-i18n="lobby.players">Na sala</h3>
+      <div class="lobby-players" id="lobby-players"></div>
+      <div class="home-card">
+        <p class="card-label" data-i18n="lobby.mode">Modo de jogo</p>
+        <div class="chips" id="lobby-modes" role="radiogroup"></div>
+      </div>
+      <p class="small muted" id="lobby-status" aria-live="polite"></p>
+      <div class="actions end">
+        <button type="button" class="btn ghost" id="leave-room" data-i18n="lobby.leave">Sair da sala</button>
+        <button type="button" class="btn big" id="lobby-start" data-i18n="btn.start">Começar</button>
+      </div>
     </section>
   </main>
 
@@ -123,5 +188,6 @@
   <script src="../gamezi-conta.js"></script>
   <script src="../gamezi-ranking.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/online.js"></script>
 </body>
 </html>

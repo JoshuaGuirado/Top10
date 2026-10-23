@@ -136,7 +136,7 @@ test("Tamanhozi está no Gamezi: portal, conta, ranking, online e banco", () => 
   assert.match(schema, /tamanhozi_registrar_diario[\s\S]*date '2026-10-13'[\s\S]*not between 0 and 1000/);
   assert.match(schema, /p_jogo not in \([^)]*'tamanhozi'/);
   for (const tabela of ["tamanhozi_salas", "tamanhozi_sala_jogadores", "tamanhozi_partidas", "tamanhozi_diario"]) assert.match(schema, new RegExp(`create table if not exists public\\.${tabela}`));
-  assert.match(schema, /array\['topzi', 'patozi', 'cravazi', 'tamanhozi'\]/, "sair e assumir a sala");
+  assert.match(schema, /array\['topzi', 'patozi', 'cravazi', 'tamanhozi'[^\]]*\] loop/, "sair e assumir a sala");
   assert.ok(scripts.includes("../gamezi-conta.js") && scripts.includes("../gamezi-ranking.js") && scripts.includes("../topzi/js/config.js"));
   assert.match(fs.readFileSync(path.join(SITE, "package.json"), "utf8"), /tamanhozi-online\.e2e\.js/);
 });

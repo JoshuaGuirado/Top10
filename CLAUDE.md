@@ -65,7 +65,8 @@
   Com a turma/online: 3 chutes de cada por rodada (`CZ_CHUTES_POR_JOGADOR`); ninguém cravou, ninguém pontua. Cravazi do dia:
   6 chutes por pergunta a partir do dia 6 (`czChutesDoDia`; os dias antigos continuam com 10).
 - Datazi: 2 vidas (`DZ_VIDAS`); o Datazi do dia usa `dzVidasDoDia` (3 até o dia 6). Mudou regra de desafio do dia? Vale a partir
-  de amanhã, como as listas.
+  de amanhã, como as listas. Três modos (`DZ_MODOS`): linha do tempo (o do dia), "Qual veio antes?" e "Em que ano?", na partida
+  livre e no online (salas `datazi_*`, como no Tamanhozi; rode `npm run test:online`). O desafio do dia continua só na linha do tempo.
 - Tamanhozi (`tamanhozi/`, antigo Mapazi; `mapazi/` só redireciona): ajustar o tamanho de uma coisa perto de outra (monumentos,
   pessoas e monstros, animais, veículos, objetos e países). Sozinho (desafio do dia com ranking e partida livre por tema) e online
   (todo mundo ajusta a mesma coisa; quem chegar mais perto leva 1 ponto; tabelas `tamanhozi_*`, rode `npm run test:online`).

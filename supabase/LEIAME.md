@@ -2,6 +2,8 @@
 
 Leva uns 10 minutos e é gratuito. Os nomes dos menus podem mudar um pouco no painel do Supabase, mas os passos são estes.
 
+> **Já configurou antes e só quer ativar o Datazi online?** Abra **SQL Editor → New query**, cole o [`datazi-online.sql`](datazi-online.sql) (só a parte nova: tabelas `datazi_salas`, `datazi_sala_jogadores` e `datazi_partidas`) e clique em **Run**. Pode rodar de novo sem problema; o `schema.sql` inteiro também tem tudo isso.
+>
 > **Já configurou antes e só quer ativar o online do Patozi (ou atualizar o banco)?** Abra **SQL Editor → New query**, cole o [`schema.sql`](schema.sql) inteiro e clique em **Run**. Ele só cria o que falta (tabelas `patozi_*`, coluna nova etc.) e não apaga nada. Não precisa mexer em chave nem em login: o Patozi usa o mesmo projeto e a mesma conta Gamezi.
 
 ## 1. Criar o projeto
