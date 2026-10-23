@@ -3,7 +3,8 @@
 // As regras das rodadas ficam em ../gamezi-rodadas.js e no jogo.js de cada jogo; o app.js do jogo chama
 // gzIniciar(GZ) com o que é só dele:
 //   id, prefixo (chaves do aparelho, "ej" → ej:stats), nome, inicio (Date.UTC do dia 1), textos (os do jogo),
-//   diario(dia) e online() → 10 rodadas; livre() → gerador de rodadas sem fim; segundos(rodada);
+//   diario(dia) e online(tema) → 10 rodadas; livre(tema) → gerador de rodadas sem fim; segundos(rodada);
+//   temas: [{ id, nome: [pt, en, es] }] (o primeiro é o padrão; aparecem como botões na partida livre e na sala online);
 //   avaliar(rodada, v, ms) → { certo, pontos }; valida(rodada, v); resumo(rodada) e respostaTexto(rodada, v) (HTML);
 //   desenhar(el, rodada, e): desenha a rodada em el. e = { fase: "jogando" | "enviado" | "revelado", nova, v, res, responder }.
 //   Com e.nova falso a rodada já está desenhada nessa fase (o jogo pode só sair, para não reiniciar animações).
@@ -108,6 +109,7 @@ const KIT_T = {
   "lobby.share": ["Convidar", "Invite", "Invitar"],
   "lobby.shareText": ["Bora jogar {nome} comigo? Entre na sala: {url}", "Play {nome} with me! Join the room: {url}", "¿Jugamos {nome}? Entra en la sala: {url}"],
   "lobby.players": ["Na sala", "In the room", "En la sala"],
+  "lobby.theme": ["Tema", "Theme", "Tema"],
   "lobby.host": ["anfitrião", "host", "anfitrión"],
   "lobby.you": ["você", "you", "tú"],
   "lobby.kick": ["Tirar da sala", "Remove from room", "Sacar de la sala"],
@@ -200,9 +202,12 @@ function kitMontar() {
         <h1 class="home-tag" data-i18n="home.tag"></h1>
       </div>
       <div class="home-card daily" id="daily-card"></div>
-      <div class="home-card home-row">
-        <div><b data-i18n="home.free"></b><span id="free-sub"></span></div>
-        <button type="button" class="btn dark" id="free-btn" data-i18n="btn.play"></button>
+      <div class="home-card">
+        <div class="home-row">
+          <div><b data-i18n="home.free"></b><span id="free-sub"></span></div>
+          <button type="button" class="btn dark" id="free-btn" data-i18n="btn.play"></button>
+        </div>
+        <div class="chips" id="free-temas" role="radiogroup" hidden></div>
       </div>
       <div class="home-card home-row">
         <div><b data-i18n="home.online"></b><span data-i18n="home.onlineSub"></span></div>
@@ -292,6 +297,10 @@ function kitMontar() {
       </div>
       <h3 data-i18n="lobby.players"></h3>
       <div class="lobby-players" id="lobby-players"></div>
+      <div class="home-card" id="lobby-temas-box" hidden>
+        <p class="card-label" data-i18n="lobby.theme"></p>
+        <div class="chips" id="lobby-temas" role="radiogroup"></div>
+      </div>
       <p class="small muted" id="lobby-status" aria-live="polite"></p>
       <div class="actions end">
         <button type="button" class="btn ghost" id="leave-room" data-i18n="lobby.leave"></button>
@@ -350,6 +359,7 @@ function sequenciaDiaria() {
 
 let partida = null; // sozinho (gzNovaPartida) ou online (gzNovaOnline)
 let modo = "livre"; // "diario", "livre" ou "online"
+let temaDaPartida = null; // tema da partida livre ou online
 let diaAtual = 0;
 let rodadaDesde = 0; // quando a rodada da vez apareceu (performance.now)
 let tempoMs = 0; // tempo pensando no desafio do dia (desempata o ranking)
@@ -384,6 +394,35 @@ function renderHome() {
   $("daily-card").querySelectorAll("[data-dia]").forEach((b) => (b.onclick = () => abrirDia(Number(b.dataset.dia))));
   const st = stats();
   $("free-sub").textContent = st.recorde ? t("home.freeSub", { n: fmt(st.recorde) }) : t("home.freeSubNew");
+  $("free-temas").hidden = !GZ.temas;
+  if (GZ.temas) chipsTemas($("free-temas"), temaLivre(), (id) => {
+    store("tema", id);
+    renderHome();
+  });
+}
+
+// ───────────── temas ─────────────
+
+function temaValido(id) {
+  return GZ.temas && GZ.temas.some((x) => x.id === id) ? id : GZ.temas ? GZ.temas[0].id : null;
+}
+
+function temaLivre() {
+  return temaValido(store("tema"));
+}
+
+function nomeTema(id) {
+  const x = GZ.temas && GZ.temas.find((y) => y.id === id);
+  return x ? tr(x.nome) : "";
+}
+
+function chipsTemas(el, atual, onEscolher, editavel = true) {
+  el.innerHTML = GZ.temas.map((x) =>
+    `<button type="button" role="radio" aria-checked="${x.id === atual}" class="chip ${x.id === atual ? "active" : ""}" data-tema="${x.id}" ${editavel ? "" : "disabled"}>${escapeHtml(tr(x.nome))}</button>`).join("");
+  el.onclick = (e) => {
+    const b = e.target.closest("[data-tema]");
+    if (b && editavel) onEscolher(b.dataset.tema);
+  };
 }
 
 function irInicio() {
@@ -414,7 +453,8 @@ function comecarDiario(dia = diaHoje()) {
 
 function comecarLivre() {
   modo = "livre";
-  comecar(gzNovaPartida({ proxima: GZ.livre(), vidas: GZ_VIDAS }));
+  temaDaPartida = temaLivre();
+  comecar(gzNovaPartida({ proxima: GZ.livre(temaDaPartida), vidas: GZ_VIDAS }));
 }
 
 function comecar(estado) {
@@ -453,7 +493,9 @@ function renderJogo() {
     v = resp ? resp.v : undefined;
     res = resp || null;
   }
-  $("game-title").textContent = online ? t("game.online") : modo === "diario" ? t("daily.kicker", { n: diaAtual }) : t("game.free");
+  const tema = online ? s.tema : temaDaPartida;
+  const comTema = GZ.temas && tema && tema !== GZ.temas[0].id;
+  $("game-title").textContent = modo === "diario" ? t("daily.kicker", { n: diaAtual }) : comTema ? nomeTema(tema) : online ? t("game.online") : t("game.free");
   const vidas = !online && s.vidasMax;
   $("game-lives").hidden = !vidas;
   if (vidas) {
@@ -558,7 +600,7 @@ function telaResultado() {
 function mostrarResultado(reg, recorde) {
   const diario = modo === "diario";
   telaResultado();
-  $("res-kicker").textContent = diario ? t("daily.kicker", { n: diaAtual }) : t("game.free");
+  $("res-kicker").textContent = diario ? t("daily.kicker", { n: diaAtual }) : t("game.free") + (GZ.temas ? " · " + nomeTema(temaDaPartida) : "");
   $("res-score").textContent = t("res.pts", { n: fmt(reg.acertos) });
   const certas = t("res.right", { a: reg.certas, b: reg.total });
   $("res-sub").textContent = diario
@@ -805,7 +847,7 @@ async function criarSala() {
   let codigo = null;
   for (let k = 0; k < 5 && !codigo; k++) {
     const tentativa = Array.from({ length: 5 }, () => SALA_LETRAS[Math.floor(Math.random() * SALA_LETRAS.length)]).join("");
-    const { error } = await sb.from(tabela("salas")).insert({ code: tentativa, host_id: me.id, status: "lobby", settings: {} });
+    const { error } = await sb.from(tabela("salas")).insert({ code: tentativa, host_id: me.id, status: "lobby", settings: { tema: temaLivre() } });
     if (!error) codigo = tentativa;
     else if (error.code !== "23505") throw erroDoBanco(error);
   }
@@ -1060,12 +1102,27 @@ function renderSala() {
       ${host && !eu ? `<button type="button" class="icon-btn" data-tirar="${escapeHtml(p.user_id)}" title="${escapeHtml(t("lobby.kick"))}" aria-label="${escapeHtml(t("lobby.kick"))}">${KIT_ICONES.x}</button>` : ""}
     </div>`;
   }).join("");
+  $("lobby-temas-box").hidden = !GZ.temas;
+  if (GZ.temas) chipsTemas($("lobby-temas"), salaTema(), (id) => mudarTemaDaSala(id).catch(onlineErro), host);
   const dono = salaJogadores.find((p) => p.user_id === sala.host_id);
   $("lobby-start").hidden = !host;
   $("lobby-start").disabled = salaJogadores.length < 2;
   $("lobby-status").textContent = host
     ? t(salaJogadores.length < 2 ? "lobby.needTwo" : "lobby.ready")
     : t("lobby.waitHost", { nome: dono ? dono.nick : "?" });
+}
+
+function salaTema() {
+  return temaValido(sala && sala.settings && sala.settings.tema);
+}
+
+async function mudarTemaDaSala(id) {
+  if (!isHost() || !GZ.temas) return;
+  store("tema", id);
+  sala.settings = { ...(sala.settings || {}), tema: temaValido(id) };
+  renderSala();
+  await sb.from(tabela("salas")).update({ settings: sala.settings }).eq("code", sala.code);
+  enviar("sala");
 }
 
 async function tirarDaSala(uid) {
@@ -1082,7 +1139,8 @@ async function comecarOnline() {
   modo = "online";
   partidaRegistrada = false;
   partidaContada = false;
-  partida = gzNovaOnline({ jogadores: salaJogadores.map((p) => ({ id: p.user_id, nome: p.nick, skin: p.user_id === me.id ? gameziMinhaSkin() : gameziSkinValida(p.skin) })), rodadas: GZ.online() });
+  partida = gzNovaOnline({ jogadores: salaJogadores.map((p) => ({ id: p.user_id, nome: p.nick, skin: p.user_id === me.id ? gameziMinhaSkin() : gameziSkinValida(p.skin) })), rodadas: GZ.online(salaTema()) });
+  partida.tema = salaTema();
   chaveDesenhada = "";
   rodadaDesde = performance.now();
   show("game");
@@ -1103,7 +1161,7 @@ function terminarOnline() {
   telaResultado();
   const placar = gzPlacar(s);
   const venc = placar.filter((j) => j.pos === 1);
-  $("res-kicker").textContent = t("game.online");
+  $("res-kicker").textContent = t("game.online") + (GZ.temas ? " · " + nomeTema(s.tema) : "");
   $("res-score").textContent = venc.length === 1 ? t("res.won", { nome: venc[0].nome }) : t("res.tie");
   $("res-sub").textContent = venc[0] ? t("res.pts", { n: fmt(venc[0].pontos) }) : "";
   $("res-again").textContent = t("res.backRoom");

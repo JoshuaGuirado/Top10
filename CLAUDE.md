@@ -91,3 +91,7 @@
   em `tests/jogos-novos.test.js`. Chaves: `ej:*`, `ct:*`, `mz:*`. Item novo no Emojizi: no fim de `emojizi/data/itens.js`, nos 3
   idiomas, e linha nova em `EJ_DIARIO_POOLS` valendo a partir de amanhã. Banco: tabelas `<jogo>_salas`, `_sala_jogadores`,
   `_partidas` e `_diario` (para quem já rodou o schema: `supabase/jogos-novos.sql`). Jogo novo do mesmo tipo: copiar um dos três.
+- Temas dos jogos do kit (partida livre e sala online; `GZ.temas`, `store("tema")`, `settings.tema` da sala): Emojizi `EJ_TEMAS`
+  (o `cat` de cada item; itens novos em `data/itens-2.js` ou arquivo novo, nos 3 idiomas, com linha nova em `EJ_DIARIO_POOLS`),
+  Contazi `CT_TEMAS`/`CT_GERADORES` (toda conta dá inteiro ≥ 0; frase em [pt, en, es]; o testes confere) e Memorizi `MZ_TEMAS`
+  (de 4 a 9 botões). O desafio do dia não usa tema: Contazi e Memorizi continuam com o misto e as 4 cores (o dia 1 está fixado).

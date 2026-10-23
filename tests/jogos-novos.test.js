@@ -8,7 +8,7 @@ const vm = require("vm");
 
 const SITE = path.join(__dirname, "..");
 const ler = (f) => fs.readFileSync(path.join(SITE, f), "utf8");
-const JOGOS = { emojizi: ["js/jogo.js", "data/itens.js"], contazi: ["js/jogo.js"], memorizi: ["js/jogo.js"] };
+const JOGOS = { emojizi: ["js/jogo.js", "data/itens.js", "data/itens-2.js"], contazi: ["js/jogo.js"], memorizi: ["js/jogo.js"] };
 
 function contexto(jogo) {
   const ctx = vm.createContext({ console });
@@ -102,11 +102,11 @@ test("Memorizi: sequências que crescem, tempo da rodada e o dia 1 não muda", (
 test("Emojizi: itens nos 3 idiomas, sem repetir, alternativas do mesmo tipo e o dia 1 não muda", () => {
   const r = contexto("emojizi");
   const itens = r("EJ_ITENS");
-  assert.ok(itens.length >= 80);
+  assert.ok(itens.length >= 380);
   const nomes = new Set();
   const emojis = new Set();
   for (const i of itens) {
-    assert.ok(["filme", "lugar"].includes(i.cat), i.id);
+    assert.ok(r("EJ_TEMAS").includes(i.cat) && i.cat !== "tudo", i.id);
     assert.equal(i.nome.length, 3, i.id);
     i.nome.forEach((n) => assert.ok(typeof n === "string" && n.length >= 2, `${i.id}: nome`));
     assert.ok(!nomes.has(i.nome[0]), `repetido: ${i.nome[0]}`);
@@ -149,4 +149,62 @@ test("os jogos novos estão no Gamezi: portal, conta, ranking, banco e testes", 
   assert.match(schema, /array\['topzi'[^\]]*'memorizi'\] loop[\s\S]*_sair_da_sala/, "sair e assumir a sala");
   assert.match(falso, /KIT = \["emojizi", "contazi", "memorizi"\]/);
   assert.match(ler("package.json"), /jogos-novos-online\.e2e\.js/);
+});
+
+test("temas: cada tema do Emojizi tem itens suficientes e a partida só traz o tema escolhido", () => {
+  const r = contexto("emojizi");
+  for (const tema of r("EJ_TEMAS")) {
+    const n = r(`ejDoTema("${tema}").length`);
+    assert.ok(n >= 20, `${tema}: ${n} itens`);
+    if (tema === "tudo") continue;
+    assert.ok(r(`ejOnline("${tema}", gzRng(5)).every((x) => ejItem(x.id).cat === "${tema}")`), tema);
+    r(`var g = ejLivre("${tema}", gzRng(6));`);
+    for (let k = 0; k < 30; k++) assert.equal(r(`ejItem(g().id).cat`), tema);
+  }
+  // O dia 1 continua com os 84 primeiros; do dia 2 em diante, com todos.
+  assert.ok(r("ejDiario(1).every((x) => Number(x.id.slice(1)) <= 84)"));
+  assert.ok(Array.from({ length: 30 }, (_, i) => i + 2).some((d) => r(`ejDiario(${d}).some((x) => Number(x.id.slice(1)) > 84)`)), "os itens novos entram a partir do dia 2");
+});
+
+test("temas: todas as contas do Contazi dão número inteiro e certo", () => {
+  const r = contexto("contazi");
+  const romano = (txt) => {
+    const v = { I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000 };
+    return [...txt].reduce((s, ch, i, a) => s + (v[a[i + 1]] > v[ch] ? -v[ch] : v[ch]), 0);
+  };
+  const sobre = { "⁰": 0, "¹": 1, "²": 2, "³": 3, "⁴": 4, "⁵": 5, "⁶": 6, "⁷": 7, "⁸": 8, "⁹": 9 };
+  for (const tema of r("CT_TEMAS")) {
+    for (let nivel = 1; nivel <= 10; nivel++) {
+      for (let k = 0; k < 120; k++) {
+        const c = r(`ctDoTema("${tema}", ${nivel}, gzRng(${nivel * 1000 + k}))`);
+        const txt = Array.isArray(c.texto) ? c.texto[0] : c.texto;
+        assert.ok(Number.isInteger(c.resposta) && c.resposta >= 0, `${tema}: ${txt} = ${c.resposta}`);
+        if (Array.isArray(c.texto)) assert.equal(c.texto.length, 3, `${tema}: 3 idiomas`);
+        if (/^[IVXLCDM]+$/.test(txt)) assert.equal(romano(txt), c.resposta, txt);
+        else if (/^√\d+$/.test(txt)) assert.equal(c.resposta ** 2, Number(txt.slice(1)), txt);
+        else if (/^\d+[⁰¹²³⁴⁵⁶⁷⁸⁹]+$/.test(txt)) {
+          const [, b, e] = txt.match(/^(\d+)(.+)$/);
+          assert.equal(Number(b) ** Number([...e].map((x) => sobre[x]).join("")), c.resposta, txt);
+        } else if (/^[\d\s+−×÷()%]+$/.test(txt)) {
+          const conta = txt.replace(/×/g, "*").replace(/÷/g, "/").replace(/−/g, "-").replace(/(\d+)% \* (\d+)/, "($1/100)*$2");
+          assert.equal(Function(`return ${conta}`)(), c.resposta, txt);
+        } else if (/^[\d, ]+, \?$/.test(txt)) assert.ok(c.resposta > 0, txt);
+      }
+    }
+  }
+  assert.equal(r('ctLivre("tabuada", gzRng(1))().texto.includes("×")'), true);
+  assert.equal(r('ctOnline("romanos", gzRng(1)).every((x) => /^[IVXLCDM]+$/.test(x.texto))'), true);
+});
+
+test("temas: o Memorizi tem botões do tamanho do tema e só aceita os que existem", () => {
+  const r = contexto("memorizi");
+  for (const tema of r("MZ_LISTA_TEMAS")) {
+    const n = r(`mzQtd("${tema}")`);
+    assert.ok(n >= 4 && n <= 9, tema);
+    const rod = r(`mzOnline("${tema}", gzRng(8))`);
+    assert.equal(rod.length, 10);
+    assert.ok(rod.every((x) => x.seq.every((c) => c >= 0 && c < n)), tema);
+    assert.equal(r(`mzValida(${JSON.stringify(rod[0])}, [${n - 1}])`), true);
+    assert.equal(r(`mzValida(${JSON.stringify(rod[0])}, [${n}])`), false);
+  }
 });

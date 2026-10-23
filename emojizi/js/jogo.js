@@ -9,7 +9,10 @@ const EJ_SEGUNDOS = 15;
 const EJ_ITENS = []; // { id, cat, emojis, nome: [pt, en, es] }
 const EJ_DIARIO_POOLS = [
   { desde: 1, itens: 84 },
+  { desde: 2, itens: 391 }, // data/itens-2.js (todos os temas)
 ];
+// Temas da partida livre e do online ("tudo" mistura todos). Cada item é de um tema (cat).
+const EJ_TEMAS = ["tudo", "filme", "personagem", "lugar", "comida", "profissao", "esporte", "festa", "game", "famoso"];
 
 function ejItens(cat, lista) {
   for (const [emojis, pt, en, es] of lista) EJ_ITENS.push({ id: "e" + (EJ_ITENS.length + 1), cat, emojis, nome: [pt, en, es] });
@@ -28,6 +31,10 @@ function ejRodada(item, rnd, itens = EJ_ITENS) {
   return { id: item.id, opcoes: gzEmbaralhar([item.id, ...outros], rnd) };
 }
 
+function ejDoTema(tema) {
+  return !tema || tema === "tudo" ? EJ_ITENS : EJ_ITENS.filter((i) => i.cat === tema);
+}
+
 function ejSortear(n, rnd, itens = EJ_ITENS) {
   return gzEmbaralhar(itens, rnd).slice(0, n).map((i) => ejRodada(i, rnd, itens));
 }
@@ -37,17 +44,18 @@ function ejDiario(dia) {
   return ejSortear(GZ_DIARIO_QTD, gzRng(dia * 7919 + 37), EJ_ITENS.slice(0, pool.itens));
 }
 
-// Partida livre: todos os itens embaralhados, sem repetir até dar a volta.
-function ejLivre(rnd = Math.random) {
+// Partida livre: os itens do tema embaralhados, sem repetir até dar a volta.
+function ejLivre(tema = "tudo", rnd = Math.random) {
+  const itens = ejDoTema(tema);
   let fila = [];
   return () => {
-    if (!fila.length) fila = gzEmbaralhar(EJ_ITENS, rnd);
+    if (!fila.length) fila = gzEmbaralhar(itens, rnd);
     return ejRodada(fila.pop(), rnd);
   };
 }
 
-function ejOnline(rnd = Math.random) {
-  return ejSortear(GZ_DIARIO_QTD, rnd);
+function ejOnline(tema = "tudo", rnd = Math.random) {
+  return ejSortear(GZ_DIARIO_QTD, rnd, ejDoTema(tema));
 }
 
 function ejAvaliar(r, v, ms) {

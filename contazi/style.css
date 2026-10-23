@@ -10,3 +10,4 @@
 .tecla:active { transform: scale(.96); background: var(--line); }
 .tecla.ok { background: var(--accent); color: var(--on-accent); font-size: 1.2rem; }
 .tecla.apagar { font-size: 1.3rem; }
+.conta.longa p { font-stretch: 100%; font-size: clamp(1.25rem, 6vw, 1.7rem); line-height: 1.2; }

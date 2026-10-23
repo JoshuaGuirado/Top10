@@ -215,6 +215,9 @@ mais perto leva 1 ponto.
 
 Nos três: acertou, de 50 a 100 pontos (quanto mais rápido, mais). **Desafio do dia** com 10 rodadas iguais para todo mundo,
 semana e ranking; **partida livre** até errar 3 vezes, com recorde; **online** com salas, skin e todo mundo respondendo a mesma
-rodada. As telas e o online são de `gamezi-kit.js`/`gamezi-kit.css`; as rodadas, de `gamezi-rodadas.js`; cada jogo só tem as
+rodada. **Temas** na partida livre e na sala online: Emojizi com 391 itens em 9 temas (filmes e histórias, personagens, lugares,
+comidas, profissões, esportes, festas e datas, jogos e famosos), Contazi com 13 (tabuada, divisão, ordem das operações, porcentagem,
+frações, potências e raízes, dobro e metade, dinheiro e troco, horas, números romanos, sequências…) e Memorizi com 13 (4 e 6 cores,
+frutas, animais, números, notas musicais, setas, formas, caras, letras, clima, transportes e bolas). As telas e o online são de `gamezi-kit.js`/`gamezi-kit.css`; as rodadas, de `gamezi-rodadas.js`; cada jogo só tem as
 regras (`js/jogo.js`), a rodada na tela (`js/app.js`) e o estilo dela. Testes: `tests/jogos-novos.test.js` e
 `tests/jogos-novos-online.e2e.js`. Banco: `supabase/jogos-novos.sql` (para quem já rodou o schema).

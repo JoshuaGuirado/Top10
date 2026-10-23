@@ -99,7 +99,21 @@ const server = http.createServer((req, res) => {
     await S.waitForSelector("#screen-results:not([hidden])");
     assert.match(await S.textContent("#res-sub"), /0 de 3/);
     // Acabou o tempo conta como erro.
-    await S.click("#res-again");
+    // Tema da partida livre: a partida só traz rodadas do tema escolhido.
+    const TEMA = { emojizi: ["comida", "(r) => ejItem(r.id).cat === 'comida'"], contazi: ["romanos", "(r) => /^[IVXLCDM]+$/.test(r.texto)"], memorizi: ["numeros", "(r) => r.tema === 'numeros'"] }[jogo];
+    await S.click("#res-home");
+    await S.click(`#free-temas [data-tema="${TEMA[0]}"]`);
+    assert.equal(await S.getAttribute(`#free-temas [data-tema="${TEMA[0]}"]`, "aria-checked"), "true");
+    await S.click("#free-btn");
+    for (let i = 0; i < 4; i++) {
+      assert.ok(await S.evaluate(`(${TEMA[1]})(partida.rodadas[partida.n])`), "rodada do tema escolhido");
+      await responder(S, CERTA[jogo]);
+      await S.click("#game-next");
+    }
+    if (jogo === "memorizi") assert.equal(await S.locator("#round .pad").count(), 9, "o tema de números tem 9 botões");
+    await S.click("#game-quit");
+    await S.click(`#free-temas [data-tema="${await S.evaluate(() => GZ.temas[0].id)}"]`);
+    await S.click("#free-btn");
     await S.evaluate(() => { rodadaDesde -= GZ.segundos(partida.rodadas[0]) * 1000 + 50; });
     await S.waitForSelector("#feedback:not([hidden])");
     assert.equal(await S.textContent("#verdict"), "Acabou o tempo!");
@@ -124,8 +138,13 @@ const server = http.createServer((req, res) => {
     await A.waitForFunction(() => document.querySelectorAll("#lobby-players .lobby-player").length === 2);
     assert.equal(await A.locator("#lobby-players .gz-face").count(), 2, "skins na sala");
     assert.equal(await B.isHidden("#lobby-start"), true);
+    // O anfitrião escolhe o tema da sala; a convidada vê e não muda.
+    await A.click(`#lobby-temas [data-tema="${TEMA[0]}"]`);
+    await B.waitForFunction((x) => document.querySelector(`#lobby-temas [data-tema="${x}"]`).getAttribute("aria-checked") === "true", TEMA[0]);
+    assert.equal(await B.isDisabled(`#lobby-temas [data-tema="${TEMA[0]}"]`), true);
     await A.click("#lobby-start");
     await B.waitForFunction(() => partida && partida.online && document.body.dataset.screen === "game");
+    assert.ok(await B.evaluate(`partida.rodadas.every(${TEMA[1]})`), "partida online do tema da sala");
     assert.deepEqual(await B.evaluate(() => partida.rodadas), await A.evaluate(() => partida.rodadas), "a mesma partida nas duas");
     for (let i = 0; i < 10; i++) {
       if (i) {

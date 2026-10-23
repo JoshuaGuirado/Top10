@@ -2,7 +2,7 @@
 // Cada jogo fica numa pasta (topzi/…, patozi/…); os arquivos dele entram na lista com o caminho da pasta.
 // Online, busca sempre a versão nova (rede primeiro); sem internet, usa a cópia guardada.
 
-const CACHE = "gamezi-v26";
+const CACHE = "gamezi-v27";
 const FILES = [
   "./",
   "index.html",
@@ -19,6 +19,7 @@ const FILES = [
   "emojizi/style.css",
   "emojizi/js/jogo.js",
   "emojizi/data/itens.js",
+  "emojizi/data/itens-2.js",
   "emojizi/js/app.js",
   "brand/emojizi-logo.svg",
   "brand/emojizi-logo-dark.svg",
