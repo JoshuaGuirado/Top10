@@ -448,7 +448,7 @@ function mostrarRanking() {
 
 function compartilhar(dia, r, btn) {
   const linha = (r.marcas || []).map((m) => (m ? "■" : "□")).join("");
-  copiar(t("res.shareText", { n: dia, a: r.acertos, b: DZ_DIARIO_QTD, linha, url: location.origin + location.pathname }), btn);
+  copiar(gameziTextoDoDia(t("res.shareText", { n: dia, a: r.acertos, b: DZ_DIARIO_QTD, linha, url: location.origin + location.pathname })), btn);
 }
 
 function copiar(texto, btn) {

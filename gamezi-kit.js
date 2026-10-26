@@ -639,7 +639,7 @@ function mostrarRanking() {
 
 function compartilhar(dia, reg, btn) {
   const linha = (reg.marcas || []).map((m) => (m ? "■" : "□")).join("");
-  copiar(t("res.share", { nome: GZ.nome, n: dia, p: reg.acertos, linha, url: location.origin + location.pathname }), btn);
+  copiar(gameziTextoDoDia(t("res.share", { nome: GZ.nome, n: dia, p: reg.acertos, linha, url: location.origin + location.pathname })), btn);
 }
 
 // ───────────── topo: tema, idioma e ajuda ─────────────

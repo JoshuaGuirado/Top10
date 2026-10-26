@@ -47,3 +47,16 @@ test("sequência do Gamezi: dias seguidos com algum desafio do dia, de qualquer 
   assert.equal(JSON.stringify(r(`gameziSequenciaAtual(${dados({ 23: {}, 25: {} }, {}, { 19: { pontos: [1, 2] } })}, ${hoje})`)), JSON.stringify({ dias: 1, jogouHoje: false, hoje: 0 }));
   assert.equal(r(`gameziSequenciaAtual(${dados({}, {}, {})}, ${hoje}).dias`), 0);
 });
+
+test("compartilhar o resultado do dia leva a sequência do Gamezi antes do link", () => {
+  const guardado = {};
+  const c = vm.createContext({ localStorage: { getItem: (k) => (k in guardado ? guardado[k] : null), setItem: (k, v) => (guardado[k] = String(v)) }, lang: "pt" });
+  for (const f of ["gamezi-conta.js", "gamezi-ranking.js"]) vm.runInContext(fs.readFileSync(path.join(__dirname, "..", f), "utf8"), c);
+  const texto = "Corzi · dia #1: 870 pts\n🟩🟩🟥\nhttps://gamezi.app/corzi/";
+  assert.equal(vm.runInContext(`gameziTextoDoDia(${JSON.stringify(texto)})`, c), texto, "sem sequência, o texto fica igual");
+  const d = new Date(), hoje = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+  const n = Math.floor((hoje - Date.UTC(2026, 9, 1)) / 864e5) + 1;
+  guardado["tt:diaria"] = JSON.stringify({ [n]: {}, [n - 1]: {}, [n - 2]: {} });
+  assert.equal(vm.runInContext(`gameziTextoDoDia(${JSON.stringify(texto)})`, c), "Corzi · dia #1: 870 pts\n🟩🟩🟥\n🔥 3 dias seguidos no Gamezi\nhttps://gamezi.app/corzi/");
+  assert.equal(vm.runInContext(`gameziTextoDoDia("Topzi #26", "en")`, c), "Topzi #26\n🔥 3-day streak on Gamezi");
+});

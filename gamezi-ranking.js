@@ -24,6 +24,7 @@ var GAMEZI_RANKING_TEXTOS = {
   antesSub: ["É ele que aparece no ranking do dia.", "It's the name shown in the daily ranking.", "Es el nombre que aparece en el ranking del día."],
   jogar: ["Jogar", "Play", "Jugar"],
   cancelar: ["Agora não", "Not now", "Ahora no"],
+  sequencia: ["🔥 {n} dias seguidos no Gamezi", "🔥 {n}-day streak on Gamezi", "🔥 {n} días seguidos en Gamezi"],
 };
 
 function gameziRankingTexto(chave, l, vars) {
@@ -31,6 +32,18 @@ function gameziRankingTexto(chave, l, vars) {
   var s = GAMEZI_RANKING_TEXTOS[chave][i < 0 ? 0 : i];
   for (var k in vars || {}) s = s.split("{" + k + "}").join(vars[k]);
   return s;
+}
+
+// Texto do resultado do dia para compartilhar (todos os jogos): com 2 dias seguidos ou mais, põe a sequência do
+// Gamezi (gameziSequenciaAtual, de gamezi-conta.js) antes do link.
+function gameziTextoDoDia(texto, l) {
+  if (typeof gameziSequenciaAtual !== "function") return texto;
+  var n = gameziSequenciaAtual().dias;
+  if (n < 2) return texto;
+  var linhas = String(texto).split("\n");
+  var i = /^https?:/.test(linhas[linhas.length - 1]) ? linhas.length - 1 : linhas.length;
+  linhas.splice(i, 0, gameziRankingTexto("sequencia", l || (typeof lang === "string" ? lang : "pt"), { n: n }));
+  return linhas.join("\n");
 }
 
 function gameziEsc(s) {

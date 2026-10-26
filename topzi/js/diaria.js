@@ -163,7 +163,7 @@ function renderDailyCard() {
       }
     });
   }
-  $("daily-btn").onclick = (e) => (res ? shareText(dailyShareText(num, res), e.currentTarget, t("btn.share")) : startDaily(num));
+  $("daily-btn").onclick = (e) => (res ? shareText(gameziTextoDoDia(dailyShareText(num, res)), e.currentTarget, t("btn.share")) : startDaily(num));
   card.querySelectorAll("[data-dia]").forEach((b) => (b.onclick = () => startDaily(Number(b.dataset.dia))));
   if ($("daily-all")) {
     $("daily-all").onclick = () => {

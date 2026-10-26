@@ -541,7 +541,7 @@ function copiar(texto, btn) {
 
 function compartilhar(dia, r, btn) {
   const linha = (r.marcas || []).map((m) => (m ? "■" : "□")).join("");
-  copiar(t("res.shareText", { n: dia, a: r.acertos, b: MM_DIARIO_QTD, linha, url: location.origin + location.pathname }), btn);
+  copiar(gameziTextoDoDia(t("res.shareText", { n: dia, a: r.acertos, b: MM_DIARIO_QTD, linha, url: location.origin + location.pathname })), btn);
 }
 
 function compartilharPartida(r, btn) {

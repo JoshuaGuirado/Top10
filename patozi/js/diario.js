@@ -193,7 +193,7 @@ function renderDiarioFim(reg, dots) {
     </div>`;
   $("daily-share").onclick = (e) => {
     const linha = reg.pontos.map((p) => (p === 0 ? "X" : p >= 90 ? "■" : p >= 60 ? "▣" : "□")).join(" ");
-    shareText(t("daily.shareText", { n: dia, pts: total, linha, url: location.origin + location.pathname }), e.target);
+    shareText(gameziTextoDoDia(t("daily.shareText", { n: dia, pts: total, linha, url: location.origin + location.pathname })), e.target);
   };
   $("daily-home").onclick = irInicio;
   renderRanking();

@@ -523,7 +523,7 @@ function copiar(texto, btn) {
 
 function compartilhar(dia, reg, btn) {
   const linha = (reg.rodadas || []).map((r) => (r.pontos >= 90 ? "🟩" : r.pontos >= 60 ? "🟨" : r.pontos > 0 ? "🟧" : "🟥")).join("");
-  copiar(t("res.shareText", { n: dia, p: reg.acertos, linha, url: location.origin + location.pathname }), btn);
+  copiar(gameziTextoDoDia(t("res.shareText", { n: dia, p: reg.acertos, linha, url: location.origin + location.pathname })), btn);
 }
 
 // ───────────── topo: tema, idioma e ajuda ─────────────

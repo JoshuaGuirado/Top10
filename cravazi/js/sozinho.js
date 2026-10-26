@@ -236,7 +236,7 @@ function maxChutes(reg) {
 
 function compartilharDia(dia, reg, btn) {
   const linha = reg.rodadas.map((r) => (r.cravou ? "🎯" + r.chutes : "❌")).join(" ");
-  copiar(t("res.shareText", { n: dia, p: reg.pontos, max: reg.rodadas.length * maxChutes(reg), linha, url: location.origin + location.pathname }), btn);
+  copiar(gameziTextoDoDia(t("res.shareText", { n: dia, p: reg.pontos, max: reg.rodadas.length * maxChutes(reg), linha, url: location.origin + location.pathname })), btn);
 }
 
 function ligarSozinho() {
