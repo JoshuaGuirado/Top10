@@ -8,7 +8,7 @@ const vm = require("vm");
 const SITE = path.join(__dirname, "..");
 const ler = (f) => fs.readFileSync(path.join(SITE, f), "utf8");
 const JOGOS = {
-  fotozi: ["js/jogo.js", "data/fotos-1.js", "data/fotos-2.js", "data/fotos-3.js", "data/fotos-4.js", "data/fotos-5.js"],
+  fotozi: ["js/jogo.js", "data/fotos-1.js", "data/fotos-2.js", "data/fotos-3.js", "data/fotos-4.js", "data/fotos-5.js", "data/fotos-6.js", "data/focos.js"],
   censurazi: ["js/jogo.js", "data/cartas-1.js", "data/cartas-2.js", "data/cartas-3.js", "data/cartas-4.js"],
   corzi: ["js/jogo.js"],
 };
@@ -143,20 +143,21 @@ test("Fotozi: muitas fotos em vários temas, nomes nos 3 idiomas e reservas do m
   }
 });
 
-test("Fotozi: zoom e pontos caem só um pouco a cada erro; chute com apelido e errinho; dia 1 fixo", () => {
+test("Fotozi: poucas etapas de zoom, cada erro afasta bastante; chute com apelido e errinho; dia 1 fixo", () => {
   const r = contexto("fotozi");
   const zoom = r("FZ_ZOOM");
   const pontos = r("FZ_PONTOS");
   assert.equal(zoom.length, pontos.length);
   assert.equal(zoom[zoom.length - 1], 1, "no fim a foto aparece inteira");
-  zoom.forEach((z, i) => i && assert.ok(z < zoom[i - 1] && zoom[i - 1] / z < 1.45, "afasta só um pouco"));
-  pontos.forEach((p, i) => i && assert.equal(pontos[i - 1] - p, 10, "perde só 10"));
+  assert.ok(zoom.length <= 5, "poucas etapas (o dono pediu)");
+  zoom.forEach((z, i) => i && assert.ok(z < zoom[i - 1] && zoom[i - 1] / z >= 1.3, "cada erro afasta bastante"));
+  pontos.forEach((p, i) => i && assert.equal(pontos[i - 1] - p, 20, "perde 20 por erro"));
   r('var cr7 = FZ_FOTOS.find((f) => f.titulo === "Cristiano Ronaldo");');
   for (const g of ["Cristiano Ronaldo", "cristiano ronaldo", "CR7", "cristiano", "Cristiano Ronalod"]) assert.equal(r(`fzAcertou(cr7, ${JSON.stringify(g)})`), true, g);
   for (const g of ["Ronaldo", "Messi", ""]) assert.equal(r(`fzAcertou(cr7, ${JSON.stringify(g)})`), false, g);
   r('var rd = fzRodada(cr7, gzRng(1));');
   assert.deepEqual(json(r('fzAvaliar(rd, { id: cr7.id, g: "cr7", n: 0 })')), { certo: true, pontos: 100 });
-  assert.equal(r('fzAvaliar(rd, { id: cr7.id, g: "cr7", n: 7 }).pontos'), 30);
+  assert.equal(r('fzAvaliar(rd, { id: cr7.id, g: "cr7", n: 4 }).pontos'), 20);
   assert.equal(r('fzAvaliar(rd, { id: "f9999", g: "cr7", n: 0 }).certo'), false, "foto que não é da rodada");
   assert.equal(r('fzAvaliar(rd, { id: cr7.id, g: "", n: 0 }).certo'), false, "desistiu");
   assert.deepEqual(json(r("fzDiario(1).map((x) => x.ids[0])")), ["f81","f70","f174","f229","f368","f144","f247","f68","f380","f207"], "o Fotozi do dia 1 não pode mudar");

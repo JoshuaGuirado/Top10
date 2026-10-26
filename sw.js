@@ -24,6 +24,8 @@ const FILES = [
   "fotozi/data/fotos-3.js",
   "fotozi/data/fotos-4.js",
   "fotozi/data/fotos-5.js",
+  "fotozi/data/fotos-6.js",
+  "fotozi/data/focos.js",
   "fotozi/js/app.js",
   "brand/fotozi-logo.svg",
   "brand/fotozi-logo-dark.svg",

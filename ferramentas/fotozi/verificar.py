@@ -44,18 +44,33 @@ def paginas(titulos):
     res = {}
     for i in range(0, len(titulos), 50):
         lote = titulos[i:i + 50]
+        res.update(consulta(lote))
+        time.sleep(1)
+    # A API às vezes deixa a foto de fora quando a consulta é em lote: as que vieram sem foto vão de novo, uma a uma.
+    for t in [t for t, p in res.items() if not p or "thumbnail" not in p]:
+        res.update(consulta([t]))
+        time.sleep(0.5)
+    return res
+
+def consulta(lote):
+    res, pags, vira, cont = {}, {}, {}, {}
+    while True:
         q = urllib.parse.urlencode({"action": "query", "format": "json", "redirects": 1, "prop": "pageimages|pageprops",
                                     "ppprop": "disambiguation", "piprop": "thumbnail|name|original", "pithumbsize": 960,
-                                    "titles": "|".join(lote)})
-        d = json.loads(baixar(API + "?" + q))["query"]
-        vira = {x["from"]: x["to"] for x in d.get("normalized", []) + d.get("redirects", [])}
-        pags = {p["title"]: p for p in d.get("pages", {}).values()}
-        for t in lote:
-            nome = t
-            for _ in range(3):
-                nome = vira.get(nome, nome)
-            res[t] = pags.get(nome)
-        time.sleep(1)
+                                    "pilimit": 50, "titles": "|".join(lote), **cont})
+        d = json.loads(baixar(API + "?" + q))
+        r = d["query"]
+        vira.update({x["from"]: x["to"] for x in r.get("normalized", []) + r.get("redirects", [])})
+        for p in r.get("pages", {}).values():
+            pags.setdefault(p["title"], {}).update(p)
+        if "continue" not in d:
+            break
+        cont = d["continue"]
+    for t in lote:
+        nome = t
+        for _ in range(3):
+            nome = vira.get(nome, nome)
+        res[t] = pags.get(nome)
     return res
 
 def detector():
