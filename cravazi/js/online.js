@@ -106,7 +106,7 @@ function renderMinhaSkinOnline() {
 
 function trocarMinhaSkin() {
   abrirSkin(t("skin.of", { nome: store("nick") || t("lobby.you") }), minhaSkin(), [], (skin) => {
-    store("skin", skin);
+    gameziGuardarSkin(skin);
     renderMinhaSkinOnline();
     if (!sala || !me) return;
     const eu = salaJogadores.find((p) => p.user_id === me.id);

@@ -82,9 +82,13 @@
   de amanhã (o dia 1 está fixado no teste). Chaves `tm:*`.
 - Música de fundo: `gamezi-musica.js` (raiz), feita na hora com Web Audio, sem arquivo de áudio; liga/desliga na linha "Música"
   que ela mesma põe no `#settings-dialog` (chave `tt:musica`, a mesma para todos). Jogo novo: carregar `../gamezi-musica.js`.
-- Todo jogo tem online com skin. Topzi, Cravazi e Patozi têm as próprias; Datazi, Tamanhozi e Maiorzi usam `gamezi-skins.js`
-  (raiz, as skins prontas do Topzi; carregar `../topzi/js/avatars.js` antes; skin guardada em `gz:skin`, coluna `skin` em
-  `<jogo>_sala_jogadores`). Jogo novo precisa de online com skin. Mudanças do banco para quem já rodou o schema: `supabase/online-novo.sql`.
+- Skin única do Gamezi (`gamezi-skins.js`, raiz): a mesma em todos os jogos, menos no Patozi (lá é o guarda-roupa do pato).
+  Fica em `gz:skin` ({ presetId, avatar }); `gameziMinhaSkin()` lê (na 1ª vez aproveita a do Topzi ou do Cravazi) e
+  `gameziGuardarSkin()` grava. A janela tem as prontas e o editor "Criar a minha"; a conta (`conta.html`) mostra e troca a skin
+  e salva no perfil (`topzi_perfis.avatar`). No Topzi, o jogador 1 é a skin única (`savePlayers`); no Cravazi, `minhaSkin()`.
+  Os bonecos são de `topzi/js/avatars.js` com visual 3D (degradês de luz em `renderAvatar`; desliga em `gz:3d`). Todo jogo
+  carrega `../topzi/js/avatars.js` e `../gamezi-skins.js`; coluna `skin` em `<jogo>_sala_jogadores` (Topzi: `avatar`).
+  Jogo novo precisa de online com skin. Mudanças do banco para quem já rodou o schema: `supabase/online-novo.sql`.
 - Maiorzi online (`maisoumenozi/js/online.js`, tabelas `maisoumenozi_*`): todo mundo responde a mesma comparação (15 s), acertou
   vale 1 (a maluca, 2); 10 rodadas sorteadas por `mmNovaOnline`. Usa os cartões da partida sozinho (`renderNormal`/`renderUau`).
 - Emojizi (`emojizi/`), Contazi (`contazi/`) e Memorizi (`memorizi/`) são "jogos do kit": as telas (início, partida, resultado,

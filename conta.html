@@ -77,6 +77,10 @@
         <p class="feedback" id="msg" role="status"></p>
       </section>
 
+      <section class="panel skin-panel">
+        <button type="button" id="minha-skin"></button>
+        <div><h2 data-t="skinTitle">Sua skin</h2><p class="muted" data-t="skinSub">A mesma em todos os jogos do Gamezi (no Patozi você veste o pato).</p></div>
+      </section>
       <section class="panel level-panel" id="nivel"></section>
 
       <ul class="points">
@@ -95,6 +99,8 @@
 
   <script src="topzi/js/config.js"></script>
   <script src="gamezi-conta.js"></script>
+  <script src="topzi/js/avatars.js"></script>
+  <script src="gamezi-skins.js"></script>
   <script>
     // Página da conta do Gamezi: entrar, criar conta, esqueci a senha, trocar senha e sair.
     // Textos em [português, inglês, espanhol]; o idioma é o mesmo escolhido no portal e nos jogos (tt:lang).
@@ -103,6 +109,8 @@
       back: ["Voltar para o Gamezi", "Back to Gamezi", "Volver a Gamezi"],
       backTo: ["Voltar para o {jogo}", "Back to {jogo}", "Volver a {jogo}"],
       title: ["Conta Gamezi", "Gamezi account", "Cuenta Gamezi"],
+      skinTitle: ["Sua skin", "Your skin", "Tu skin"],
+      skinSub: ["A mesma em todos os jogos do Gamezi (no Patozi você veste o pato).", "The same in every Gamezi game (in Patozi you dress the duck).", "La misma en todos los juegos de Gamezi (en Patozi vistes al pato)."],
       pitch: ["Uma conta só para todos os jogos do Gamezi. Entre com e-mail e senha para salvar seu perfil e jogar em qualquer celular.", "One account for every Gamezi game. Sign in with email and password to save your profile and play on any phone.", "Una sola cuenta para todos los juegos de Gamezi. Entra con correo y contraseña para guardar tu perfil y jugar en cualquier celular."],
       connected: ["Você está conectado como {email}.", "You're signed in as {email}.", "Estás conectado como {email}."],
       needSetup: ["A conta precisa do banco (Supabase) configurado. Veja supabase/LEIAME.md.", "Accounts need the database (Supabase) set up. See supabase/LEIAME.md.", "La cuenta necesita la base de datos (Supabase) configurada. Mira supabase/LEIAME.md."],
@@ -302,10 +310,13 @@
       var id = me.id;
       resumo = {};
       function pegar(tabela) {
-        return sb.from(tabela).select("nick, data").eq("id", id).maybeSingle().then(function (r) { return r.data; }, function () { return null; });
+        return sb.from(tabela).select(tabela === "topzi_perfis" ? "nick, data, avatar" : "nick, data").eq("id", id).maybeSingle().then(function (r) { return r.data; }, function () { return null; });
       }
       Promise.all([pegar("topzi_perfis"), pegar("patozi_perfis")]).then(function (linhas) {
         if (!me || me.id !== id) return;
+        // A skin salva na conta (perfil do Topzi) vale neste aparelho também.
+        var remota = linhas[0] && gameziSkinValida({ presetId: linhas[0].data && linhas[0].data.preset, avatar: linhas[0].avatar });
+        if (remota && JSON.stringify(remota) !== JSON.stringify(gameziMinhaSkin())) gameziGuardarSkin(remota);
         var tz = linhas[0] && linhas[0].data && linhas[0].data.stats;
         var pz = linhas[1] && linhas[1].data && linhas[1].data.stats;
         dadosConta = {
@@ -477,6 +488,18 @@
     if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
       addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
     }
+    // Skin única do Gamezi: troca aqui e vale em todos os jogos; com a conta conectada, vai também para o perfil
+    // (o mesmo do Topzi: avatar e, em data.preset, qual pronta é).
+    gameziBotaoSkin($("minha-skin"), function (skin) {
+      if (!sb || !me) return;
+      var id = me.id;
+      sb.from("topzi_perfis").select("data").eq("id", id).maybeSingle().then(function (r) {
+        if (!r.data) return;
+        var data = Object.assign({}, r.data.data, { preset: skin.presetId });
+        return sb.from("topzi_perfis").update({ avatar: skin.avatar, data: data }).eq("id", id);
+      }).then(function () {}, function () {});
+    });
+    document.getElementById("lang").addEventListener("change", function () { window.dispatchEvent(new CustomEvent("gamezi-skin")); });
   </script>
 </body>
 </html>

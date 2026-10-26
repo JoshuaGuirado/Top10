@@ -173,9 +173,10 @@ function medir(W) {
     await tentar("mais-partida", () => page.click("#daily-btn"));
     await tentar("mais-respondeu", () => page.click("#btn-up"));
     await tentar("mais-resultado", async () => {
+      // A rodada pode ser normal (Mais/Menos) ou a comparação maluca (dois cartões): toca no que estiver na tela.
       for (let i = 0; i < 30 && (await page.isVisible("#screen-game")); i++) {
-        if (await page.isVisible("#game-next")) await page.click("#game-next").catch(() => {});
-        else await page.click("#btn-down").catch(() => {});
+        const alvo = ["#game-next", "#btn-down", "#uau-a"];
+        for (const sel of alvo) if (await page.isVisible(sel)) { await page.click(sel, { timeout: 2000 }).catch(() => {}); break; }
         await page.waitForTimeout(150);
       }
     });

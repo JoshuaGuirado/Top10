@@ -27,14 +27,9 @@ const ICONES = {
   x: '<svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
 };
 
-// Skin de quem usa este aparelho (Cravazi do dia e online). Na primeira vez, sorteia uma pronta.
+// Skin de quem usa este aparelho (Cravazi do dia e online): a skin única do Gamezi (gz:skin, de ../gamezi-skins.js).
 function minhaSkin() {
-  let s = czSkinValida(store("skin"));
-  if (!s) {
-    s = czSkinValida(skins[0]) || czSkinSorteada();
-    store("skin", s);
-  }
-  return s;
+  return gameziMinhaSkin();
 }
 
 // ───────────── início e "Com a turma" ─────────────

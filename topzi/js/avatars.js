@@ -46,10 +46,30 @@ const DEFAULT_AVATAR = {
 // Opções do editor que viram combinações de peça + estilo.
 const HEAD_ALIASES = { knight: ["helmet", "knight"], robot: ["helmet", "robot"], heromask: ["mask", "plain"], ninja: ["mask", "ninja"] };
 
+// Visual 3D (padrão): luz de cima à esquerda, sombra embaixo à direita e brilho, como um boneco de vinil.
+// Quem preferir o desenho chapado desliga na escolha de skin (gz:3d, vale para todos os jogos).
+function avatar3d() {
+  try { return JSON.parse(localStorage.getItem("gz:3d")) !== false; } catch (e) { return true; }
+}
+
+// Repete por cima de cada peça pintada com uma dessas cores uma cópia com o degradê de luz (url(#grad)).
+function avatarLuz(svg, cores, grad) {
+  cores.filter((cor, i) => cor && cores.indexOf(cor) === i).forEach((cor) => {
+    const f = `fill="${cor}"`;
+    svg = svg.replace(new RegExp(`<g ${f}>([\\s\\S]*?)</g>`, "g"), (m, dentro) => `${m}<g fill="url(#${grad})">${dentro.replace(/ fill="[^"]*"/g, "")}</g>`);
+    svg = svg.replace(new RegExp(`<(rect|circle|ellipse|path)\\b[^>]*${f}[^>]*/>`, "g"), (m) => m + m.split(f).join(`fill="url(#${grad})"`).replace(/ fill-opacity="[^"]*"/, "").replace(/ stroke[-\w]*="[^"]*"/g, ""));
+  });
+  return svg;
+}
+
 function renderAvatar(input) {
   const c = { ...DEFAULT_AVATAR, ...input };
   if (HEAD_ALIASES[c.head]) [c.head, c.headStyle] = HEAD_ALIASES[c.head];
   const id = "av" + ++avatarSeq;
+  const d3 = avatar3d();
+  // bola: brilho arredondado (cabeça, mãos, cabelo, chapéus); cano: luz dos lados (corpo, braços e pernas).
+  const luz = (svg, ...cores) => (d3 ? avatarLuz(svg, cores, id + "b") : svg);
+  const cano = (forma) => (d3 ? forma.replace(/fill="[^"]*"/, `fill="url(#${id}c)"`) : "");
   const skinDark = darken(c.skin, 0.12);
   const ink = "#1D1B2F";
   const patterns = Array.isArray(c.pattern) ? c.pattern : [c.pattern];
@@ -57,29 +77,46 @@ function renderAvatar(input) {
   const out = [];
   if (patterns.includes("tank")) c.sleeve = c.skin;
 
+  if (d3) {
+    out.push(`<defs><radialGradient id="${id}b" cx=".32" cy=".24" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".3" stop-color="#fff" stop-opacity=".12"/>` +
+      `<stop offset=".62" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".32"/></radialGradient>` +
+      `<linearGradient id="${id}c"><stop offset="0" stop-color="#fff" stop-opacity=".3"/><stop offset=".28" stop-color="#fff" stop-opacity=".06"/>` +
+      `<stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".34"/></linearGradient></defs>`);
+  }
+
   // ── atrás ──
   if (c.bg) out.push(`<rect x="0" y="-8" width="100" height="119" fill="${c.bg}"/>`);
-  if (c.cape) out.push(`<path d="M30 60 H70 L86 110 H14 Z" fill="${c.cape}"/>`);
-  if (!covered) out.push(hairBack(c));
-  out.push(headBack(c));
+  if (d3) out.push(`<ellipse cx="50" cy="110" rx="34" ry="3.2" fill="#000" fill-opacity=".16"/>`);
+  if (c.cape) {
+    const capa = `<path d="M30 60 H70 L86 110 H14 Z" fill="${c.cape}"/>`;
+    out.push(capa + cano(capa));
+  }
+  if (!covered) out.push(luz(hairBack(c), c.hairColor));
+  out.push(luz(headBack(c), c.headColor, c.skin));
 
   // ── corpo ──
-  out.push(`<rect x="26" y="99" width="48" height="12" fill="${c.legs}"/>`);
+  const pernas = `<rect x="26" y="99" width="48" height="12" fill="${c.legs}"/>`;
+  out.push(pernas + cano(pernas));
   out.push(`<rect x="49" y="101" width="2" height="10" fill="${darken(c.legs, 0.3)}"/>`);
   const sleeve = c.sleeve || c.top;
-  out.push(`<path d="M34 59 L24 62 L16 90 L25 93 L31 73 Z" fill="${sleeve}"/>`);
-  out.push(`<path d="M66 59 L76 62 L84 90 L75 93 L69 73 Z" fill="${sleeve}"/>`);
-  out.push(`<circle cx="20" cy="95" r="5.5" fill="${c.skin}"/><circle cx="80" cy="95" r="5.5" fill="${c.skin}"/>`);
+  const braco1 = `<path d="M34 59 L24 62 L16 90 L25 93 L31 73 Z" fill="${sleeve}"/>`;
+  const braco2 = `<path d="M66 59 L76 62 L84 90 L75 93 L69 73 Z" fill="${sleeve}"/>`;
+  out.push(braco1 + cano(braco1) + braco2 + cano(braco2));
+  out.push(luz(`<circle cx="20" cy="95" r="5.5" fill="${c.skin}"/><circle cx="80" cy="95" r="5.5" fill="${c.skin}"/>`, c.skin));
   out.push(`<clipPath id="${id}t"><path d="M34 58 H66 L74 100 H26 Z"/></clipPath>`);
-  out.push(`<path d="M34 58 H66 L74 100 H26 Z" fill="${c.top}"/>`);
+  const tronco = `<path d="M34 58 H66 L74 100 H26 Z" fill="${c.top}"/>`;
+  out.push(tronco);
   out.push(`<g clip-path="url(#${id}t)">${patterns.map((p) => torsoPattern(p, c)).join("")}</g>`);
   if (c.belt) out.push(`<rect x="26" y="94" width="48" height="6" fill="${c.belt}"/>`);
+  out.push(cano(tronco));
+  if (d3) out.push(`<path d="M34 58 H66 L67 63 H33 Z" fill="#000" fill-opacity=".14"/>`); // sombra da cabeça no peito
   out.push(handItem(c.item));
 
   // ── cabeça ──
   out.push(`<rect x="44" y="53" width="12" height="7" fill="${skinDark}"/>`);
-  out.push(`<rect x="41" y="13" width="18" height="9" rx="3" fill="${skinDark}"/>`);
+  out.push(luz(`<rect x="41" y="13" width="18" height="9" rx="3" fill="${skinDark}"/>`, skinDark));
   out.push(`<rect x="29" y="20" width="42" height="36" rx="11" fill="${c.skin}"/>`);
+  if (d3) out.push(`<rect x="29" y="20" width="42" height="36" rx="11" fill="url(#${id}b)"/><ellipse cx="38" cy="26" rx="6" ry="3" fill="#fff" fill-opacity=".35" transform="rotate(-20 38 26)"/>`);
 
   if (!covered) {
     out.push(faceExtra(c));
@@ -88,9 +125,9 @@ function renderAvatar(input) {
     out.push(mouth(c.mouth, ink));
     out.push(beard(c));
     if (c.extra === "eyepatch") out.push(`<path d="M30 30 L70 25" stroke="${ink}" stroke-width="1.6"/><ellipse cx="58" cy="37" rx="5.5" ry="5" fill="${ink}"/>`);
-    out.push(hairFront(c));
+    out.push(luz(hairFront(c), c.hairColor));
   }
-  out.push(headFront(c, ink));
+  out.push(luz(headFront(c, ink), c.headColor, c.headColor2));
 
   return `<svg viewBox="0 -8 100 119" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${out.join("")}</svg>`;
 }

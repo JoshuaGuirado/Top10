@@ -1,5 +1,5 @@
 // Conferência geral dos 12 jogos do Gamezi: cada um abre sem erro, cria sala online com o visual do jogador
-// (skin, avatar do Topzi ou pato do Patozi) e tem a aba no ranking do dia (ranking.html) mostrando quem jogou.
+// (a skin única do Gamezi; no Patozi, o pato) e tem a aba no ranking do dia (ranking.html) mostrando quem jogou.
 // Também confere o portal: todos os jogos aparecem e cabem sem rolagem para o lado no celular.
 // Usa o Supabase falso de tests/supabase-falso.js. Rode com: npm run test:online
 const http = require("http");
@@ -39,6 +39,8 @@ const SALA = { topzi: "room_code" };
     // Um contexto por jogo: cada um com o próprio banco falso (no localStorage) e o próprio login.
     const ctx = await browser.newContext({ viewport: { width: 400, height: 860 }, serviceWorkers: "block", locale: "pt-BR" });
     await ctx.addInitScript(fs.readFileSync(path.join(__dirname, "supabase-falso.js"), "utf8"));
+    // A mesma skin única (gz:skin) em todos os jogos, menos no Patozi (que tem o pato).
+    await ctx.addInitScript(() => { if (!localStorage.getItem("gz:skin")) localStorage.setItem("gz:skin", JSON.stringify({ presetId: "mario", avatar: { skin: "#F6D7BE", top: "#D62828", legs: "#1F4BA5", head: "cap", headColor: "#D62828", headText: "M" } })); });
     await ctx.route("**/js/config.js", (r) => r.fulfill({ contentType: "application/javascript", body: 'const SUPABASE_URL = "https://falso.supabase.co"; const SUPABASE_ANON_KEY = "x";' }));
     await ctx.route(/wikipedia|wikimedia|fonts\.|_vercel/, (r) => r.abort());
     const p = await ctx.newPage();
@@ -61,7 +63,11 @@ const SALA = { topzi: "room_code" };
     assert.ok(visual && typeof visual === "object", jogo + ": visual guardado na sala");
     // O pato sem roupa é {} e a cor dele fica na coluna cor; nos outros jogos a skin sempre tem algo.
     if (jogo === "patozi") assert.equal(typeof linha.cor, "number", "patozi: cor do pato");
-    else assert.ok(Object.keys(visual).length, jogo + ": skin com as peças");
+    else {
+      const avatar = jogo === "topzi" ? visual : visual.avatar;
+      assert.equal(avatar.headText, "M", jogo + ": usa a skin única do Gamezi");
+      assert.equal(avatar.top, "#D62828", jogo + ": usa a skin única do Gamezi");
+    }
     assert.ok(await p.$eval("#lobby-players", (el) => !!el.querySelector("svg, img")), jogo + ": o visual aparece na lista da sala");
     step(`${jogo}: sala online ${code} com o visual do jogador`);
 

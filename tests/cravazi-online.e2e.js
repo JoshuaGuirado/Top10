@@ -58,7 +58,7 @@ const server = http.createServer((req, res) => {
   await A.evaluate(() => {
     localStorage.removeItem("cz:sala");
     localStorage.setItem("cz:nick", JSON.stringify("Lara"));
-    localStorage.setItem("cz:skin", JSON.stringify({ presetId: "pikachu", avatar: PRESETS.find((p) => p.id === "pikachu").cfg }));
+    localStorage.setItem("gz:skin", JSON.stringify({ presetId: "pikachu", avatar: PRESETS.find((p) => p.id === "pikachu").cfg }));
   });
   const B = await page();
   await B.goto(`${base}?sala=${code}`);

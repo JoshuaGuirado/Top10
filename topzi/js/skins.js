@@ -45,7 +45,7 @@ function renderAvatarDialog() {
     card.querySelector(".preset-pick").addEventListener("click", () => {
       players[dialogPlayer].presetId = preset.id;
       players[dialogPlayer].avatar = { ...preset.cfg };
-      store("players", players);
+      savePlayers();
       $("avatar-dialog").close();
       refreshAfterAvatar();
     });

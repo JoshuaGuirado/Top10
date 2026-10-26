@@ -167,6 +167,12 @@ a { color: inherit; }
 .my-game small { color: var(--muted); font-size: .88rem; }
 .my-game-play { margin-left: auto; padding: 8px 16px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: .9rem; }
 
+/* skin única do Gamezi (conta) */
+.skin-panel { display: flex; align-items: center; gap: 16px; }
+.skin-panel h2 { margin: 0 0 4px; font-stretch: 75%; font-weight: 800; font-size: 1.6rem; }
+.skin-panel p { margin: 0; }
+.skin-panel .gz-skin-btn { width: 104px; }
+
 /* nível e conquistas (portal e conta) */
 .portal-level { justify-self: center; margin: -4px 0 4px; padding: 6px 14px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-ink); font-weight: 700; font-size: .85rem; text-decoration: none; }
 .level-panel { display: grid; gap: 10px; }

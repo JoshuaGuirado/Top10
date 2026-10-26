@@ -49,9 +49,9 @@ const server = http.createServer((req, res) => {
   await A.goto(base);
   await A.click("#online-btn");
   await A.click("#online-skin");
-  await A.click('#gz-skin-dialog .gz-skin-aba >> nth=1');
-  const skinA = await A.getAttribute("#gz-skin-dialog .gz-skin-item >> nth=0", "data-skin");
-  await A.click("#gz-skin-dialog .gz-skin-item >> nth=0");
+  await A.click('#gz-skin-dialog [data-grupo="Vilões"]');
+  const skinA = await A.getAttribute("#gz-skin-dialog .gz-skin-pick >> nth=0", "data-skin");
+  await A.click("#gz-skin-dialog .gz-skin-pick >> nth=0");
   assert.equal(await A.evaluate(() => gameziMinhaSkin().presetId), skinA);
   await A.fill("#online-nick", "Arthur");
   await A.click("#create-room-btn");

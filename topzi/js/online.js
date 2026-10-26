@@ -162,7 +162,7 @@ function mergeProfile(remote) {
     players[0].avatar = remote.avatar;
     players[0].presetId = d.preset || null;
   }
-  store("players", players);
+  savePlayers();
 
   const local = loadStats();
   if (d.stats && (d.stats.games || 0) >= (local.games || 0)) store("stats", d.stats);

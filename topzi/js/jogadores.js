@@ -9,6 +9,7 @@ const DICE_ICON = '<svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="c
 
 let playerCount = store("count") || 2;
 let players = store("players") || [];
+skinDoGamezi();
 let turnTime = TIMER_OPTIONS.includes(store("timer")) ? store("timer") : 0;
 
 // Com vidas ou sem vidas, guardado por modo (a equipe começa com vidas; os outros, sem).
@@ -43,6 +44,16 @@ function playerName(p, i) {
 
 function savePlayers() {
   store("players", players);
+  if (players[0] && typeof gameziGuardarSkin === "function") gameziGuardarSkin({ presetId: players[0].presetId || null, avatar: players[0].avatar });
+}
+
+// A skin do jogador 1 (quem usa o aparelho) é a skin única do Gamezi (gz:skin, a mesma em todos os jogos menos o Patozi).
+function skinDoGamezi() {
+  if (typeof gameziMinhaSkin !== "function") return;
+  const s = gameziMinhaSkin();
+  if (!players[0]) players[0] = { nick: "", presetId: s.presetId, avatar: s.avatar };
+  players[0].presetId = s.presetId;
+  players[0].avatar = s.avatar;
 }
 
 // Quantos jogadores há em cada time, entre os que vão jogar.
