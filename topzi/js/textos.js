@@ -488,6 +488,8 @@ Object.assign(TEXTS, {
 Object.assign(TEXTS, {
   "daily.title": ["Lista do dia", "Daily list", "Lista del día"],
   "daily.tag": ["Lista do dia #{n}", "Daily list #{n}", "Lista del día #{n}"],
+  "daily.all": ["Ver todos os dias", "See all days", "Ver todos los días"],
+  "daily.less": ["Ver só esta semana", "Show only this week", "Ver solo esta semana"],
   "daily.pitch": ["Você contra a lista: 10 itens, 3 vidas.", "You against the list: 10 items, 3 lives.", "Tú contra la lista: 10 ítems, 3 vidas."],
   "daily.done": ["Você fez {a} de {b} pts. Volte amanhã para a #{next}.", "You scored {a} of {b} pts. Come back tomorrow for #{next}.", "Hiciste {a} de {b} pts. Vuelve mañana para la #{next}."],
   "daily.doneWon": ["Você fez {a} de {b} pts e venceu a lista. Volte amanhã para a #{next}.", "You scored {a} of {b} pts and beat the list. Come back tomorrow for #{next}.", "Hiciste {a} de {b} pts y le ganaste a la lista. Vuelve mañana para la #{next}."],

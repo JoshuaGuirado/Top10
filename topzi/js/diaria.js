@@ -96,18 +96,40 @@ function startDaily(num = todayNumber()) {
 }
 
 // Semana de domingo a sábado, como no Contexto: os dias jogados ficam marcados e os que já passaram dá
-// para jogar tocando no dia.
-function weekHtml(today = new Date()) {
+// para jogar tocando no dia. semanasAtras: 0 é a semana de hoje, 1 a anterior… (sem o nome do dia, só o número).
+function weekHtml(today = new Date(), semanasAtras = 0) {
   const loc = { pt: "pt-BR", en: "en", es: "es" }[lang];
   const hoje = todayNumber(today);
   const res = dailyResults();
-  const dias = Array.from({ length: 7 }, (_, i) => new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() + i));
-  return `<div class="week">${dias.map((d) => {
+  const domingo = today.getDate() - today.getDay() - 7 * semanasAtras;
+  const dias = Array.from({ length: 7 }, (_, i) => new Date(today.getFullYear(), today.getMonth(), domingo + i));
+  return `<div class="week${semanasAtras ? " past" : ""}">${dias.map((d) => {
     const n = todayNumber(d);
     const cls = ["day", res[n] ? "done" : "", n === hoje ? "today" : ""].filter(Boolean).join(" ");
-    return `<button type="button" class="${cls}" data-dia="${n}" ${n > hoje || n < 1 ? "disabled" : ""} aria-label="${escapeHtml(t("daily.tag", { n }))}">
-      <small>${escapeHtml(d.toLocaleDateString(loc, { weekday: "short" }))}</small><b>${d.getDate()}</b></button>`;
+    return `<button type="button" class="${cls}" data-dia="${n}" ${n > hoje || n < 1 ? "disabled" : ""} aria-label="${escapeHtml(t("daily.tag", { n }))} · ${escapeHtml(d.toLocaleDateString(loc))}">
+      ${semanasAtras ? "" : `<small>${escapeHtml(d.toLocaleDateString(loc, { weekday: "short" }))}</small>`}<b>${d.getDate()}</b></button>`;
   }).join("")}</div>`;
+}
+
+// Todas as semanas antes desta, até a da lista #1, da mais nova para a mais velha, com o mês quando ele muda.
+let dailyAllOpen = false;
+function pastWeeksHtml(today = new Date()) {
+  const loc = { pt: "pt-BR", en: "en", es: "es" }[lang];
+  let html = "";
+  let mesAnterior = `${today.getFullYear()}-${today.getMonth()}`;
+  for (let k = 1; ; k++) {
+    const sabado = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() - 7 * k + 6);
+    if (todayNumber(sabado) < 1) break;
+    const mes = `${sabado.getFullYear()}-${sabado.getMonth()}`;
+    if (mes !== mesAnterior) html += `<p class="week-month">${escapeHtml(sabado.toLocaleDateString(loc, { month: "long", year: "numeric" }))}</p>`;
+    mesAnterior = mes;
+    html += weekHtml(today, k);
+  }
+  return html;
+}
+
+function hasPastWeeks(today = new Date()) {
+  return todayNumber(new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay() - 1)) >= 1;
 }
 
 // Cartão da lista do dia no início: data, Jogar (ou Compartilhar) e a semana.
@@ -129,6 +151,8 @@ function renderDailyCard() {
       <button type="button" class="btn ${res ? "ghost" : ""}" id="daily-btn">${escapeHtml(t(res ? "btn.share" : "btn.play"))}</button>
     </div>
     ${weekHtml()}
+    ${hasPastWeeks() ? `${dailyAllOpen ? `<div class="weeks-past">${pastWeeksHtml()}</div>` : ""}
+      <button type="button" class="link-btn week-more" id="daily-all" aria-expanded="${dailyAllOpen}">${escapeHtml(t(dailyAllOpen ? "daily.less" : "daily.all"))}</button>` : ""}
     ${res ? `<p class="daily-status">${escapeHtml(t("daily.ptsOf", { a: res.score, b: res.total }))}${current > 1 ? ` · ${escapeHtml(t("daily.streak", { n: current }))}` : ""}</p>` : ""}`;
   if (res && typeof dailyPositionLine === "function") {
     dailyPositionLine(num).then((pos) => {
@@ -141,4 +165,10 @@ function renderDailyCard() {
   }
   $("daily-btn").onclick = (e) => (res ? shareText(dailyShareText(num, res), e.currentTarget, t("btn.share")) : startDaily(num));
   card.querySelectorAll("[data-dia]").forEach((b) => (b.onclick = () => startDaily(Number(b.dataset.dia))));
+  if ($("daily-all")) {
+    $("daily-all").onclick = () => {
+      dailyAllOpen = !dailyAllOpen;
+      renderDailyCard();
+    };
+  }
 }
