@@ -1,0 +1,41 @@
+name: Fotozi - conferir fotos
+
+# Baixa as fotos do Fotozi da Wikipédia, acha o rosto (gente) ou o assunto (o resto) e monta folhas de conferência.
+# Roda à mão (Actions → Fotozi - conferir fotos → Run workflow) ou quando o verificador muda.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "ferramentas/fotozi/verificar.py"
+      - ".github/workflows/fotozi-fotos.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  conferir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install opencv-contrib-python-headless numpy pillow
+      - run: python ferramentas/fotozi/verificar.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fotozi-conferencia
+          path: |
+            ferramentas/fotozi/fotos.json
+            ferramentas/fotozi/folhas/
+      # Grava o resultado na própria branch (as folhas são só para conferir e saem depois).
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ferramentas/fotozi/fotos.json ferramentas/fotozi/folhas
+          git commit -m "Fotozi: resultado da conferência das fotos [skip ci]" || exit 0
+          git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}"
