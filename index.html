@@ -46,7 +46,10 @@
 
     <main class="portal">
       <h1 class="portal-tag" data-t="tag">Jogos rápidos para jogar sozinho ou com a turma.</h1>
-      <a class="portal-level" id="portal-level" href="conta.html" hidden></a>
+      <div class="portal-chips">
+        <a class="portal-level" id="portal-level" href="conta.html" hidden></a>
+        <span class="portal-streak" id="portal-streak" hidden></span>
+      </div>
 
       <div class="game-grid">
         <a class="game-row" href="topzi/">
@@ -57,7 +60,7 @@
           <span class="game-text">
             <b>Topzi</b>
             <small data-t="topziKind">Adivinhe os itens da lista</small>
-            <small class="game-daily" data-inicio="2026-10-01"></small>
+            <small class="game-daily" data-jogo="topzi"></small>
           </span>
         </a>
 
@@ -69,7 +72,7 @@
           <span class="game-text">
             <b>Patozi</b>
             <small data-t="patoziKind">Chute sem passar do número</small>
-            <small class="game-daily" data-inicio="2026-10-08"></small>
+            <small class="game-daily" data-jogo="patozi"></small>
           </span>
         </a>
 
@@ -81,7 +84,7 @@
           <span class="game-text">
             <b>Datazi</b>
             <small data-t="dataziKind">Ponha os fatos em ordem</small>
-            <small class="game-daily" data-inicio="2026-10-08"></small>
+            <small class="game-daily" data-jogo="datazi"></small>
           </span>
         </a>
 
@@ -93,7 +96,7 @@
           <span class="game-text">
             <b>Maiorzi</b>
             <small data-t="maisKind">Tem mais ou tem menos?</small>
-            <small class="game-daily" data-inicio="2026-10-09"></small>
+            <small class="game-daily" data-jogo="maisoumenozi"></small>
           </span>
         </a>
 
@@ -105,7 +108,7 @@
           <span class="game-text">
             <b>Cravazi</b>
             <small data-t="cravaziKind">Quem crava o número exato?</small>
-            <small class="game-daily" data-inicio="2026-10-09"></small>
+            <small class="game-daily" data-jogo="cravazi"></small>
           </span>
         </a>
 
@@ -117,7 +120,7 @@
           <span class="game-text">
             <b>Tamanhozi</b>
             <small data-t="tamanhoziKind">Qual o tamanho de verdade?</small>
-            <small class="game-daily" data-inicio="2026-10-13"></small>
+            <small class="game-daily" data-jogo="tamanhozi"></small>
           </span>
         </a>
 
@@ -129,7 +132,7 @@
           <span class="game-text">
             <b>Emojizi</b>
             <small data-t="emojiziKind">Adivinhe pelos emojis</small>
-            <small class="game-daily" data-inicio="2026-10-23"></small>
+            <small class="game-daily" data-jogo="emojizi"></small>
           </span>
         </a>
 
@@ -141,7 +144,7 @@
           <span class="game-text">
             <b>Contazi</b>
             <small data-t="contaziKind">Contas contra o relógio</small>
-            <small class="game-daily" data-inicio="2026-10-23"></small>
+            <small class="game-daily" data-jogo="contazi"></small>
           </span>
         </a>
 
@@ -153,7 +156,7 @@
           <span class="game-text">
             <b>Memorizi</b>
             <small data-t="memoriziKind">Repita a sequência de cores</small>
-            <small class="game-daily" data-inicio="2026-10-23"></small>
+            <small class="game-daily" data-jogo="memorizi"></small>
           </span>
         </a>
 
@@ -165,7 +168,7 @@
           <span class="game-text">
             <b>Fotozi</b>
             <small data-t="fotoziKind">Quem está na foto?</small>
-            <small class="game-daily" data-inicio="2026-10-26"></small>
+            <small class="game-daily" data-jogo="fotozi"></small>
           </span>
         </a>
 
@@ -177,7 +180,7 @@
           <span class="game-text">
             <b>Censurazi</b>
             <small data-t="censuraziKind">Descubra a palavra secreta</small>
-            <small class="game-daily" data-inicio="2026-10-26"></small>
+            <small class="game-daily" data-jogo="censurazi"></small>
           </span>
         </a>
 
@@ -189,7 +192,7 @@
           <span class="game-text">
             <b>Corzi</b>
             <small data-t="corziKind">Toque na cor certa, rápido!</small>
-            <small class="game-daily" data-inicio="2026-10-26"></small>
+            <small class="game-daily" data-jogo="corzi"></small>
           </span>
         </a>
       </div>
@@ -231,6 +234,12 @@
       corziKind: ["Toque na cor certa, rápido!", "Tap the right color, fast!", "¡Toca el color correcto, rápido!"],
       memoriziKind: ["Repita a sequência de cores", "Repeat the color sequence", "Repite la secuencia de colores"],
       dia: ["Do dia #{n}", "Daily #{n}", "Del día #{n}"],
+      feito: ["✓ Feito hoje", "✓ Done today", "✓ Hecho hoy"],
+      seq: ["🔥 {n} dias seguidos", "🔥 {n}-day streak", "🔥 {n} días seguidos"],
+      seq1: ["🔥 1 dia", "🔥 1 day", "🔥 1 día"],
+      seqHoje: [" · hoje {a} de {b}", " · today {a} of {b}", " · hoy {a} de {b}"],
+      seqFalta: [" · jogue hoje!", " · play today!", " · ¡juega hoy!"],
+      seqTitulo: ["Dias seguidos com pelo menos um desafio do dia", "Days in a row with at least one daily challenge", "Días seguidos con al menos un desafío del día"],
       ranking: ["Ranking do dia", "Daily ranking", "Ranking del día"],
       soon: ["Mais jogos em breve.", "More games coming soon.", "Más juegos muy pronto."],
       terms: ["Termos de uso", "Terms of use", "Términos de uso"],
@@ -259,14 +268,23 @@
       document.documentElement.lang = { pt: "pt-BR", en: "en", es: "es" }[lang];
       document.querySelectorAll("[data-t]").forEach(function (el) { el.textContent = t(el.dataset.t); });
       document.getElementById("lang").value = lang;
-      // Número do desafio do dia de cada jogo: data-inicio é o dia 1 (a mesma conta de cada jogo).
-      var d = new Date(), hoje = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
-      document.querySelectorAll("[data-inicio]").forEach(function (el) {
-        var p = el.dataset.inicio.split("-");
-        var n = Math.floor((hoje - Date.UTC(+p[0], p[1] - 1, +p[2])) / 864e5) + 1;
+      // Número do desafio do dia de cada jogo (gameziDiaDe, de gamezi-conta.js) e ✓ em quem já fez o de hoje.
+      var feitos = gameziDesafiosFeitos();
+      document.querySelectorAll(".game-daily[data-jogo]").forEach(function (el) {
+        var j = el.dataset.jogo, n = gameziDiaDe(j);
+        var feito = feitos[j].indexOf(n) >= 0;
         el.hidden = n < 1;
-        el.textContent = t("dia").replace("{n}", n);
+        el.textContent = feito ? t("feito") : t("dia").replace("{n}", n);
+        el.closest(".game-row").classList.toggle("feito", feito);
       });
+      // Sequência do Gamezi: dias seguidos com pelo menos um desafio do dia (qualquer jogo).
+      var seq = gameziSequenciaAtual();
+      var chip = document.getElementById("portal-streak");
+      chip.hidden = !seq.dias;
+      chip.classList.toggle("risco", !seq.jogouHoje);
+      chip.title = t("seqTitulo");
+      chip.textContent = (seq.dias === 1 ? t("seq1") : t("seq").replace("{n}", seq.dias)) +
+        (seq.jogouHoje ? t("seqHoje").replace("{a}", seq.hoje).replace("{b}", GAMEZI_JOGOS.length) : t("seqFalta"));
       // Nível do Gamezi (soma o que se joga em todos os jogos neste aparelho).
       var prog = gameziProgresso();
       var nivel = document.getElementById("portal-level");

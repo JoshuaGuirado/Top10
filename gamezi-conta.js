@@ -64,6 +64,52 @@ function gameziDadosLocais() {
   };
 }
 
+// Dia 1 do desafio do dia de cada jogo (a mesma conta de cada jogo: a data do aparelho, contada em UTC).
+var GAMEZI_INICIO = {
+  topzi: Date.UTC(2026, 9, 1), patozi: Date.UTC(2026, 9, 8), datazi: Date.UTC(2026, 9, 8), maisoumenozi: Date.UTC(2026, 9, 9),
+  cravazi: Date.UTC(2026, 9, 9), tamanhozi: Date.UTC(2026, 9, 13), emojizi: Date.UTC(2026, 9, 23), contazi: Date.UTC(2026, 9, 23),
+  memorizi: Date.UTC(2026, 9, 23), fotozi: Date.UTC(2026, 9, 26), censurazi: Date.UTC(2026, 9, 26), corzi: Date.UTC(2026, 9, 26),
+};
+
+function gameziHojeUTC(quando) {
+  var d = quando || new Date();
+  return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+// Número do desafio do dia de um jogo hoje (ou na data dada).
+function gameziDiaDe(jogo, quando) {
+  return Math.floor((gameziHojeUTC(quando) - GAMEZI_INICIO[jogo]) / 864e5) + 1;
+}
+
+// Números dos desafios do dia que cada jogo terminou neste aparelho: { topzi: [24, 25], … }.
+function gameziDesafiosFeitos(d) {
+  d = d || gameziDadosLocais();
+  var out = {};
+  GAMEZI_JOGOS.forEach(function (j) {
+    var reg = (j === "topzi" ? d.topzi && d.topzi.diaria : d[j] && d[j].diario) || {};
+    out[j] = Object.keys(reg).filter(function (k) {
+      return j !== "patozi" || (reg[k] && reg[k].pontos && reg[k].pontos.length >= 5); // o Pato do dia só conta inteiro
+    }).map(Number);
+  });
+  return out;
+}
+
+// Sequência do Gamezi: dias seguidos, até hoje (ou até ontem, se ainda não jogou hoje), com pelo menos um desafio do
+// dia de qualquer jogo. { dias, jogouHoje, hoje: quantos jogos já fez hoje }
+function gameziSequenciaAtual(d, quando) {
+  var feitos = gameziDesafiosFeitos(d), dias = {}, hoje = gameziHojeUTC(quando) / 864e5, deHoje = 0;
+  Object.keys(feitos).forEach(function (j) {
+    feitos[j].forEach(function (n) {
+      var dia = GAMEZI_INICIO[j] / 864e5 + n - 1;
+      dias[dia] = true;
+      if (dia === hoje) deHoje++;
+    });
+  });
+  var n = 0, k = dias[hoje] ? hoje : hoje - 1;
+  while (dias[k]) { n++; k--; }
+  return { dias: n, jogouHoje: !!dias[hoje], hoje: deHoje };
+}
+
 // Maior sequência de dias seguidos numa lista de números de dia.
 function gameziSequencia(dias) {
   var ord = dias.map(Number).filter(function (n) { return n >= 1; }).sort(function (a, b) { return a - b; });

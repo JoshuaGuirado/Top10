@@ -35,3 +35,15 @@ test("conquistas: nome e como liberar nos três idiomas", () => {
     assert.equal(c.como.length, 3, c.id);
   }
 });
+
+test("sequência do Gamezi: dias seguidos com algum desafio do dia, de qualquer jogo", () => {
+  const dados = (topzi, corzi, patozi) => JSON.stringify({ topzi: { stats: {}, diaria: topzi }, corzi: { stats: {}, diario: corzi }, patozi: { stats: {}, diario: patozi } });
+  const hoje = "new Date(2026, 9, 26)"; // Topzi #26, Corzi #1, Patozi #19
+  assert.equal(r(`gameziDiaDe("topzi", ${hoje})`), 26);
+  assert.equal(r(`gameziDiaDe("corzi", ${hoje})`), 1);
+  // Topzi nos dias 24 e 25, Corzi hoje: 3 dias seguidos, 1 jogo feito hoje.
+  assert.equal(JSON.stringify(r(`gameziSequenciaAtual(${dados({ 24: {}, 25: {} }, { 1: {} }, {})}, ${hoje})`)), JSON.stringify({ dias: 3, jogouHoje: true, hoje: 1 }));
+  // Ainda não jogou hoje: conta até ontem. Pato do dia pela metade não conta.
+  assert.equal(JSON.stringify(r(`gameziSequenciaAtual(${dados({ 23: {}, 25: {} }, {}, { 19: { pontos: [1, 2] } })}, ${hoje})`)), JSON.stringify({ dias: 1, jogouHoje: false, hoje: 0 }));
+  assert.equal(r(`gameziSequenciaAtual(${dados({}, {}, {})}, ${hoje}).dias`), 0);
+});

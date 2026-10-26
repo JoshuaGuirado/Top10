@@ -174,7 +174,14 @@ a { color: inherit; }
 .skin-panel .gz-skin-btn { width: 104px; }
 
 /* nível e conquistas (portal e conta) */
-.portal-level { justify-self: center; margin: -4px 0 4px; padding: 6px 14px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-ink); font-weight: 700; font-size: .85rem; text-decoration: none; }
+.portal-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: -4px 0 4px; }
+.portal-chips:not(:has(> :not([hidden]))) { display: none; }
+.portal-streak { padding: 6px 14px; border-radius: 999px; background: var(--fg); color: var(--bg); font-weight: 700; font-size: .85rem; }
+.portal-streak.risco { background: var(--accent); color: var(--on-accent); }
+.game-row.feito .game-icon { position: relative; }
+.game-row.feito .game-icon::after { content: "✓"; position: absolute; top: -5px; right: -5px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--good, #2BA84A); color: #fff; font-size: .8rem; font-weight: 800; box-shadow: 0 0 0 2px var(--surface); }
+.game-row.feito .game-daily { color: var(--good, #2BA84A); }
+.portal-level { justify-self: center; margin: 0; padding: 6px 14px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-ink); font-weight: 700; font-size: .85rem; text-decoration: none; }
 .level-panel { display: grid; gap: 10px; }
 .level-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .level-head b { font-stretch: 75%; font-weight: 800; font-size: 2rem; line-height: 1; }

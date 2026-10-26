@@ -187,6 +187,14 @@ body[data-screen]:not([data-screen="home"]) .gamezi-back { display: none; }
 .size-btn { flex: none; width: 52px; height: 52px; border-radius: 14px; border: 0; background: var(--fg); color: var(--bg); font: inherit; font-size: 1.7rem; font-weight: 800; line-height: 1; cursor: pointer; touch-action: none; }
 .size-btn:active { transform: scale(.94); }
 .controls .confirm { flex: 1; margin-left: 4px; text-transform: uppercase; letter-spacing: .04em; }
+/* celular estreito: o título ganha a linha dele e o Confirmar encolhe para caber ao lado do − e do + */
+@media (max-width: 380px) {
+  .game-head b { flex: 1 1 100%; font-size: 1.2rem; }
+  .game-dots { display: none; }
+  .game-head .game-score { margin-left: auto; }
+  .size-btn { width: 46px; height: 46px; }
+  .controls .confirm { min-width: 0; padding-left: 10px; padding-right: 10px; letter-spacing: 0; }
+}
 .sent { text-align: center; font-weight: 700; color: var(--muted); margin: 14px 0; }
 .reveal { text-align: center; display: grid; gap: 8px; margin: 10px 0 8px; justify-items: center; }
 .reveal #reveal { display: grid; gap: 2px; }
