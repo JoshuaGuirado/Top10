@@ -750,7 +750,7 @@ FZ_FOCOS.f823 = ["Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",20.8,29.6];
 FZ_FOCOS.f824 = ["Edvard_Munch,_1893,_The_Scream,_oil,_tempera_and_pastel_on_cardboard,_91_x_73_cm,_National_Gallery_of_Norway.jpg",23.5,43.2];
 FZ_FOCOS.f825 = ["Leonardo_da_Vinci_(1452-1519)_-_The_Last_Supper_(1495-1498).jpg",72.2,53.9];
 FZ_FOCOS.f826 = ["Johannes_Vermeer_(1632-1675)_-_The_Girl_With_The_Pearl_Earring_(1665).jpg",61.4,47.4];
-FZ_FOCOS.f827 = ["Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",75.7,46.4];
+FZ_FOCOS.f827 = ["Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg",50,22];
 FZ_FOCOS.f828 = ["God2-Sistine_Chapel.png",63.8,41.5];
 FZ_FOCOS.f830 = ["Vincent_Willem_van_Gogh_128.jpg",50.3,30];
 FZ_FOCOS.f831 = ["Claude_Monet,_Impression,_soleil_levant.jpg",32.2,80.7];
@@ -758,9 +758,35 @@ FZ_FOCOS.f833 = ["La_Liberté_guidant_le_peuple_-_Eugène_Delacroix_-_Musée_du_
 FZ_FOCOS.f834 = ["Great_Wave_off_Kanagawa2.jpg",44.1,66.8];
 FZ_FOCOS.f835 = ["Pedro_Américo_-_Independência_ou_Morte_-_cores_ajustadas.jpg",50.6,60.7];
 FZ_FOCOS.f837 = ["La_ronda_de_noche,_por_Rembrandt_van_Rijn.jpg",50.4,72.3];
-FZ_FOCOS.f838 = ["Grant_DeVolson_Wood_-_American_Gothic.jpg",49.5,42.2];
+FZ_FOCOS.f838 = ["Grant_DeVolson_Wood_-_American_Gothic.jpg",70,30];
 FZ_FOCOS.f839 = ["The_Garden_of_Earthly_Delights_by_Bosch_High_Resolution.jpg",61.5,85.9];
 FZ_FOCOS.f841 = ["Starry_Night_Over_the_Rhone.jpg",33.6,63.1];
+FZ_FOCOS.f842 = ["Left_side_of_Flying_Pigeon.jpg",67.9,51.7];
+FZ_FOCOS.f843 = ["Red_Honda_C50_(1975?)_in_Athens_on_10-13-2023.jpg",48.6,49.2];
+FZ_FOCOS.f844 = ["LAPD_Bell_206_Jetranger.jpg",48.9,57.7];
+FZ_FOCOS.f845 = ["Caravela_Vera_Cruz_no_rio_Tejo.jpg",51.3,61.8];
+FZ_FOCOS.f846 = ["Kerala_backwater_20080218-11.jpg",53.6,70.9];
+FZ_FOCOS.f847 = ["USS_John_C._Stennis_(CVN-74)_and_HMS_Illustrious_(R_06)_in_the_Persian_Gulf_on_April_9,_1998.jpg",37.1,47.6];
+FZ_FOCOS.f848 = ["Freedom_of_the_Seas_(12174093863).jpg",51.6,53.3];
+FZ_FOCOS.f849 = ["Antibes-marina.jpg",30.7,57.2];
+FZ_FOCOS.f850 = ["2016-10-24_Lissabon_6258_(30824048342)_(cropped).jpg",35.6,19.3];
+FZ_FOCOS.f851 = ["Trolebus_de_Santos_-_panoramio.jpg",51.4,47.2];
+FZ_FOCOS.f852 = ["3511_-_Hartswater_240481.jpg",47.4,44.5];
+FZ_FOCOS.f853 = ["Razor_Scooter.JPG",44.2,85.3];
+FZ_FOCOS.f854 = ["Escola_de_Atenas_-_Vaticano_2.jpg",26.9,71.4];
+FZ_FOCOS.f856 = ["Van_Gogh_-_Terrace_of_a_Café_at_Night_(Place_du_Forum)_1888.jpg",34.9,35.3];
+FZ_FOCOS.f857 = ["Van-willem-vincent-gogh-die-kartoffelesser-03850.jpg",53.6,61];
+FZ_FOCOS.f861 = ["Le_Serment_des_Horaces_-_Jacques-Louis_David_-_Musée_du_Louvre_Peintures_INV_3692_;_MR_1432.jpg",52.7,69.4];
+FZ_FOCOS.f862 = ["Jacques-Louis_David_-_Marat_assassinated_-_Google_Art_Project_2FXD.jpg",25,50];
+FZ_FOCOS.f864 = ["Meirelles-primeiramissa2.jpg",57.3,52.1];
+FZ_FOCOS.f865 = ["Ultimo_tamoio_1883.jpg",56.2,61.7];
+FZ_FOCOS.f866 = ["Cachaca.JPG",49.2,58.9];
+FZ_FOCOS.f867 = ["Cyber_tasting_sake.jpg",49.3,72.4];
+FZ_FOCOS.f868 = ["A_Glass_of_Whiskey_on_the_Rocks.jpg",51.9,68.7];
+FZ_FOCOS.f869 = ["Milk_glass.jpg",52.3,63.4];
+FZ_FOCOS.f870 = ["Red_Wine_Sangria_with_lemon,_lime,_apple,_and_orange_served_in_a_glass_-_Evan_Swigart.jpg",47.5,42.1];
+FZ_FOCOS.f872 = ["Green_tea_3_appearances.jpg",31,38.8];
+FZ_FOCOS.f873 = ["Glass_cola.jpg",61.5,34];
 FZ_FORA.add("f29"); // sem foto
 FZ_FORA.add("f111"); // sem foto
 FZ_FORA.add("f130"); // a pessoa aparece minúscula no meio da multidão
@@ -842,3 +868,9 @@ FZ_FORA.add("f829"); // sem foto
 FZ_FORA.add("f832"); // sem foto
 FZ_FORA.add("f836"); // sem foto
 FZ_FORA.add("f840"); // sem foto
+FZ_FORA.add("f855"); // sem foto
+FZ_FORA.add("f858"); // sem foto
+FZ_FORA.add("f859"); // sem foto
+FZ_FORA.add("f860"); // sem foto
+FZ_FORA.add("f863"); // sem foto
+FZ_FORA.add("f871"); // foto de um copo na mão, não dá para saber o que é

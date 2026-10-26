@@ -8,7 +8,7 @@
 .fz-quadro.carregando { animation: fz-pulsa 1.2s ease-in-out infinite; }
 @keyframes fz-pulsa { 50% { opacity: .75; } }
 .fz-espera { color: #FFF4DE; font-weight: 700; padding: 16px; text-align: center; }
-.fz-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2, .8, .2, 1); user-select: none; -webkit-user-drag: none; }
+.fz-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2, .8, .2, 1), transform-origin .6s cubic-bezier(.2, .8, .2, 1); user-select: none; -webkit-user-drag: none; }
 .fz-img.inteira { object-fit: contain; transition: none; }
 .fz-credito { position: absolute; right: 8px; bottom: 8px; background: rgba(0, 0, 0, .6); color: #fff; font-size: .72rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; text-decoration: none; }
 .fz-vale { margin: 0; display: flex; justify-content: center; align-items: center; gap: 10px; font-weight: 800; color: var(--accent-ink); }

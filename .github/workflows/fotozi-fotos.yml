@@ -1,11 +1,13 @@
 name: Fotozi - conferir fotos
 
 # Baixa as fotos do Fotozi da Wikipédia, acha o rosto (gente) ou o assunto (o resto) e monta folhas de conferência.
-# Roda à mão (Actions → Fotozi - conferir fotos → Run workflow) ou quando o verificador muda.
+# Roda à mão (Actions → Fotozi - conferir fotos → Run workflow), quando entram fotos novas ou quando o verificador muda.
+# As folhas são gravadas na branch de trabalho só para conferir: não levar ferramentas/fotozi/folhas/ para a main.
 on:
   workflow_dispatch:
   push:
     paths:
+      - "fotozi/data/fotos-*.js"
       - "ferramentas/fotozi/verificar.py"
       - ".github/workflows/fotozi-fotos.yml"
 

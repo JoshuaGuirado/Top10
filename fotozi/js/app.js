@@ -252,11 +252,23 @@ function fzEnquadrar(img, foto, dados) {
   const eixo = (f, lado, quadro) => {
     const sobra = lado * esc - quadro;
     const corte = Math.min(Math.max((f / 100) * lado * esc - quadro / 2, 0), sobra);
-    return { pos: sobra > 0.5 ? (corte / sobra) * 100 : 50, origem: (((f / 100) * lado * esc - corte) / quadro) * 100 };
+    return { pos: sobra > 0.5 ? (corte / sobra) * 100 : 50, ponto: ((f / 100) * lado * esc - corte) / quadro };
   };
   const x = eixo(c.x, dims[0], caixa.width), y = eixo(c.y, dims[1], caixa.height);
   img.style.objectPosition = `${x.pos}% ${y.pos}%`;
-  img.style.transformOrigin = `${x.origem}% ${y.origem}%`;
+  img.dataset.px = x.ponto;
+  img.dataset.py = y.ponto;
+  fzZoom(img, FZ_ZOOM[fzN]);
+}
+
+// Amplia a foto. Com o ponto conferido, a origem do zoom é escolhida para o ponto ficar no MEIO do quadro
+// (até onde dá sem aparecer borda): ponto p vai para o + z·(p − o); para cair em 0,5, o = (z·p − 0,5) / (z − 1).
+function fzZoom(img, z) {
+  if (img.dataset.px !== undefined && z > 1) {
+    const o = (p) => Math.min(Math.max((z * p - 0.5) / (z - 1), 0), 1) * 100;
+    img.style.transformOrigin = `${o(Number(img.dataset.px))}% ${o(Number(img.dataset.py))}%`;
+  }
+  img.style.transform = `scale(${z})`;
 }
 
 function fzCredito(dados) {
@@ -329,7 +341,7 @@ function fzAtualizar() {
   $("fz-vale").innerHTML = `<span class="fz-niveis">${FZ_PONTOS.map((_, i) => `<i class="${i < fzN ? "usado" : i === fzN ? "agora" : ""}"></i>`).join("")}</span> ${escapeHtml(t("fz.worth", { n: FZ_PONTOS[fzN] }))}`;
   $("fz-mais").hidden = fzN >= FZ_ZOOM.length - 1 || !fzAtual;
   const img = document.querySelector("#fz-quadro .fz-img");
-  if (img && fzAtual) img.style.transform = `scale(${FZ_ZOOM[fzN]})`;
+  if (img && fzAtual) fzZoom(img, FZ_ZOOM[fzN]);
 }
 
 function fzAbrirMais() {

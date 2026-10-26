@@ -1,6 +1,6 @@
 // Regras do Fotozi, sem tela (testadas em tests/jogos-fotozi-censurazi-corzi.test.js).
 // Aparece só um pedacinho bem ampliado de uma foto (um jogador, uma comida, um lugar…). A pessoa chuta o nome;
-// cada chute errado (ou "abrir mais") afasta um pouco a foto e a rodada vale um pouco menos: de 100 a 30 pontos.
+// cada chute errado (ou "abrir mais") afasta bastante a foto e a rodada vale menos: de 100 a 20 pontos, em 5 etapas.
 // As fotos são as principais dos artigos da Wikipédia em português (licença livre); o navegador busca na hora.
 // Cada rodada leva duas fotos reserva do mesmo tema, para o caso de uma foto não carregar.
 // Fotos novas entram no FIM de data/fotos-*.js (os ids são a ordem) e precisam de uma linha nova em
