@@ -180,3 +180,13 @@ test("Fotozi, Censurazi e Corzi estão no Gamezi: portal, conta, ranking, banco 
   assert.match(novo, /date '2026-10-26'/);
   assert.match(schema, /array\['topzi'[^\]]*'corzi'\] loop[\s\S]*_sair_da_sala/, "sair e assumir a sala");
 });
+
+test("todo script do banco que cria o ranking do dia aceita todos os jogos (rodar um antigo depois não tira jogo)", () => {
+  const jogos = JSON.parse(ler("gamezi-conta.js").match(/GAMEZI_JOGOS = (\[[^\]]*\])/)[1]);
+  for (const arq of fs.readdirSync(path.join(SITE, "supabase")).filter((a) => a.endsWith(".sql"))) {
+    const sql = ler(`supabase/${arq}`);
+    if (!/function public\.gamezi_ranking_dia/.test(sql)) continue;
+    const lista = sql.match(/p_jogo not in \(([^)]*)\)/)[1];
+    for (const jogo of jogos) assert.match(lista, new RegExp(`'${jogo}'`), `${arq}: falta ${jogo}`);
+  }
+});

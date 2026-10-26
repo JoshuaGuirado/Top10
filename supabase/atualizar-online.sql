@@ -174,7 +174,8 @@ create or replace function public.gamezi_ranking_dia(p_jogo text, p_dia integer,
 returns table (posicao bigint, nick text, pontos integer, tempo_ms integer, eu boolean, total bigint)
 language plpgsql stable security definer set search_path = public as $$
 begin
-  if p_jogo is null or p_jogo not in ('topzi', 'patozi', 'datazi', 'maisoumenozi', 'cravazi', 'tamanhozi', 'emojizi', 'contazi', 'memorizi') then raise exception 'Jogo desconhecido.'; end if;
+  -- Lista com todos os jogos: rodar um script antigo depois de um novo não tira nenhum jogo do ranking.
+  if p_jogo is null or p_jogo not in ('topzi', 'patozi', 'datazi', 'maisoumenozi', 'cravazi', 'tamanhozi', 'emojizi', 'contazi', 'memorizi', 'fotozi', 'censurazi', 'corzi') then raise exception 'Jogo desconhecido.'; end if;
   return query execute format($q$
     with r as (
       select d.nick, d.pontos::integer as pontos, d.tempo_ms, d.user_id,

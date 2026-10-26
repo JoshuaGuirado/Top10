@@ -2,6 +2,11 @@
 
 Leva uns 10 minutos e é gratuito. Os nomes dos menus podem mudar um pouco no painel do Supabase, mas os passos são estes.
 
+> **Algum jogo sem ranking ou sem online ("Não deu para carregar o ranking", sala que não abre)?** O banco ainda não tem as tabelas dele.
+> Abra **SQL Editor → New query**, cole o [`schema.sql`](schema.sql) **inteiro** e clique em **Run**. Ele cria o que falta de todos os
+> jogos (salas online, desafio do dia e ranking), não apaga nada e pode rodar quantas vezes quiser. Quem for rodar precisa ser membro
+> do projeto no Supabase (**Organization → Team → Invite**); quem só mexe no código não tem acesso ao banco.
+>
 > **Já configurou antes e só quer ativar o Fotozi, o Censurazi e o Corzi?** Abra **SQL Editor → New query**, cole o [`jogos-novos-2.sql`](jogos-novos-2.sql) e clique em **Run**. Pode rodar de novo sem problema.
 >
 > **Já configurou antes e só quer ativar o que é novo (Datazi e Maiorzi online, skins nas salas, Emojizi, Contazi e Memorizi)?** Abra **SQL Editor → New query**, cole o [`atualizar-online.sql`](atualizar-online.sql) (um script só, curto) e clique em **Run**. Pode rodar de novo sem problema. (Ele faz o mesmo que `online-novo.sql` + `jogos-novos.sql`.)
