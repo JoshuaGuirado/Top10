@@ -89,10 +89,10 @@ const server = http.createServer((req, res) => {
       } else if (jogo === "corzi" && i === 0) {
         await S.click(`#round [data-op="${await S.evaluate(() => partida.rodadas[0].resposta)}"]`);
       } else if (jogo === "censurazi" && i === 0) {
-        // Um chute errado mostra mais uma proibida; depois acerta digitando.
+        // Um chute errado mostra mais uma dica; depois acerta digitando.
         await S.fill("#cs-chute", "abacaxi azul");
         await S.click("#cs-form .btn");
-        assert.equal(await S.locator("#cs-dicas li").count(), 2, "o erro mostrou mais uma proibida");
+        assert.equal(await S.locator("#cs-dicas li").count(), 2, "o erro mostrou mais uma dica");
         await S.fill("#cs-chute", await S.evaluate(() => csCarta(partida.rodadas[0].id).txt.pt[0]));
         await S.click("#cs-form .btn");
       } else if (jogo === "fotozi" && i === 0) {

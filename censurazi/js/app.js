@@ -1,4 +1,5 @@
-// Censurazi na tela (modo adivinhar): as proibidas aparecem como dicas, uma por vez, e a pessoa digita a palavra.
+// Censurazi na tela (modo adivinhar): as 5 palavras da carta aparecem como dicas, uma por vez, e a pessoa digita a palavra.
+// (No "Na mesa" elas são as proibidas: quem explica não pode falar.)
 // As telas comuns (início, resultado, online e sala) são de ../gamezi-kit.js; as regras, de js/jogo.js;
 // o modo "Na mesa" (times num celular só), de js/mesa.js.
 
@@ -118,22 +119,22 @@ gzIniciar({
   respostaTexto: (r, v) => (v && v.g ? escapeHtml(v.g) : "—"),
   extra: CS_MESA,
   textos: {
-    "home.tag": ["Descubra a palavra pelas proibidas. Ou jogue o clássico com a turma: explique sem falar as proibidas!", "Find the word from its forbidden words. Or play the classic with friends: explain it without saying them!", "Descubre la palabra por las prohibidas. O juega el clásico con amigos: ¡explícala sin decirlas!"],
+    "home.tag": ["Descubra a palavra secreta pelas dicas. Ou jogue o clássico com a turma: explique sem falar as proibidas!", "Find the secret word from the clues. Or play the classic with friends: explain it without saying the forbidden words!", "Descubre la palabra secreta con las pistas. O juega el clásico con amigos: ¡explícala sin decir las prohibidas!"],
     "daily.name": ["Censurazi do dia", "Daily Censurazi", "Censurazi del día"],
     "daily.kicker": ["Censurazi do dia #{n}", "Daily Censurazi #{n}", "Censurazi del día #{n}"],
-    "cs.q": ["Qual é a palavra? Estas são proibidas:", "What's the word? These are forbidden:", "¿Cuál es la palabra? Estas están prohibidas:"],
+    "cs.q": ["Qual é a palavra? As dicas:", "What's the word? The clues:", "¿Cuál es la palabra? Las pistas:"],
     "cs.ph": ["Digite a palavra", "Type the word", "Escribe la palabra"],
     "cs.guess": ["Chutar", "Guess", "Probar"],
-    "cs.hint": ["Mais uma proibida", "One more forbidden word", "Otra prohibida"],
+    "cs.hint": ["Mais uma dica", "One more clue", "Otra pista"],
     "cs.giveUp": ["Desisto", "Give up", "Me rindo"],
     "cs.worth": ["Vale {n} pontos", "Worth {n} points", "Vale {n} puntos"],
     "cs.notIt": ["Não é \"{g}\". Lá vai mais uma.", "It's not \"{g}\". Here's another.", "No es \"{g}\". Ahí va otra."],
     "cs.youGot": ["Você acertou! Era:", "You got it! It was:", "¡Acertaste! Era:"],
     "cs.was": ["A palavra era", "The word was", "La palabra era"],
     "help.html": [
-      "<ol class=\"help-steps\"><li>Toda carta tem uma palavra secreta e 5 palavras <b>proibidas</b>, as que mais entregam a resposta.</li><li>Aparece uma proibida de cada vez. Digite qual é a palavra secreta.</li><li>Cada chute errado (ou \"mais uma proibida\") mostra a próxima e a rodada vale menos: 100, 88, 76, 64, 52 e 40 pontos. Com todas, aparece a primeira letra.</li></ol><p><b>Censurazi do dia:</b> as mesmas 10 para todo mundo, com ranking. <b>Partida livre:</b> até errar 3 vezes. <b>Online:</b> todo mundo tenta a mesma carta, cada um no seu celular. <b>Na mesa:</b> o jogo clássico com a turma num celular só: em times, um explica a palavra sem falar nenhuma proibida e o time adivinha antes de acabar o tempo.</p>",
-      "<ol class=\"help-steps\"><li>Every card has a secret word and 5 <b>forbidden</b> words, the ones that give it away the most.</li><li>One forbidden word shows up at a time. Type the secret word.</li><li>Each wrong guess (or \"one more forbidden word\") shows the next one and the round is worth less: 100, 88, 76, 64, 52 and 40 points. With all of them, the first letter shows up too.</li></ol><p><b>Daily Censurazi:</b> the same 10 for everyone, with a ranking. <b>Free play:</b> until you miss 3 times. <b>Online:</b> everyone tries the same card on their own phone. <b>At the table:</b> the classic with friends on one phone: in teams, one player explains the word without saying any forbidden word and the team guesses before time runs out.</p>",
-      "<ol class=\"help-steps\"><li>Cada carta tiene una palabra secreta y 5 palabras <b>prohibidas</b>, las que más la delatan.</li><li>Aparece una prohibida por vez. Escribe la palabra secreta.</li><li>Cada intento fallido (u \"otra prohibida\") muestra la siguiente y la ronda vale menos: 100, 88, 76, 64, 52 y 40 puntos. Con todas, aparece también la primera letra.</li></ol><p><b>Censurazi del día:</b> las mismas 10 para todos, con ranking. <b>Partida libre:</b> hasta fallar 3 veces. <b>Online:</b> todos intentan la misma carta, cada uno en su celular. <b>En la mesa:</b> el clásico con amigos en un solo celular: en equipos, uno explica la palabra sin decir ninguna prohibida y su equipo adivina antes de que se acabe el tiempo.</p>",
+      "<ol class=\"help-steps\"><li>Toda carta tem uma palavra secreta e 5 <b>dicas</b>, palavras que têm a ver com ela.</li><li>Aparece uma dica de cada vez. Digite qual é a palavra secreta.</li><li>Cada chute errado (ou \"mais uma dica\") mostra a próxima e a rodada vale menos: 100, 88, 76, 64, 52 e 40 pontos. Com todas, aparece a primeira letra.</li></ol><p><b>Censurazi do dia:</b> as mesmas 10 para todo mundo, com ranking. <b>Partida livre:</b> até errar 3 vezes. <b>Online:</b> todo mundo tenta a mesma carta, cada um no seu celular. <b>Na mesa:</b> o jogo clássico com a turma num celular só: em times, um explica a palavra sem falar nenhuma das 5 palavras proibidas e o time adivinha antes de acabar o tempo.</p>",
+      "<ol class=\"help-steps\"><li>Every card has a secret word and 5 <b>clues</b>, words related to it.</li><li>One clue shows up at a time. Type the secret word.</li><li>Each wrong guess (or \"one more clue\") shows the next one and the round is worth less: 100, 88, 76, 64, 52 and 40 points. With all of them, the first letter shows up too.</li></ol><p><b>Daily Censurazi:</b> the same 10 for everyone, with a ranking. <b>Free play:</b> until you miss 3 times. <b>Online:</b> everyone tries the same card on their own phone. <b>At the table:</b> the classic with friends on one phone: in teams, one player explains the word without saying any of the 5 forbidden words and the team guesses before time runs out.</p>",
+      "<ol class=\"help-steps\"><li>Cada carta tiene una palabra secreta y 5 <b>pistas</b>, palabras relacionadas con ella.</li><li>Aparece una pista por vez. Escribe la palabra secreta.</li><li>Cada intento fallido (u \"otra pista\") muestra la siguiente y la ronda vale menos: 100, 88, 76, 64, 52 y 40 puntos. Con todas, aparece también la primera letra.</li></ol><p><b>Censurazi del día:</b> las mismas 10 para todos, con ranking. <b>Partida libre:</b> hasta fallar 3 veces. <b>Online:</b> todos intentan la misma carta, cada uno en su celular. <b>En la mesa:</b> el clásico con amigos en un solo celular: en equipos, uno explica la palabra sin decir ninguna de las 5 palabras prohibidas y su equipo adivina antes de que se acabe el tiempo.</p>",
     ],
     ...CS_MESA_TEXTOS,
   },

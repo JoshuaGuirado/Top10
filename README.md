@@ -238,7 +238,7 @@ livre** por tema até errar 3 vezes e **online** com salas e skin. Testes: `test
   rodadas.
   - `fotozi/data/fotos-*.js`: `[título do artigo, "nome", "English"?, "español"?, "apelidos|aceitos"?]`; fotos novas no FIM e uma
     linha nova em `FZ_DIARIO_POOLS` (`fotozi/js/jogo.js`) valendo a partir de amanhã.
-- **Censurazi**: cada carta tem uma palavra e 5 **proibidas**. Sozinho e online, as proibidas viram dicas: aparece uma de cada vez
+- **Censurazi**: cada carta tem uma palavra e 5 **proibidas**. Sozinho e online, elas viram **dicas** da palavra secreta: aparece uma de cada vez
   e cada erro mostra a próxima (100, 88, 76, 64, 52 e 40 pontos; com todas, aparece a primeira letra). **Na mesa** é o jogo clássico
   com a turma num celular só: de 2 a 4 times, um explica a palavra sem falar as proibidas e o time adivinha antes de acabar o tempo
   (60, 90 ou 120 s); acertou +1, pulou 0, falou proibida −1. São 240 cartas em 12 temas, nos 3 idiomas.
