@@ -2,16 +2,17 @@
 
 Leva uns 10 minutos e é gratuito. Os nomes dos menus podem mudar um pouco no painel do Supabase, mas os passos são estes.
 
-> **Algum jogo sem ranking ou sem online ("Não deu para carregar o ranking", sala que não abre)?** O banco ainda não tem as tabelas dele.
-> Abra **SQL Editor → New query**, cole o [`schema.sql`](schema.sql) **inteiro** e clique em **Run**. Ele cria o que falta de todos os
-> jogos (salas online, desafio do dia e ranking), não apaga nada e pode rodar quantas vezes quiser. Quem for rodar precisa ser membro
-> do projeto no Supabase (**Organization → Team → Invite**); quem só mexe no código não tem acesso ao banco.
+> **Já configurou antes? Atualizar o banco é sempre o mesmo passo:** abra **SQL Editor → New query**, cole o
+> [`schema.sql`](schema.sql) **inteiro** e clique em **Run**. Ele cria o que falta de todos os jogos (salas online, desafio do
+> dia, ranking, ligas entre amigos, a visão de uso `gamezi_uso`), não apaga nada e pode rodar quantas vezes quiser. Rode de novo
+> sempre que o site ganhar algo novo no banco. (Os scripts parciais antigos — `online-novo.sql`, `jogos-novos.sql`… — saíram:
+> eles repetiam partes do `schema.sql` e um antigo, rodado depois, desfazia o novo.)
 >
-> **Já configurou antes e só quer ativar o Fotozi, o Censurazi e o Corzi?** Abra **SQL Editor → New query**, cole o [`jogos-novos-2.sql`](jogos-novos-2.sql) e clique em **Run**. Pode rodar de novo sem problema.
+> Quem for rodar precisa ser membro do projeto no Supabase (**Organization → Team → Invite**); quem só mexe no código não
+> tem acesso ao banco. O GitHub testa o `schema.sql` num Postgres de verdade a cada envio (`tests/banco.sh`).
 >
-> **Já configurou antes e só quer ativar o que é novo (Datazi e Maiorzi online, skins nas salas, Emojizi, Contazi e Memorizi)?** Abra **SQL Editor → New query**, cole o [`atualizar-online.sql`](atualizar-online.sql) (um script só, curto) e clique em **Run**. Pode rodar de novo sem problema. (Ele faz o mesmo que `online-novo.sql` + `jogos-novos.sql`.)
->
-> **Já configurou antes e só quer ativar o online do Patozi (ou atualizar o banco)?** Abra **SQL Editor → New query**, cole o [`schema.sql`](schema.sql) inteiro e clique em **Run**. Ele só cria o que falta (tabelas `patozi_*`, coluna nova etc.) e não apaga nada. Não precisa mexer em chave nem em login: o Patozi usa o mesmo projeto e a mesma conta Gamezi.
+> **Uso de cada jogo:** no painel, **Table Editor → gamezi_uso** mostra, por jogo e por dia, quantos fizeram o desafio do dia e
+> quantas partidas online terminaram.
 
 ## 1. Criar o projeto
 1. Entre em [supabase.com](https://supabase.com) e crie um projeto (plano Free).

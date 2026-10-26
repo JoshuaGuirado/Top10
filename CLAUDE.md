@@ -12,7 +12,8 @@
   da raiz, com o caminho `topzi/…` (o teste `tests/arquivos.test.js` acusa se faltar).
 - Antes de enviar: `npm test` e testar o fluxo no navegador (Playwright com o Chromium do ambiente).
 - Mexeu no online (`topzi/js/online.js`, `patozi/js/online.js`, partida ou resultado)? Rode também `npm run test:online`
-  (duas abas com o Supabase falso de `tests/supabase-falso.js`, para os dois jogos). Mudou o banco? Atualize `supabase/schema.sql` (precisa poder rodar de novo).
+  (duas abas com o Supabase falso de `tests/supabase-falso.js`, para os dois jogos). Mudou o banco? Só no `supabase/schema.sql` (um script só, que precisa poder rodar de novo; nada de script parcial) e rode
+  `sh tests/banco.sh` se tiver Postgres (o GitHub roda sozinho). O dono atualiza o Supabase colando o `schema.sql` inteiro.
 - Listas novas de 10 itens: entram no fim (arquivo novo carregado depois dos outros) e precisam de uma linha
   nova em `DAILY_POOLS` (`topzi/js/diaria.js`) valendo a partir de amanhã, senão a lista do dia de hoje muda.
 - Lista oficial nova precisa do título em inglês e espanhol em `topzi/data/traducoes-titulos.js` (o teste
@@ -94,7 +95,7 @@
   e salva no perfil (`topzi_perfis.avatar`). No Topzi, o jogador 1 é a skin única (`savePlayers`); no Cravazi, `minhaSkin()`.
   Os bonecos são de `topzi/js/avatars.js` com visual 3D (degradês de luz em `renderAvatar`; desliga em `gz:3d`). Todo jogo
   carrega `../topzi/js/avatars.js` e `../gamezi-skins.js`; coluna `skin` em `<jogo>_sala_jogadores` (Topzi: `avatar`).
-  Jogo novo precisa de online com skin. Mudanças do banco para quem já rodou o schema: `supabase/online-novo.sql`.
+  Jogo novo precisa de online com skin.
 - Maiorzi online (`maisoumenozi/js/online.js`, tabelas `maisoumenozi_*`): todo mundo responde a mesma comparação (15 s), acertou
   vale 1 (a maluca, 2); 10 rodadas sorteadas por `mmNovaOnline`. Usa os cartões da partida sozinho (`renderNormal`/`renderUau`).
 - Emojizi (`emojizi/`), Contazi (`contazi/`) e Memorizi (`memorizi/`) são "jogos do kit": as telas (início, partida, resultado,
@@ -103,13 +104,13 @@
   (regras, sem tela), `js/app.js` (desenha a rodada e chama `gzIniciar`) e `style.css`. O dia 1 dos três é 23/10/2026 e está fixado
   em `tests/jogos-novos.test.js`. Chaves: `ej:*`, `ct:*`, `mz:*`. Item novo no Emojizi: no fim de `emojizi/data/itens.js`, nos 3
   idiomas, e linha nova em `EJ_DIARIO_POOLS` valendo a partir de amanhã. Banco: tabelas `<jogo>_salas`, `_sala_jogadores`,
-  `_partidas` e `_diario` (para quem já rodou o schema: `supabase/jogos-novos.sql`). Jogo novo do mesmo tipo: copiar um dos três.
+  `_partidas` e `_diario` (no `schema.sql`). Jogo novo do mesmo tipo: copiar um dos três.
 - Temas dos jogos do kit (partida livre e sala online; `GZ.temas`, `store("tema")`, `settings.tema` da sala): Emojizi `EJ_TEMAS`
   (o `cat` de cada item; itens novos em `data/itens-2.js` ou arquivo novo, nos 3 idiomas, com linha nova em `EJ_DIARIO_POOLS`),
   Contazi `CT_TEMAS`/`CT_GERADORES` (toda conta dá inteiro ≥ 0; frase em [pt, en, es]; o testes confere) e Memorizi `MZ_TEMAS`
   (de 4 a 9 botões). O desafio do dia não usa tema: Contazi e Memorizi continuam com o misto e as 4 cores (o dia 1 está fixado).
 - Fotozi (`fotozi/`), Censurazi (`censurazi/`) e Corzi (`corzi/`) também são jogos do kit (chaves `fz:*`, `cs:*`, `cr:*`; o dia 1 é
-  26/10/2026, fixado em `tests/jogos-fotozi-censurazi-corzi.test.js`; banco em `supabase/jogos-novos-2.sql` para quem já rodou o schema).
+  26/10/2026, fixado em `tests/jogos-fotozi-censurazi-corzi.test.js`; banco no `schema.sql`).
   O kit aceita `GZ.quantias` (o anfitrião escolhe quantas rodadas na sala; Corzi 10/20/30, Fotozi 5/10/15) e `GZ.extra` (cartão e
   telas próprias no início: o "Na mesa" do Censurazi, em `censurazi/js/mesa.js`).
 - Fotozi: as fotos NÃO ficam no repositório. Cada item é o título do artigo da Wikipédia em português (`fotozi/data/fotos-*.js`); o

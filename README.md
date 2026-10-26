@@ -220,13 +220,13 @@ comidas, profissões, esportes, festas e datas, jogos e famosos), Contazi com 13
 frações, potências e raízes, dobro e metade, dinheiro e troco, horas, números romanos, sequências…) e Memorizi com 13 (4 e 6 cores,
 frutas, animais, números, notas musicais, setas, formas, caras, letras, clima, transportes e bolas). As telas e o online são de `gamezi-kit.js`/`gamezi-kit.css`; as rodadas, de `gamezi-rodadas.js`; cada jogo só tem as
 regras (`js/jogo.js`), a rodada na tela (`js/app.js`) e o estilo dela. Testes: `tests/jogos-novos.test.js` e
-`tests/jogos-novos-online.e2e.js`. Banco: `supabase/jogos-novos.sql` (para quem já rodou o schema).
+`tests/jogos-novos-online.e2e.js`. Banco: `supabase/schema.sql` (roda de novo para atualizar).
 
 # Fotozi, Censurazi e Corzi (jogos do kit)
 
 Também são jogos do kit (`gamezi-kit.js`), com **desafio do dia** (10 rodadas e ranking; o dia 1 é 26/10/2026), **partida
 livre** por tema até errar 3 vezes e **online** com salas e skin. Testes: `tests/jogos-fotozi-censurazi-corzi.test.js` e
-`tests/jogos-novos-online.e2e.js`. Banco: `supabase/jogos-novos-2.sql` (para quem já rodou o schema).
+`tests/jogos-novos-online.e2e.js`. Banco: `supabase/schema.sql` (roda de novo para atualizar).
 
 - **Fotozi**: aparece só um pedacinho bem ampliado de uma foto (jogador de futebol, famoso, atleta, comida, fruta, bicho, lugar,
   carro ou instrumento). Cada chute errado (ou "abrir mais") afasta um pouco a foto e a rodada vale 10 pontos a menos: de 100

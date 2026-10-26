@@ -129,7 +129,6 @@ test("Emojizi: itens nos 3 idiomas, sem repetir, alternativas do mesmo tipo e o 
 test("os jogos novos estão no Gamezi: portal, conta, ranking, banco e testes", () => {
   const conta = ler("gamezi-conta.js");
   const schema = ler("supabase/schema.sql");
-  const novo = ler("supabase/jogos-novos.sql");
   const falso = ler("tests/supabase-falso.js");
   for (const [jogo, pre] of [["emojizi", "ej"], ["contazi", "ct"], ["memorizi", "mz"]]) {
     assert.match(conta, new RegExp(`GAMEZI_JOGOS = \\[[^\\]]*"${jogo}"`));
@@ -140,11 +139,9 @@ test("os jogos novos estão no Gamezi: portal, conta, ranking, banco e testes", 
     assert.match(ler(`${jogo}/js/app.js`), new RegExp(`prefixo: "${pre}"`));
     for (const tabela of ["salas", "sala_jogadores", "partidas", "diario"]) {
       assert.match(schema, new RegExp(`create table if not exists public\\.${jogo}_${tabela} `));
-      assert.match(novo, new RegExp(`create table if not exists public\\.${jogo}_${tabela} `));
     }
     assert.match(schema, new RegExp(`${jogo}_registrar_diario[\\s\\S]*date '2026-10-23'`));
     assert.match(schema, new RegExp(`p_jogo not in \\([^)]*'${jogo}'`));
-    assert.match(novo, new RegExp(`p_jogo not in \\([^)]*'${jogo}'`));
   }
   assert.match(schema, /array\['topzi'[^\]]*'memorizi'[^\]]*\] loop[\s\S]*_sair_da_sala/, "sair e assumir a sala");
   assert.match(falso, /KIT = \["emojizi", "contazi", "memorizi"[^\]]*\]/);

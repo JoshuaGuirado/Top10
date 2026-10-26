@@ -208,6 +208,5 @@ test("online: todo mundo responde a mesma comparação, acertou pontua e o placa
   assert.equal(JSON.stringify(rr("mmPlacar(o)").map((j) => [j.nome, j.pos])), '[["Ana",1],["Beto",2]]');
   const schema = fs.readFileSync(path.join(SITE, "supabase", "schema.sql"), "utf8");
   for (const tabela of ["maisoumenozi_salas", "maisoumenozi_sala_jogadores", "maisoumenozi_partidas"]) assert.match(schema, new RegExp(`create table if not exists public\\.${tabela}`));
-  assert.match(fs.readFileSync(path.join(SITE, "supabase", "online-novo.sql"), "utf8"), /maisoumenozi_sala_jogadores/);
   assert.match(fs.readFileSync(path.join(SITE, "package.json"), "utf8"), /maiorzi-online\.e2e\.js/);
 });

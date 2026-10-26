@@ -14,3 +14,36 @@ jobs:
           node-version: 22
       - run: for f in gamezi-*.js emojizi/js/*.js emojizi/data/*.js contazi/js/*.js memorizi/js/*.js fotozi/js/*.js fotozi/data/*.js censurazi/js/*.js censurazi/data/*.js corzi/js/*.js topzi/js/*.js topzi/data/*.js patozi/js/*.js patozi/data/*.js datazi/js/*.js datazi/data/*.js maisoumenozi/js/*.js maisoumenozi/data/*.js cravazi/js/*.js cravazi/data/*.js tamanhozi/js/*.js tamanhozi/data/*.js sw.js; do node --check "$f"; done
       - run: npm test
+
+  # Online, ranking, skins e ligas no navegador (duas abas com o Supabase falso de tests/supabase-falso.js).
+  online:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save playwright@1.63.0
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:online
+
+  # O supabase/schema.sql num Postgres de verdade: roda duas vezes e testa ranking, salas e ligas.
+  banco:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: teste
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: teste
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - run: sh tests/banco.sh

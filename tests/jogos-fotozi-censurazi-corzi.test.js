@@ -159,7 +159,6 @@ test("Fotozi: zoom e pontos caem só um pouco a cada erro; chute com apelido e e
 test("Fotozi, Censurazi e Corzi estão no Gamezi: portal, conta, ranking, banco e testes", () => {
   const conta = ler("gamezi-conta.js");
   const schema = ler("supabase/schema.sql");
-  const novo = ler("supabase/jogos-novos-2.sql");
   const falso = ler("tests/supabase-falso.js");
   for (const [jogo, pre] of [["fotozi", "fz"], ["censurazi", "cs"], ["corzi", "cr"]]) {
     assert.match(conta, new RegExp(`GAMEZI_JOGOS = \\[[^\\]]*"${jogo}"`));
@@ -173,15 +172,15 @@ test("Fotozi, Censurazi e Corzi estão no Gamezi: portal, conta, ranking, banco 
     for (const tabela of ["salas", "sala_jogadores", "partidas", "diario"]) assert.match(schema, new RegExp(`create table if not exists public\\.${jogo}_${tabela} `));
     assert.match(schema, new RegExp(`${jogo}_registrar_diario[\\s\\S]*?date '2026-10-26'`));
     assert.match(schema, new RegExp(`p_jogo not in \\([^)]*'${jogo}'`));
-    assert.match(novo, new RegExp(`p_jogo not in \\([^)]*'${jogo}'`));
-    assert.match(novo, new RegExp(`array\\[[^\\]]*'${jogo}'[^\\]]*\\] loop`));
     assert.match(falso, new RegExp(`KIT = \\[[^\\]]*"${jogo}"`));
   }
-  assert.match(novo, /date '2026-10-26'/);
   assert.match(schema, /array\['topzi'[^\]]*'corzi'\] loop[\s\S]*_sair_da_sala/, "sair e assumir a sala");
 });
 
-test("todo script do banco que cria o ranking do dia aceita todos os jogos (rodar um antigo depois não tira jogo)", () => {
+test("o banco é um script só (schema.sql, que roda de novo) e o ranking do dia aceita todos os jogos", () => {
+  // Os scripts parciais (online-novo, jogos-novos…) repetiam partes do schema.sql e um antigo desfazia o novo.
+  assert.deepEqual(fs.readdirSync(path.join(SITE, "supabase")).filter((a) => a.endsWith(".sql")).sort(), ["patozi-respostas.sql", "schema.sql"]);
+  assert.match(ler(".github/workflows/testes.yml"), /tests\/banco\.sh/, "o GitHub roda o schema.sql num Postgres de verdade");
   const jogos = JSON.parse(ler("gamezi-conta.js").match(/GAMEZI_JOGOS = (\[[^\]]*\])/)[1]);
   for (const arq of fs.readdirSync(path.join(SITE, "supabase")).filter((a) => a.endsWith(".sql"))) {
     const sql = ler(`supabase/${arq}`);
