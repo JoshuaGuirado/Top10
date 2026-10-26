@@ -10,8 +10,11 @@ const CS_INICIO = Date.UTC(2026, 9, 26); // Censurazi do dia: o dia 1 é 26/10/2
 const CS_SEGUNDOS = 45;
 const CS_PONTOS = [100, 88, 76, 64, 52, 40]; // pela quantidade de dicas a mais (0 a 5)
 const CS_CARTAS = []; // { id, tema, txt: { pt: [palavra, ...5], en, es } }
-const CS_DIARIO_POOLS = [{ desde: 1, cartas: 240 }];
-const CS_TEMAS = ["tudo", "casa", "comida", "animais", "lugares", "profissoes", "esportes", "natureza", "corpo", "transporte", "festas", "tecnologia", "cultura"];
+const CS_DIARIO_POOLS = [
+  { desde: 1, cartas: 240 },
+  { desde: 2, cartas: 520 }, // data/cartas-3.js e cartas-4.js (10 a mais por tema e 8 temas novos)
+];
+const CS_TEMAS = ["tudo", "casa", "comida", "animais", "lugares", "profissoes", "esportes", "natureza", "corpo", "transporte", "festas", "tecnologia", "cultura", "roupas", "musica", "escola", "brincadeiras", "mundo", "ciencia", "brasil", "sentimentos"];
 
 function csCartas(lista) {
   for (const [tema, pt, en, es] of lista) {

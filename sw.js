@@ -2,7 +2,7 @@
 // Cada jogo fica numa pasta (topzi/…, patozi/…); os arquivos dele entram na lista com o caminho da pasta.
 // Online, busca sempre a versão nova (rede primeiro); sem internet, usa a cópia guardada.
 
-const CACHE = "gamezi-v39";
+const CACHE = "gamezi-v40";
 const FILES = [
   "./",
   "index.html",
@@ -35,6 +35,8 @@ const FILES = [
   "censurazi/js/jogo.js",
   "censurazi/data/cartas-1.js",
   "censurazi/data/cartas-2.js",
+  "censurazi/data/cartas-3.js",
+  "censurazi/data/cartas-4.js",
   "censurazi/js/mesa.js",
   "censurazi/js/app.js",
   "brand/censurazi-logo.svg",

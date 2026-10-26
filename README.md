@@ -243,7 +243,8 @@ livre** por tema até errar 3 vezes e **online** com salas e skin. Testes: `test
 - **Censurazi**: cada carta tem uma palavra e 5 **proibidas**. Sozinho e online, elas viram **dicas** da palavra secreta: aparece uma de cada vez
   e cada erro mostra a próxima (100, 88, 76, 64, 52 e 40 pontos; com todas, aparece a primeira letra). **Na mesa** é o jogo clássico
   com a turma num celular só: de 2 a 4 times, um explica a palavra sem falar as proibidas e o time adivinha antes de acabar o tempo
-  (60, 90 ou 120 s); acertou +1, pulou 0, falou proibida −1. São 240 cartas em 12 temas, nos 3 idiomas.
+  (60, 90 ou 120 s); acertou +1, pulou 0, falou proibida −1. São 520 cartas em 20 temas, nos 3 idiomas (o teste confere que
+  nenhuma dica entrega a palavra, que nada se repete e que nenhuma resposta tem parênteses).
   - `censurazi/data/cartas-*.js`: `[tema, "palavra|5 proibidas", "word|…", "palabra|…"]`, as proibidas da mais vaga para a mais
     óbvia; cartas novas no FIM e linha nova em `CS_DIARIO_POOLS`. O "Na mesa" fica em `censurazi/js/mesa.js` (telas próprias no kit
     com `GZ.extra`).

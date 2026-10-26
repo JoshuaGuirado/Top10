@@ -17,6 +17,14 @@ const CS_NOMES_TEMAS = {
   festas: ["Festas e datas", "Parties & holidays", "Fiestas y fechas"],
   tecnologia: ["Tecnologia", "Technology", "Tecnología"],
   cultura: ["Filmes e personagens", "Movies & characters", "Películas y personajes"],
+  roupas: ["Roupas e acessórios", "Clothes & accessories", "Ropa y accesorios"],
+  musica: ["Música", "Music", "Música"],
+  escola: ["Escola e trabalho", "School & work", "Escuela y trabajo"],
+  brincadeiras: ["Brinquedos e brincadeiras", "Toys & games", "Juguetes y juegos"],
+  mundo: ["Países e cidades", "Countries & cities", "Países y ciudades"],
+  ciencia: ["Ciência", "Science", "Ciencia"],
+  brasil: ["Coisas do Brasil", "Things from Brazil", "Cosas de Brasil"],
+  sentimentos: ["Sentimentos e jeitos", "Feelings & traits", "Sentimientos y maneras de ser"],
 };
 
 let csN = 0; // dicas a mais na rodada da vez

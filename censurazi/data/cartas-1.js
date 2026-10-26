@@ -90,7 +90,7 @@ csCartas([
   ["lugares", "Shopping|loja|escada rolante|vitrine|comprar|praça de alimentação", "Mall|store|escalator|window|shopping|food court", "Centro comercial|tienda|escalera mecánica|vitrina|comprar|patio de comidas"],
   ["lugares", "Museu|antigo|quadro|visitar|arte|exposição", "Museum|old|painting|visit|art|exhibit", "Museo|antiguo|cuadro|visitar|arte|exposición"],
   ["lugares", "Fazenda|campo|vaca|trator|roça|plantação", "Farm|countryside|cow|tractor|barn|crops", "Granja|campo|vaca|tractor|establo|cultivo"],
-  ["lugares", "Ilha|barco|mar|isolada|água|náufrago", "Island|boat|sea|isolated|water|castaway", "Isla|barco|mar|aislada|agua|náufrago"],
+  ["lugares", "Ilha|barco|mar|isolada|água|náufrago", "Island|boat|sea|isolated|water|castaway", "Isla|barco|mar|remota|agua|náufrago"],
 
   // ── profissões ──
   ["profissoes", "Bombeiro|caminhão|mangueira|vermelho|incêndio|fogo", "Firefighter|truck|hose|red|blaze|fire", "Bombero|camión|manguera|rojo|incendio|fuego"],
@@ -116,7 +116,7 @@ csCartas([
 
   // ── esportes ──
   ["esportes", "Futebol|Copa|grama|chuteira|bola|gol", "Soccer|Cup|grass|cleats|ball|goal", "Fútbol|Copa|césped|botines|pelota|gol"],
-  ["esportes", "Surfe|praia|prancha|mar|onda|surfista", "Surfing|beach|board|sea|wave|surfer", "Surf|playa|tabla|mar|ola|surfista"],
+  ["esportes", "Surfe|praia|prancha|mar|onda|surfista", "Surfing|beach|board|sea|wave|surfer", "Surf|playa|tabla|mar|ola|neopreno"],
   ["esportes", "Natação|touca|piscina|braçada|nadar|água", "Swimming|cap|pool|stroke|swim|water", "Natación|gorro|piscina|brazada|nadar|agua"],
   ["esportes", "Boxe|ringue|soco|luva|nocaute|luta", "Boxing|ring|punch|glove|knockout|fight", "Boxeo|cuadrilátero|puñetazo|guante|nocaut|pelea"],
   ["esportes", "Xadrez|rei|tabuleiro|peão|rainha|xeque-mate", "Chess|king|board|pawn|queen|checkmate", "Ajedrez|rey|tablero|peón|reina|jaque mate"],
@@ -127,7 +127,7 @@ csCartas([
   ["esportes", "Basquete|alto|quadra|bola|cesta|NBA", "Basketball|tall|court|ball|hoop|NBA", "Básquet|alto|cancha|pelota|canasta|NBA"],
   ["esportes", "Fórmula 1|Senna|corrida|carro|piloto|velocidade", "Formula 1|Senna|race|car|driver|speed", "Fórmula 1|Senna|carrera|coche|piloto|velocidad"],
   ["esportes", "Golfe|grama|buraco|taco|bolinha|tacada", "Golf|grass|hole|club|ball|swing", "Golf|césped|hoyo|palo|bola|golpe"],
-  ["esportes", "Judô|faixa|quimono|Japão|luta|tatame", "Judo|belt|gi|Japan|fight|mat", "Judo|cinturón|judogi|Japón|lucha|tatami"],
+  ["esportes", "Judô|faixa|quimono|Japão|luta|tatame", "Judo|belt|gi|Japan|fight|mat", "Judo|cinturón|kimono|Japón|lucha|tatami"],
   ["esportes", "Ciclismo|capacete|pedal|corrida|bicicleta|pedalar", "Cycling|helmet|pedal|race|bicycle|ride", "Ciclismo|casco|pedal|carrera|bicicleta|pedalear"],
   ["esportes", "Olimpíadas|quatro anos|tocha|anéis|medalha|ouro", "Olympics|four years|torch|rings|medal|gold", "Olimpiadas|cuatro años|antorcha|anillos|medalla|oro"],
   ["esportes", "Capoeira|Bahia|roda|berimbau|luta|dança", "Capoeira|Bahia|circle|berimbau|fight|dance", "Capoeira|Bahía|rueda|berimbau|lucha|danza"],
@@ -139,7 +139,7 @@ csCartas([
   // ── natureza ──
   ["natureza", "Arco-íris|céu|cores|sol|chuva|sete", "Rainbow|sky|colors|sun|rain|seven", "Arcoíris|cielo|colores|sol|lluvia|siete"],
   ["natureza", "Vulcão|montanha|fogo|erupção|lava|quente", "Volcano|mountain|fire|eruption|lava|hot", "Volcán|montaña|fuego|erupción|lava|caliente"],
-  ["natureza", "Neve|inverno|branca|frio|gelo|boneco", "Snow|winter|white|cold|ice|snowman", "Nieve|invierno|blanca|frío|hielo|muñeco"],
+  ["natureza", "Neve|inverno|branca|frio|gelo|boneco", "Snow|winter|white|cold|ice|flakes", "Nieve|invierno|blanca|frío|hielo|muñeco"],
   ["natureza", "Cachoeira|rio|pedra|banho|queda|água", "Waterfall|river|rock|swim|drop|water", "Cascada|río|piedra|baño|caída|agua"],
   ["natureza", "Lua|noite|céu|cheia|minguante|astronauta", "Moon|night|sky|full|crescent|astronaut", "Luna|noche|cielo|llena|menguante|astronauta"],
   ["natureza", "Raio|tempestade|barulho|trovão|luz|céu", "Lightning|storm|noise|thunder|flash|sky", "Rayo|tormenta|ruido|trueno|luz|cielo"],

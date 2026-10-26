@@ -1,0 +1,148 @@
+// Mais cartas do Censurazi (mesmo formato de cartas-1.js): 10 a mais em cada tema antigo.
+// Entram no Censurazi do dia a partir do dia 2 (CS_DIARIO_POOLS).
+
+csCartas([
+  // ── casa e objetos ──
+  ["casa", "Sofá|sala|almofada|assistir|deitar|sentar", "Couch|living room|cushion|watch TV|lie down|sit", "Sofá|sala|cojín|ver tele|acostarse|sentarse"],
+  ["casa", "Cortina|janela|tecido|varão|abrir|sol", "Curtain|window|fabric|rod|open|sunlight", "Cortina|ventana|tela|barra|abrir|sol"],
+  ["casa", "Tapete|chão|sala|pisar|pano|voador", "Rug|floor|living room|step on|fabric|flying", "Alfombra|suelo|sala|pisar|tela|voladora"],
+  ["casa", "Torneira|pia|água|abrir|pingar|cozinha", "Faucet|sink|water|turn on|drip|kitchen", "Grifo|lavabo|agua|abrir|gotear|cocina"],
+  ["casa", "Fósforo|caixinha|riscar|palito|fogo|acender", "Match|little box|strike|stick|fire|light", "Fósforo|cajita|raspar|palito|fuego|encender"],
+  ["casa", "Agulha|costura|linha|furo|dedal|costurar", "Needle|sewing|thread|eye|thimble|sew", "Aguja|costura|hilo|ojo|dedal|coser"],
+  ["casa", "Garfo|mesa|faca|dentes|comer|talher", "Fork|table|knife|prongs|eat|cutlery", "Tenedor|mesa|cuchillo|dientes|comer|cubierto"],
+  ["casa", "Cama|quarto|lençol|colchão|travesseiro|dormir", "Bed|bedroom|sheet|mattress|pillow|sleep", "Cama|dormitorio|sábana|colchón|almohada|dormir"],
+  ["casa", "Varal|roupa|sol|prendedor|secar|corda", "Clothesline|laundry|sun|clothespin|dry|rope", "Tendedero|ropa|sol|pinza|secar|cuerda"],
+  ["casa", "Campainha|porta|visita|tocar|botão|barulho", "Doorbell|door|visitor|ring|button|sound", "Timbre|puerta|visita|tocar|botón|sonido"],
+
+  // ── comida ──
+  ["comida", "Pão|padaria|manteiga|fatia|café da manhã|forno", "Bread|bakery|butter|slice|breakfast|oven", "Pan|panadería|mantequilla|rebanada|desayuno|horno"],
+  ["comida", "Arroz|feijão|branco|panela|grão|prato", "Rice|beans|white|pot|grain|plate", "Arroz|frijoles|blanco|olla|grano|plato"],
+  ["comida", "Mel|abelha|doce|pote|amarelo|colmeia", "Honey|bee|sweet|jar|golden|hive", "Miel|abeja|dulce|frasco|dorado|colmena"],
+  ["comida", "Queijo|rato|buraco|amarelo|leite|fatia", "Cheese|mouse|holes|yellow|milk|slice", "Queso|ratón|agujeros|amarillo|leche|loncha"],
+  ["comida", "Morango|vermelho|chantili|semente|bolo|fruta", "Strawberry|red|whipped cream|seeds|cake|fruit", "Fresa|roja|nata|semillas|pastel|fruta"],
+  ["comida", "Batata frita|McDonald's|óleo|sal|ketchup|palito", "French fries|McDonald's|oil|salt|ketchup|sticks", "Papas fritas|McDonald's|aceite|sal|kétchup|palitos"],
+  ["comida", "Salada|verde|alface|tomate|dieta|folha", "Salad|green|lettuce|tomato|diet|leaf", "Ensalada|verde|lechuga|tomate|dieta|hoja"],
+  ["comida", "Sopa|inverno|colher|quente|caldo|prato fundo", "Soup|winter|spoon|hot|broth|bowl", "Sopa|invierno|cuchara|caliente|caldo|plato hondo"],
+  ["comida", "Pudim|sobremesa|calda|leite condensado|doce|furo", "Flan|dessert|caramel|condensed milk|sweet|hole", "Flan|postre|caramelo|leche condensada|dulce|agujero"],
+  ["comida", "Cenoura|laranja|coelho|legume|horta|vista", "Carrot|orange|rabbit|vegetable|garden|eyesight", "Zanahoria|naranja|conejo|verdura|huerto|vista"],
+
+  // ── animais ──
+  ["animais", "Gato|bigode|miar|rato|unha|bichano", "Cat|whiskers|meow|mouse|claws|kitty", "Gato|bigotes|maullar|ratón|uñas|minino"],
+  ["animais", "Vaca|fazenda|leite|mancha|mugir|pasto", "Cow|farm|milk|spots|moo|pasture", "Vaca|granja|leche|manchas|mugir|pasto"],
+  ["animais", "Porco|lama|rosa|fazenda|focinho|bacon", "Pig|mud|pink|farm|snout|bacon", "Cerdo|barro|rosa|granja|hocico|tocino"],
+  ["animais", "Rato|queijo|pequeno|toca|armadilha|cinza", "Rat|cheese|small|hole|trap|gray", "Rata|queso|pequeña|agujero|trampa|gris"],
+  ["animais", "Sapo|lagoa|pular|verde|princesa|coaxar", "Frog|pond|jump|green|princess|croak", "Rana|charca|saltar|verde|princesa|croar"],
+  ["animais", "Jacaré|rio|dentes|réptil|pântano|crocodilo", "Alligator|river|teeth|reptile|swamp|crocodile", "Caimán|río|dientes|reptil|pantano|cocodrilo"],
+  ["animais", "Urso|mel|floresta|hibernar|pelúcia|grande", "Bear|honey|forest|hibernate|teddy|big", "Oso|miel|bosque|hibernar|peluche|grande"],
+  ["animais", "Lobo|uivar|lua|matilha|Chapeuzinho|selvagem", "Wolf|howl|moon|pack|Little Red Riding Hood|wild", "Lobo|aullar|luna|manada|Caperucita|salvaje"],
+  ["animais", "Baleia|oceano|enorme|jato|azul|mamífero", "Whale|ocean|huge|spout|blue|mammal", "Ballena|océano|enorme|chorro|azul|mamífero"],
+  ["animais", "Aranha|teia|oito|patas|inseto|veneno", "Spider|web|eight|legs|bug|venom", "Araña|red pegajosa|ocho|patas|bicho|veneno"],
+
+  // ── lugares ──
+  ["lugares", "Restaurante|garçom|cardápio|mesa|conta|jantar", "Restaurant|waiter|menu|table|bill|dinner", "Restaurante|camarero|menú|mesa|cuenta|cena"],
+  ["lugares", "Hotel|viagem|quarto|recepção|diária|hospedar", "Hotel|trip|room|front desk|night|stay", "Hotel|viaje|habitación|recepción|noche|hospedarse"],
+  ["lugares", "Parque|árvore|banco|criança|grama|passear", "Park|tree|bench|kids|grass|stroll", "Parque|árbol|banco|niños|césped|pasear"],
+  ["lugares", "Castelo|rei|torre|princesa|muralha|medieval", "Castle|king|tower|princess|wall|medieval", "Castillo|rey|torre|princesa|muralla|medieval"],
+  ["lugares", "Banco|fila|caixa|conta|dinheiro|gerente", "Bank|line|ATM|account|money|manager", "Banco|fila|cajero|cuenta|dinero|gerente"],
+  ["lugares", "Posto de gasolina|carro|bomba|frentista|abastecer|combustível", "Gas station|car|pump|attendant|fill up|fuel", "Gasolinera|coche|surtidor|empleado|repostar|combustible"],
+  ["lugares", "Cemitério|flores|silêncio|túmulo|finados|enterro", "Cemetery|flowers|silence|grave|Day of the Dead|burial", "Cementerio|flores|silencio|tumba|difuntos|entierro"],
+  ["lugares", "Circo|lona|palhaço|picadeiro|trapézio|malabarista", "Circus|big top|clown|ring|trapeze|juggler", "Circo|carpa|payaso|pista|trapecio|malabarista"],
+  ["lugares", "Parque de diversões|ingresso|fila|montanha-russa|roda-gigante|brinquedo", "Amusement park|ticket|line|roller coaster|Ferris wheel|ride", "Parque de atracciones|entrada|fila|montaña rusa|noria|atracción"],
+  ["lugares", "Rodoviária|mala|viagem|passagem|plataforma|ônibus", "Bus station|suitcase|trip|ticket|platform|bus", "Terminal de autobuses|maleta|viaje|boleto|andén|autobús"],
+
+  // ── profissões ──
+  ["profissoes", "Advogado|terno|cliente|tribunal|processo|lei", "Lawyer|suit|client|court|lawsuit|law", "Abogado|traje|cliente|tribunal|juicio|ley"],
+  ["profissoes", "Enfermeira|plantão|hospital|branco|injeção|paciente", "Nurse|shift|hospital|white|shot|patient", "Enfermera|guardia|hospital|blanco|inyección|paciente"],
+  ["profissoes", "Padeiro|madrugada|farinha|forno|massa|pão", "Baker|dawn|flour|oven|dough|bread", "Panadero|madrugada|harina|horno|masa|pan"],
+  ["profissoes", "Cantor|palco|voz|microfone|show|música", "Singer|stage|voice|microphone|concert|song", "Cantante|escenario|voz|micrófono|concierto|canción"],
+  ["profissoes", "Ator|personagem|palco|novela|filme|papel", "Actor|character|stage|soap opera|movie|role", "Actor|personaje|escenario|telenovela|película|papel"],
+  ["profissoes", "Engenheiro|cálculo|projeto|obra|ponte|capacete", "Engineer|math|project|construction|bridge|hard hat", "Ingeniero|cálculo|proyecto|obra|puente|casco"],
+  ["profissoes", "Programador|computador|código|teclado|aplicativo|bug", "Programmer|computer|code|keyboard|app|bug", "Programador|computadora|código|teclado|aplicación|bug"],
+  ["profissoes", "Jornalista|notícia|microfone|reportagem|jornal|entrevista", "Journalist|news|microphone|report|newspaper|interview", "Periodista|noticia|micrófono|reportaje|periódico|entrevista"],
+  ["profissoes", "Eletricista|fio|choque|tomada|lâmpada|luz", "Electrician|wire|shock|outlet|bulb|power", "Electricista|cable|descarga|enchufe|bombilla|luz"],
+  ["profissoes", "Encanador|cano|vazamento|chave inglesa|pia|água", "Plumber|pipe|leak|wrench|sink|water", "Fontanero|tubería|fuga|llave inglesa|lavabo|agua"],
+
+  // ── esportes ──
+  ["esportes", "Árbitro|jogo|apito|cartão|regra|falta", "Referee|game|whistle|card|rule|foul", "Árbitro|partido|silbato|tarjeta|regla|falta"],
+  ["esportes", "Gol|rede|comemorar|bola|trave|artilheiro", "Goal|net|celebrate|ball|post|striker", "Gol|red|celebrar|pelota|palo|delantero"],
+  ["esportes", "Medalha|pódio|pescoço|ouro|prata|campeão", "Medal|podium|neck|gold|silver|champion", "Medalla|podio|cuello|oro|plata|campeón"],
+  ["esportes", "Torcida|arquibancada|grito|camisa|time|estádio", "Fans|stands|chant|jersey|team|stadium", "Hinchada|tribuna|grito|camiseta|equipo|estadio"],
+  ["esportes", "Corrida|tênis|largada|chegada|correr|rápido", "Race|sneakers|start|finish line|run|fast", "Carrera|zapatillas|salida|meta|correr|rápido"],
+  ["esportes", "Bola|redonda|chutar|jogar|futebol|quicar", "Ball|round|kick|play|soccer|bounce", "Pelota|redonda|patear|jugar|fútbol|rebotar"],
+  ["esportes", "Halterofilismo|academia|força|levantar|barra|peso", "Weightlifting|gym|strength|lift|barbell|weight", "Halterofilia|gimnasio|fuerza|levantar|barra|pesas"],
+  ["esportes", "Escalada|parede|corda|subir|montanha|agarrar", "Rock climbing|wall|rope|climb|mountain|grip", "Escalada|pared|cuerda|subir|montaña|agarrar"],
+  ["esportes", "Campeonato|time|tabela|rodada|final|taça", "Championship|team|standings|round|final|trophy", "Campeonato|equipo|tabla|jornada|final|copa"],
+  ["esportes", "Treinador|banco|tática|time|apito|técnico", "Coach|bench|tactics|team|whistle|manager", "Entrenador|banquillo|táctica|equipo|silbato|técnico"],
+
+  // ── natureza ──
+  ["natureza", "Chuva|nuvem|temporal|molhado|gota|água", "Rain|cloud|umbrella|wet|drop|water", "Lluvia|nube|paraguas|mojado|gota|agua"],
+  ["natureza", "Vento|folha|soprar|pipa|ar|forte", "Wind|leaf|blow|kite|air|strong", "Viento|hoja|soplar|cometa|aire|fuerte"],
+  ["natureza", "Árvore|tronco|galho|folha|raiz|sombra", "Tree|trunk|branch|leaf|root|shade", "Árbol|tronco|rama|hoja|raíz|sombra"],
+  ["natureza", "Pedra|chão|dura|cinza|rocha|jogar", "Stone|ground|hard|gray|pebble|throw", "Piedra|suelo|dura|gris|roca|lanzar"],
+  ["natureza", "Lago|água|parada|barco|pato|pescar", "Lake|water|still|boat|duck|fish", "Lago|agua|quieta|barca|pato|pescar"],
+  ["natureza", "Gelo|frio|cubo|geladeira|derreter|congelado", "Ice|cold|cube|freezer|melt|frozen", "Hielo|frío|cubo|congelador|derretir|congelado"],
+  ["natureza", "Fogo|vermelho|quente|chama|lenha|queimar", "Fire|red|hot|flame|logs|burn", "Fuego|rojo|caliente|llama|leña|quemar"],
+  ["natureza", "Céu|azul|nuvem|alto|estrela|avião", "Sky|blue|cloud|high|star|airplane", "Cielo|azul|nube|alto|estrella|avión"],
+  ["natureza", "Tempestade|escuro|vento|chuva|trovão|raio", "Storm|dark|wind|rain|thunder|lightning", "Tormenta|oscuro|viento|lluvia|trueno|rayo"],
+  ["natureza", "Amanhecer|cedo|galo|manhã|sol|nascer", "Sunrise|early|rooster|morning|sun|rise", "Amanecer|temprano|gallo|mañana|sol|salir"],
+
+  // ── corpo e saúde ──
+  ["corpo", "Olho|rosto|ver|piscar|cílios|azul", "Eye|face|see|blink|eyelashes|blue", "Ojo|cara|ver|parpadear|pestañas|azul"],
+  ["corpo", "Mão|braço|dedo|palma|unha|pegar", "Hand|arm|finger|palm|nail|grab", "Mano|brazo|dedo|palma|uña|agarrar"],
+  ["corpo", "Pé|chão|sapato|dedão|chulé|andar", "Foot|ground|shoe|big toe|smelly feet|walk", "Pie|suelo|zapato|dedo gordo|olor a pies|caminar"],
+  ["corpo", "Orelha|cabeça|brinco|lado|ouvir|surdo", "Ear|head|earring|side|hear|deaf", "Oreja|cabeza|arete|lado|oír|sordo"],
+  ["corpo", "Boca|rosto|língua|lábio|dente|falar", "Mouth|face|tongue|lip|tooth|talk", "Boca|cara|lengua|labio|diente|hablar"],
+  ["corpo", "Gripe|inverno|nariz|tosse|febre|resfriado", "Flu|winter|nose|cough|fever|cold", "Gripe|invierno|nariz|tos|fiebre|resfriado"],
+  ["corpo", "Tosse|garganta|xarope|gripe|cof-cof|pigarro", "Cough|throat|syrup|flu|ahem|clear throat", "Tos|garganta|jarabe|gripe|cof cof|carraspera"],
+  ["corpo", "Cócegas|risada|pé|barriga|dedos|rir", "Tickle|laughter|feet|belly|fingers|laugh", "Cosquillas|risa|pies|barriga|dedos|reír"],
+  ["corpo", "Suor|calor|testa|academia|desodorante|molhado", "Sweat|heat|forehead|gym|deodorant|wet", "Sudor|calor|frente|gimnasio|desodorante|mojado"],
+  ["corpo", "Dor de cabeça|cansaço|remédio|barulho|cabeça|latejar", "Headache|tiredness|pill|noise|head|throb", "Dolor de cabeza|cansancio|pastilla|ruido|cabeza|palpitar"],
+
+  // ── transporte ──
+  ["transporte", "Barco|rio|vela|mar|remo|navegar", "Boat|river|sail|sea|oar|navigate", "Bote|río|vela|mar|remo|navegar"],
+  ["transporte", "Semáforo|esquina|parar|vermelho|verde|amarelo", "Traffic light|corner|stop|red|green|yellow", "Semáforo|esquina|parar|rojo|verde|amarillo"],
+  ["transporte", "Pneu|carro|borracha|furado|roda|estepe", "Tire|car|rubber|flat|wheel|spare", "Neumático|coche|goma|pinchado|rueda|repuesto"],
+  ["transporte", "Estrada|viagem|asfalto|placa|carro|pedágio", "Road|trip|asphalt|sign|car|toll", "Carretera|viaje|asfalto|señal|coche|peaje"],
+  ["transporte", "Engarrafamento|cidade|buzina|atraso|carros|parado", "Traffic jam|city|horn|delay|cars|stuck", "Atasco|ciudad|bocina|retraso|coches|parado"],
+  ["transporte", "Passaporte|viagem|país|aeroporto|carimbo|documento", "Passport|trip|country|airport|stamp|document", "Pasaporte|viaje|país|aeropuerto|sello|documento"],
+  ["transporte", "Mala|viagem|roupa|rodinha|aeroporto|bagagem", "Suitcase|trip|clothes|wheels|airport|luggage", "Maleta|viaje|ropa|ruedas|aeropuerto|equipaje"],
+  ["transporte", "Carteira de motorista|exame|carro|autoescola|dirigir|documento", "Driver's license|test|car|driving school|drive|ID", "Licencia de conducir|examen|coche|autoescuela|manejar|documento"],
+  ["transporte", "Lancha|lago|rápida|motor|água|barco", "Speedboat|lake|fast|motor|water|boat", "Lancha|lago|rápida|motor|agua|barco"],
+  ["transporte", "Carroça|antigo|roda|madeira|puxar|cavalo", "Cart|old|wheel|wood|pull|horse", "Carreta|antiguo|rueda|madera|tirar|caballo"],
+
+  // ── festas e datas ──
+  ["festas", "Dia dos Namorados|junho|casal|presente|amor|beijo", "Valentine's Day|February|couple|gift|love|kiss", "San Valentín|febrero|pareja|regalo|amor|beso"],
+  ["festas", "Dia das Crianças|outubro|brinquedo|presente|infância|criança", "Children's Day|holiday|toy|present|childhood|kid", "Día del Niño|fiesta|juguete|regalo|infancia|niño"],
+  ["festas", "Ano-novo|janeiro|promessa|contagem|recomeço|calendário", "New Year|January|resolution|countdown|fresh start|calendar", "Año Nuevo|enero|propósito|cuenta atrás|empezar|calendario"],
+  ["festas", "Batizado|igreja|bebê|padrinho|água|padre", "Baptism|church|baby|godfather|water|priest", "Bautizo|iglesia|bebé|padrino|agua|cura"],
+  ["festas", "Festa surpresa|segredo|esconder|aniversário|luzes|surpresa", "Surprise party|secret|hide|birthday|lights|surprise", "Fiesta sorpresa|secreto|esconderse|cumpleaños|luces|sorpresa"],
+  ["festas", "Karaokê|microfone|cantar|desafinado|música|letra", "Karaoke|microphone|sing|off-key|song|lyrics", "Karaoke|micrófono|cantar|desafinado|canción|letra"],
+  ["festas", "Brinde|copo|taça|levantar|saúde|comemorar", "Toast|glass|champagne glass|raise|cheers|celebrate", "Brindis|vaso|copa|levantar|salud|celebrar"],
+  ["festas", "Convite|festa|data|enviar|nome|chamar", "Invitation|party|date|send|name|invite", "Invitación|fiesta|fecha|enviar|nombre|invitar"],
+  ["festas", "Ovo de Páscoa|domingo|chocolate|embrulho|surpresa|coelho", "Easter egg|Sunday|chocolate|wrapper|surprise|bunny", "Huevo de Pascua|domingo|chocolate|envoltorio|sorpresa|conejo"],
+  ["festas", "Árvore de Natal|dezembro|pinheiro|bolas|luzinhas|enfeite", "Christmas tree|December|pine|ornaments|lights|decoration", "Árbol de Navidad|diciembre|pino|bolas|lucecitas|adorno"],
+
+  // ── tecnologia ──
+  ["tecnologia", "Computador|mesa|tela|teclado|mouse|internet", "Computer|desk|screen|keyboard|mouse|internet", "Computadora|escritorio|pantalla|teclado|ratón|internet"],
+  ["tecnologia", "Internet|rede|site|conectar|online|Google", "Internet|network|website|connect|online|Google", "Internet|red|sitio|conectar|online|Google"],
+  ["tecnologia", "Aplicativo|celular|baixar|ícone|loja|app", "App|phone|download|icon|store|application", "Aplicación|celular|descargar|icono|tienda|app"],
+  ["tecnologia", "Carregador|tomada|cabo|celular|bateria|carregar", "Charger|outlet|cable|phone|battery|charge", "Cargador|enchufe|cable|celular|batería|cargar"],
+  ["tecnologia", "Teclado|letras|digitar|computador|teclas|escrever", "Keyboard|letters|type|computer|keys|write", "Teclado|letras|teclear|computadora|teclas|escribir"],
+  ["tecnologia", "Hacker|computador|invadir|senha|segurança|ataque", "Hacker|computer|break in|password|security|attack", "Hacker|computadora|invadir|contraseña|seguridad|ataque"],
+  ["tecnologia", "Streaming|filme|série|assinatura|Netflix|assistir", "Streaming|movie|series|subscription|Netflix|watch", "Streaming|película|serie|suscripción|Netflix|ver"],
+  ["tecnologia", "Podcast|ouvir|episódio|microfone|conversa|áudio", "Podcast|listen|episode|microphone|conversation|audio", "Pódcast|escuchar|episodio|micrófono|charla|audio"],
+  ["tecnologia", "GPS|mapa|rota|satélite|localização|perdido", "GPS|map|route|satellite|location|lost", "GPS|mapa|ruta|satélite|ubicación|perdido"],
+  ["tecnologia", "Inteligência artificial|futuro|computador|robô|pensar|ChatGPT", "Artificial intelligence|future|computer|robot|think|ChatGPT", "Inteligencia artificial|futuro|computadora|robot|pensar|ChatGPT"],
+
+  // ── filmes e personagens ──
+  ["cultura", "Chapeuzinho Vermelho|floresta|cesta|vovó|lobo|capuz", "Little Red Riding Hood|forest|basket|grandma|wolf|hood", "Caperucita Roja|bosque|cesta|abuela|lobo|capucha"],
+  ["cultura", "Branca de Neve|bruxa|espelho|maçã|princesa|anões", "Snow White|witch|mirror|apple|princess|dwarfs", "Blancanieves|bruja|espejo|manzana|princesa|enanitos"],
+  ["cultura", "Harry Potter|óculos|cicatriz|bruxo|Hogwarts|varinha", "Harry Potter|glasses|scar|wizard|Hogwarts|wand", "Harry Potter|gafas|cicatriz|mago|Hogwarts|varita"],
+  ["cultura", "Batman|morcego|capa|noite|Coringa|Gotham", "Batman|bat|cape|night|Joker|Gotham", "Batman|murciélago|capa|noche|Joker|Gotham"],
+  ["cultura", "Homem-Aranha|teia|máscara|herói|Peter Parker|aranha", "Spider-Man|web|mask|hero|Peter Parker|spider", "Hombre Araña|telaraña|máscara|héroe|Peter Parker|araña"],
+  ["cultura", "Mickey Mouse|orelhas|Disney|rato|Minnie|desenho", "Mickey Mouse|ears|Disney|mouse|Minnie|cartoon", "Mickey Mouse|orejas|Disney|ratón|Minnie|dibujo"],
+  ["cultura", "Shrek|pântano|burro|verde|ogro|Fiona", "Shrek|swamp|donkey|green|ogre|Fiona", "Shrek|pantano|burro|verde|ogro|Fiona"],
+  ["cultura", "Chaves|barril|vila|Seu Madruga|Quico|seriado", "El Chavo|barrel|neighborhood|Don Ramón|Quico|sitcom", "El Chavo|barril|vecindad|Don Ramón|Quico|serie"],
+  ["cultura", "Turma da Mônica|gibi|coelho|dentuça|Cebolinha|Mauricio de Sousa", "Monica's Gang|comic|bunny|buck teeth|Jimmy Five|Mauricio de Sousa", "La pandilla de Mónica|cómic|conejo|dientona|Cebollita|Mauricio de Sousa"],
+  ["cultura", "Titanic|navio|iceberg|afundar|Jack|Rose", "Titanic|ship|iceberg|sink|Jack|Rose", "Titanic|barco|iceberg|hundirse|Jack|Rose"],
+]);

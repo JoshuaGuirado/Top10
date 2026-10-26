@@ -9,7 +9,7 @@ const SITE = path.join(__dirname, "..");
 const ler = (f) => fs.readFileSync(path.join(SITE, f), "utf8");
 const JOGOS = {
   fotozi: ["js/jogo.js", "data/fotos-1.js", "data/fotos-2.js", "data/fotos-3.js", "data/fotos-4.js", "data/fotos-5.js"],
-  censurazi: ["js/jogo.js", "data/cartas-1.js", "data/cartas-2.js"],
+  censurazi: ["js/jogo.js", "data/cartas-1.js", "data/cartas-2.js", "data/cartas-3.js", "data/cartas-4.js"],
   corzi: ["js/jogo.js"],
 };
 
@@ -62,7 +62,7 @@ test("Corzi: 4 alternativas com as duas que confundem, cada vez mais difícil, e
 test("Censurazi: cartas com 5 proibidas nos 3 idiomas, sem repetir e sem entregar a palavra", () => {
   const r = contexto("censurazi");
   const cartas = r("CS_CARTAS");
-  assert.ok(cartas.length >= 240);
+  assert.ok(cartas.length >= 500);
   const pools = r("CS_DIARIO_POOLS");
   assert.equal(pools[pools.length - 1].cartas, cartas.length, "a última linha de CS_DIARIO_POOLS precisa contar todas as cartas");
   const norm = (s) => r(`csNormal(${JSON.stringify(s)})`);
@@ -73,7 +73,11 @@ test("Censurazi: cartas com 5 proibidas nos 3 idiomas, sem repetir e sem entrega
       assert.equal(txt.length, 6, `${c.id} ${l}: palavra e 5 proibidas`);
       txt.forEach((x) => assert.ok(x.trim().length > 1, `${c.id} ${l}: vazio`));
       for (const p of txt.slice(1)) assert.notEqual(norm(p), norm(txt[0]), `${c.id} ${l}: proibida igual à palavra`);
-      if (l === "pt") assert.ok(!vistas.has(norm(txt[0])), `repetida: ${txt[0]}`);
+      // A dica não pode entregar a palavra ("taxímetro" para Táxi, "snowman" para Snow).
+      if (norm(txt[0]).length >= 4) for (const p of txt.slice(1)) assert.ok(!norm(p).includes(norm(txt[0])), `${c.id} ${l}: "${p}" entrega "${txt[0]}"`);
+      assert.equal(new Set(txt.slice(1).map(norm)).size, 5, `${c.id} ${l}: dica repetida`);
+      assert.ok(!/[()]/.test(txt[0]), `${c.id} ${l}: palavra com parênteses é ruim de digitar`);
+      assert.ok(!vistas.has(norm(txt[0])), `repetida em ${l}: ${txt[0]}`);
       vistas.add(norm(txt[0]));
     }
   }
