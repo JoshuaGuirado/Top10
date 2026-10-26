@@ -52,30 +52,42 @@ a { color: inherit; }
 .lang-select:hover, .icon-btn:hover { border-color: var(--fg); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-/* início: uma coluna, uma frase e uma linha por jogo (no jeito do Contexto) */
-.portal { max-width: 460px; margin: 0 auto; padding: 18px 0 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+/* início: os jogos numa grade, para caberem na tela sem rolar (3 por linha no celular; cartões lado a lado no computador) */
+.portal { max-width: 1000px; margin: 0 auto; padding: 18px 0 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
 .portal-tag { margin: 0 0 6px; text-align: center; font-size: 1.15rem; font-weight: 600; line-height: 1.35; }
+.game-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .game-row {
-  display: flex; align-items: center; gap: 14px; padding: 12px 14px; text-decoration: none;
-  background: var(--surface); border: 2px solid transparent; border-radius: 20px; transition: border-color .15s;
+  display: flex; align-items: center; gap: 14px; padding: 12px 14px; text-decoration: none; color: var(--fg);
+  background: var(--surface); border: 2px solid transparent; border-radius: 20px; transition: border-color .15s, transform .15s;
 }
-.game-row:hover { border-color: var(--accent); }
+.game-row:hover { border-color: var(--accent); transform: translateY(-2px); }
 .game-icon { width: 64px; height: 64px; flex: none; border-radius: 16px; background: var(--bg); display: grid; place-items: center; }
 .game-icon img { width: 44px; height: auto; }
 .game-icon img[src*="patozi"] { width: 50px; }
-.game-text { flex: 1; min-width: 0; display: grid; gap: 1px; }
-.game-text b { font-stretch: 75%; font-weight: 800; font-size: 1.6rem; line-height: 1.05; }
-.game-text small { color: var(--muted); font-size: .88rem; }
-.game-text .game-daily { color: var(--accent-ink); font-weight: 700; font-size: .78rem; }
-.play { flex: none; background: var(--accent); color: var(--on-accent); border-radius: 999px; padding: 11px 22px; font-weight: 700; }
-@media (max-width: 380px) {
-  .game-row { gap: 10px; padding: 10px; }
+.game-text { flex: 1; min-width: 0; display: grid; gap: 1px; overflow-wrap: anywhere; }
+.game-text b { font-stretch: 75%; font-weight: 800; font-size: 1.5rem; line-height: 1.05; }
+.game-text small { color: var(--muted); font-size: .86rem; line-height: 1.25; }
+.game-text .game-daily { color: var(--accent-ink); font-weight: 700; font-size: .76rem; }
+@media (max-width: 899px) {
+  .game-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 599px) {
+  .portal { padding-top: 10px; gap: 10px; }
+  .portal-tag { font-size: 1rem; margin-bottom: 2px; }
+  .game-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .game-row { flex-direction: column; gap: 6px; padding: 10px 4px; border-radius: 16px; text-align: center; }
   .game-icon { width: 52px; height: 52px; border-radius: 14px; }
   .game-icon img { width: 36px; }
-  .game-icon img[src*="patozi"] { width: 40px; }
-  .play { padding: 10px 16px; }
+  .game-icon img[src*="patozi"] { width: 41px; }
+  .game-text b { font-size: 1.12rem; }
+  .game-text small { font-size: .7rem; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+  .game-text .game-daily { font-size: .66rem; }
 }
-.game-row:hover .play { filter: brightness(1.08); }
+@media (max-width: 340px) {
+  .game-text b { font-size: 1rem; }
+  .game-icon { width: 46px; height: 46px; }
+  .game-icon img { width: 32px; }
+}
 .soon { margin: 4px 0 0; text-align: center; color: var(--muted); font-size: .9rem; }
 .portal-links { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px 20px; margin-top: 10px; font-weight: 700; font-size: .95rem; }
 .portal-links label { display: flex; align-items: center; gap: 8px; }

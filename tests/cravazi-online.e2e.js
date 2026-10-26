@@ -152,19 +152,22 @@ const server = http.createServer((req, res) => {
     await B.click("#solo-next");
   }
   await B.waitForSelector("#screen-solo-results:not([hidden])");
-  assert.equal(await B.textContent("#solo-res-score"), "49 pontos");
+  // Cravou as 5, a 1ª no 2º chute: o máximo do dia (6 chutes por pergunta desde o dia 6) menos 1.
+  const max = await B.evaluate(() => czChutesDoDia(czDiaNumero()));
+  const pontos = 5 * max - 1;
+  assert.equal(await B.textContent("#solo-res-score"), pontos + " pontos");
   await B.waitForSelector("#leaderboard .lb-row.me");
   assert.match(await B.textContent("#leaderboard .lb-row.me"), /Lara/);
   const dia = (await db(B)).cravazi_diario;
   assert.equal(dia.length, 1);
-  assert.equal(dia[0].pontos, 49);
+  assert.equal(dia[0].pontos, pontos);
   assert.ok(dia[0].tempo_ms > 0, "o tempo vai junto para desempatar");
   await B.click("#solo-res-home");
-  assert.match(await B.textContent("#daily-card"), /49 de 50 pontos/);
+  assert.match(await B.textContent("#daily-card"), new RegExp(pontos + " de " + 5 * max + " pontos"));
   await B.click("#daily-card [data-dia].today");
   await B.waitForSelector("#leaderboard .lb-row.me");
   assert.equal((await db(B)).cravazi_diario.length, 1, "não manda de novo");
-  step("Cravazi do dia: 49 pontos no ranking do dia, uma vez só");
+  step(`Cravazi do dia: ${pontos} pontos no ranking do dia, uma vez só`);
 
   // Treino: perguntas sorteadas, sem ranking.
   await B.click("#solo-res-train");

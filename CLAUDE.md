@@ -23,6 +23,9 @@
 - A conta é do **Gamezi**, uma só para todos os jogos: entrar, criar conta, esqueci/trocar senha e sair ficam só em
   `conta.html` (raiz). Os jogos não têm tela de login: leem a sessão com `gamezi-conta.js` e mandam para
   `conta.html?volta=<jogo>`. Jogo novo: carregar `../gamezi-conta.js`, pôr a pasta em `GAMEZI_JOGOS` e em `JOGOS` da `conta.html`.
+- Portal (`index.html`): os jogos ficam numa grade (`.game-grid`; 3 por linha no celular, para caber sem rolar). Jogo novo: cartão
+  no fim da grade com frase curta nos 3 idiomas (`<jogo>Kind`) e `data-inicio="AAAA-MM-DD"` (dia 1 do desafio do dia). O
+  `tests/todos-os-jogos.e2e.js` (no `npm run test:online`) confere em todos os jogos: sala online com skin, ranking e portal.
 - Patozi: scripts comuns como no Topzi (ordem no fim do `patozi/index.html`); script novo também vai no `FILES` do
   `sw.js` com o caminho `patozi/…` (o `tests/patozi.test.js` acusa). Regras e computador ficam em `patozi/js/jogo.js`, sem tela.
   Na partida, "Chutar" e "Nem a pato!" ficam separados
