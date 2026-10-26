@@ -37,7 +37,7 @@ function gameziRankingTexto(chave, l, vars) {
 // Texto do resultado do dia para compartilhar (todos os jogos): com 2 dias seguidos ou mais, põe a sequência do
 // Gamezi (gameziSequenciaAtual, de gamezi-conta.js) antes do link.
 function gameziTextoDoDia(texto, l) {
-  if (typeof gameziEvento === "function") gameziEvento("compartilhou", { jogo: location.pathname.split("/").filter(Boolean)[0] || "gamezi" });
+  if (typeof gameziEvento === "function" && typeof location !== "undefined") gameziEvento("compartilhou", { jogo: location.pathname.split("/").filter(Boolean)[0] || "gamezi" });
   if (typeof gameziSequenciaAtual !== "function") return texto;
   var n = gameziSequenciaAtual().dias;
   if (n < 2) return texto;
