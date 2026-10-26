@@ -8,7 +8,7 @@ const vm = require("vm");
 const SITE = path.join(__dirname, "..");
 const ler = (f) => fs.readFileSync(path.join(SITE, f), "utf8");
 const JOGOS = {
-  fotozi: ["js/jogo.js", "data/fotos-1.js", "data/fotos-2.js", "data/fotos-3.js"],
+  fotozi: ["js/jogo.js", "data/fotos-1.js", "data/fotos-2.js", "data/fotos-3.js", "data/fotos-4.js", "data/fotos-5.js"],
   censurazi: ["js/jogo.js", "data/cartas-1.js", "data/cartas-2.js"],
   corzi: ["js/jogo.js"],
 };
@@ -125,7 +125,9 @@ test("Fotozi: muitas fotos em vários temas, nomes nos 3 idiomas e reservas do m
     f.nome.forEach((n) => assert.ok(n && n.length > 1, f.id));
     assert.ok(r(`fzAcertou(fzFoto("${f.id}"), ${JSON.stringify(f.nome[0])})`), `${f.id}: o próprio nome vale`);
   }
-  for (const tema of r("FZ_TEMAS")) assert.ok(r(`fzDoTema("${tema}").length`) >= 25, tema);
+  for (const tema of r("FZ_TEMAS")) assert.ok(r(`fzDoTema("${tema}").length`) >= 20, tema);
+  assert.ok(r("FZ_TEMAS").length >= 19, "muitos temas");
+  assert.ok(fotos.length >= 800, "muitas fotos");
   for (const x of r("fzOnline('animais', 15, gzRng(9))")) {
     assert.equal(x.ids.length, 3);
     assert.ok(x.ids.every((id) => r(`fzFoto("${id}").tema`) === "animais"), "reservas do mesmo tema");

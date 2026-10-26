@@ -13,9 +13,12 @@ const FZ_PONTOS = [100, 90, 80, 70, 60, 50, 40, 30]; // quanto vale acertar em c
 const FZ_RESERVAS = 2;
 const FZ_QUANTIAS = [5, 10, 15]; // rodadas da partida online (o anfitrião escolhe)
 const FZ_FOTOS = []; // { id, tema, titulo, nome: [pt, en, es], apelidos: [] }
-const FZ_DIARIO_POOLS = [{ desde: 1, fotos: 427 }];
-const FZ_TEMAS = ["tudo", "futebol", "famosos", "atletas", "comidas", "frutas", "animais", "lugares", "carros", "instrumentos"];
-const FZ_PESSOAS = ["futebol", "famosos", "atletas"]; // nas fotos de gente, o pedacinho fica mais para cima (o rosto)
+const FZ_DIARIO_POOLS = [
+  { desde: 1, fotos: 427 },
+  { desde: 2, fotos: 841 }, // data/fotos-4.js e fotos-5.js (músicos, atores, história, pets, plantas, objetos…)
+];
+const FZ_TEMAS = ["tudo", "futebol", "famosos", "musicos", "atores", "atletas", "historia", "comidas", "frutas", "bebidas", "animais", "pets", "plantas", "lugares", "carros", "transportes", "objetos", "instrumentos", "esportes", "pinturas"];
+const FZ_PESSOAS = ["futebol", "famosos", "musicos", "atores", "atletas", "historia"]; // nas fotos de gente, o pedacinho é o rosto
 
 function fzFotos(tema, lista) {
   for (const [titulo, pt, en, es, apelidos] of lista) {
@@ -40,7 +43,7 @@ function fzFoco(foto) {
   for (const c of foto.id + foto.titulo) h = (h * 31 + c.charCodeAt(0)) >>> 0;
   const rnd = gzRng(h);
   const gente = FZ_PESSOAS.includes(foto.tema);
-  return { x: Math.round(32 + rnd() * 36), y: Math.round(gente ? 22 + rnd() * 26 : 30 + rnd() * 40) };
+  return gente ? { x: 50, y: 30 } : { x: Math.round(32 + rnd() * 36), y: Math.round(30 + rnd() * 40) };
 }
 
 function fzNormal(s) {

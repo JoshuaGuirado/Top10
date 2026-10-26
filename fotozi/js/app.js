@@ -17,6 +17,16 @@ const FZ_NOMES_TEMAS = {
   lugares: ["Lugares e monumentos", "Places & landmarks", "Lugares y monumentos"],
   carros: ["Carros", "Cars", "Autos"],
   instrumentos: ["Instrumentos musicais", "Musical instruments", "Instrumentos musicales"],
+  musicos: ["Cantores e músicos", "Singers & musicians", "Cantantes y músicos"],
+  atores: ["Atores e atrizes", "Actors & actresses", "Actores y actrices"],
+  historia: ["Gente da história", "Historical figures", "Personajes históricos"],
+  pets: ["Cachorros e pets", "Dogs & pets", "Perros y mascotas"],
+  plantas: ["Flores e plantas", "Flowers & plants", "Flores y plantas"],
+  objetos: ["Objetos", "Objects", "Objetos"],
+  esportes: ["Esportes", "Sports", "Deportes"],
+  bebidas: ["Bebidas", "Drinks", "Bebidas"],
+  transportes: ["Transportes", "Transport", "Transportes"],
+  pinturas: ["Pinturas famosas", "Famous paintings", "Pinturas famosas"],
 };
 
 const fzCache = new Map(); // título → Promise<{ src, arquivo, pagina } | null>
@@ -61,16 +71,16 @@ function fzBuscar(titulos) {
 // Carrega a foto e já acha o ponto com mais detalhe dela (onde o zoom começa).
 // Se o servidor não deixar ler os pixels (CORS), carrega de novo do jeito comum e fica com o ponto de reserva.
 const fzSemCors = new Set();
-function fzCarregarImagem(src, cors = true) {
+function fzCarregarImagem(src, cors = true, gente = false) {
   return new Promise((ok) => {
     const img = new Image();
     if (cors) img.crossOrigin = "anonymous";
     img.onload = () => {
-      if (cors && !fzFocos.has(src)) fzFocos.set(src, fzFocoDetalhe(img));
+      if (cors && !fzFocos.has(src)) fzFocos.set(src, gente ? fzFocoRosto(img) : fzFocoDetalhe(img));
       if (!cors) fzSemCors.add(src);
       ok(true);
     };
-    img.onerror = () => (cors ? fzCarregarImagem(src, false).then(ok) : ok(false));
+    img.onerror = () => (cors ? fzCarregarImagem(src, false, gente).then(ok) : ok(false));
     img.src = src;
   });
 }
@@ -78,18 +88,106 @@ function fzCarregarImagem(src, cors = true) {
 // A parte da foto (como ela aparece no quadro 4:5, cortada pelo meio) com mais detalhe: divide em quadradinhos, mede
 // quanto a cor muda dentro de cada um e escolhe o mais "cheio" longe da borda. Num rosto cai nos olhos e na boca; numa
 // comida, na comida; num prédio, nas janelas. Céu, parede e fundo liso ficam de fora. null se não der para ler a foto.
+// Pixels da foto do jeito que ela aparece no quadro 4:5 (cortada pelo meio), numa grade pequena.
+function fzPixels(img, W, H) {
+  const c = document.createElement("canvas");
+  c.width = W;
+  c.height = H;
+  const g = c.getContext("2d", { willReadFrequently: true });
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const esc = Math.max(W / iw, H / ih);
+  const sw = W / esc, sh = H / esc;
+  g.drawImage(img, (iw - sw) / 2, (ih - sh) / 2, sw, sh, 0, 0, W, H);
+  return g.getImageData(0, 0, W, H).data;
+}
+
+// Foto de gente: o rosto. Procura as manchas de cor de pele da foto e fica com a do rosto: grande, alta (mãos e braços
+// ficam mais embaixo) e com detalhe dentro (olhos, boca); parede bege lisa não conta. Devolve o meio do alto dela.
+// Sem pele à vista (foto em preto e branco, por exemplo), fica no lugar do rosto num retrato: no meio, um pouco acima.
+const FZ_ROSTO_PADRAO = { x: 50, y: 30 };
+function fzFocoRosto(img) {
+  try {
+    const W = 60, H = 75, G = 5;
+    const d = fzPixels(img, W, H);
+    const pele = (i) => {
+      const r = d[i], g = d[i + 1], b = d[i + 2];
+      const y = 0.299 * r + 0.587 * g + 0.114 * b;
+      const cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
+      const cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+      return y > 45 && cb >= 77 && cb <= 127 && cr >= 135 && cr <= 173 && r > g && r > b;
+    };
+    const lum = (x, y) => { const i = (y * W + x) * 4; return 0.3 * d[i] + 0.59 * d[i + 1] + 0.11 * d[i + 2]; };
+    const cols = W / G, lins = H / G;
+    const cel = [];
+    for (let cy = 0; cy < lins; cy++) {
+      cel.push([]);
+      for (let cx = 0; cx < cols; cx++) {
+        let p = 0, e = 0, tom = 0;
+        for (let y = cy * G; y < cy * G + G; y++) {
+          for (let x = cx * G; x < cx * G + G; x++) {
+            if (pele((y * W + x) * 4)) { p++; tom += lum(x, y); }
+            if (x + 1 < W) e += Math.abs(lum(x + 1, y) - lum(x, y));
+            if (y + 1 < H) e += Math.abs(lum(x, y + 1) - lum(x, y));
+          }
+        }
+        cel[cy].push({ p: p / (G * G), e: e / (G * G), tom: p ? tom / p : 0 });
+      }
+    }
+    // Manchas de pele (células vizinhas com bastante pele). Parede ou areia da cor da pele dá uma mancha enorme ou
+    // grudada na borda: fica de fora. Das que sobram, ganha a maior e mais alta que não seja lisa.
+    const ehPele = (cy, cx) => cel[cy][cx].p >= 0.35;
+    const visto = cel.map((l) => l.map(() => false));
+    let melhor = null, melhorNota = 0;
+    // Começa cada mancha pela célula com mais pele (a de borda, misturada com o fundo, tem um tom que engana).
+    const sementes = [];
+    for (let cy = 0; cy < lins; cy++) for (let cx = 0; cx < cols; cx++) if (ehPele(cy, cx)) sementes.push([cy, cx]);
+    sementes.sort((a, b) => cel[b[0]][b[1]].p - cel[a[0]][a[1]].p);
+    for (const [y0, x0] of sementes) {
+      {
+        if (visto[y0][x0]) continue;
+        const mancha = [];
+        const fila = [[y0, x0]];
+        visto[y0][x0] = true;
+        while (fila.length) {
+          const [cy, cx] = fila.pop();
+          mancha.push([cy, cx]);
+          for (const [dy, dx] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const ny = cy + dy, nx = cx + dx;
+            // Só junta pele do mesmo tom (o rosto não gruda na parede bege em volta).
+            if (ny >= 0 && ny < lins && nx >= 0 && nx < cols && !visto[ny][nx] && ehPele(ny, nx) && Math.abs(cel[ny][nx].tom - cel[y0][x0].tom) < 30) {
+              visto[ny][nx] = true;
+              fila.push([ny, nx]);
+            }
+          }
+        }
+        const n = mancha.length;
+        const borda = mancha.filter(([cy, cx]) => cy === 0 || cx === 0 || cx === cols - 1).length;
+        if (n < 3 || n > lins * cols * 0.4 || borda / n > 0.4) continue;
+        const topo = Math.min(...mancha.map(([cy]) => cy));
+        if (topo > lins * 0.75) continue;
+        const det = mancha.reduce((t, [cy, cx]) => t + cel[cy][cx].e, 0) / n;
+        // Detalhe só separa rosto (olhos, boca) de parede lisa; muito detalhe é a borda entre o rosto e o fundo, não o rosto.
+        const nota = Math.min(n, 30) * (1.6 - topo / lins) * (det >= 2 ? 1 : 0.3);
+        if (nota > melhorNota) { melhorNota = nota; melhor = { mancha, topo }; }
+      }
+    }
+    if (melhor) {
+      // O meio do alto da mancha (as 4 primeiras linhas): o rosto, sem o pescoço e o colo.
+      const alto = melhor.mancha.filter(([cy]) => cy <= melhor.topo + 3);
+      const mx = alto.reduce((t, [, cx]) => t + cx + 0.5, 0) / alto.length;
+      const my = alto.reduce((t, [cy]) => t + cy + 0.5, 0) / alto.length;
+      return { x: Math.round((mx / cols) * 100), y: Math.round((my / lins) * 100) };
+    }
+    return FZ_ROSTO_PADRAO;
+  } catch (e) {
+    return null; // a foto não deixa ler os pixels: usa o ponto de reserva
+  }
+}
+
 function fzFocoDetalhe(img) {
   try {
     const W = 48, H = 60, G = 6;
-    const c = document.createElement("canvas");
-    c.width = W;
-    c.height = H;
-    const g = c.getContext("2d", { willReadFrequently: true });
-    const iw = img.naturalWidth, ih = img.naturalHeight;
-    const esc = Math.max(W / iw, H / ih);
-    const sw = W / esc, sh = H / esc;
-    g.drawImage(img, (iw - sw) / 2, (ih - sh) / 2, sw, sh, 0, 0, W, H);
-    const d = g.getImageData(0, 0, W, H).data;
+    const d = fzPixels(img, W, H);
     const lum = (x, y) => { const i = (y * W + x) * 4; return 0.3 * d[i] + 0.59 * d[i + 1] + 0.11 * d[i + 2]; };
     const cols = W / G, lins = H / G;
     let melhor = null, max = -1;
@@ -119,7 +217,7 @@ async function fzResolver(r) {
   for (const id of r.ids) {
     const foto = fzFoto(id);
     const dados = await fzCache.get(foto.titulo);
-    if (dados && (await fzCarregarImagem(dados.src))) {
+    if (dados && (await fzCarregarImagem(dados.src, true, FZ_PESSOAS.includes(foto.tema)))) {
       fzEscolhida.set(chave, id);
       return { foto, dados };
     }
