@@ -229,15 +229,16 @@ livre** por tema até errar 3 vezes e **online** com salas e skin. Testes: `test
 `tests/jogos-novos-online.e2e.js`. Banco: `supabase/schema.sql` (roda de novo para atualizar).
 
 - **Fotozi**: aparece só um pedacinho bem ampliado de uma foto (jogador de futebol, famoso, atleta, comida, fruta, bicho, lugar,
-  carro ou instrumento). Cada chute errado (ou "abrir mais") afasta um pouco a foto e a rodada vale 10 pontos a menos: de 100
-  (bem de perto) a 30 (a foto inteira). Enquanto digita, aparecem sugestões; vale apelido ("CR7") e errinho de digitação.
-  São 841 fotos em 19 temas (jogadores, famosos, cantores e músicos, atores, atletas, gente da história, comidas, frutas, bebidas,
+  carro ou instrumento). Cada chute errado (ou "abrir mais") afasta bastante a foto e a rodada vale 20 pontos a menos: são só 5
+  etapas, de 100 (bem de perto) a 20 (a foto inteira). Enquanto digita, aparecem sugestões; vale apelido ("CR7") e errinho de digitação.
+  São 873 fotos em 19 temas (jogadores, famosos, cantores e músicos, atores, atletas, gente da história, comidas, frutas, bebidas,
   animais, cachorros e pets, flores e plantas, lugares, carros, transportes, objetos, instrumentos, esportes e pinturas famosas). As fotos são as principais dos artigos da **Wikipédia em português** (licença livre, Wikimedia
   Commons): o jogo guarda só o título do artigo e o navegador busca a foto na hora, com o crédito no fim da rodada. Cada rodada
-  leva duas fotos reserva do mesmo tema, para o caso de um artigo estar sem foto (ou com mapa, assinatura, brasão ou logo no lugar
-  da foto). O pedacinho ampliado é a parte com mais detalhe da foto (comida, fachada…), achada pelo navegador; nas fotos de gente é o
-  rosto (a mancha de cor de pele mais alta da foto), para nunca ficar só no corpo. No online o anfitrião escolhe 5, 10 ou 15
-  rodadas.
+  leva duas fotos reserva do mesmo tema. **Todas as fotos são conferidas a olho**: um robô no GitHub Actions
+  (`ferramentas/fotozi/verificar.py`) baixa as fotos, acha os rostos e monta folhas de conferência; a revisão
+  (`ferramentas/fotozi/revisao.json`) diz onde o zoom começa (o rosto da pessoa, a cabeça do bicho) e tira as fotos estranhas
+  (mapa, logo, desenho, montagem, foto de outra coisa); `node ferramentas/fotozi/gerar-focos.js` gera `fotozi/data/focos.js`.
+  O ponto conferido fica no meio do quadro em cada etapa do zoom. No online o anfitrião escolhe 5, 10 ou 15 rodadas.
   - `fotozi/data/fotos-*.js`: `[título do artigo, "nome", "English"?, "español"?, "apelidos|aceitos"?]`; fotos novas no FIM e uma
     linha nova em `FZ_DIARIO_POOLS` (`fotozi/js/jogo.js`) valendo a partir de amanhã.
 - **Censurazi**: cada carta tem uma palavra e 5 **proibidas**. Sozinho e online, elas viram **dicas** da palavra secreta: aparece uma de cada vez

@@ -1,6 +1,6 @@
 // Regras do Fotozi, sem tela (testadas em tests/jogos-fotozi-censurazi-corzi.test.js).
 // Aparece só um pedacinho bem ampliado de uma foto (um jogador, uma comida, um lugar…). A pessoa chuta o nome;
-// cada chute errado (ou "abrir mais") afasta um pouco a foto e a rodada vale um pouco menos: de 100 a 30 pontos.
+// cada chute errado (ou "abrir mais") afasta bastante a foto e a rodada vale menos: de 100 a 20 pontos, em 5 etapas.
 // As fotos são as principais dos artigos da Wikipédia em português (licença livre); o navegador busca na hora.
 // Cada rodada leva duas fotos reserva do mesmo tema, para o caso de uma foto não carregar.
 // Fotos novas entram no FIM de data/fotos-*.js (os ids são a ordem) e precisam de uma linha nova em
@@ -8,14 +8,20 @@
 
 const FZ_INICIO = Date.UTC(2026, 9, 26); // Fotozi do dia: o dia 1 é 26/10/2026
 const FZ_SEGUNDOS = 60;
-const FZ_ZOOM = [4.2, 3.4, 2.8, 2.3, 1.9, 1.55, 1.25, 1]; // quanto a foto está ampliada em cada nível (de perto, mas sem borrar)
-const FZ_PONTOS = [100, 90, 80, 70, 60, 50, 40, 30]; // quanto vale acertar em cada nível
+// Quanto a foto está ampliada em cada nível: poucas etapas, cada erro afasta bastante (o dono pediu assim).
+const FZ_ZOOM = [4.5, 3, 2, 1.4, 1];
+const FZ_PONTOS = [100, 80, 60, 40, 20]; // quanto vale acertar em cada nível
+// Conferência das fotos (data/focos.js, feito a partir de ferramentas/fotozi/fotos.json, conferido a olho):
+// FZ_FOCOS[id] = [arquivo da foto na Wikipédia, x, y]: onde o zoom começa, em % da foto inteira (o rosto, nas de gente);
+// FZ_FORA: fotos estranhas ou sem sentido, fora do sorteio (do dia 2 em diante no Fotozi do dia).
+const FZ_FOCOS = {};
+const FZ_FORA = new Set();
 const FZ_RESERVAS = 2;
 const FZ_QUANTIAS = [5, 10, 15]; // rodadas da partida online (o anfitrião escolhe)
 const FZ_FOTOS = []; // { id, tema, titulo, nome: [pt, en, es], apelidos: [] }
 const FZ_DIARIO_POOLS = [
   { desde: 1, fotos: 427 },
-  { desde: 2, fotos: 841 }, // data/fotos-4.js e fotos-5.js (músicos, atores, história, pets, plantas, objetos…)
+  { desde: 2, fotos: 873, conferidas: true }, // fotos-4.js a fotos-6.js; sem as de FZ_FORA (conferidas a olho)
 ];
 const FZ_TEMAS = ["tudo", "futebol", "famosos", "musicos", "atores", "atletas", "historia", "comidas", "frutas", "bebidas", "animais", "pets", "plantas", "lugares", "carros", "transportes", "objetos", "instrumentos", "esportes", "pinturas"];
 const FZ_PESSOAS = ["futebol", "famosos", "musicos", "atores", "atletas", "historia"]; // nas fotos de gente, o pedacinho é o rosto
@@ -33,7 +39,14 @@ function fzFoto(id) {
 }
 
 function fzDoTema(tema) {
-  return !tema || tema === "tudo" ? FZ_FOTOS : FZ_FOTOS.filter((f) => f.tema === tema);
+  return FZ_FOTOS.filter((f) => !FZ_FORA.has(f.id) && (!tema || tema === "tudo" || f.tema === tema));
+}
+
+// O ponto conferido da foto, se a foto que veio da Wikipédia ainda é a mesma que foi conferida.
+function fzFocoConferido(foto, arquivo) {
+  const c = FZ_FOCOS[foto.id];
+  const igual = (a) => String(a || "").replace(/_/g, " ").toLowerCase();
+  return c && igual(c[0]) === igual(arquivo) ? { x: c[1], y: c[2] } : null;
 }
 
 // Ponto de reserva do pedacinho ampliado (em % da foto), quando a tela não consegue achar a parte com mais detalhe
@@ -84,7 +97,8 @@ function fzSortear(n, rnd, fotos = FZ_FOTOS) {
 
 function fzDiario(dia) {
   const pool = FZ_DIARIO_POOLS.filter((p) => p.desde <= Math.max(dia, 1)).pop();
-  return fzSortear(GZ_DIARIO_QTD, gzRng(dia * 7919 + 71), FZ_FOTOS.slice(0, pool.fotos));
+  const fotos = FZ_FOTOS.slice(0, pool.fotos).filter((f) => !pool.conferidas || !FZ_FORA.has(f.id));
+  return fzSortear(GZ_DIARIO_QTD, gzRng(dia * 7919 + 71), fotos);
 }
 
 // Partida livre: as fotos do tema embaralhadas, sem repetir até dar a volta.

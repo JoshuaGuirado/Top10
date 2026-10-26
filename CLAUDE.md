@@ -115,10 +115,15 @@
   telas próprias no início: o "Na mesa" do Censurazi, em `censurazi/js/mesa.js`).
 - Fotozi: as fotos NÃO ficam no repositório. Cada item é o título do artigo da Wikipédia em português (`fotozi/data/fotos-*.js`); o
   navegador busca a foto principal (licença livre) pela API da Wikipédia e mostra o crédito. Foto nova: título que existe no
-  pt.wikipedia, nome nos 3 idiomas e apelidos, no FIM, com linha nova em `FZ_DIARIO_POOLS`. Cada erro afasta só um pouco a foto e
-  tira só 10 pontos (o dono pediu assim). O zoom começa em 4,2× (mais que isso borra) e a foto vem com 2560 px; o pedacinho
-  é a parte com mais detalhe da foto (`fzFocoDetalhe`, lendo os pixels), não um ponto ao acaso; nas fotos de gente (`FZ_PESSOAS`)
-  é o ROSTO (`fzFocoRosto`, pela cor de pele no alto da foto; o dono reclamou de zoom só no corpo); páginas de desambiguação e
+  pt.wikipedia, nome nos 3 idiomas e apelidos, no FIM, com linha nova em `FZ_DIARIO_POOLS`. Zoom em 5 etapas (`FZ_ZOOM`
+  4,5× → 1×; 100, 80, 60, 40, 20 pontos): o dono pediu poucas etapas e cada erro afastando bastante. TODA foto é conferida a olho:
+  o robô do GitHub Actions (`.github/workflows/fotozi-fotos.yml`, `ferramentas/fotozi/verificar.py`, roda no push dele ou à mão;
+  o contêiner não alcança a Wikipédia) baixa as fotos, acha o rosto (OpenCV) e faz folhas de conferência com grade A–E × 1–5;
+  quem revisa anota em `ferramentas/fotozi/revisao.json` (`{"foco": "C2"}` ou `[x, y]`, ou `{"fora": "motivo"}`) e roda
+  `node ferramentas/fotozi/gerar-focos.js`, que gera `fotozi/data/focos.js` (`FZ_FOCOS`: onde o zoom começa, centrado no quadro;
+  `FZ_FORA`: fora do sorteio). Gente: sempre o ROSTO; bicho: a CABEÇA (o dono reclamou de zoom no corpo e na barriga do cachorro).
+  Foto estranha (mapa, logo, desenho, montagem, imagem preta, foto de outra coisa) vai para `fora`. As folhas não ficam na `main`.
+  Sem foco conferido (a Wikipédia trocou a foto), entram `fzFocoRosto`/`fzFocoDetalhe` no navegador. Páginas de desambiguação e
   imagens que não são foto (assinatura, mapa, brasão, logo…) são puladas e entra a reserva. Os testes simulam a Wikipédia.
 - Censurazi: cartas com a palavra e 5 proibidas nos 3 idiomas (da mais vaga para a mais óbvia), no FIM, com linha nova em
   `CS_DIARIO_POOLS`. Corzi: cores em `CZR_CORES` (aparecem num cartão escuro).

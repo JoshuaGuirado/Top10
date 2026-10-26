@@ -31,7 +31,8 @@ const FZ_NOMES_TEMAS = {
 
 const fzCache = new Map(); // título → Promise<{ src, arquivo, pagina } | null>
 const fzEscolhida = new Map(); // ids da rodada → id da foto que apareceu
-const fzFocos = new Map(); // endereço da foto → ponto com mais detalhe { x, y } (em %)
+const fzFocos = new Map(); // endereço da foto → ponto com mais detalhe { x, y } (em %), achado na hora
+const fzDims = new Map(); // endereço da foto → [largura, altura]
 let fzN = 0; // nível da foto na rodada da vez (0 = bem ampliada)
 let fzAtual = null; // foto da rodada da vez
 let fzResponder = null;
@@ -76,6 +77,7 @@ function fzCarregarImagem(src, cors = true, gente = false) {
     const img = new Image();
     if (cors) img.crossOrigin = "anonymous";
     img.onload = () => {
+      fzDims.set(src, [img.naturalWidth, img.naturalHeight]);
       if (cors && !fzFocos.has(src)) fzFocos.set(src, gente ? fzFocoRosto(img) : fzFocoDetalhe(img));
       if (!cors) fzSemCors.add(src);
       ok(true);
@@ -239,6 +241,36 @@ function fzImg(dados, foto, n, inteira) {
   return `<img class="fz-img ${inteira ? "inteira" : ""}" src="${escapeHtml(dados.src)}"${fzSemCors.has(dados.src) ? "" : ' crossorigin="anonymous"'} alt="" draggable="false" style="transform-origin:${f.x}% ${f.y}%;transform:scale(${z})">`;
 }
 
+// Com o ponto conferido (em % da foto inteira): enquadra a foto no quadro de modo que o ponto apareça (foto deitada
+// corta dos lados, em pé corta em cima e embaixo; o corte vai para perto do ponto) e põe o zoom em cima dele.
+function fzEnquadrar(img, foto, dados) {
+  const c = fzFocoConferido(foto, dados.arquivo);
+  const dims = fzDims.get(dados.src);
+  const caixa = img.parentElement.getBoundingClientRect();
+  if (!c || !dims || !caixa.width || !caixa.height) return;
+  const esc = Math.max(caixa.width / dims[0], caixa.height / dims[1]);
+  const eixo = (f, lado, quadro) => {
+    const sobra = lado * esc - quadro;
+    const corte = Math.min(Math.max((f / 100) * lado * esc - quadro / 2, 0), sobra);
+    return { pos: sobra > 0.5 ? (corte / sobra) * 100 : 50, ponto: ((f / 100) * lado * esc - corte) / quadro };
+  };
+  const x = eixo(c.x, dims[0], caixa.width), y = eixo(c.y, dims[1], caixa.height);
+  img.style.objectPosition = `${x.pos}% ${y.pos}%`;
+  img.dataset.px = x.ponto;
+  img.dataset.py = y.ponto;
+  fzZoom(img, FZ_ZOOM[fzN]);
+}
+
+// Amplia a foto. Com o ponto conferido, a origem do zoom é escolhida para o ponto ficar no MEIO do quadro
+// (até onde dá sem aparecer borda): ponto p vai para o + z·(p − o); para cair em 0,5, o = (z·p − 0,5) / (z − 1).
+function fzZoom(img, z) {
+  if (img.dataset.px !== undefined && z > 1) {
+    const o = (p) => Math.min(Math.max((z * p - 0.5) / (z - 1), 0), 1) * 100;
+    img.style.transformOrigin = `${o(Number(img.dataset.px))}% ${o(Number(img.dataset.py))}%`;
+  }
+  img.style.transform = `scale(${z})`;
+}
+
 function fzCredito(dados) {
   return `<a class="fz-credito" href="https://commons.wikimedia.org/wiki/File:${encodeURIComponent(dados.arquivo)}" target="_blank" rel="noopener">${escapeHtml(t("fz.credit"))}</a>`;
 }
@@ -280,6 +312,7 @@ function fzDesenhar(el, r, e) {
       fzAtual = achou.foto;
       $("fz-quadro").classList.remove("carregando");
       $("fz-quadro").innerHTML = fzImg(achou.dados, achou.foto, fzN, false);
+      fzEnquadrar($("fz-quadro").querySelector(".fz-img"), achou.foto, achou.dados);
       $("fz-chute").disabled = false;
       $("fz-form").querySelector(".btn").disabled = false;
       fzAtualizar();
@@ -308,7 +341,7 @@ function fzAtualizar() {
   $("fz-vale").innerHTML = `<span class="fz-niveis">${FZ_PONTOS.map((_, i) => `<i class="${i < fzN ? "usado" : i === fzN ? "agora" : ""}"></i>`).join("")}</span> ${escapeHtml(t("fz.worth", { n: FZ_PONTOS[fzN] }))}`;
   $("fz-mais").hidden = fzN >= FZ_ZOOM.length - 1 || !fzAtual;
   const img = document.querySelector("#fz-quadro .fz-img");
-  if (img && fzAtual) img.style.transform = `scale(${FZ_ZOOM[fzN]})`;
+  if (img && fzAtual) fzZoom(img, FZ_ZOOM[fzN]);
 }
 
 function fzAbrirMais() {
@@ -364,14 +397,14 @@ gzIniciar({
   resumo: fzResumo,
   respostaTexto: (r, v) => (v && v.g ? escapeHtml(v.g) : "—"),
   textos: {
-    "home.tag": ["Só um pedacinho da foto. Quem é? O que é? Cada erro abre um pouco mais e vale um pouco menos.", "Just a tiny piece of the photo. Who is it? What is it? Each miss zooms out a bit and is worth a bit less.", "Solo un pedacito de la foto. ¿Quién es? ¿Qué es? Cada error abre un poco más y vale un poco menos."],
+    "home.tag": ["Só um pedacinho da foto. Quem é? O que é? Cada erro abre mais a foto e vale menos.", "Just a tiny piece of the photo. Who is it? What is it? Each miss zooms out a bit and is worth a bit less.", "Solo un pedacito de la foto. ¿Quién es? ¿Qué es? Cada error abre un poco más y vale un poco menos."],
     "daily.name": ["Fotozi do dia", "Daily Fotozi", "Fotozi del día"],
     "daily.kicker": ["Fotozi do dia #{n}", "Daily Fotozi #{n}", "Fotozi del día #{n}"],
     "fz.loading": ["Carregando a foto…", "Loading the photo…", "Cargando la foto…"],
     "fz.noPhoto": ["Não deu para carregar a foto. Confira a internet e toque em Desisto para seguir.", "Couldn't load the photo. Check your connection and tap Give up to move on.", "No se pudo cargar la foto. Revisa internet y toca Me rindo para seguir."],
     "fz.ph": ["Quem ou o que é?", "Who or what is it?", "¿Quién o qué es?"],
     "fz.guess": ["Chutar", "Guess", "Probar"],
-    "fz.more": ["Abrir mais a foto (−10)", "Zoom out (−10)", "Abrir más la foto (−10)"],
+    "fz.more": ["Abrir mais a foto (−20)", "Zoom out (−20)", "Abrir más la foto (−20)"],
     "fz.giveUp": ["Desisto", "Give up", "Me rindo"],
     "fz.worth": ["Vale {n} pontos", "Worth {n} points", "Vale {n} puntos"],
     "fz.notIt": ["Não é \"{g}\". A foto abriu um pouco.", "It's not \"{g}\". The photo zoomed out a bit.", "No es \"{g}\". La foto se abrió un poco."],
@@ -380,9 +413,9 @@ gzIniciar({
     "fz.was": ["Era", "It was", "Era"],
     "fz.credit": ["Foto: Wikimedia Commons", "Photo: Wikimedia Commons", "Foto: Wikimedia Commons"],
     "help.html": [
-      "<ol class=\"help-steps\"><li>Aparece só um pedacinho bem ampliado de uma foto: um jogador, um famoso, uma comida, um bicho, um lugar…</li><li>Digite quem ou o que é (aparecem sugestões enquanto você digita).</li><li>Cada chute errado afasta um pouco a foto, e a rodada vale um pouco menos: 100, 90, 80… até 30 com a foto inteira. Dá também para abrir mais sem chutar.</li></ol><p><b>Fotozi do dia:</b> as mesmas 10 para todo mundo, com ranking. <b>Partida livre:</b> escolha o tema e vá até errar 3 vezes. <b>Online:</b> todo mundo vê a mesma foto, cada um no seu celular; o anfitrião escolhe o tema e 5, 10 ou 15 rodadas.</p><p class=\"small muted\">As fotos são da Wikipédia (Wikimedia Commons), com licença livre; o crédito aparece no fim de cada rodada.</p>",
-      "<ol class=\"help-steps\"><li>Just a tiny, very zoomed-in piece of a photo shows up: a soccer player, a celebrity, a dish, an animal, a place…</li><li>Type who or what it is (suggestions show up as you type).</li><li>Each wrong guess zooms out a bit and the round is worth a bit less: 100, 90, 80… down to 30 with the full photo. You can also zoom out without guessing.</li></ol><p><b>Daily Fotozi:</b> the same 10 for everyone, with a ranking. <b>Free play:</b> pick a theme and go until you miss 3 times. <b>Online:</b> everyone sees the same photo on their own phone; the host picks the theme and 5, 10 or 15 rounds.</p><p class=\"small muted\">Photos come from Wikipedia (Wikimedia Commons) under free licenses; the credit shows at the end of each round.</p>",
-      "<ol class=\"help-steps\"><li>Aparece solo un pedacito muy ampliado de una foto: un futbolista, un famoso, una comida, un animal, un lugar…</li><li>Escribe quién o qué es (aparecen sugerencias mientras escribes).</li><li>Cada intento fallido abre un poco la foto y la ronda vale un poco menos: 100, 90, 80… hasta 30 con la foto entera. También puedes abrir más sin intentar.</li></ol><p><b>Fotozi del día:</b> las mismas 10 para todos, con ranking. <b>Partida libre:</b> elige el tema y sigue hasta fallar 3 veces. <b>Online:</b> todos ven la misma foto, cada uno en su celular; el anfitrión elige el tema y 5, 10 o 15 rondas.</p><p class=\"small muted\">Las fotos son de Wikipedia (Wikimedia Commons), con licencia libre; el crédito aparece al final de cada ronda.</p>",
+      "<ol class=\"help-steps\"><li>Aparece só um pedacinho bem ampliado de uma foto: um jogador, um famoso, uma comida, um bicho, um lugar…</li><li>Digite quem ou o que é (aparecem sugestões enquanto você digita).</li><li>Cada chute errado afasta a foto, e a rodada vale menos: 100, 80, 60, 40 e 20 com a foto inteira. Dá também para abrir mais sem chutar.</li></ol><p><b>Fotozi do dia:</b> as mesmas 10 para todo mundo, com ranking. <b>Partida livre:</b> escolha o tema e vá até errar 3 vezes. <b>Online:</b> todo mundo vê a mesma foto, cada um no seu celular; o anfitrião escolhe o tema e 5, 10 ou 15 rodadas.</p><p class=\"small muted\">As fotos são da Wikipédia (Wikimedia Commons), com licença livre; o crédito aparece no fim de cada rodada.</p>",
+      "<ol class=\"help-steps\"><li>Just a tiny, very zoomed-in piece of a photo shows up: a soccer player, a celebrity, a dish, an animal, a place…</li><li>Type who or what it is (suggestions show up as you type).</li><li>Each wrong guess zooms out and the round is worth less: 100, 80, 60, 40 and 20 with the full photo. You can also zoom out without guessing.</li></ol><p><b>Daily Fotozi:</b> the same 10 for everyone, with a ranking. <b>Free play:</b> pick a theme and go until you miss 3 times. <b>Online:</b> everyone sees the same photo on their own phone; the host picks the theme and 5, 10 or 15 rounds.</p><p class=\"small muted\">Photos come from Wikipedia (Wikimedia Commons) under free licenses; the credit shows at the end of each round.</p>",
+      "<ol class=\"help-steps\"><li>Aparece solo un pedacito muy ampliado de una foto: un futbolista, un famoso, una comida, un animal, un lugar…</li><li>Escribe quién o qué es (aparecen sugerencias mientras escribes).</li><li>Cada intento fallido abre la foto y la ronda vale menos: 100, 80, 60, 40 y 20 con la foto entera. También puedes abrir más sin intentar.</li></ol><p><b>Fotozi del día:</b> las mismas 10 para todos, con ranking. <b>Partida libre:</b> elige el tema y sigue hasta fallar 3 veces. <b>Online:</b> todos ven la misma foto, cada uno en su celular; el anfitrión elige el tema y 5, 10 o 15 rondas.</p><p class=\"small muted\">Las fotos son de Wikipedia (Wikimedia Commons), con licencia libre; el crédito aparece al final de cada ronda.</p>",
     ],
   },
 });

@@ -100,7 +100,7 @@ const server = http.createServer((req, res) => {
         await S.waitForSelector("#fz-quadro .fz-img");
         await S.fill("#fz-chute", "zzzz");
         await S.click("#fz-form .btn");
-        assert.match(await S.textContent("#fz-vale"), /90/, "o erro tirou 10 pontos");
+        assert.match(await S.textContent("#fz-vale"), /80/, "o erro tirou 20 pontos");
         const nome = await S.evaluate(() => fzAtual.nome[0]);
         await S.fill("#fz-chute", nome.slice(0, 5));
         await S.click(`#fz-sug [data-nome="${nome}"]`);
