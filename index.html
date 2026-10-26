@@ -300,6 +300,10 @@
       var b = document.getElementById("theme");
       b.innerHTML = ICONS[isDark() ? "sun" : "moon"] + "<span>" + t(isDark() ? "light" : "dark") + "</span>";
     }
+    // Qual jogo as pessoas abrem pelo portal (métrica de uso, sem dado pessoal).
+    document.querySelectorAll(".game-row").forEach(function (a) {
+      a.addEventListener("click", function () { gameziEvento("abriu_jogo", { jogo: a.getAttribute("href").replace("/", "") }); });
+    });
     document.getElementById("lang").addEventListener("change", function (e) { lang = e.target.value; save("lang", lang); render(); });
     document.getElementById("theme").addEventListener("click", function () {
       var next = isDark() ? "light" : "dark";

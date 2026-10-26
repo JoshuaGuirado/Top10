@@ -124,6 +124,7 @@ async function enviarDiario(dia, reg) {
   await ensureOnline();
   const nick = gameziNick(store("nick"));
   if (!nick) return; // sem nome não entra no ranking (o nome é pedido antes do Pato do dia)
+  gameziEvento("desafio_do_dia", { jogo: "patozi", pontos: diarioTotal(reg) });
   const chutes = pzDiarioCartas(dia).map((carta, k) => ({ carta, chute: reg.chutes[k] }));
   const semFuncao = (error) => error && (error.code === "PGRST202" || /could not find the function/i.test(error.message || ""));
   let { error } = await sb.rpc("patozi_registrar_diario", { p_dia: dia, p_nick: nick, p_chutes: chutes, p_tempo: gameziTempoValido(reg.ms) });

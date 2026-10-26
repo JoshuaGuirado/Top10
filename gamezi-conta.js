@@ -71,6 +71,12 @@ var GAMEZI_INICIO = {
   memorizi: Date.UTC(2026, 9, 23), fotozi: Date.UTC(2026, 9, 26), censurazi: Date.UTC(2026, 9, 26), corzi: Date.UTC(2026, 9, 26),
 };
 
+// Métrica de uso (eventos do Vercel Web Analytics; o painel da Vercel mostra os eventos no plano Pro). Nunca leva
+// nome, e-mail nem nada da pessoa: só o jogo e o que aconteceu. Sem a Vercel (arquivo aberto direto), não faz nada.
+function gameziEvento(nome, dados) {
+  try { if (typeof window !== "undefined" && typeof window.va === "function") window.va("event", { name: nome, data: dados || {} }); } catch (e) { /* métrica nunca atrapalha o jogo */ }
+}
+
 function gameziHojeUTC(quando) {
   var d = quando || new Date();
   return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());

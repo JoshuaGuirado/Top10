@@ -37,6 +37,7 @@ function gameziRankingTexto(chave, l, vars) {
 // Texto do resultado do dia para compartilhar (todos os jogos): com 2 dias seguidos ou mais, põe a sequência do
 // Gamezi (gameziSequenciaAtual, de gamezi-conta.js) antes do link.
 function gameziTextoDoDia(texto, l) {
+  if (typeof gameziEvento === "function") gameziEvento("compartilhou", { jogo: location.pathname.split("/").filter(Boolean)[0] || "gamezi" });
   if (typeof gameziSequenciaAtual !== "function") return texto;
   var n = gameziSequenciaAtual().dias;
   if (n < 2) return texto;
@@ -221,6 +222,7 @@ function gameziRankingDoDia(o) {
   if (o.dia !== o.hoje || o.reg.enviado) return gameziRankingDesenhar(o.box, gameziCliente(false), o.jogo, o.dia, o.lang);
   var nick = gameziNick(o.nick);
   if (!nick) return gameziRankingPedirNome(o);
+  if (typeof gameziEvento === "function") gameziEvento("desafio_do_dia", { jogo: o.jogo, pontos: o.reg.acertos });
   var envio = gameziCliente(true).then(function (sb) {
     return sb.rpc(o.jogo + "_registrar_diario", { p_dia: o.dia, p_nick: nick, p_acertos: o.reg.acertos, p_tempo: gameziTempoValido(o.reg.ms) }).then(function (r) {
       if (r.error) throw new Error(r.error.message || "erro");

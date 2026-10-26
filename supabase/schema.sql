@@ -1758,6 +1758,7 @@ comment on view public.gamezi_jogadores_nas_salas is 'Gamezi: quem está em cada
 
 revoke all on public.gamezi_salas, public.gamezi_jogadores_nas_salas from anon, authenticated;
 
+
 -- Atalhos com os nomes antigos do Topzi (profiles, rooms, room_players, matches): já não são usados.
 do $$
 declare
@@ -2332,3 +2333,26 @@ begin
     execute format('grant execute on function public.%I(text) to authenticated', jogo || '_assumir_sala');
   end loop;
 end $$;
+
+-- Uso de cada jogo por dia, para o dono ver no painel (Table Editor → gamezi_uso): quantas pessoas fizeram o desafio
+-- do dia (as linhas dos rankings) e quantas partidas online terminaram. Sem dado pessoal e fechada para o site.
+drop view if exists public.gamezi_uso;
+do $$
+declare
+  j text;
+  partes text[] := '{}';
+  inicio constant jsonb := '{"topzi": "2026-10-01", "patozi": "2026-10-08", "datazi": "2026-10-08", "maisoumenozi": "2026-10-09",
+    "cravazi": "2026-10-09", "tamanhozi": "2026-10-13", "emojizi": "2026-10-23", "contazi": "2026-10-23", "memorizi": "2026-10-23",
+    "fotozi": "2026-10-26", "censurazi": "2026-10-26", "corzi": "2026-10-26"}';
+begin
+  for j in select jsonb_object_keys(inicio) loop
+    partes := partes || format('select %L::text as jogo, %L::date + (d.dia - 1) as data, count(*)::int as desafio_do_dia, 0 as partidas_online from public.%I d group by d.dia',
+      j, inicio ->> j, j || '_diario');
+    partes := partes || format('select %L::text, (p.created_at at time zone %L)::date, 0, count(*)::int from public.%I p group by 2',
+      j, 'America/Sao_Paulo', j || '_partidas');
+  end loop;
+  execute 'create view public.gamezi_uso with (security_invoker = true) as select jogo, data, sum(desafio_do_dia)::int as desafio_do_dia, ' ||
+    'sum(partidas_online)::int as partidas_online from (' || array_to_string(partes, ' union all ') || ') x group by jogo, data';
+end $$;
+comment on view public.gamezi_uso is 'Gamezi: uso de cada jogo por dia (desafio do dia = quantos entraram no ranking; partidas online terminadas)';
+revoke all on public.gamezi_uso from anon, authenticated;
