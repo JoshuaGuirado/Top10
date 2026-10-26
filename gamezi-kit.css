@@ -116,6 +116,9 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .daily { border: 2px solid var(--accent); display: grid; gap: 12px; }
 .daily-top { display: flex; align-items: center; gap: 10px; }
 .daily-date { margin-right: auto; color: var(--muted); font-size: .9rem; font-weight: 600; }
+/* Celular bem estreito: o nome do desafio ("Censurazi do dia") e o botão não cabem com a data; a data sai. */
+.daily, .daily > * { min-width: 0; }
+@media (max-width: 360px) { .daily-top .daily-date { display: none; } .daily-top .daily-name { margin-right: auto; } }
 .daily-status { margin: 0; font-size: .88rem; color: var(--muted); text-align: center; }
 .week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 .week .day {
