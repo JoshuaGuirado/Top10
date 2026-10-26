@@ -15,6 +15,7 @@
   };
   // Jogos do kit (gamezi-kit.js): as mesmas tabelas com o nome de cada um.
   const KIT = ["emojizi", "contazi", "memorizi", "fotozi", "censurazi", "corzi"];
+  Object.assign(PK, { gamezi_ligas: ["codigo"], gamezi_liga_membros: ["liga", "user_id"] });
   KIT.forEach((j) => Object.assign(PK, { [j + "_salas"]: ["code"], [j + "_sala_jogadores"]: ["sala_code", "user_id"], [j + "_partidas"]: ["id"], [j + "_diario"]: ["dia", "user_id"] }));
 
   const empty = () => Object.fromEntries(Object.keys(PK).map((k) => [k, []]));
@@ -200,6 +201,61 @@
         return { data: true, error: null };
       }
       // Como gamezi_ranking_dia do schema.sql: mais pontos na frente; no empate, menos tempo (sem tempo fica atrás).
+      // Ligas: como as funções gamezi_liga_* do schema.sql (cada desafio do dia vale de 0 a 100; semana de segunda a domingo).
+      if (nome.startsWith("gamezi_liga") || nome === "gamezi_minhas_ligas") {
+        if (!uid) return { data: null, error: { message: "Entre para participar da liga." } };
+        const membros = db.gamezi_liga_membros;
+        const cod = String(a.p_codigo || "").trim().toUpperCase();
+        const membro = (c) => membros.some((m) => m.liga === c && m.user_id === uid);
+        if (nome === "gamezi_liga_criar") {
+          const c = Array.from({ length: 6 }, () => "ABCDEFGHJKMNPQRSTUVWXYZ23456789"[Math.floor(Math.random() * 31)]).join("");
+          db.gamezi_ligas.push({ codigo: c, nome: a.p_nome.slice(0, 24), dono: uid, created_at: now() });
+          membros.push({ liga: c, user_id: uid, nick: a.p_nick.slice(0, 16), joined_at: now() });
+          save(db);
+          return { data: c, error: null };
+        }
+        if (nome === "gamezi_liga_entrar") {
+          const l = db.gamezi_ligas.find((x) => x.codigo === cod);
+          if (!l) return { data: null, error: { message: "Liga não encontrada." } };
+          const eu = membros.find((m) => m.liga === cod && m.user_id === uid);
+          if (eu) eu.nick = a.p_nick.slice(0, 16);
+          else membros.push({ liga: cod, user_id: uid, nick: a.p_nick.slice(0, 16), joined_at: now() });
+          save(db);
+          return { data: l.nome, error: null };
+        }
+        if (nome === "gamezi_liga_sair") {
+          db.gamezi_liga_membros = membros.filter((m) => !(m.liga === cod && m.user_id === uid));
+          db.gamezi_ligas = db.gamezi_ligas.filter((l) => db.gamezi_liga_membros.some((m) => m.liga === l.codigo));
+          save(db);
+          return { data: null, error: null };
+        }
+        if (nome === "gamezi_minhas_ligas") {
+          return { data: membros.filter((m) => m.user_id === uid).map((m) => {
+            const l = db.gamezi_ligas.find((x) => x.codigo === m.liga);
+            return { codigo: l.codigo, nome: l.nome, membros: membros.filter((x) => x.liga === l.codigo).length };
+          }), error: null };
+        }
+        if (nome === "gamezi_liga_ranking") {
+          if (!membro(cod)) return { data: null, error: { message: "Você não está nessa liga." } };
+          const jogos = { topzi: ["2026-10-01", 55], patozi: ["2026-10-08", 500], datazi: ["2026-10-08", 8], maisoumenozi: ["2026-10-09", 10],
+            cravazi: ["2026-10-09", 30], tamanhozi: ["2026-10-13", 1000], emojizi: ["2026-10-23", 1000], contazi: ["2026-10-23", 1000],
+            memorizi: ["2026-10-23", 1000], fotozi: ["2026-10-26", 1000], censurazi: ["2026-10-26", 1000], corzi: ["2026-10-26", 1000] };
+          const d = new Date(), hoje = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+          const seg = hoje - ((new Date(hoje).getUTCDay() + 6) % 7) * 864e5;
+          const tot = {};
+          Object.entries(jogos).forEach(([j, [ini, max]]) => (db[j + "_diario"] || []).forEach((x) => {
+            const data = Date.parse(ini + "T00:00:00Z") + (x.dia - 1) * 864e5;
+            if (data < seg || data > seg + 6 * 864e5) return;
+            const t = (tot[x.user_id] = tot[x.user_id] || { pontos: 0, desafios: 0 });
+            t.pontos += Math.min(100, Math.round((x.pontos * 100) / max));
+            t.desafios++;
+          }));
+          const linhas = membros.filter((m) => m.liga === cod).map((m) => ({ nick: m.nick, pontos: (tot[m.user_id] || {}).pontos || 0, desafios: (tot[m.user_id] || {}).desafios || 0, eu: m.user_id === uid }))
+            .sort((x, y) => y.pontos - x.pontos || y.desafios - x.desafios || x.nick.localeCompare(y.nick));
+          linhas.forEach((x) => (x.posicao = linhas.findIndex((y) => y.pontos === x.pontos) + 1));
+          return { data: linhas, error: null };
+        }
+      }
       if (nome === "gamezi_ranking_dia") {
         const sem = 864e5 + 1;
         const rows = db[a.p_jogo + "_diario"].filter((x) => x.dia === a.p_dia)

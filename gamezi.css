@@ -202,6 +202,7 @@ a { color: inherit; }
 /* ranking do dia (portal e ranking.html; as linhas vêm de gamezi-ranking.js) */
 .portal-rank { justify-self: center; display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 999px; border: 2px solid var(--accent); color: var(--fg); font-weight: 700; text-decoration: none; }
 .portal-rank:hover { background: var(--accent-soft); }
+.portal-rank-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 .portal-rank svg { width: 20px; height: 20px; color: var(--accent-ink); }
 .rank-page .panel > p { margin-bottom: 14px; }
 .rank-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -223,3 +224,24 @@ a { color: inherit; }
 .lb-time { font-style: normal; font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .lb-note { margin: 8px 0 0; text-align: center; font-size: .85rem; }
 .small { font-size: .85rem; }
+
+/* ligas entre amigos (ranking.html#ligas; o conteúdo vem de gamezi-ligas.js) */
+.rank-tab-ligas { border-color: var(--fg); }
+.rank-box h2 { margin: 0 0 4px; font-stretch: 75%; font-weight: 800; font-size: 1.8rem; line-height: 1; }
+.liga-abas { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 0; }
+.liga-box { margin-top: 14px; }
+.liga-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.liga-head b { display: block; font-stretch: 75%; font-weight: 800; font-size: 1.5rem; line-height: 1.05; }
+.liga-head small { color: var(--muted); font-size: .82rem; }
+.liga-head .btn { min-height: 0; padding: 9px 18px; }
+.liga-lb { margin: 12px 0 0; }
+.liga-lb .lb-row small { font-size: .78rem; }
+.liga-convite, .liga-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+.liga-convite { padding: 12px; border-radius: 14px; background: var(--accent-soft); }
+.liga-convite p { flex: 1 1 100%; margin: 0; }
+.liga-convite .lb-input, .liga-form .lb-input { flex: 1 1 140px; min-width: 0; }
+.liga-nova { margin-top: 16px; }
+.liga-nova summary { cursor: pointer; font-weight: 700; }
+.rank-box .lb-input { font: inherit; padding: 10px 14px; border-radius: 12px; border: 2px solid var(--line); background: var(--bg); color: var(--fg); }
+.rank-box .lb-input:focus { outline: none; border-color: var(--accent); }
+.rank-box .liga-form .btn, .rank-box .liga-convite .btn { min-height: 0; padding: 10px 18px; }

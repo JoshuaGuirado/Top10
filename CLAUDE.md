@@ -40,6 +40,11 @@
 - Mudou carta do Patozi (nova ou resposta)? Rode `node supabase/gerar-respostas.js` e mande o `supabase/patozi-respostas.sql`
   para rodar no Supabase: o banco calcula os pontos do Pato do dia com essas respostas (o `tests/patozi.test.js` acusa).
 - Rankings do dia (`topzi_diario`, `patozi_diario`, `cravazi_diario`…) só recebem resultado pelas funções `*_registrar_diario` do banco.
+- Ligas entre amigos (`gamezi-ligas.js`, aba "👥 Ligas" do `ranking.html`; convite `ranking.html?liga=CODIGO`): ranking da semana
+  (segunda a domingo) somando o desafio do dia de todos os jogos, cada um de 0 a 100 (pontos ÷ máximo do jogo, na função
+  `gamezi_liga_ranking` do banco). Tabelas `gamezi_ligas`/`gamezi_liga_membros` só pelas funções `gamezi_liga_*`. Jogo novo
+  com desafio do dia: pôr o dia 1 e o máximo em `gamezi_liga_ranking` e na visão `gamezi_uso` (schema.sql) e no
+  `tests/supabase-falso.js`. Métricas: `gameziEvento` (Vercel) e a visão `gamezi_uso` (painel do Supabase).
 - Desafio do dia de qualquer jogo: sem nome para o ranking, o nome é pedido **antes** de começar (`gameziNomeAntesDoDia`, em
   `gamezi-ranking.js`). Nunca mandar "Jogador" ou "Pato" para o ranking; sem nome, não manda.
 - Tabelas do banco sempre com o nome do jogo na frente: `topzi_*` (perfis, salas, sala_jogadores, partidas) e `patozi_*`.

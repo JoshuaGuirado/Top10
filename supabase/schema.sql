@@ -2356,3 +2356,122 @@ begin
 end $$;
 comment on view public.gamezi_uso is 'Gamezi: uso de cada jogo por dia (desafio do dia = quantos entraram no ranking; partidas online terminadas)';
 revoke all on public.gamezi_uso from anon, authenticated;
+
+-- ───────────── ligas entre amigos ─────────────
+-- Uma liga é um grupo com código (ex.: "K7M2QX") e um ranking da semana (segunda a domingo) que soma o desafio do dia
+-- de todos os jogos. Para jogos com escalas diferentes valerem igual, cada desafio vale de 0 a 100 (pontos ÷ máximo do
+-- jogo). Ninguém lê nem escreve nas tabelas direto: só pelas funções gamezi_liga_* abaixo.
+create table if not exists public.gamezi_ligas (
+  codigo text primary key check (codigo ~ '^[A-Z0-9]{6}$'),
+  nome text not null check (char_length(nome) between 1 and 24),
+  dono uuid not null references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.gamezi_liga_membros (
+  liga text not null references public.gamezi_ligas (codigo) on delete cascade,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  nick text not null check (char_length(nick) between 1 and 16),
+  joined_at timestamptz not null default now(),
+  primary key (liga, user_id)
+);
+create index if not exists gamezi_liga_membros_user_idx on public.gamezi_liga_membros (user_id);
+
+alter table public.gamezi_ligas enable row level security; -- sem regras: só as funções leem e gravam
+alter table public.gamezi_liga_membros enable row level security;
+comment on table public.gamezi_ligas is 'Gamezi: ligas entre amigos (código, nome e quem criou)';
+comment on table public.gamezi_liga_membros is 'Gamezi: quem está em cada liga (com o nome que aparece no ranking da liga)';
+
+drop trigger if exists gamezi_liga_membros_nick_limpo on public.gamezi_liga_membros;
+create trigger gamezi_liga_membros_nick_limpo before insert or update of nick on public.gamezi_liga_membros
+  for each row execute function public.gamezi_limpar_nick();
+
+create or replace function public.gamezi_liga_criar(p_nome text, p_nick text)
+returns text language plpgsql security definer set search_path = public as $$
+declare
+  letras constant text := 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  cod text;
+begin
+  if auth.uid() is null then raise exception 'Entre para criar uma liga.'; end if;
+  if coalesce(trim(p_nome), '') = '' or coalesce(trim(p_nick), '') = '' then raise exception 'Falta o nome.'; end if;
+  if (select count(*) from public.gamezi_liga_membros where user_id = auth.uid()) >= 20 then raise exception 'Você já está em 20 ligas.'; end if;
+  loop
+    cod := (select string_agg(substr(letras, 1 + floor(random() * length(letras))::int, 1), '') from generate_series(1, 6));
+    exit when not exists (select 1 from public.gamezi_ligas where codigo = cod);
+  end loop;
+  insert into public.gamezi_ligas (codigo, nome, dono) values (cod, left(trim(p_nome), 24), auth.uid());
+  insert into public.gamezi_liga_membros (liga, user_id, nick) values (cod, auth.uid(), left(trim(p_nick), 16));
+  return cod;
+end $$;
+
+-- Entra (ou troca o nome, se já estava). Devolve o nome da liga.
+create or replace function public.gamezi_liga_entrar(p_codigo text, p_nick text)
+returns text language plpgsql security definer set search_path = public as $$
+declare
+  l public.gamezi_ligas;
+begin
+  if auth.uid() is null then raise exception 'Entre para participar da liga.'; end if;
+  if coalesce(trim(p_nick), '') = '' then raise exception 'Falta o nome.'; end if;
+  select * into l from public.gamezi_ligas where codigo = upper(trim(p_codigo));
+  if not found then raise exception 'Liga não encontrada.'; end if;
+  if not exists (select 1 from public.gamezi_liga_membros where liga = l.codigo and user_id = auth.uid()) then
+    if (select count(*) from public.gamezi_liga_membros where liga = l.codigo) >= 50 then raise exception 'A liga está cheia.'; end if;
+    if (select count(*) from public.gamezi_liga_membros where user_id = auth.uid()) >= 20 then raise exception 'Você já está em 20 ligas.'; end if;
+  end if;
+  insert into public.gamezi_liga_membros (liga, user_id, nick) values (l.codigo, auth.uid(), left(trim(p_nick), 16))
+    on conflict (liga, user_id) do update set nick = excluded.nick;
+  return l.nome;
+end $$;
+
+-- Sai da liga; a liga sem ninguém some.
+create or replace function public.gamezi_liga_sair(p_codigo text)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  delete from public.gamezi_liga_membros where liga = upper(trim(p_codigo)) and user_id = auth.uid();
+  delete from public.gamezi_ligas l where l.codigo = upper(trim(p_codigo))
+    and not exists (select 1 from public.gamezi_liga_membros m where m.liga = l.codigo);
+end $$;
+
+create or replace function public.gamezi_minhas_ligas()
+returns table (codigo text, nome text, membros bigint) language sql stable security definer set search_path = public as $$
+  select l.codigo, l.nome, (select count(*) from public.gamezi_liga_membros x where x.liga = l.codigo)
+    from public.gamezi_liga_membros m join public.gamezi_ligas l on l.codigo = m.liga
+   where m.user_id = auth.uid()
+   order by m.joined_at;
+$$;
+
+-- Ranking da semana de uma liga (só quem está nela vê). p_semana: a segunda-feira da semana (padrão: esta semana,
+-- no horário de Brasília). pontos: soma de 0 a 100 por desafio do dia; desafios: quantos fez na semana.
+create or replace function public.gamezi_liga_ranking(p_codigo text, p_semana date default null)
+returns table (posicao bigint, nick text, pontos integer, desafios integer, eu boolean)
+language plpgsql stable security definer set search_path = public as $$
+declare
+  ini date := coalesce(p_semana, date_trunc('week', (now() at time zone 'America/Sao_Paulo')::date)::date);
+  cod text := upper(trim(p_codigo));
+  -- dia 1 e pontos máximos do desafio do dia de cada jogo (o Cravazi do dia vale 30 desde o dia 6; antes, 50).
+  jogos constant jsonb := '{"topzi": ["2026-10-01", "55"], "patozi": ["2026-10-08", "500"], "datazi": ["2026-10-08", "8"],
+    "maisoumenozi": ["2026-10-09", "10"], "cravazi": ["2026-10-09", "case when d.dia >= 6 then 30 else 50 end"],
+    "tamanhozi": ["2026-10-13", "1000"], "emojizi": ["2026-10-23", "1000"], "contazi": ["2026-10-23", "1000"],
+    "memorizi": ["2026-10-23", "1000"], "fotozi": ["2026-10-26", "1000"], "censurazi": ["2026-10-26", "1000"], "corzi": ["2026-10-26", "1000"]}';
+  j text;
+  partes text[] := '{}';
+begin
+  if auth.uid() is null or not exists (select 1 from public.gamezi_liga_membros m where m.liga = cod and m.user_id = auth.uid()) then
+    raise exception 'Você não está nessa liga.';
+  end if;
+  for j in select jsonb_object_keys(jogos) loop
+    partes := partes || format('select d.user_id, least(100, round(d.pontos * 100.0 / (%s)))::int as pts from public.%I d where %L::date + (d.dia - 1) between $1 and $1 + 6',
+      jogos -> j ->> 1, j || '_diario', jogos -> j ->> 0);
+  end loop;
+  return query execute format($q$
+    with r as (%s)
+    select rank() over (order by coalesce(sum(r.pts), 0) desc), m.nick, coalesce(sum(r.pts), 0)::int, count(r.pts)::int, m.user_id = auth.uid()
+      from public.gamezi_liga_membros m left join r on r.user_id = m.user_id
+     where m.liga = $2
+     group by m.user_id, m.nick
+     order by 3 desc, 4 desc, 2
+  $q$, array_to_string(partes, ' union all ')) using ini, cod;
+end $$;
+
+grant execute on function public.gamezi_liga_criar(text, text), public.gamezi_liga_entrar(text, text), public.gamezi_liga_sair(text),
+  public.gamezi_minhas_ligas(), public.gamezi_liga_ranking(text, date) to authenticated;

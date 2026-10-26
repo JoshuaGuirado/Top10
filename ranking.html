@@ -49,6 +49,7 @@
   <script src="topzi/js/config.js"></script>
   <script src="gamezi-conta.js"></script>
   <script src="gamezi-ranking.js"></script>
+  <script src="gamezi-ligas.js"></script>
   <script>
     // Textos em [português, inglês, espanhol]. O idioma é o mesmo escolhido nos jogos (tt:lang).
     var T = {
@@ -60,6 +61,7 @@
       play: ["Jogar o de hoje", "Play today's", "Jugar el de hoy"],
       off: ["O ranking aparece quando o modo online está ligado.", "The ranking shows up when online mode is on.", "El ranking aparece cuando el modo online está activo."],
       pts: ["pontos", "points", "puntos"],
+      ligas: ["👥 Ligas", "👥 Leagues", "👥 Ligas"],
     };
     // Jogos e o dia 1 do desafio de cada um (mesma conta dos jogos).
     var JOGOS = [
@@ -86,10 +88,13 @@
       return Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - j.inicio) / 864e5) + 1;
     }
 
-    var escolhido = (location.hash.slice(1) && JOGOS.some(function (j) { return j.id === location.hash.slice(1); })) ? location.hash.slice(1) : "topzi";
+    // Aba escolhida: um jogo ou as ligas (#ligas; o convite ?liga=CODIGO também abre as ligas).
+    var aba = location.hash.slice(1);
+    var escolhido = /[?&]liga=/.test(location.search) || aba === "ligas" ? "ligas" : JOGOS.some(function (j) { return j.id === aba; }) ? aba : "topzi";
 
     function renderAbas() {
-      document.getElementById("tabs").innerHTML = JOGOS.map(function (j) {
+      document.getElementById("tabs").innerHTML = '<button type="button" role="tab" class="rank-tab rank-tab-ligas" data-jogo="ligas" aria-selected="' + (escolhido === "ligas") + '">' +
+        gameziEsc(tr(T.ligas)) + "</button>" + JOGOS.map(function (j) {
         return '<button type="button" role="tab" class="rank-tab" data-jogo="' + j.id + '" aria-selected="' + (j.id === escolhido) + '">' + gameziEsc(j.nome) + "</button>";
       }).join("");
       document.querySelectorAll("[data-jogo]").forEach(function (b) {
@@ -103,6 +108,7 @@
     }
 
     function renderRanking() {
+      if (escolhido === "ligas") return gameziLigasDesenhar(document.getElementById("rank"), lang);
       var j = JOGOS.filter(function (x) { return x.id === escolhido; })[0];
       var n = diaDe(j);
       var box = document.getElementById("rank");
