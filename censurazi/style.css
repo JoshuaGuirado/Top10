@@ -10,8 +10,8 @@
 .cs-tracos i.hif { border-bottom: 0; width: 8px; }
 .cs-dicas { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
 .cs-dicas li {
-  font-weight: 800; font-size: 1.15rem; padding: 6px 14px; border-radius: 999px; background: var(--bg);
-  border: 2px solid var(--bad); color: var(--bad); text-decoration: line-through; text-decoration-thickness: 2px;
+  font-weight: 800; font-size: 1.2rem; padding: 6px 14px; border-radius: 999px; background: var(--bg);
+  border: 2px solid var(--accent); color: var(--fg);
 }
 .cs-dicas li.nova { animation: cs-pop .35s ease-out; }
 @keyframes cs-pop { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }

@@ -8,7 +8,7 @@
 
 const FZ_INICIO = Date.UTC(2026, 9, 26); // Fotozi do dia: o dia 1 é 26/10/2026
 const FZ_SEGUNDOS = 60;
-const FZ_ZOOM = [7, 5.4, 4.2, 3.2, 2.5, 1.9, 1.4, 1]; // quanto a foto está ampliada em cada nível
+const FZ_ZOOM = [4.2, 3.4, 2.8, 2.3, 1.9, 1.55, 1.25, 1]; // quanto a foto está ampliada em cada nível (de perto, mas sem borrar)
 const FZ_PONTOS = [100, 90, 80, 70, 60, 50, 40, 30]; // quanto vale acertar em cada nível
 const FZ_RESERVAS = 2;
 const FZ_QUANTIAS = [5, 10, 15]; // rodadas da partida online (o anfitrião escolhe)
@@ -33,7 +33,8 @@ function fzDoTema(tema) {
   return !tema || tema === "tudo" ? FZ_FOTOS : FZ_FOTOS.filter((f) => f.tema === tema);
 }
 
-// Onde fica o pedacinho ampliado (em % da foto), sempre o mesmo para a mesma foto.
+// Ponto de reserva do pedacinho ampliado (em % da foto), quando a tela não consegue achar a parte com mais detalhe
+// (js/app.js, fzFocoDetalhe). Sempre o mesmo para a mesma foto.
 function fzFoco(foto) {
   let h = 0;
   for (const c of foto.id + foto.titulo) h = (h * 31 + c.charCodeAt(0)) >>> 0;

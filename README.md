@@ -233,7 +233,8 @@ livre** por tema até errar 3 vezes e **online** com salas e skin. Testes: `test
   (bem de perto) a 30 (a foto inteira). Enquanto digita, aparecem sugestões; vale apelido ("CR7") e errinho de digitação.
   São 427 fotos em 9 temas. As fotos são as principais dos artigos da **Wikipédia em português** (licença livre, Wikimedia
   Commons): o jogo guarda só o título do artigo e o navegador busca a foto na hora, com o crédito no fim da rodada. Cada rodada
-  leva duas fotos reserva do mesmo tema, para o caso de um artigo estar sem foto. No online o anfitrião escolhe 5, 10 ou 15
+  leva duas fotos reserva do mesmo tema, para o caso de um artigo estar sem foto (ou com mapa, assinatura, brasão ou logo no lugar
+  da foto). O pedacinho ampliado é a parte com mais detalhe da foto (rosto, comida, fachada), achada pelo navegador. No online o anfitrião escolhe 5, 10 ou 15
   rodadas.
   - `fotozi/data/fotos-*.js`: `[título do artigo, "nome", "English"?, "español"?, "apelidos|aceitos"?]`; fotos novas no FIM e uma
     linha nova em `FZ_DIARIO_POOLS` (`fotozi/js/jogo.js`) valendo a partir de amanhã.

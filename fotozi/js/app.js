@@ -3,6 +3,9 @@
 // navegador; se uma não carregar, a rodada usa a reserva. As telas comuns são de ../gamezi-kit.js; as regras, de js/jogo.js.
 
 const FZ_API = "https://pt.wikipedia.org/w/api.php";
+const FZ_TAMANHO = 2560; // largura pedida para a foto (bem maior que a tela, para não borrar com o zoom)
+// Imagem de artigo que não é foto do assunto: assinatura, mapa, brasão, bandeira, logo, diagrama…
+const FZ_NAO_FOTO = /(signature|assinatura|firma|autograph|map|mapa|locator|location|coat[_ ]of[_ ]arms|bras[aã]o|escudo|flag|bandeira|logo|emblem|diagram|diagrama|icon|chart|grafico|gr[aá]fico)/i;
 const FZ_NOMES_TEMAS = {
   tudo: ["Tudo", "Everything", "Todo"],
   futebol: ["Jogadores de futebol", "Soccer players", "Futbolistas"],
@@ -18,6 +21,7 @@ const FZ_NOMES_TEMAS = {
 
 const fzCache = new Map(); // título → Promise<{ src, arquivo, pagina } | null>
 const fzEscolhida = new Map(); // ids da rodada → id da foto que apareceu
+const fzFocos = new Map(); // endereço da foto → ponto com mais detalhe { x, y } (em %)
 let fzN = 0; // nível da foto na rodada da vez (0 = bem ampliada)
 let fzAtual = null; // foto da rodada da vez
 let fzResponder = null;
@@ -28,7 +32,7 @@ function fzBuscar(titulos) {
   const faltam = [...new Set(titulos)].filter((t) => !fzCache.has(t));
   for (let i = 0; i < faltam.length; i += 50) {
     const lote = faltam.slice(i, i + 50);
-    const url = `${FZ_API}?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail|name&pithumbsize=1280&titles=${encodeURIComponent(lote.join("|"))}`;
+    const url = `${FZ_API}?action=query&format=json&origin=*&redirects=1&prop=pageimages|pageprops&ppprop=disambiguation&piprop=thumbnail|name|original&pithumbsize=${FZ_TAMANHO}&titles=${encodeURIComponent(lote.join("|"))}`;
     const pedido = fetch(url).then((r) => r.json()).then((d) => {
       const q = (d && d.query) || {};
       const vira = new Map();
@@ -40,8 +44,13 @@ function fzBuscar(titulos) {
         let nome = t;
         for (let k = 0; k < 3 && vira.has(nome); k++) nome = vira.get(nome);
         const p = paginas.get(nome);
-        const ok = p && p.thumbnail && p.thumbnail.source && p.pageimage && !/\.(svg|png|gif)$/i.test(p.pageimage);
-        res.set(t, ok ? { src: p.thumbnail.source, arquivo: p.pageimage, pagina: nome } : null);
+        // Só foto de verdade: nada de página de desambiguação, desenho (svg/png/gif), mapa, assinatura ou foto pequena.
+        const th = p && p.thumbnail;
+        const larg = th ? Math.max(th.width || 0, (p.original && p.original.width) || 0) : 0;
+        const ok = th && th.source && p.pageimage && !(p.pageprops && "disambiguation" in p.pageprops) &&
+          !/\.(svg|png|gif|tiff?)$/i.test(p.pageimage) && !FZ_NAO_FOTO.test(p.pageimage) && (!larg || larg >= 600) &&
+          (!th.width || !th.height || (th.width / th.height < 2.6 && th.height / th.width < 2.6));
+        res.set(t, ok ? { src: th.source, arquivo: p.pageimage, pagina: nome } : null);
       }
       return res;
     }).catch(() => new Map());
@@ -49,13 +58,57 @@ function fzBuscar(titulos) {
   }
 }
 
-function fzCarregarImagem(src) {
+// Carrega a foto e já acha o ponto com mais detalhe dela (onde o zoom começa).
+// Se o servidor não deixar ler os pixels (CORS), carrega de novo do jeito comum e fica com o ponto de reserva.
+const fzSemCors = new Set();
+function fzCarregarImagem(src, cors = true) {
   return new Promise((ok) => {
     const img = new Image();
-    img.onload = () => ok(true);
-    img.onerror = () => ok(false);
+    if (cors) img.crossOrigin = "anonymous";
+    img.onload = () => {
+      if (cors && !fzFocos.has(src)) fzFocos.set(src, fzFocoDetalhe(img));
+      if (!cors) fzSemCors.add(src);
+      ok(true);
+    };
+    img.onerror = () => (cors ? fzCarregarImagem(src, false).then(ok) : ok(false));
     img.src = src;
   });
+}
+
+// A parte da foto (como ela aparece no quadro 4:5, cortada pelo meio) com mais detalhe: divide em quadradinhos, mede
+// quanto a cor muda dentro de cada um e escolhe o mais "cheio" longe da borda. Num rosto cai nos olhos e na boca; numa
+// comida, na comida; num prédio, nas janelas. Céu, parede e fundo liso ficam de fora. null se não der para ler a foto.
+function fzFocoDetalhe(img) {
+  try {
+    const W = 48, H = 60, G = 6;
+    const c = document.createElement("canvas");
+    c.width = W;
+    c.height = H;
+    const g = c.getContext("2d", { willReadFrequently: true });
+    const iw = img.naturalWidth, ih = img.naturalHeight;
+    const esc = Math.max(W / iw, H / ih);
+    const sw = W / esc, sh = H / esc;
+    g.drawImage(img, (iw - sw) / 2, (ih - sh) / 2, sw, sh, 0, 0, W, H);
+    const d = g.getImageData(0, 0, W, H).data;
+    const lum = (x, y) => { const i = (y * W + x) * 4; return 0.3 * d[i] + 0.59 * d[i + 1] + 0.11 * d[i + 2]; };
+    const cols = W / G, lins = H / G;
+    let melhor = null, max = -1;
+    for (let cy = 1; cy < lins - 1; cy++) {
+      for (let cx = 1; cx < cols - 1; cx++) {
+        let e = 0;
+        for (let y = cy * G; y < cy * G + G; y++) {
+          for (let x = cx * G; x < cx * G + G; x++) e += Math.abs(lum(x + 1 < W ? x + 1 : x, y) - lum(x, y)) + Math.abs(lum(x, y + 1 < H ? y + 1 : y) - lum(x, y));
+        }
+        // Um pouco de preferência pelo meio da foto, onde costuma estar o assunto.
+        const dx = (cx + 0.5) / cols - 0.5, dy = (cy + 0.5) / lins - 0.45;
+        const nota = e * (1 - 0.9 * (dx * dx + dy * dy));
+        if (nota > max) { max = nota; melhor = { x: Math.round(((cx + 0.5) / cols) * 100), y: Math.round(((cy + 0.5) / lins) * 100) }; }
+      }
+    }
+    return max > 0 ? melhor : null;
+  } catch (e) {
+    return null; // a foto não deixa ler os pixels: usa o ponto de reserva
+  }
 }
 
 // A primeira foto da rodada que carrega de verdade (ou null, sem internet).
@@ -83,9 +136,9 @@ function fzAdiantar() {
 }
 
 function fzImg(dados, foto, n, inteira) {
-  const f = fzFoco(foto);
+  const f = fzFocos.get(dados.src) || fzFoco(foto);
   const z = inteira ? 1 : FZ_ZOOM[n];
-  return `<img class="fz-img ${inteira ? "inteira" : ""}" src="${escapeHtml(dados.src)}" alt="" draggable="false" style="transform-origin:${f.x}% ${f.y}%;transform:scale(${z})">`;
+  return `<img class="fz-img ${inteira ? "inteira" : ""}" src="${escapeHtml(dados.src)}"${fzSemCors.has(dados.src) ? "" : ' crossorigin="anonymous"'} alt="" draggable="false" style="transform-origin:${f.x}% ${f.y}%;transform:scale(${z})">`;
 }
 
 function fzCredito(dados) {

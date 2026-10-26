@@ -102,6 +102,8 @@
 - Fotozi: as fotos NÃO ficam no repositório. Cada item é o título do artigo da Wikipédia em português (`fotozi/data/fotos-*.js`); o
   navegador busca a foto principal (licença livre) pela API da Wikipédia e mostra o crédito. Foto nova: título que existe no
   pt.wikipedia, nome nos 3 idiomas e apelidos, no FIM, com linha nova em `FZ_DIARIO_POOLS`. Cada erro afasta só um pouco a foto e
-  tira só 10 pontos (o dono pediu assim). Os testes simulam a Wikipédia (este ambiente não acessa).
+  tira só 10 pontos (o dono pediu assim). O zoom começa em 4,2× (mais que isso borra) e a foto vem com 2560 px; o pedacinho
+  é a parte com mais detalhe da foto (`fzFocoDetalhe`, lendo os pixels), não um ponto ao acaso; páginas de desambiguação e
+  imagens que não são foto (assinatura, mapa, brasão, logo…) são puladas e entra a reserva. Os testes simulam a Wikipédia.
 - Censurazi: cartas com a palavra e 5 proibidas nos 3 idiomas (da mais vaga para a mais óbvia), no FIM, com linha nova em
   `CS_DIARIO_POOLS`. Corzi: cores em `CZR_CORES` (aparecem num cartão escuro).
