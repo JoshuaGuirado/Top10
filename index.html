@@ -164,6 +164,45 @@
         <span class="play" data-t="play">Jogar</span>
       </a>
 
+      <a class="game-row" href="fotozi/">
+        <span class="game-icon">
+          <img class="logo-light" src="brand/fotozi-simbolo.svg" alt="" aria-hidden="true">
+          <img class="logo-dark" src="brand/fotozi-simbolo-escuro.svg" alt="" aria-hidden="true">
+        </span>
+        <span class="game-text">
+          <b>Fotozi</b>
+          <small data-t="fotoziKind"></small>
+          <small class="game-daily" id="fotozi-tag"></small>
+        </span>
+        <span class="play" data-t="play">Jogar</span>
+      </a>
+
+      <a class="game-row" href="censurazi/">
+        <span class="game-icon">
+          <img class="logo-light" src="brand/censurazi-simbolo.svg" alt="" aria-hidden="true">
+          <img class="logo-dark" src="brand/censurazi-simbolo-escuro.svg" alt="" aria-hidden="true">
+        </span>
+        <span class="game-text">
+          <b>Censurazi</b>
+          <small data-t="censuraziKind"></small>
+          <small class="game-daily" id="censurazi-tag"></small>
+        </span>
+        <span class="play" data-t="play">Jogar</span>
+      </a>
+
+      <a class="game-row" href="corzi/">
+        <span class="game-icon">
+          <img class="logo-light" src="brand/corzi-simbolo.svg" alt="" aria-hidden="true">
+          <img class="logo-dark" src="brand/corzi-simbolo-escuro.svg" alt="" aria-hidden="true">
+        </span>
+        <span class="game-text">
+          <b>Corzi</b>
+          <small data-t="corziKind"></small>
+          <small class="game-daily" id="corzi-tag"></small>
+        </span>
+        <span class="play" data-t="play">Jogar</span>
+      </a>
+
       <a class="portal-rank" href="ranking.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/></svg><span data-t="ranking">Ranking do dia</span></a>
 
       <p class="soon" data-t="soon">Mais jogos em breve.</p>
@@ -202,6 +241,9 @@
       tamanhoDaily: ["Tamanhozi do dia #{n}", "Daily Tamanhozi #{n}", "Tamanhozi del día #{n}"],
       emojiziKind: ["Adivinhe o filme ou o lugar pelos emojis", "Guess the movie or place from the emojis", "Adivina la película o el lugar por los emojis"],
       contaziKind: ["Contas de cabeça contra o relógio", "Mental math against the clock", "Cuentas de cabeza contra el reloj"],
+      fotoziKind: ["Quem é pelo pedacinho da foto?", "Who is it from a tiny piece of the photo?", "¿Quién es por el pedacito de la foto?"],
+      censuraziKind: ["Explique ou adivinhe sem as palavras proibidas", "Explain or guess without the forbidden words", "Explica o adivina sin las palabras prohibidas"],
+      corziKind: ["Toque na cor certa, rápido!", "Tap the right color, fast!", "¡Toca el color correcto, rápido!"],
       memoriziKind: ["Memorize a sequência de cores e repita", "Memorize the color sequence and repeat it", "Memoriza la secuencia de colores y repítela"],
       novoDaily: ["{jogo} do dia #{n}", "Daily {jogo} #{n}", "{jogo} del día #{n}"],
       play: ["Jogar", "Play", "Jugar"],
@@ -272,6 +314,13 @@
         var el = document.getElementById(x[0]);
         el.hidden = nn < 1;
         el.textContent = t("novoDaily").replace("{jogo}", x[1]).replace("{n}", nn);
+      });
+      // Fotozi, Censurazi e Corzi do dia (o dia 1 é 26/10/2026).
+      var fn = pn - 18;
+      [["fotozi-tag", "Fotozi"], ["censurazi-tag", "Censurazi"], ["corzi-tag", "Corzi"]].forEach(function (x) {
+        var el = document.getElementById(x[0]);
+        el.hidden = fn < 1;
+        el.textContent = t("novoDaily").replace("{jogo}", x[1]).replace("{n}", fn);
       });
       // Nível do Gamezi (soma o que se joga em todos os jogos neste aparelho).
       var prog = gameziProgresso();

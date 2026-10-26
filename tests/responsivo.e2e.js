@@ -224,6 +224,22 @@ function medir(W) {
     });
     await tentar("crava-online", async () => { await page.goto(base + "/cravazi/index.html"); await page.click("#online-btn"); });
     await tentar("crava-sala", async () => { await page.fill("#online-nick", "Arthur Henrique"); await page.click("#create-room-btn"); await page.waitForSelector("#screen-lobby:not([hidden])"); });
+    // ── Corzi, Censurazi (com o "Na mesa") e Fotozi ──
+    await page.route("https://pt.wikipedia.org/**", (r) => {
+      const titulos = new URL(r.request().url()).searchParams.get("titles").split("|");
+      const pages = Object.fromEntries(titulos.map((t, i) => [i + 1, { title: t, thumbnail: { source: `${base}/brand/patozi-og.png` }, pageimage: `Foto_${i}.jpg` }]));
+      r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ query: { pages } }) });
+    });
+    for (const jogo of ["corzi", "censurazi", "fotozi"]) {
+      await tentar(`${jogo}-inicio`, () => page.goto(`${base}/${jogo}/index.html`));
+      await tentar(`${jogo}-partida`, async () => { await page.click("#free-btn"); if (jogo === "fotozi") await page.waitForSelector("#fz-quadro .fz-img"); });
+      await tentar(`${jogo}-respondeu`, () => page.evaluate(() => responderAgora(null)));
+      await tentar(`${jogo}-online`, async () => { await page.click("#game-quit"); await page.click("#online-btn"); });
+    }
+    await tentar("censurazi-mesa", async () => { await page.goto(`${base}/censurazi/index.html`); await page.click("#mesa-btn"); await page.click("#mesa-add"); await page.click("#mesa-add"); });
+    await tentar("censurazi-mesa-vez", () => page.click("#mesa-comecar"));
+    await tentar("censurazi-mesa-carta", async () => { await page.click("#mesa-go"); await page.click("#mesa-certo"); });
+    await tentar("censurazi-mesa-fim-da-vez", async () => { await page.evaluate(() => { csMesaFim = Date.now(); }); await page.waitForSelector("#screen-mesa-turno:not([hidden])"); });
     await tentar("portal-com-nivel", async () => { await page.evaluate(() => localStorage.removeItem("cz:sala")); await page.goto(base + "/index.html"); });
     await tentar("conta-nivel", () => page.goto(base + "/conta.html"));
 

@@ -1,4 +1,4 @@
-// Teste de ponta a ponta dos jogos do kit (Emojizi, Contazi, Memorizi): o desafio do dia tocando na tela (com o
+// Teste de ponta a ponta dos jogos do kit (Emojizi, Contazi, Memorizi, Fotozi, Censurazi, Corzi): o desafio do dia tocando na tela (com o
 // ranking), a partida livre até acabarem as vidas e o online em duas abas com skin (pontos, tempo, placar, volta
 // para a sala e troca de anfitrião). Usa o Supabase falso de tests/supabase-falso.js. Rode com: npm run test:online
 // Usa o Supabase falso de tests/supabase-falso.js. Rode com: npm run test:online
@@ -31,16 +31,28 @@ const server = http.createServer((req, res) => {
     emojizi: "(r) => r.id",
     contazi: "(r) => r.resposta",
     memorizi: "(r) => r.seq",
+    corzi: "(r) => r.resposta",
+    censurazi: "(r) => ({ g: csCarta(r.id).txt.pt[0], n: 0 })",
+    fotozi: "(r) => ({ id: r.ids[0], g: fzFoto(r.ids[0]).nome[0], n: 0 })",
   };
   const ERRADA = {
     emojizi: "(r) => r.opcoes.find((o) => o !== r.id)",
     contazi: "(r) => r.resposta + 1",
     memorizi: "(r) => r.seq.map((c) => (c + 1) % 4)",
+    corzi: "(r) => r.opcoes.find((o) => o !== r.resposta)",
+    censurazi: "() => ({ g: '', n: 0 })",
+    fotozi: "(r) => ({ id: r.ids[0], g: '', n: 0 })",
   };
 
-  for (const jogo of ["contazi", "emojizi", "memorizi"]) {
+  for (const jogo of ["contazi", "emojizi", "memorizi", "corzi", "censurazi", "fotozi"]) {
     const ctx = await browser.newContext({ viewport: { width: 400, height: 860 }, serviceWorkers: "block", locale: "pt-BR" });
     await ctx.addInitScript(fs.readFileSync(path.join(__dirname, "supabase-falso.js"), "utf8"));
+    // Fotozi: a Wikipédia de mentira devolve uma imagem do próprio site para cada artigo.
+    await ctx.route("https://pt.wikipedia.org/**", (r) => {
+      const titulos = new URL(r.request().url()).searchParams.get("titles").split("|");
+      const pages = Object.fromEntries(titulos.map((t, i) => [i + 1, { title: t, thumbnail: { source: `${site}/brand/patozi-og.png` }, pageimage: `Foto_${i}.jpg` }]));
+      r.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify({ query: { pages } }) });
+    });
     await ctx.route("**/js/config.js", (r) => r.fulfill({ contentType: "application/javascript", body: 'const SUPABASE_URL = "https://falso.supabase.co"; const SUPABASE_ANON_KEY = "x";' }));
     const page = async () => {
       const p = await ctx.newPage();
@@ -74,6 +86,24 @@ const server = http.createServer((req, res) => {
         // Espera a sequência acabar de acender e repete tocando nos botões.
         await S.waitForSelector("#round .pad:not([disabled])", { timeout: 8000 });
         for (const c of await S.evaluate(() => partida.rodadas[0].seq)) await S.click(`#round [data-pad="${c}"]`);
+      } else if (jogo === "corzi" && i === 0) {
+        await S.click(`#round [data-op="${await S.evaluate(() => partida.rodadas[0].resposta)}"]`);
+      } else if (jogo === "censurazi" && i === 0) {
+        // Um chute errado mostra mais uma proibida; depois acerta digitando.
+        await S.fill("#cs-chute", "abacaxi azul");
+        await S.click("#cs-form .btn");
+        assert.equal(await S.locator("#cs-dicas li").count(), 2, "o erro mostrou mais uma proibida");
+        await S.fill("#cs-chute", await S.evaluate(() => csCarta(partida.rodadas[0].id).txt.pt[0]));
+        await S.click("#cs-form .btn");
+      } else if (jogo === "fotozi" && i === 0) {
+        // Um chute errado afasta a foto; depois acerta escolhendo na lista de sugestões.
+        await S.waitForSelector("#fz-quadro .fz-img");
+        await S.fill("#fz-chute", "zzzz");
+        await S.click("#fz-form .btn");
+        assert.match(await S.textContent("#fz-vale"), /90/, "o erro tirou 10 pontos");
+        const nome = await S.evaluate(() => fzAtual.nome[0]);
+        await S.fill("#fz-chute", nome.slice(0, 5));
+        await S.click(`#fz-sug [data-nome="${nome}"]`);
       } else await responder(S, i % 3 ? CERTA[jogo] : ERRADA[jogo]);
       await S.waitForSelector("#feedback:not([hidden])");
       if (i === 0) assert.match(await S.textContent("#verdict"), /Certo!/, "tocando na tela");
@@ -100,7 +130,7 @@ const server = http.createServer((req, res) => {
     assert.match(await S.textContent("#res-sub"), /0 de 3/);
     // Acabou o tempo conta como erro.
     // Tema da partida livre: a partida só traz rodadas do tema escolhido.
-    const TEMA = { emojizi: ["comida", "(r) => ejItem(r.id).cat === 'comida'"], contazi: ["romanos", "(r) => /^[IVXLCDM]+$/.test(r.texto)"], memorizi: ["numeros", "(r) => r.tema === 'numeros'"] }[jogo];
+    const TEMA = { emojizi: ["comida", "(r) => ejItem(r.id).cat === 'comida'"], contazi: ["romanos", "(r) => /^[IVXLCDM]+$/.test(r.texto)"], memorizi: ["numeros", "(r) => r.tema === 'numeros'"], corzi: ["cor", "(r) => r.tipo === 'cor'"], censurazi: ["comida", "(r) => csCarta(r.id).tema === 'comida'"], fotozi: ["animais", "(r) => r.ids.every((id) => fzFoto(id).tema === 'animais')"] }[jogo];
     await S.click("#res-home");
     await S.click(`#free-temas [data-tema="${TEMA[0]}"]`);
     assert.equal(await S.getAttribute(`#free-temas [data-tema="${TEMA[0]}"]`, "aria-checked"), "true");
@@ -142,11 +172,19 @@ const server = http.createServer((req, res) => {
     await A.click(`#lobby-temas [data-tema="${TEMA[0]}"]`);
     await B.waitForFunction((x) => document.querySelector(`#lobby-temas [data-tema="${x}"]`).getAttribute("aria-checked") === "true", TEMA[0]);
     assert.equal(await B.isDisabled(`#lobby-temas [data-tema="${TEMA[0]}"]`), true);
+    // Corzi e Fotozi: o anfitrião escolhe quantas rodadas.
+    const QTD = { corzi: 20, fotozi: 5 }[jogo];
+    if (QTD) {
+      await A.click(`#lobby-qtd [data-qtd="${QTD}"]`);
+      await B.waitForFunction((x) => document.querySelector(`#lobby-qtd [data-qtd="${x}"]`).getAttribute("aria-checked") === "true", QTD);
+    } else assert.equal(await A.isHidden("#lobby-qtd-box"), true);
     await A.click("#lobby-start");
     await B.waitForFunction(() => partida && partida.online && document.body.dataset.screen === "game");
+    const rodadas = await A.evaluate(() => partida.rodadas.length);
+    assert.equal(rodadas, QTD || 10, "quantidade de rodadas da sala");
     assert.ok(await B.evaluate(`partida.rodadas.every(${TEMA[1]})`), "partida online do tema da sala");
     assert.deepEqual(await B.evaluate(() => partida.rodadas), await A.evaluate(() => partida.rodadas), "a mesma partida nas duas");
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < rodadas; i++) {
       if (i) {
         await A.click("#game-next");
         await B.waitForFunction((n) => partida.n === n && partida.fase === "jogando", i);
@@ -182,7 +220,7 @@ const server = http.createServer((req, res) => {
     assert.equal(await B.textContent("#verdict"), "Não respondeu");
     await A.click("#game-quit");
     await B.waitForFunction(() => isHost(), null, { timeout: 15000 });
-    step(`${jogo}: online com skin, 10 rodadas, tempo e troca de anfitrião`);
+    step(`${jogo}: online com skin, ${rodadas} rodadas, tempo e troca de anfitrião`);
     await ctx.close();
   }
 

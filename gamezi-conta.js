@@ -3,7 +3,7 @@
 // a sessão que o Supabase guarda neste navegador e, para entrar ou mexer na conta, mandam a pessoa
 // para conta.html com ?volta=<pasta do jogo>, que a traz de volta para o jogo depois do login.
 
-var GAMEZI_JOGOS = ["topzi", "patozi", "datazi", "maisoumenozi", "cravazi", "tamanhozi", "emojizi", "contazi", "memorizi"];
+var GAMEZI_JOGOS = ["topzi", "patozi", "datazi", "maisoumenozi", "cravazi", "tamanhozi", "emojizi", "contazi", "memorizi", "fotozi", "censurazi", "corzi"];
 
 // Sessão salva pelo Supabase neste navegador: { email, anon } ou null. Não precisa carregar a biblioteca.
 function gameziSessao() {
@@ -58,6 +58,9 @@ function gameziDadosLocais() {
     emojizi: { stats: gameziLer("ej:stats") || {}, diario: gameziLer("ej:diario") || {} },
     contazi: { stats: gameziLer("ct:stats") || {}, diario: gameziLer("ct:diario") || {} },
     memorizi: { stats: gameziLer("mz:stats") || {}, diario: gameziLer("mz:diario") || {} },
+    fotozi: { stats: gameziLer("fz:stats") || {}, diario: gameziLer("fz:diario") || {} },
+    censurazi: { stats: gameziLer("cs:stats") || {}, diario: gameziLer("cs:diario") || {} },
+    corzi: { stats: gameziLer("cr:stats") || {}, diario: gameziLer("cr:diario") || {} },
   };
 }
 
@@ -102,8 +105,8 @@ function gameziProgresso(d) {
   var diasMais = Object.keys((d.maisoumenozi && d.maisoumenozi.diario) || {});
   var diasCravazi = Object.keys((d.cravazi && d.cravazi.diario) || {});
   var diasTamanhozi = Object.keys((d.tamanhozi && d.tamanhozi.diario) || {});
-  // Os jogos do kit (Emojizi, Contazi, Memorizi) contam do mesmo jeito: partidas em stats e dias em diario.
-  var novos = ["emojizi", "contazi", "memorizi"].map(function (j) {
+  // Os jogos do kit (Emojizi, Contazi, Memorizi, Fotozi, Censurazi, Corzi) contam do mesmo jeito: partidas em stats e dias em diario.
+  var novos = ["emojizi", "contazi", "memorizi", "fotozi", "censurazi", "corzi"].map(function (j) {
     var st = (d[j] && d[j].stats) || {};
     return { partidas: st.partidas || 0, dias: Object.keys((d[j] && d[j].diario) || {}) };
   });

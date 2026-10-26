@@ -221,3 +221,30 @@ frações, potências e raízes, dobro e metade, dinheiro e troco, horas, númer
 frutas, animais, números, notas musicais, setas, formas, caras, letras, clima, transportes e bolas). As telas e o online são de `gamezi-kit.js`/`gamezi-kit.css`; as rodadas, de `gamezi-rodadas.js`; cada jogo só tem as
 regras (`js/jogo.js`), a rodada na tela (`js/app.js`) e o estilo dela. Testes: `tests/jogos-novos.test.js` e
 `tests/jogos-novos-online.e2e.js`. Banco: `supabase/jogos-novos.sql` (para quem já rodou o schema).
+
+# Fotozi, Censurazi e Corzi (jogos do kit)
+
+Também são jogos do kit (`gamezi-kit.js`), com **desafio do dia** (10 rodadas e ranking; o dia 1 é 26/10/2026), **partida
+livre** por tema até errar 3 vezes e **online** com salas e skin. Testes: `tests/jogos-fotozi-censurazi-corzi.test.js` e
+`tests/jogos-novos-online.e2e.js`. Banco: `supabase/jogos-novos-2.sql` (para quem já rodou o schema).
+
+- **Fotozi**: aparece só um pedacinho bem ampliado de uma foto (jogador de futebol, famoso, atleta, comida, fruta, bicho, lugar,
+  carro ou instrumento). Cada chute errado (ou "abrir mais") afasta um pouco a foto e a rodada vale 10 pontos a menos: de 100
+  (bem de perto) a 30 (a foto inteira). Enquanto digita, aparecem sugestões; vale apelido ("CR7") e errinho de digitação.
+  São 427 fotos em 9 temas. As fotos são as principais dos artigos da **Wikipédia em português** (licença livre, Wikimedia
+  Commons): o jogo guarda só o título do artigo e o navegador busca a foto na hora, com o crédito no fim da rodada. Cada rodada
+  leva duas fotos reserva do mesmo tema, para o caso de um artigo estar sem foto. No online o anfitrião escolhe 5, 10 ou 15
+  rodadas.
+  - `fotozi/data/fotos-*.js`: `[título do artigo, "nome", "English"?, "español"?, "apelidos|aceitos"?]`; fotos novas no FIM e uma
+    linha nova em `FZ_DIARIO_POOLS` (`fotozi/js/jogo.js`) valendo a partir de amanhã.
+- **Censurazi**: cada carta tem uma palavra e 5 **proibidas**. Sozinho e online, as proibidas viram dicas: aparece uma de cada vez
+  e cada erro mostra a próxima (100, 88, 76, 64, 52 e 40 pontos; com todas, aparece a primeira letra). **Na mesa** é o jogo clássico
+  com a turma num celular só: de 2 a 4 times, um explica a palavra sem falar as proibidas e o time adivinha antes de acabar o tempo
+  (60, 90 ou 120 s); acertou +1, pulou 0, falou proibida −1. São 240 cartas em 12 temas, nos 3 idiomas.
+  - `censurazi/data/cartas-*.js`: `[tema, "palavra|5 proibidas", "word|…", "palabra|…"]`, as proibidas da mais vaga para a mais
+    óbvia; cartas novas no FIM e linha nova em `CS_DIARIO_POOLS`. O "Na mesa" fica em `censurazi/js/mesa.js` (telas próprias no kit
+    com `GZ.extra`).
+- **Corzi**: o nome de uma cor pintado com outra tinta ("AZUL" em vermelho). A rodada pede a **COR** da tinta ou o que está
+  **ESCRITO**, e a pessoa toca na alternativa certa; quanto mais rápido, mais pontos (50 a 100), como no Kahoot. Fica mais difícil a
+  cada rodada (mais cores, menos tempo e alternativas pintadas para confundir). Modos: misto, só a cor e só a palavra. No online
+  todo mundo vê a mesma ao mesmo tempo e o anfitrião escolhe 10, 20 ou 30 rodadas (`GZ.quantias` do kit).

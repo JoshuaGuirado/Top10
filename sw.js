@@ -2,7 +2,7 @@
 // Cada jogo fica numa pasta (topzi/…, patozi/…); os arquivos dele entram na lista com o caminho da pasta.
 // Online, busca sempre a versão nova (rede primeiro); sem internet, usa a cópia guardada.
 
-const CACHE = "gamezi-v27";
+const CACHE = "gamezi-v28";
 const FILES = [
   "./",
   "index.html",
@@ -14,6 +14,39 @@ const FILES = [
   "gamezi-rodadas.js",
   "gamezi-kit.js",
   "gamezi-kit.css",
+  "fotozi/",
+  "fotozi/index.html",
+  "fotozi/style.css",
+  "fotozi/js/jogo.js",
+  "fotozi/data/fotos-1.js",
+  "fotozi/data/fotos-2.js",
+  "fotozi/data/fotos-3.js",
+  "fotozi/js/app.js",
+  "brand/fotozi-logo.svg",
+  "brand/fotozi-logo-dark.svg",
+  "brand/fotozi-simbolo.svg",
+  "brand/fotozi-simbolo-escuro.svg",
+  "censurazi/",
+  "censurazi/index.html",
+  "censurazi/style.css",
+  "censurazi/js/jogo.js",
+  "censurazi/data/cartas-1.js",
+  "censurazi/data/cartas-2.js",
+  "censurazi/js/mesa.js",
+  "censurazi/js/app.js",
+  "brand/censurazi-logo.svg",
+  "brand/censurazi-logo-dark.svg",
+  "brand/censurazi-simbolo.svg",
+  "brand/censurazi-simbolo-escuro.svg",
+  "corzi/",
+  "corzi/index.html",
+  "corzi/style.css",
+  "corzi/js/jogo.js",
+  "corzi/js/app.js",
+  "brand/corzi-logo.svg",
+  "brand/corzi-logo-dark.svg",
+  "brand/corzi-simbolo.svg",
+  "brand/corzi-simbolo-escuro.svg",
   "emojizi/",
   "emojizi/index.html",
   "emojizi/style.css",
@@ -234,7 +267,7 @@ self.addEventListener("fetch", (e) => {
       .catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => {
         if (hit) return hit;
         if (req.mode !== "navigate") return Response.error();
-        const jogo = ["topzi", "patozi", "datazi", "maisoumenozi", "cravazi", "tamanhozi", "emojizi", "contazi", "memorizi"].find((j) => url.pathname.includes(`/${j}/`));
+        const jogo = ["topzi", "patozi", "datazi", "maisoumenozi", "cravazi", "tamanhozi", "emojizi", "contazi", "memorizi", "fotozi", "censurazi", "corzi"].find((j) => url.pathname.includes(`/${j}/`));
         return caches.match(jogo ? `${jogo}/index.html` : "index.html");
       })),
   );

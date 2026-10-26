@@ -6,6 +6,8 @@
 //   diario(dia) e online(tema) → 10 rodadas; livre(tema) → gerador de rodadas sem fim; segundos(rodada);
 //   temas: [{ id, nome: [pt, en, es] }] (o primeiro é o padrão; aparecem como botões na partida livre e na sala online);
 //   avaliar(rodada, v, ms) → { certo, pontos }; valida(rodada, v); resumo(rodada) e respostaTexto(rodada, v) (HTML);
+//   quantias (opcional): [10, 20, 30] → o anfitrião escolhe quantas rodadas na sala; online(tema, qtd) recebe a escolhida;
+//   extra (opcional): { card, telas, ligar(), idioma() } → um cartão a mais no início e telas próprias (o "Na mesa" do Censurazi);
 //   desenhar(el, rodada, e): desenha a rodada em el. e = { fase: "jogando" | "enviado" | "revelado", nova, v, res, responder }.
 //   Com e.nova falso a rodada já está desenhada nessa fase (o jogo pode só sair, para não reiniciar animações).
 // Online como no Maiorzi: o aparelho do anfitrião roda a partida e manda o estado inteiro pelo Realtime (tabelas
@@ -110,6 +112,7 @@ const KIT_T = {
   "lobby.shareText": ["Bora jogar {nome} comigo? Entre na sala: {url}", "Play {nome} with me! Join the room: {url}", "¿Jugamos {nome}? Entra en la sala: {url}"],
   "lobby.players": ["Na sala", "In the room", "En la sala"],
   "lobby.theme": ["Tema", "Theme", "Tema"],
+  "lobby.rounds": ["Rodadas", "Rounds", "Rondas"],
   "lobby.host": ["anfitrião", "host", "anfitrión"],
   "lobby.you": ["você", "you", "tú"],
   "lobby.kick": ["Tirar da sala", "Remove from room", "Sacar de la sala"],
@@ -213,6 +216,7 @@ function kitMontar() {
         <div><b data-i18n="home.online"></b><span data-i18n="home.onlineSub"></span></div>
         <button type="button" class="btn dark" id="online-btn" data-i18n="btn.play"></button>
       </div>
+      ${GZ.extra ? GZ.extra.card : ""}
       <nav class="home-links">
         <button type="button" class="link-btn" id="help-link" data-i18n="help.title"></button>
         <a href="../" data-i18n="home.more"></a>
@@ -301,12 +305,17 @@ function kitMontar() {
         <p class="card-label" data-i18n="lobby.theme"></p>
         <div class="chips" id="lobby-temas" role="radiogroup"></div>
       </div>
+      <div class="home-card" id="lobby-qtd-box" hidden>
+        <p class="card-label" data-i18n="lobby.rounds"></p>
+        <div class="chips" id="lobby-qtd" role="radiogroup"></div>
+      </div>
       <p class="small muted" id="lobby-status" aria-live="polite"></p>
       <div class="actions end">
         <button type="button" class="btn ghost" id="leave-room" data-i18n="lobby.leave"></button>
         <button type="button" class="btn big" id="lobby-start" data-i18n="btn.start"></button>
       </div>
     </section>
+    ${GZ.extra ? GZ.extra.telas : ""}
   </main>
 
   <dialog class="dialog" id="help-dialog">
@@ -656,6 +665,7 @@ function setLang(l) {
   if (tela === "home") renderHome();
   if (tela === "game") renderJogo();
   if (tela === "lobby") renderSala();
+  if (GZ.extra && GZ.extra.idioma) GZ.extra.idioma(tela);
 }
 
 function sairDoJogo() {
@@ -698,6 +708,7 @@ function kitLigar() {
   $("share-room").onclick = (e) => copiar(t("lobby.shareText", { nome: GZ.nome, url: location.origin + location.pathname + "?sala=" + sala.code }), e.currentTarget);
   $("leave-room").onclick = sairDaSala;
   $("lobby-start").onclick = () => comecarOnline().catch(onlineErro);
+  if (GZ.extra) GZ.extra.ligar();
   $("lobby-players").onclick = (e) => {
     const b = e.target.closest("[data-tirar]");
     if (b && isHost()) tirarDaSala(b.dataset.tirar).catch(onlineErro);
@@ -847,7 +858,7 @@ async function criarSala() {
   let codigo = null;
   for (let k = 0; k < 5 && !codigo; k++) {
     const tentativa = Array.from({ length: 5 }, () => SALA_LETRAS[Math.floor(Math.random() * SALA_LETRAS.length)]).join("");
-    const { error } = await sb.from(tabela("salas")).insert({ code: tentativa, host_id: me.id, status: "lobby", settings: { tema: temaLivre() } });
+    const { error } = await sb.from(tabela("salas")).insert({ code: tentativa, host_id: me.id, status: "lobby", settings: { tema: temaLivre(), qtd: qtdValida(store("qtd")) } });
     if (!error) codigo = tentativa;
     else if (error.code !== "23505") throw erroDoBanco(error);
   }
@@ -1104,6 +1115,16 @@ function renderSala() {
   }).join("");
   $("lobby-temas-box").hidden = !GZ.temas;
   if (GZ.temas) chipsTemas($("lobby-temas"), salaTema(), (id) => mudarTemaDaSala(id).catch(onlineErro), host);
+  $("lobby-qtd-box").hidden = !GZ.quantias;
+  if (GZ.quantias) {
+    const atual = salaQtd();
+    $("lobby-qtd").innerHTML = GZ.quantias.map((n) =>
+      `<button type="button" role="radio" aria-checked="${n === atual}" class="chip ${n === atual ? "active" : ""}" data-qtd="${n}" ${host ? "" : "disabled"}>${n}</button>`).join("");
+    $("lobby-qtd").onclick = (e) => {
+      const b = e.target.closest("[data-qtd]");
+      if (b && host) mudarQtdDaSala(Number(b.dataset.qtd)).catch(onlineErro);
+    };
+  }
   const dono = salaJogadores.find((p) => p.user_id === sala.host_id);
   $("lobby-start").hidden = !host;
   $("lobby-start").disabled = salaJogadores.length < 2;
@@ -1114,6 +1135,24 @@ function renderSala() {
 
 function salaTema() {
   return temaValido(sala && sala.settings && sala.settings.tema);
+}
+
+// Quantas rodadas na partida online (só nos jogos com GZ.quantias; nos outros, 10).
+function qtdValida(n) {
+  return GZ.quantias ? (GZ.quantias.includes(n) ? n : GZ.quantias[0]) : GZ_DIARIO_QTD;
+}
+
+function salaQtd() {
+  return qtdValida(sala && sala.settings && sala.settings.qtd);
+}
+
+async function mudarQtdDaSala(n) {
+  if (!isHost() || !GZ.quantias) return;
+  store("qtd", n);
+  sala.settings = { ...(sala.settings || {}), qtd: qtdValida(n) };
+  renderSala();
+  await sb.from(tabela("salas")).update({ settings: sala.settings }).eq("code", sala.code);
+  enviar("sala");
 }
 
 async function mudarTemaDaSala(id) {
@@ -1139,7 +1178,7 @@ async function comecarOnline() {
   modo = "online";
   partidaRegistrada = false;
   partidaContada = false;
-  partida = gzNovaOnline({ jogadores: salaJogadores.map((p) => ({ id: p.user_id, nome: p.nick, skin: p.user_id === me.id ? gameziMinhaSkin() : gameziSkinValida(p.skin) })), rodadas: GZ.online(salaTema()) });
+  partida = gzNovaOnline({ jogadores: salaJogadores.map((p) => ({ id: p.user_id, nome: p.nick, skin: p.user_id === me.id ? gameziMinhaSkin() : gameziSkinValida(p.skin) })), rodadas: GZ.online(salaTema(), salaQtd()) });
   partida.tema = salaTema();
   chaveDesenhada = "";
   rodadaDesde = performance.now();

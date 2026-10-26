@@ -2,6 +2,8 @@
 
 Leva uns 10 minutos e é gratuito. Os nomes dos menus podem mudar um pouco no painel do Supabase, mas os passos são estes.
 
+> **Já configurou antes e só quer ativar o Fotozi, o Censurazi e o Corzi?** Abra **SQL Editor → New query**, cole o [`jogos-novos-2.sql`](jogos-novos-2.sql) e clique em **Run**. Pode rodar de novo sem problema.
+>
 > **Já configurou antes e só quer ativar o que é novo (Datazi e Maiorzi online, skins nas salas, Emojizi, Contazi e Memorizi)?** Abra **SQL Editor → New query**, cole o [`atualizar-online.sql`](atualizar-online.sql) (um script só, curto) e clique em **Run**. Pode rodar de novo sem problema. (Ele faz o mesmo que `online-novo.sql` + `jogos-novos.sql`.)
 >
 > **Já configurou antes e só quer ativar o online do Patozi (ou atualizar o banco)?** Abra **SQL Editor → New query**, cole o [`schema.sql`](schema.sql) inteiro e clique em **Run**. Ele só cria o que falta (tabelas `patozi_*`, coluna nova etc.) e não apaga nada. Não precisa mexer em chave nem em login: o Patozi usa o mesmo projeto e a mesma conta Gamezi.

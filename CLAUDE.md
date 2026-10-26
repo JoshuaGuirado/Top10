@@ -95,3 +95,13 @@
   (o `cat` de cada item; itens novos em `data/itens-2.js` ou arquivo novo, nos 3 idiomas, com linha nova em `EJ_DIARIO_POOLS`),
   Contazi `CT_TEMAS`/`CT_GERADORES` (toda conta dá inteiro ≥ 0; frase em [pt, en, es]; o testes confere) e Memorizi `MZ_TEMAS`
   (de 4 a 9 botões). O desafio do dia não usa tema: Contazi e Memorizi continuam com o misto e as 4 cores (o dia 1 está fixado).
+- Fotozi (`fotozi/`), Censurazi (`censurazi/`) e Corzi (`corzi/`) também são jogos do kit (chaves `fz:*`, `cs:*`, `cr:*`; o dia 1 é
+  26/10/2026, fixado em `tests/jogos-fotozi-censurazi-corzi.test.js`; banco em `supabase/jogos-novos-2.sql` para quem já rodou o schema).
+  O kit aceita `GZ.quantias` (o anfitrião escolhe quantas rodadas na sala; Corzi 10/20/30, Fotozi 5/10/15) e `GZ.extra` (cartão e
+  telas próprias no início: o "Na mesa" do Censurazi, em `censurazi/js/mesa.js`).
+- Fotozi: as fotos NÃO ficam no repositório. Cada item é o título do artigo da Wikipédia em português (`fotozi/data/fotos-*.js`); o
+  navegador busca a foto principal (licença livre) pela API da Wikipédia e mostra o crédito. Foto nova: título que existe no
+  pt.wikipedia, nome nos 3 idiomas e apelidos, no FIM, com linha nova em `FZ_DIARIO_POOLS`. Cada erro afasta só um pouco a foto e
+  tira só 10 pontos (o dono pediu assim). Os testes simulam a Wikipédia (este ambiente não acessa).
+- Censurazi: cartas com a palavra e 5 proibidas nos 3 idiomas (da mais vaga para a mais óbvia), no FIM, com linha nova em
+  `CS_DIARIO_POOLS`. Corzi: cores em `CZR_CORES` (aparecem num cartão escuro).

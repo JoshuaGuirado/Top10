@@ -14,7 +14,7 @@
     maisoumenozi_salas: ["code"], maisoumenozi_sala_jogadores: ["sala_code", "user_id"], maisoumenozi_partidas: ["id"],
   };
   // Jogos do kit (gamezi-kit.js): as mesmas tabelas com o nome de cada um.
-  const KIT = ["emojizi", "contazi", "memorizi"];
+  const KIT = ["emojizi", "contazi", "memorizi", "fotozi", "censurazi", "corzi"];
   KIT.forEach((j) => Object.assign(PK, { [j + "_salas"]: ["code"], [j + "_sala_jogadores"]: ["sala_code", "user_id"], [j + "_partidas"]: ["id"], [j + "_diario"]: ["dia", "user_id"] }));
 
   const empty = () => Object.fromEntries(Object.keys(PK).map((k) => [k, []]));
@@ -171,7 +171,7 @@
         return { data: null, error: null };
       }
       // Salas: quem sai passa o comando para quem entrou primeiro; quem fica assume se o anfitrião sumiu.
-      if (/^(topzi|patozi|cravazi|tamanhozi|datazi|maisoumenozi|emojizi|contazi|memorizi)_(sair_da_sala|assumir_sala)$/.test(nome)) {
+      if (/^(topzi|patozi|cravazi|tamanhozi|datazi|maisoumenozi|emojizi|contazi|memorizi|fotozi|censurazi|corzi)_(sair_da_sala|assumir_sala)$/.test(nome)) {
         const jogo = nome.split("_")[0];
         const col = jogo === "topzi" ? "room_code" : "sala_code";
         const salas = db[jogo + "_salas"];

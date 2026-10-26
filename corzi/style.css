@@ -1,0 +1,19 @@
+/* Corzi: o pedido, a palavra pintada num cartão escuro e as quatro alternativas (o resto vem de ../gamezi-kit.css) */
+.czr-pede { margin: 0; text-align: center; font-size: 1.25rem; font-weight: 600; }
+.czr-pede b { font-stretch: 75%; font-weight: 800; font-size: 1.6rem; padding: 0 8px; border-radius: 8px; background: var(--fg); color: var(--bg); }
+.czr-pede.palavra b { background: var(--accent); color: var(--on-accent); }
+.czr-cartao { background: #171717; border-radius: var(--r); min-height: 150px; display: grid; place-items: center; padding: 16px; }
+.czr-cartao b { font-stretch: 75%; font-weight: 800; font-size: clamp(2.6rem, 14vw, 4.4rem); letter-spacing: .02em; line-height: 1; }
+.czr-opcoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.czr-op {
+  min-height: 72px; padding: 10px; cursor: pointer; font: inherit; font-stretch: 75%; font-weight: 800; font-size: 1.45rem;
+  color: var(--fg); background: var(--surface); border: 3px solid var(--line); border-radius: var(--r); touch-action: manipulation;
+  transition: transform .06s;
+}
+.czr-op.pintada { background: #171717; border-color: #171717; }
+.czr-op:not(:disabled):active { transform: scale(.97); }
+.czr-op:disabled { cursor: default; }
+.czr-op.chosen { border-color: var(--fg); }
+.czr-op.right { border-color: var(--good); box-shadow: 0 0 0 3px var(--good); }
+.czr-op.wrong { border-color: var(--bad); opacity: .7; }
+.czr-mini { font-style: normal; font-weight: 800; background: #171717; padding: 0 6px; border-radius: 6px; }

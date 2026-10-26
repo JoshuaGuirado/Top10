@@ -146,8 +146,8 @@ test("os jogos novos estão no Gamezi: portal, conta, ranking, banco e testes", 
     assert.match(schema, new RegExp(`p_jogo not in \\([^)]*'${jogo}'`));
     assert.match(novo, new RegExp(`p_jogo not in \\([^)]*'${jogo}'`));
   }
-  assert.match(schema, /array\['topzi'[^\]]*'memorizi'\] loop[\s\S]*_sair_da_sala/, "sair e assumir a sala");
-  assert.match(falso, /KIT = \["emojizi", "contazi", "memorizi"\]/);
+  assert.match(schema, /array\['topzi'[^\]]*'memorizi'[^\]]*\] loop[\s\S]*_sair_da_sala/, "sair e assumir a sala");
+  assert.match(falso, /KIT = \["emojizi", "contazi", "memorizi"[^\]]*\]/);
   assert.match(ler("package.json"), /jogos-novos-online\.e2e\.js/);
 });
 

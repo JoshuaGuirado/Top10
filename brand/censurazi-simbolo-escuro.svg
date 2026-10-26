@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Censurazi">
+  <rect fill="#FFF4DE" x="6" y="6" width="88" height="88" rx="22"/>
+  <path fill="#171717" d="M22 24 H78 A6 6 0 0 1 84 30 V62 A6 6 0 0 1 78 68 H46 L32 80 V68 H22 A6 6 0 0 1 16 62 V30 A6 6 0 0 1 22 24 Z"/>
+  <rect fill="#FF4D3D" x="26" y="39" width="48" height="14" rx="3"/>
+</svg>

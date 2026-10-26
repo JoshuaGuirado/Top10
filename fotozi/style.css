@@ -1,0 +1,34 @@
+/* Fotozi: o quadro da foto ampliada, o campo do chute com sugestões (o resto vem de ../gamezi-kit.css) */
+.fz-quadro {
+  position: relative; overflow: hidden; width: 100%; max-width: 440px; margin: 0 auto; aspect-ratio: 4 / 5; max-height: 52vh;
+  border-radius: var(--r); background: #171717; display: grid; place-items: center;
+}
+.fz-quadro.ok { box-shadow: 0 0 0 4px var(--good); }
+.fz-quadro.no { box-shadow: 0 0 0 4px var(--bad); }
+.fz-quadro.carregando { animation: fz-pulsa 1.2s ease-in-out infinite; }
+@keyframes fz-pulsa { 50% { opacity: .75; } }
+.fz-espera { color: #FFF4DE; font-weight: 700; padding: 16px; text-align: center; }
+.fz-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2, .8, .2, 1); user-select: none; -webkit-user-drag: none; }
+.fz-img.inteira { object-fit: contain; transition: none; }
+.fz-credito { position: absolute; right: 8px; bottom: 8px; background: rgba(0, 0, 0, .6); color: #fff; font-size: .72rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; text-decoration: none; }
+.fz-vale { margin: 0; display: flex; justify-content: center; align-items: center; gap: 10px; font-weight: 800; color: var(--accent-ink); }
+.fz-niveis { display: inline-flex; gap: 4px; }
+.fz-niveis i { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+.fz-niveis i.usado { background: var(--line); }
+.fz-niveis i.agora { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent); }
+.fz-form { display: flex; gap: 8px; }
+.fz-form input {
+  flex: 1; min-width: 0; width: 0; font: inherit; font-weight: 700; font-size: 1.15rem; color: var(--fg); background: var(--bg);
+  border: 2px solid var(--fg); border-radius: var(--r-sm); padding: 10px 14px;
+}
+.fz-form input:focus { outline: none; border-color: var(--accent); }
+.fz-sug { list-style: none; margin: -4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.fz-sug button { border: 0; background: var(--surface); color: var(--fg); font: inherit; font-weight: 700; font-size: .9rem; padding: 8px 12px; border-radius: 999px; cursor: pointer; }
+.fz-sug button:hover { background: var(--line); }
+.fz-msg { margin: 0; min-height: 1.3em; text-align: center; font-weight: 700; color: var(--bad); }
+.fz-acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 20px; }
+.fz-nome { margin: 0; text-align: center; font-size: 1.1rem; }
+.fz-nome b { font-stretch: 75%; font-weight: 800; font-size: 1.6rem; }
+.shake { animation: fz-shake .3s; }
+@keyframes fz-shake { 25% { transform: translateX(-6px); } 50% { transform: translateX(6px); } 75% { transform: translateX(-3px); } }
+@media (prefers-reduced-motion: reduce) { .fz-img, .shake, .fz-quadro.carregando { animation: none; transition: none; } }
