@@ -17933,5 +17933,548 @@
 33.6,
 63.1
 ]
+},
+"f842": {
+"tema": "transportes",
+"titulo": "Bicicleta",
+"nome": "Bicicleta",
+"arquivo": "Left_side_of_Flying_Pigeon.jpg",
+"pagina": "Bicicleta",
+"original": [
+3556,
+2371
+],
+"tamanho": [
+960,
+640
+],
+"foco": [
+67.9,
+51.7
+]
+},
+"f843": {
+"tema": "transportes",
+"titulo": "Motocicleta",
+"nome": "Moto",
+"arquivo": "Red_Honda_C50_(1975?)_in_Athens_on_10-13-2023.jpg",
+"pagina": "Motocicleta",
+"original": [
+6000,
+4000
+],
+"tamanho": [
+960,
+640
+],
+"foco": [
+48.6,
+49.2
+]
+},
+"f844": {
+"tema": "transportes",
+"titulo": "Helicóptero",
+"nome": "Helicóptero",
+"arquivo": "LAPD_Bell_206_Jetranger.jpg",
+"pagina": "Helicóptero",
+"original": [
+2856,
+1904
+],
+"tamanho": [
+960,
+640
+],
+"foco": [
+48.9,
+57.7
+]
+},
+"f845": {
+"tema": "transportes",
+"titulo": "Caravela",
+"nome": "Caravela",
+"arquivo": "Caravela_Vera_Cruz_no_rio_Tejo.jpg",
+"pagina": "Caravela",
+"original": [
+630,
+912
+],
+"tamanho": [
+630,
+912
+],
+"foco": [
+51.3,
+61.8
+]
+},
+"f846": {
+"tema": "transportes",
+"titulo": "Canoa",
+"nome": "Canoa",
+"arquivo": "Kerala_backwater_20080218-11.jpg",
+"pagina": "Canoa",
+"original": [
+3600,
+2400
+],
+"tamanho": [
+960,
+640
+],
+"foco": [
+53.6,
+70.9
+]
+},
+"f847": {
+"tema": "transportes",
+"titulo": "Porta-aviões",
+"nome": "Porta-aviões",
+"arquivo": "USS_John_C._Stennis_(CVN-74)_and_HMS_Illustrious_(R_06)_in_the_Persian_Gulf_on_April_9,_1998.jpg",
+"pagina": "Porta-aviões",
+"original": [
+2100,
+1500
+],
+"tamanho": [
+960,
+686
+],
+"foco": [
+37.1,
+47.6
+]
+},
+"f848": {
+"tema": "transportes",
+"titulo": "Navio de cruzeiro",
+"nome": "Navio de cruzeiro",
+"arquivo": "Freedom_of_the_Seas_(12174093863).jpg",
+"pagina": "Cruzeiro (viagem)",
+"original": [
+5184,
+3456
+],
+"tamanho": [
+960,
+640
+],
+"foco": [
+51.6,
+53.3
+]
+},
+"f849": {
+"tema": "transportes",
+"titulo": "Iate",
+"nome": "Iate",
+"arquivo": "Antibes-marina.jpg",
+"pagina": "Iate",
+"original": [
+1024,
+671
+],
+"tamanho": [
+960,
+629
+],
+"foco": [
+30.7,
+57.2
+]
+},
+"f850": {
+"tema": "transportes",
+"titulo": "Táxi",
+"nome": "Táxi",
+"arquivo": "2016-10-24_Lissabon_6258_(30824048342)_(cropped).jpg",
+"pagina": "Táxi",
+"original": [
+2205,
+1675
+],
+"tamanho": [
+960,
+729
+],
+"foco": [
+35.6,
+19.3
+]
+},
+"f851": {
+"tema": "transportes",
+"titulo": "Trólebus",
+"nome": "Trólebus",
+"arquivo": "Trolebus_de_Santos_-_panoramio.jpg",
+"pagina": "Trólebus",
+"original": [
+4000,
+3000
+],
+"tamanho": [
+960,
+720
+],
+"foco": [
+51.4,
+47.2
+]
+},
+"f852": {
+"tema": "transportes",
+"titulo": "Locomotiva a vapor",
+"nome": "Locomotiva a vapor",
+"arquivo": "3511_-_Hartswater_240481.jpg",
+"pagina": "Locomotiva a vapor",
+"original": [
+1800,
+1169
+],
+"tamanho": [
+960,
+623
+],
+"foco": [
+47.4,
+44.5
+]
+},
+"f853": {
+"tema": "transportes",
+"titulo": "Patinete",
+"nome": "Patinete",
+"arquivo": "Razor_Scooter.JPG",
+"pagina": "Patinete",
+"original": [
+2048,
+1536
+],
+"tamanho": [
+960,
+720
+],
+"foco": [
+44.2,
+85.3
+]
+},
+"f854": {
+"tema": "pinturas",
+"titulo": "A Escola de Atenas",
+"nome": "A Escola de Atenas",
+"arquivo": "Escola_de_Atenas_-_Vaticano_2.jpg",
+"pagina": "Escola de Atenas",
+"original": [
+1170,
+790
+],
+"tamanho": [
+960,
+648
+],
+"foco": [
+26.9,
+71.4
+]
+},
+"f855": {
+"tema": "pinturas",
+"titulo": "O Quarto em Arles",
+"nome": "O Quarto em Arles",
+"erro": "sem foto"
+},
+"f856": {
+"tema": "pinturas",
+"titulo": "Terraço do Café à Noite",
+"nome": "Terraço do Café à Noite",
+"arquivo": "Van_Gogh_-_Terrace_of_a_Café_at_Night_(Place_du_Forum)_1888.jpg",
+"pagina": "Terraço do Café à Noite",
+"original": [
+6415,
+8000
+],
+"tamanho": [
+960,
+1197
+],
+"foco": [
+34.9,
+35.3
+]
+},
+"f857": {
+"tema": "pinturas",
+"titulo": "Os Comedores de Batata",
+"nome": "Os Comedores de Batata",
+"arquivo": "Van-willem-vincent-gogh-die-kartoffelesser-03850.jpg",
+"pagina": "Os Comedores de Batata",
+"original": [
+7698,
+5428
+],
+"tamanho": [
+960,
+677
+],
+"foco": [
+53.6,
+61.0
+]
+},
+"f858": {
+"tema": "pinturas",
+"titulo": "Saturno Devorando um Filho",
+"nome": "Saturno Devorando um Filho",
+"erro": "sem foto"
+},
+"f859": {
+"tema": "pinturas",
+"titulo": "A Jangada da Medusa",
+"nome": "A Jangada da Medusa",
+"erro": "sem foto"
+},
+"f860": {
+"tema": "pinturas",
+"titulo": "O Caminhante sobre o Mar de Névoa",
+"nome": "O Caminhante sobre o Mar de Névoa",
+"erro": "sem foto"
+},
+"f861": {
+"tema": "pinturas",
+"titulo": "O Juramento dos Horácios",
+"nome": "O Juramento dos Horácios",
+"arquivo": "Le_Serment_des_Horaces_-_Jacques-Louis_David_-_Musée_du_Louvre_Peintures_INV_3692_;_MR_1432.jpg",
+"pagina": "O Juramento dos Horácios",
+"original": [
+10051,
+7794
+],
+"tamanho": [
+960,
+744
+],
+"foco": [
+52.7,
+69.4
+]
+},
+"f862": {
+"tema": "pinturas",
+"titulo": "A Morte de Marat",
+"nome": "A Morte de Marat",
+"arquivo": "Jacques-Louis_David_-_Marat_assassinated_-_Google_Art_Project_2FXD.jpg",
+"pagina": "A Morte de Marat",
+"original": [
+3885,
+5000
+],
+"tamanho": [
+960,
+1236
+],
+"foco": [
+45.0,
+64.6
+]
+},
+"f863": {
+"tema": "pinturas",
+"titulo": "O Três de Maio de 1808",
+"nome": "O Três de Maio de 1808",
+"erro": "sem foto"
+},
+"f864": {
+"tema": "pinturas",
+"titulo": "Primeira Missa no Brasil",
+"nome": "Primeira Missa no Brasil",
+"arquivo": "Meirelles-primeiramissa2.jpg",
+"pagina": "Primeira Missa no Brasil (Victor Meirelles)",
+"original": [
+4424,
+3399
+],
+"tamanho": [
+960,
+738
+],
+"foco": [
+57.3,
+52.1
+]
+},
+"f865": {
+"tema": "pinturas",
+"titulo": "O Último Tamoio",
+"nome": "O Último Tamoio",
+"arquivo": "Ultimo_tamoio_1883.jpg",
+"pagina": "O Último Tamoio",
+"original": [
+1000,
+686
+],
+"tamanho": [
+960,
+659
+],
+"foco": [
+56.2,
+61.7
+]
+},
+"f866": {
+"tema": "bebidas",
+"titulo": "Cachaça",
+"nome": "Cachaça",
+"arquivo": "Cachaca.JPG",
+"pagina": "Cachaça",
+"original": [
+1870,
+2315
+],
+"tamanho": [
+960,
+1188
+],
+"foco": [
+49.2,
+58.9
+]
+},
+"f867": {
+"tema": "bebidas",
+"titulo": "Saquê",
+"nome": "Saquê",
+"arquivo": "Cyber_tasting_sake.jpg",
+"pagina": "Saquê",
+"original": [
+800,
+533
+],
+"tamanho": [
+800,
+533
+],
+"foco": [
+49.3,
+72.4
+]
+},
+"f868": {
+"tema": "bebidas",
+"titulo": "Uísque",
+"nome": "Uísque",
+"arquivo": "A_Glass_of_Whiskey_on_the_Rocks.jpg",
+"pagina": "Uísque",
+"original": [
+1888,
+1888
+],
+"tamanho": [
+960,
+960
+],
+"foco": [
+51.9,
+68.7
+]
+},
+"f869": {
+"tema": "bebidas",
+"titulo": "Leite",
+"nome": "Leite",
+"arquivo": "Milk_glass.jpg",
+"pagina": "Leite",
+"original": [
+568,
+640
+],
+"tamanho": [
+568,
+640
+],
+"foco": [
+52.3,
+63.4
+]
+},
+"f870": {
+"tema": "bebidas",
+"titulo": "Sangria (bebida)",
+"nome": "Sangria",
+"arquivo": "Red_Wine_Sangria_with_lemon,_lime,_apple,_and_orange_served_in_a_glass_-_Evan_Swigart.jpg",
+"pagina": "Sangria (bebida)",
+"original": [
+681,
+1024
+],
+"tamanho": [
+681,
+1024
+],
+"foco": [
+47.5,
+42.1
+]
+},
+"f871": {
+"tema": "bebidas",
+"titulo": "Quentão",
+"nome": "Quentão",
+"arquivo": "Urbantiba_55536028254_o_(cropped).jpg",
+"pagina": "Quentão",
+"original": [
+1206,
+1400
+],
+"tamanho": [
+960,
+1114
+],
+"foco": [
+56.9,
+17.7
+]
+},
+"f872": {
+"tema": "bebidas",
+"titulo": "Chá verde",
+"nome": "Chá verde",
+"arquivo": "Green_tea_3_appearances.jpg",
+"pagina": "Chá verde",
+"original": [
+819,
+614
+],
+"tamanho": [
+819,
+614
+],
+"foco": [
+31.0,
+38.8
+]
+},
+"f873": {
+"tema": "bebidas",
+"titulo": "Refrigerante",
+"nome": "Refrigerante",
+"arquivo": "Glass_cola.jpg",
+"pagina": "Refrigerante",
+"original": [
+2200,
+1704
+],
+"tamanho": [
+960,
+744
+],
+"foco": [
+61.5,
+34.0
+]
 }
 }
