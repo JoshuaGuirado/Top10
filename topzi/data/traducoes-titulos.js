@@ -57,6 +57,7 @@ Object.assign(LIST_I18N, {
   "capitais-alfabetica": ["The first 10 Brazilian state capitals in alphabetical order", "Las 10 primeras capitales brasileñas en orden alfabético"],
   "cidades-turisticas": ["The 10 most touristic cities in Brazil", "Las 10 ciudades más turísticas de Brasil"],
   "hino-nacional": ["The first 10 words of the Brazilian National Anthem", "Las 10 primeras palabras del Himno Nacional de Brasil"],
+  "50-hino-nacional": ["The first 50 words of the Brazilian National Anthem", "Las 50 primeras palabras del Himno Nacional de Brasil"],
   "30-cidades-br": ["The 30 most populous cities in Brazil", "Las 30 ciudades más pobladas de Brasil"],
   "30-turismo-br": ["The 30 most famous tourist spots in Brazil", "Los 30 lugares turísticos más famosos de Brasil"],
   "x-rios-br": ["The 10 most famous rivers in Brazil", "Los 10 ríos más famosos de Brasil"],

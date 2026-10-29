@@ -64,9 +64,11 @@ function chipButton(label, count, active, onClick, iconHtml = "") {
 // 2) categoria escolhida ou pesquisa: as listas em linhas curtas.
 let suggestedIds = [];
 
-function pickSuggestions() {
+// trocar: o botão "Outras sugestões" pede listas diferentes das que estão na tela.
+function pickSuggestions(trocar = false) {
   const pool = allLists().filter((l) => sizeOk(l) && !l.custom);
-  const fresh = pool.filter((l) => !lastListIds.includes(l.id));
+  const evitar = trocar ? suggestedIds : [];
+  const fresh = pool.filter((l) => !lastListIds.includes(l.id) && !evitar.includes(l.id));
   const from = (fresh.length >= 5 ? fresh : pool).slice();
   suggestedIds = [];
   while (from.length && suggestedIds.length < 5) suggestedIds.push(from.splice(Math.floor(Math.random() * from.length), 1)[0].id);
@@ -153,11 +155,17 @@ function renderListGrid() {
   const grid = $("list-grid");
   grid.innerHTML = "";
   if (browsing) {
-    $("lists-sub").textContent = t("lists.suggest");
+    $("lists-sub").innerHTML = `<span>${t("lists.suggest")}</span><button type="button" class="link-btn" id="more-suggest">↻ ${t("lists.moreSuggest")}</button>`;
+    $("lists-sub").classList.add("sug-head");
+    $("more-suggest").addEventListener("click", () => {
+      pickSuggestions(true);
+      renderListGrid();
+    });
     renderCatGrid();
     suggestedIds.map((id) => allLists().find((l) => l.id === id)).filter((l) => l && sizeOk(l)).forEach((l) => grid.appendChild(listRow(l, true)));
     return;
   }
+  $("lists-sub").classList.remove("sug-head");
   const lists = filteredLists();
   const cat = activeCat !== "all" ? categoryOf({ cat: activeCat }) : null;
   $("lists-sub").textContent = `${cat && !searching ? catLabel(cat) + " · " : ""}${t("mode.lists", { n: lists.length })}`;
