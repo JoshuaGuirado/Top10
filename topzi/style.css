@@ -180,6 +180,8 @@ button { font: inherit; cursor: pointer; color: inherit; }
 .builder-controls { display: grid; gap: 12px; }
 .ctrl { display: grid; grid-template-columns: 120px 1fr; gap: 8px; align-items: center; }
 .ctrl-label { font-size: .75rem; font-weight: 700; color: var(--muted); }
+.ctrl-label.sug-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.sug-head .link-btn { font-size: .8rem; padding: 2px 0; }
 .swatches { display: flex; flex-wrap: wrap; gap: 5px; }
 .swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); padding: 0; }
 .swatch.active { outline: 3px solid var(--accent); outline-offset: 1px; }

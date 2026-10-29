@@ -158,6 +158,7 @@ Object.assign(TEXTS, {
   "lists.searchAria": ["Pesquisar listas", "Search lists", "Buscar listas"],
   "lists.random": ["Sortear lista", "Random list", "Lista al azar"],
   "lists.suggest": ["Sugestões", "Suggestions", "Sugerencias"],
+  "lists.moreSuggest": ["Outras sugestões", "Other suggestions", "Otras sugerencias"],
   "lists.cats": ["Categorias", "Categories", "Categorías"],
   "lists.back": ["← Categorias", "← Categories", "← Categorías"],
   "lists.all": ["Todas", "All", "Todas"],
