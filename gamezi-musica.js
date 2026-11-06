@@ -4,7 +4,8 @@
 // o mesmo para todos os jogos. Logo abaixo, a linha "Volume" (de 0 a 100, em tt:musica-volume): o dono pediu uma
 // margem bem grande, então vai do silêncio a bem alto (o 100 é umas 14 vezes o volume de antes). Os navegadores só deixam tocar som depois do primeiro toque na tela, então ela começa aí.
 // Para quando a aba fica escondida.
-// "Música especial" (tt:musica-trilha = "especial"): outra trilha, original, no ESTILO das trilhas ambientes de jogo
+// Faixas: a setinha da linha "Música" abre a lista (FAIXAS; a escolhida fica em tt:musica-trilha). "Padrão" é a de
+// cima. "Entardecer" (id "especial"): outra trilha, original, no ESTILO das trilhas ambientes de jogo
 // (o dono pediu "o mais perto do C418 sem burlar direitos"): piano abafado com muito eco, tempo solto, pequenos motivos que
 // voltam com variação, um fundo suave e pausas longas entre os trechos. Tudo sorteado na hora (tom, acordes, motivo),
 // nunca repete igual; nenhuma melodia ou sequência de acordes de música existente — copiar isso não pode.
@@ -16,7 +17,13 @@
   var TEXTO_VOLUME = { pt: "Volume", en: "Volume", es: "Volumen" };
   var BPM = 84;
   var CHAVE_TRILHA = "tt:musica-trilha";
-  var TEXTO_ESPECIAL = { pt: "Música especial", en: "Special music", es: "Música especial" };
+  // Faixas que a pessoa escolhe na setinha da linha "Música". O id "especial" é o da trilha "Entardecer" (nome antigo,
+  // mantido para quem já tinha escolhido). Faixa nova: um item aqui e o caso dela em agendar().
+  var FAIXAS = [
+    { id: "normal", nome: { pt: "Padrão", en: "Default", es: "Predeterminada" } },
+    { id: "especial", nome: { pt: "Entardecer", en: "Dusk", es: "Atardecer" } },
+  ];
+  var TEXTO_FAIXAS = { pt: "Escolher a faixa", en: "Choose the track", es: "Elegir la pista" };
   var VOLUME_PADRAO = 26; // na escala de 0 a 100; dá o volume de antes (0,07)
   // Trilha especial: um tempo a cada ~1,1 s; cada acorde dura 4 tempos; cada trecho tem de 4 a 7 acordes e depois
   // vem uma pausa de 8 a 16 tempos. Tom maior sorteado a cada trecho; acordes com sétima e nona, abertos.
@@ -34,7 +41,9 @@
   var espPausa = 0;
 
   function trilha() {
-    try { return localStorage.getItem(CHAVE_TRILHA) === "especial" ? "especial" : "normal"; } catch (e) { return "normal"; }
+    var t = null;
+    try { t = localStorage.getItem(CHAVE_TRILHA); } catch (e) { /* sem armazenamento */ }
+    return FAIXAS.some(function (f) { return f.id === t; }) ? t : "normal";
   }
 
   function ligada() {
@@ -291,52 +300,87 @@
     b.style.opacity = on ? "1" : ".55";
   }
 
-  // Linha "Música" nas Configurações do jogo (depois de Tema/Som).
+  // Linha "Música" nas Configurações do jogo (depois de Tema/Som): liga/desliga e uma setinha que abre a lista de faixas.
+  // Logo abaixo, a linha "Volume".
   function colocarNasConfiguracoes() {
     var caixa = document.querySelector("#settings-dialog .dialog-inner");
     if (!caixa || document.getElementById("musica-btn")) return;
     var linha = document.createElement("div");
     linha.className = "setting-row";
-    linha.innerHTML = '<span class="musica-rotulo"></span><button type="button" class="icon-btn" id="musica-btn"></button>';
+    linha.innerHTML = '<span class="musica-nome"><span class="musica-rotulo"></span><small class="musica-atual"></small></span>' +
+      '<span class="musica-botoes"><button type="button" class="icon-btn musica-seta" id="musica-faixas-btn" aria-expanded="false">' +
+      '<svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>' +
+      '</button><button type="button" class="icon-btn" id="musica-btn"></button></span>';
     caixa.appendChild(linha);
+    var lista = document.createElement("div");
+    lista.className = "musica-faixas";
+    lista.id = "musica-faixas";
+    lista.hidden = true;
+    caixa.appendChild(lista);
     var linhaVol = document.createElement("div");
     linhaVol.className = "setting-row";
     linhaVol.innerHTML = '<span class="musica-rotulo"></span><span class="musica-volume"><input type="range" id="musica-volume" min="0" max="100" step="1"><output></output></span>';
     caixa.appendChild(linhaVol);
-    var linhaEsp = document.createElement("div");
-    linhaEsp.className = "setting-row";
-    linhaEsp.innerHTML = '<span class="musica-rotulo"></span><button type="button" class="icon-btn" id="musica-especial-btn"></button>';
-    caixa.appendChild(linhaEsp);
     if (!document.getElementById("musica-volume-css")) {
       var css = document.createElement("style");
       css.id = "musica-volume-css";
       css.textContent = ".musica-volume{display:flex;align-items:center;gap:8px;flex:1;max-width:220px}" +
         ".musica-volume input{flex:1;min-width:0;accent-color:var(--accent,#ff4d3d)}" +
-        ".musica-volume output{min-width:2.2em;text-align:right;font-variant-numeric:tabular-nums}";
+        ".musica-volume output{min-width:2.2em;text-align:right;font-variant-numeric:tabular-nums}" +
+        ".musica-nome{display:flex;flex-direction:column;gap:1px}" +
+        ".musica-atual{font-size:.78rem;font-weight:600;color:var(--muted,#888)}" +
+        ".musica-botoes{display:flex;gap:8px}" +
+        ".musica-seta svg{transition:transform .2s}.musica-seta[aria-expanded=true] svg{transform:rotate(180deg)}" +
+        ".musica-faixas{display:flex;flex-wrap:wrap;gap:8px;padding:2px 0 12px;border-bottom:1.5px solid var(--line,#ddd)}" +
+        ".musica-faixa{font:inherit;font-weight:700;font-size:.9rem;padding:8px 14px;border-radius:999px;cursor:pointer;" +
+        "border:1.5px solid var(--line,#ddd);background:transparent;color:inherit}" +
+        ".musica-faixa[aria-pressed=true]{background:var(--fg,#1a1a1a);color:var(--bg,#fff);border-color:var(--fg,#1a1a1a)}";
       document.head.appendChild(css);
     }
     var rotulo = linha.querySelector(".musica-rotulo");
+    var atual = linha.querySelector(".musica-atual");
+    var seta = linha.querySelector(".musica-seta");
     var rotuloVol = linhaVol.querySelector(".musica-rotulo");
-    var rotuloEsp = linhaEsp.querySelector(".musica-rotulo");
-    var bEsp = linhaEsp.querySelector("button");
-    var b = linha.querySelector("button");
+    var b = linha.querySelector("#musica-btn");
     var faixa = linhaVol.querySelector("input");
     var numero = linhaVol.querySelector("output");
     var atualizar = function () {
-      rotulo.textContent = TEXTO[idioma()];
-      rotuloVol.textContent = TEXTO_VOLUME[idioma()];
-      faixa.setAttribute("aria-label", TEXTO_VOLUME[idioma()]);
+      var l = idioma();
+      rotulo.textContent = TEXTO[l];
+      var escolhida = trilha();
+      atual.textContent = FAIXAS.filter(function (f) { return f.id === escolhida; })[0].nome[l];
+      seta.setAttribute("aria-label", TEXTO_FAIXAS[l]);
+      seta.title = TEXTO_FAIXAS[l];
+      lista.innerHTML = "";
+      FAIXAS.forEach(function (f) {
+        var bt = document.createElement("button");
+        bt.type = "button";
+        bt.className = "musica-faixa";
+        bt.dataset.faixa = f.id;
+        bt.textContent = f.nome[l];
+        bt.setAttribute("aria-pressed", f.id === escolhida ? "true" : "false");
+        bt.onclick = function () {
+          if (f.id !== trilha()) {
+            try { localStorage.setItem(CHAVE_TRILHA, f.id); } catch (e) { /* vale só agora */ }
+            trocarTrilha();
+          }
+          // Escolheu uma faixa com a música desligada: liga, para ouvir.
+          if (!ligada()) guardar(true);
+          comecar();
+          atualizar();
+        };
+        lista.appendChild(bt);
+      });
+      rotuloVol.textContent = TEXTO_VOLUME[l];
+      faixa.setAttribute("aria-label", TEXTO_VOLUME[l]);
       faixa.value = volume();
       numero.textContent = volume();
       linhaVol.style.opacity = ligada() ? "1" : ".55";
-      var esp = trilha() === "especial";
-      rotuloEsp.textContent = TEXTO_ESPECIAL[idioma()];
-      bEsp.innerHTML = '<svg class="ui-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>' + (esp ? "" : '<path d="M3 3l18 18"/>') + "</svg>";
-      bEsp.setAttribute("aria-pressed", esp ? "true" : "false");
-      bEsp.setAttribute("aria-label", TEXTO_ESPECIAL[idioma()]);
-      bEsp.title = TEXTO_ESPECIAL[idioma()];
-      bEsp.style.opacity = esp ? "1" : ".55";
       desenharBotao(b);
+    };
+    seta.onclick = function () {
+      lista.hidden = !lista.hidden;
+      seta.setAttribute("aria-expanded", lista.hidden ? "false" : "true");
     };
     faixa.oninput = function () {
       var v = Number(faixa.value);
@@ -351,15 +395,6 @@
       }
     };
     atualizar();
-    bEsp.onclick = function () {
-      var esp = trilha() !== "especial";
-      try { localStorage.setItem(CHAVE_TRILHA, esp ? "especial" : "normal"); } catch (e) { /* vale só agora */ }
-      trocarTrilha();
-      // Escolheu a especial com a música desligada: liga, para ouvir.
-      if (!ligada()) guardar(true);
-      comecar();
-      atualizar();
-    };
     b.onclick = function () {
       var on = !ligada();
       guardar(on);

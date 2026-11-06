@@ -89,10 +89,11 @@
   de amanhã (o dia 1 está fixado no teste). Chaves `tm:*`.
 - Música de fundo: `gamezi-musica.js` (raiz), feita na hora com Web Audio, sem arquivo de áudio; liga/desliga na linha "Música"
   que ela mesma põe no `#settings-dialog` (chave `tt:musica`, a mesma para todos), com a linha "Volume" logo abaixo (0 a 100 em
-  `tt:musica-volume`, ganho (v/100)²; o dono pediu margem bem grande: do silêncio a ~14× o volume antigo, que é o 26). A linha "Música especial"
-  (`tt:musica-trilha`) troca para uma trilha ORIGINAL no estilo das trilhas ambientes de jogo (piano abafado, muito eco,
-  tempo solto, motivo curto que volta, fundo suave, pausas longas), com tom, acordes e motivo sorteados na hora; nada de copiar melodia de
-  música com dono (o dono pediu as do Minecraft/C418: só o clima, nunca as notas). Jogo novo: carregar `../gamezi-musica.js`.
+  `tt:musica-volume`, ganho (v/100)²; o dono pediu margem bem grande: do silêncio a ~14× o volume antigo, que é o 26). A setinha da linha "Música"
+  abre as faixas (`FAIXAS` em `gamezi-musica.js`, escolhida em `tt:musica-trilha`): "Padrão" (a de sempre) e "Entardecer"
+  (id `especial`), ORIGINAL no estilo das trilhas ambientes de jogo (piano abafado, muito eco, tempo solto, motivo curto que
+  volta, fundo suave, pausas longas), sorteada na hora. Faixa nova: item em `FAIXAS`, nome nos 3 idiomas e o caso em
+  `agendar()`. Nada de copiar melodia de música com dono (o dono pediu as do Minecraft/C418: só o clima, nunca as notas). Jogo novo: carregar `../gamezi-musica.js`.
 - Skin única do Gamezi (`gamezi-skins.js`, raiz): a mesma em todos os jogos, menos no Patozi (lá é o guarda-roupa do pato).
   Fica em `gz:skin` ({ presetId, avatar }); `gameziMinhaSkin()` lê (na 1ª vez aproveita a do Topzi ou do Cravazi) e
   `gameziGuardarSkin()` grava. A janela tem as prontas e o editor "Criar a minha"; a conta (`conta.html`) mostra e troca a skin
