@@ -93,7 +93,7 @@
   abre as faixas (`FAIXAS` em `gamezi-musica.js`, escolhida em `tt:musica-trilha`): "Padrão" (a de sempre) e "Entardecer"
   (id `especial`), ORIGINAL no estilo das trilhas ambientes de jogo (piano abafado, muito eco, tempo solto, motivo curto que
   volta, fundo suave, pausas curtas com nota de fundo e trecho que termina na tônica — o dono achou o silêncio longo e
-  o começo/fim secos) e "Varanda" (id `varanda`, ORIGINAL no estilo neo-soul/lo-fi: piano elétrico, acordes de 9ª/13ª,
+  o começo/fim secos) e "Varanda" (id `varanda`, ORIGINAL no estilo chill/tropical: piano elétrico com chorus, dedilhado tipo guitarra,
   riff curto original em loop, vamp de 2–3 acordes, bumbo em todo tempo, fundo que "bombeia"; o dono pediu "estilo Ylang
   Ylang", do FKJ, que tem dono: nunca o riff dela, nem transposto), "Tempestade" (id `tempestade`, rápida no estilo czardas/
   Presto agitato: menor harmônica, violino com corridas, piano em arpejo ou "um-pá") e "Meia-Noite" (id `meianoite`, jazz de
