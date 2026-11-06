@@ -914,18 +914,21 @@ body[data-screen]:not([data-screen="home"]) .gamezi-back { display: none; }
 .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin: 6px 0 22px; }
 #lists-cats { margin-top: 20px; }
 .cat-tile {
-  display: flex; align-items: center; gap: 8px; padding: 12px; cursor: pointer; text-align: left;
+  position: relative; display: flex; align-items: center; gap: 8px; padding: 12px; cursor: pointer; text-align: left;
   font: inherit; font-weight: 700; font-size: .9rem; color: var(--fg); background: var(--surface);
   border: 2px solid transparent; border-radius: var(--r);
 }
 .cat-tile:hover { border-color: var(--accent); }
 .cat-tile span { flex: 1; min-width: 0; line-height: 1.15; }
-.cat-tile small { color: var(--muted); font-weight: 600; }
+/* O número de listas fica no canto, para não grudar nos nomes longos ("Curiosidades", "Personagens"). */
+.cat-tile small { position: absolute; top: 4px; right: 8px; font-size: .7rem; color: var(--muted); font-weight: 600; }
 .cat-tile .ico, .cat-tile svg { color: var(--accent-ink); flex: none; }
 .cat-back { margin: 0 0 6px; font-size: .95rem; }
-/* Celular estreito: sem o número de listas, para o nome da categoria caber inteiro. */
-@media (max-width: 380px) {
+/* Tela estreita: letra menor para o nome da categoria caber inteiro; no celular bem estreito, sem o número. */
+@media (max-width: 560px) {
   .cat-tile { padding: 10px; gap: 6px; font-size: .84rem; }
+}
+@media (max-width: 380px) {
   .cat-tile small { display: none; }
 }
 #lists-sub { margin: 4px 0 8px; }
