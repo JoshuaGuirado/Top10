@@ -22,11 +22,29 @@
   var FAIXAS = [
     { id: "normal", nome: { pt: "Padrão", en: "Default", es: "Predeterminada" } },
     { id: "especial", nome: { pt: "Entardecer", en: "Dusk", es: "Atardecer" } },
+    { id: "varanda", nome: { pt: "Varanda", en: "Porch", es: "Terraza" } },
   ];
+  // "Varanda": ORIGINAL no estilo neo-soul/lo-fi (o dono pediu "no estilo de Ylang Ylang", do FKJ; a música tem dono,
+  // então só o estilo: piano elétrico, acordes de 9ª e 13ª, baixo macio, bateria leve com balanço, frases curtas).
+  // Anda de semicolcheia em semicolcheia; cada acorde dura um compasso; tom e sequência sorteados a cada 8 compassos.
+  var VAR_BPM = 88;
+  var VAR_TONS = [50, 51, 53, 55, 56, 46]; // Ré, Mi♭, Fá, Sol, Lá♭, Si♭ (a nota do baixo)
+  // Tipos de acorde (intervalos a partir do baixo; o baixo toca a fundamental sozinho, a mão direita o resto).
+  var VAR_TIPOS = { m9: [10, 14, 15, 19], maj9: [11, 14, 16, 19], d13: [10, 16, 21, 26], m11: [10, 15, 17, 22] };
+  // Caminhos de acordes comuns no gênero (graus a partir da tônica, em semitons, com o tipo de cada um).
+  var VAR_CAMINHOS = [
+    [[2, "m9"], [7, "d13"], [0, "maj9"], [9, "m9"]],
+    [[5, "maj9"], [4, "m9"], [9, "m11"], [2, "m9"]],
+    [[9, "m9"], [2, "m11"], [7, "d13"], [0, "maj9"]],
+    [[0, "maj9"], [5, "maj9"], [4, "m9"], [9, "m9"]],
+    [[2, "m11"], [5, "maj9"], [9, "m9"], [7, "d13"]],
+  ];
+  var VAR_PENTA = [0, 2, 4, 7, 9]; // frases do piano: pentatônica maior do tom
   var TEXTO_FAIXAS = { pt: "Escolher a faixa", en: "Choose the track", es: "Elegir la pista" };
   var VOLUME_PADRAO = 26; // na escala de 0 a 100; dá o volume de antes (0,07)
-  // Trilha especial: um tempo a cada ~1,1 s; cada acorde dura 4 tempos; cada trecho tem de 4 a 7 acordes e depois
-  // vem uma pausa de 8 a 16 tempos. Tom maior sorteado a cada trecho; acordes com sétima e nona, abertos.
+  // Trilha especial: um tempo a cada ~1,1 s; cada acorde dura 4 tempos; cada trecho tem de 4 a 8 acordes, termina na
+  // tônica (o último acorde soa mais) e depois vem uma pausa curta de 2 a 4 tempos com uma nota de fundo (o dono achou
+  // o silêncio longo e o começo/fim secos). Tom maior sorteado a cada trecho; acordes com sétima e nona, abertos.
   var ESP_BPM = 54;
   var ESP_TONS = [48, 50, 53, 55, 45, 52]; // Dó, Ré, Fá, Sol, Lá, Mi (a nota do baixo)
   var ESP_ESCALA = [0, 2, 4, 5, 7, 9, 11]; // escala maior
@@ -39,6 +57,8 @@
   var ctx = null, saida = null, eco = null, timer = null, passo = 0, proximo = 0, tocando = false;
   var esp = null; // trecho da trilha especial que está tocando (ou null na pausa / antes de começar)
   var espPausa = 0;
+  var vr = null; // seção da "Varanda" (tom e sequência de acordes)
+  var ruido = null; // um segundo de ruído branco, para a bateria
 
   function trilha() {
     var t = null;
@@ -143,6 +163,7 @@
 
   // Fundo suave: duas notas longas que entram devagar, com um balanço leve na afinação.
   function fundo(notas, quando, dur) {
+    quando = Math.max(quando, ctx.currentTime + 0.01); // entra um pouco antes do acorde, mas nunca antes de agora
     notas.forEach(function (n) {
       var o = ctx.createOscillator();
       var g = ctx.createGain();
@@ -173,6 +194,7 @@
     var graus = [sorte([0, 0, 3, 5])];
     var n = 4 + Math.floor(Math.random() * 4);
     while (graus.length < n) graus.push(sorte(ESP_CAMINHOS[graus[graus.length - 1]]));
+    if (graus[graus.length - 1] !== 0) graus.push(0); // o trecho sempre termina "em casa", para não acabar no ar
     var motivo = [], g = sorte([2, 4, 4, 7]), t = Math.random() < 0.5 ? 0 : 0.5;
     var tam = 3 + Math.floor(Math.random() * 3);
     for (var k = 0; k < tam && t < 3.6; k++) {
@@ -195,21 +217,26 @@
     var b = esp.batida;
     var c = Math.floor(b / 4);
     if (c >= esp.graus.length) {
+      // Pausa curta (2 a 4 tempos) com uma nota de fundo segurando o tom: nada de silêncio seco entre os trechos.
+      espPausa = 2 + Math.floor(Math.random() * 3);
+      fundo([grau(esp.tonica, 0, 1), grau(esp.tonica, 4, 1)], quando - tempo * 0.5, tempo * (espPausa + 4));
       esp = null;
-      espPausa = 8 + Math.floor(Math.random() * 9);
       return;
     }
     var gr = esp.graus[c], ton = esp.tonica;
+    var primeiro = c === 0, ultimo = c === esp.graus.length - 1;
     if (b % 4 === 0) {
       // Acorde aberto: baixo, quinta, sétima ou nona, e a terça uma oitava acima; dedilhado devagar ou junto.
       var notas = [grau(ton, gr, 0), grau(ton, gr + 4, 0), grau(ton, gr + sorte([6, 8]), 0), grau(ton, gr + 2, 1)];
       var dedilha = Math.random() < 0.6;
       notas.forEach(function (n, k) {
-        piano(n, quando + (dedilha ? k * (0.14 + Math.random() * 0.08) : 0) + solto(), k === 0 ? 0.1 : 0.05 + Math.random() * 0.02, 7);
+        // O primeiro acorde entra mais baixinho; o último soa mais tempo, morrendo devagar.
+        var vol = (k === 0 ? 0.1 : 0.05 + Math.random() * 0.02) * (primeiro ? 0.7 : 1);
+        piano(n, quando + (dedilha || ultimo ? k * (0.16 + Math.random() * 0.08) : 0) + solto(), vol, ultimo ? 10 : 7);
       });
-      if (esp.comFundo) fundo([grau(ton, gr, 1), grau(ton, gr + 4, 1)], quando, tempo * 4.5);
+      if (esp.comFundo || primeiro || ultimo) fundo([grau(ton, gr, 1), grau(ton, gr + 4, 1)], quando - (primeiro ? tempo : 0), tempo * (ultimo ? 6 : 4.5));
       // Em ~1 de cada 4 acordes a melodia descansa; nos outros, o motivo volta (às vezes com uma nota mudada).
-      esp.semMelodia = Math.random() < 0.25;
+      esp.semMelodia = Math.random() < 0.25 || primeiro;
       esp.variar = Math.random() < 0.45 ? 1 + Math.floor(Math.random() * esp.motivo.length) : 0;
     }
     if (!esp.semMelodia) {
@@ -236,11 +263,143 @@
     nota(hz(acorde[DEDILHADO[k]] + 12), quando, colcheia * 1.6, "triangle", 0.045, 0.01);
   }
 
+  // Piano elétrico: síntese FM simples (o "plim" do martelo que some rápido) com um tremolo leve.
+  function rhodes(n, quando, vol, dur) {
+    var f = hz(n);
+    var c = ctx.createOscillator(), m = ctx.createOscillator(), mg = ctx.createGain(), g = ctx.createGain();
+    c.type = "sine";
+    m.type = "sine";
+    c.frequency.value = f;
+    m.frequency.value = f;
+    mg.gain.setValueAtTime(f * 1.4, quando);
+    mg.gain.exponentialRampToValueAtTime(f * 0.08, quando + 0.4);
+    m.connect(mg);
+    mg.connect(c.frequency);
+    g.gain.setValueAtTime(0.0001, quando);
+    g.gain.exponentialRampToValueAtTime(vol, quando + 0.006);
+    g.gain.exponentialRampToValueAtTime(vol * 0.45, quando + 0.35);
+    g.gain.exponentialRampToValueAtTime(0.0001, quando + dur);
+    var filtro = ctx.createBiquadFilter();
+    filtro.type = "lowpass";
+    filtro.frequency.value = 2400;
+    c.connect(filtro);
+    filtro.connect(g);
+    g.connect(saida);
+    if (eco) {
+      var mol = ctx.createGain();
+      mol.gain.value = 0.35;
+      g.connect(mol);
+      mol.connect(eco);
+    }
+    c.start(quando);
+    m.start(quando);
+    c.stop(quando + dur + 0.05);
+    m.stop(quando + dur + 0.05);
+  }
+
+  function baixo(n, quando, dur, vol) {
+    var o = ctx.createOscillator(), g = ctx.createGain(), filtro = ctx.createBiquadFilter();
+    o.type = "triangle";
+    o.frequency.value = hz(n);
+    filtro.type = "lowpass";
+    filtro.frequency.value = 500;
+    g.gain.setValueAtTime(0.0001, quando);
+    g.gain.exponentialRampToValueAtTime(vol, quando + 0.02);
+    g.gain.exponentialRampToValueAtTime(vol * 0.6, quando + dur * 0.7);
+    g.gain.exponentialRampToValueAtTime(0.0001, quando + dur);
+    o.connect(filtro);
+    filtro.connect(g);
+    g.connect(saida);
+    o.start(quando);
+    o.stop(quando + dur + 0.05);
+  }
+
+  // Bateria leve: bumbo (seno que cai de tom), caixa de aro e chimbal (ruído filtrado bem curto).
+  function bateria(peca, quando, vol) {
+    var g = ctx.createGain();
+    g.connect(saida);
+    if (peca === "bumbo") {
+      var o = ctx.createOscillator();
+      o.frequency.setValueAtTime(120, quando);
+      o.frequency.exponentialRampToValueAtTime(42, quando + 0.12);
+      g.gain.setValueAtTime(vol, quando);
+      g.gain.exponentialRampToValueAtTime(0.0001, quando + 0.3);
+      o.connect(g);
+      o.start(quando);
+      o.stop(quando + 0.32);
+      return;
+    }
+    if (!ruido) {
+      ruido = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+      var d = ruido.getChannelData(0);
+      for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    var r = ctx.createBufferSource(), filtro = ctx.createBiquadFilter();
+    r.buffer = ruido;
+    var curto = peca === "chimbal" ? 0.05 : 0.12;
+    filtro.type = peca === "chimbal" ? "highpass" : "bandpass";
+    filtro.frequency.value = peca === "chimbal" ? 7000 : 1800;
+    g.gain.setValueAtTime(vol, quando);
+    g.gain.exponentialRampToValueAtTime(0.0001, quando + curto);
+    r.connect(filtro);
+    filtro.connect(g);
+    r.start(quando, Math.random() * 0.8);
+    r.stop(quando + curto + 0.02);
+  }
+
+  // Uma semicolcheia da "Varanda". As semicolcheias "de trás" saem um pouco atrasadas (o balanço do gênero).
+  function tocarVaranda(i, quando) {
+    var sc = 60 / VAR_BPM / 4;
+    var k = i % 16; // posição no compasso
+    var compasso = Math.floor(i / 16);
+    if (k % 2 === 1) quando += sc * 0.28;
+    if (!vr || (k === 0 && compasso % 8 === 0)) {
+      vr = { tom: VAR_TONS[Math.floor(Math.random() * VAR_TONS.length)], caminho: VAR_CAMINHOS[Math.floor(Math.random() * VAR_CAMINHOS.length)], frase: null };
+    }
+    var ac = vr.caminho[compasso % 4];
+    var raiz = vr.tom + ac[0];
+    if (raiz > 55) raiz -= 12;
+    var mao = VAR_TIPOS[ac[1]].map(function (x) { return raiz + 12 + x - (raiz + 12 + x > 79 ? 12 : 0); });
+    var solto = function () { return (Math.random() - 0.5) * 0.02; };
+    // Bateria: bumbo no 1 e no "e" do 3, aro no 2 e no 4, chimbal nas colcheias (às vezes some, para respirar).
+    var semBateria = compasso % 8 === 7 && k >= 8;
+    if (!semBateria) {
+      if (k === 0 || k === 10 || (k === 7 && Math.random() < 0.3)) bateria("bumbo", quando, 0.5);
+      if (k === 4 || k === 12) bateria("caixa", quando + 0.01, 0.16);
+      if (k % 2 === 0) bateria("chimbal", quando, k % 4 === 0 ? 0.05 : 0.03);
+      else if (Math.random() < 0.15) bateria("chimbal", quando, 0.02);
+    }
+    // Baixo: fundamental no 1, notas de passagem sorteadas.
+    if (k === 0) baixo(raiz - 12, quando, sc * 5, 0.22);
+    if (k === 6 && Math.random() < 0.6) baixo(raiz - 12 + (Math.random() < 0.5 ? 7 : 12), quando, sc * 2, 0.15);
+    if (k === 10) baixo(raiz - 12, quando, sc * 3, 0.17);
+    if (k === 14 && Math.random() < 0.5) baixo(raiz - 12 + (Math.random() < 0.5 ? 10 : 5), quando, sc * 2, 0.13);
+    // Acorde no piano elétrico: no 1 (às vezes um pouquinho antes), e um toque curto no "e" do 2 ou do 3.
+    if (k === 0) mao.forEach(function (n, j) { rhodes(n, quando + j * 0.012 + solto(), 0.06, sc * 14); });
+    if ((k === 6 || k === 11) && Math.random() < 0.55) mao.forEach(function (n) { rhodes(n, quando + solto(), 0.04, sc * 3); });
+    // Frase curta: sorteada no começo de alguns compassos, de 3 a 6 notas da pentatônica, depois silêncio.
+    if (k === 0) {
+      vr.frase = null;
+      if (compasso % 2 === 1 && Math.random() < 0.7) {
+        var t = 2 + Math.floor(Math.random() * 3), notas = {}, g = Math.floor(Math.random() * 5), tam = 3 + Math.floor(Math.random() * 4);
+        for (var j = 0; j < tam && t < 15; j++) {
+          notas[t] = vr.tom + 24 + 12 * Math.floor(g / 5) + VAR_PENTA[((g % 5) + 5) % 5];
+          g = Math.max(0, Math.min(9, g + [-2, -1, -1, 1, 1, 2][Math.floor(Math.random() * 6)]));
+          t += [1, 2, 2, 3][Math.floor(Math.random() * 4)];
+        }
+        vr.frase = notas;
+      }
+    }
+    if (vr.frase && vr.frase[k] !== undefined) rhodes(vr.frase[k], quando + solto(), 0.07, sc * 4);
+  }
+
   function agendar() {
-    var especial = trilha() === "especial";
-    var passoDur = especial ? 60 / ESP_BPM : 60 / BPM / 2; // a especial anda de tempo em tempo
+    var t = trilha();
+    var especial = t === "especial";
+    var passoDur = especial ? 60 / ESP_BPM : t === "varanda" ? 60 / VAR_BPM / 4 : 60 / BPM / 2;
     while (proximo < ctx.currentTime + 0.25) {
       if (especial) tocarEspecial(passo, proximo);
+      else if (t === "varanda") tocarVaranda(passo, proximo);
       else tocarPasso(passo, proximo);
       passo += 1;
       proximo += passoDur;
@@ -252,6 +411,7 @@
     passo = 0;
     esp = null;
     espPausa = 0;
+    vr = null;
     if (ctx) proximo = ctx.currentTime + 0.3;
   }
 
