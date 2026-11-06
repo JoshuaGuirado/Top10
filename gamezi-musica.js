@@ -4,9 +4,10 @@
 // o mesmo para todos os jogos. Logo abaixo, a linha "Volume" (de 0 a 100, em tt:musica-volume): o dono pediu uma
 // margem bem grande, então vai do silêncio a bem alto (o 100 é umas 14 vezes o volume de antes). Os navegadores só deixam tocar som depois do primeiro toque na tela, então ela começa aí.
 // Para quando a aba fica escondida.
-// "Música especial" (tt:musica-trilha = "especial"): outra trilha, original, de piano calmo com notas espaçadas, eco e
-// silêncios, sorteada na hora (nunca repete igual). Não é cópia de música de ninguém (o dono pediu as do Minecraft;
-// copiar melodia de música com dono não pode, então é só o clima: calma, espaçada, com eco).
+// "Música especial" (tt:musica-trilha = "especial"): outra trilha, original, no ESTILO das trilhas ambientes de jogo
+// (o dono pediu "o mais perto do C418 sem burlar direitos"): piano abafado com muito eco, tempo solto, pequenos motivos que
+// voltam com variação, um fundo suave e pausas longas entre os trechos. Tudo sorteado na hora (tom, acordes, motivo),
+// nunca repete igual; nenhuma melodia ou sequência de acordes de música existente — copiar isso não pode.
 
 (function () {
   var CHAVE = "tt:musica";
@@ -16,17 +17,21 @@
   var BPM = 84;
   var CHAVE_TRILHA = "tt:musica-trilha";
   var TEXTO_ESPECIAL = { pt: "Música especial", en: "Special music", es: "Música especial" };
-  var VOLUME_PADRAO = 26;
-  // Trilha especial: um tempo a cada ~0,9 s; cada acorde dura 8 tempos. Ré maior com sétimas e nonas, bem aberto.
-  var ESP_BPM = 66;
-  var ESP_ACORDES = [[50, 57, 61, 64, 69], [47, 54, 57, 62, 66], [43, 50, 54, 59, 64], [45, 52, 57, 61, 64], [42, 49, 52, 57, 61], [43, 50, 55, 59, 62]];
-  var ESP_ESCALA = [69, 71, 73, 74, 76, 78, 81, 83, 85, 86]; // Ré maior, região média-aguda do piano // na escala de 0 a 100; dá o volume de antes (0,07)
+  var VOLUME_PADRAO = 26; // na escala de 0 a 100; dá o volume de antes (0,07)
+  // Trilha especial: um tempo a cada ~1,1 s; cada acorde dura 4 tempos; cada trecho tem de 4 a 7 acordes e depois
+  // vem uma pausa de 8 a 16 tempos. Tom maior sorteado a cada trecho; acordes com sétima e nona, abertos.
+  var ESP_BPM = 54;
+  var ESP_TONS = [48, 50, 53, 55, 45, 52]; // Dó, Ré, Fá, Sol, Lá, Mi (a nota do baixo)
+  var ESP_ESCALA = [0, 2, 4, 5, 7, 9, 11]; // escala maior
+  // Para onde cada grau costuma ir (harmonia comum de qualquer música tranquila, sem copiar nenhuma).
+  var ESP_CAMINHOS = { 0: [3, 5, 3, 1], 1: [4, 3, 0], 2: [5, 3], 3: [0, 4, 5, 1, 0], 4: [0, 5, 3], 5: [3, 1, 2, 3] };
   // Acordes (notas MIDI): Dó, Lá menor, Fá, Sol, Mi menor, Lá menor, Ré menor, Sol.
   var ACORDES = [[60, 64, 67], [57, 60, 64], [53, 57, 60], [55, 59, 62], [52, 55, 59], [57, 60, 64], [50, 53, 57], [55, 59, 62]];
   var DEDILHADO = [0, 1, 2, 1, 2, 1, 0, 2]; // qual nota do acorde em cada colcheia (mais uma oitava acima)
 
   var ctx = null, saida = null, eco = null, timer = null, passo = 0, proximo = 0, tocando = false;
-  var espAcorde = 0, espNota = 4, espDescanso = 0;
+  var esp = null; // trecho da trilha especial que está tocando (ou null na pausa / antes de começar)
+  var espPausa = 0;
 
   function trilha() {
     try { return localStorage.getItem(CHAVE_TRILHA) === "especial" ? "especial" : "normal"; } catch (e) { return "normal"; }
@@ -70,65 +75,146 @@
     o.stop(quando + dur + 0.05);
   }
 
-  // Uma colcheia: dedilhado sempre; no começo do compasso, o acorde (suave) e o baixo.
   // Eco de sala grande (ruído que vai sumindo), só para a trilha especial.
   function criarEco() {
-    var dur = 3.2, n = Math.floor(ctx.sampleRate * dur);
+    var dur = 5, n = Math.floor(ctx.sampleRate * dur);
     var buf = ctx.createBuffer(2, n, ctx.sampleRate);
     for (var c = 0; c < 2; c++) {
       var d = buf.getChannelData(c);
-      for (var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2.6);
+      for (var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
     }
     var conv = ctx.createConvolver();
     conv.buffer = buf;
     var volta = ctx.createGain();
-    volta.gain.value = 0.55;
+    volta.gain.value = 0.75;
     conv.connect(volta);
     volta.connect(saida);
     return conv;
   }
 
-  // Uma nota de "piano": ataque rápido e som que vai morrendo devagar (fundamental + harmônicos fracos).
+  function sorte(lista) {
+    return lista[Math.floor(Math.random() * lista.length)];
+  }
+
+  // Nota da escala do trecho: grau (0, 1, 2… pode passar de 7) a partir da tônica, numa oitava.
+  function grau(tonica, g, oitava) {
+    var o = Math.floor(g / 7);
+    return tonica + ESP_ESCALA[((g % 7) + 7) % 7] + 12 * (o + oitava);
+  }
+
+  // Piano abafado ("felt piano"): ataque macio, harmônicos fracos e um filtro que fecha enquanto a nota soa.
   function piano(n, quando, vol, dur) {
     var f = hz(n);
-    [[1, "sine", 1], [2, "sine", 0.28], [3, "triangle", 0.08]].forEach(function (h) {
+    var filtro = ctx.createBiquadFilter();
+    filtro.type = "lowpass";
+    filtro.Q.value = 0.3;
+    filtro.frequency.setValueAtTime(Math.min(2600, f * 6), quando);
+    filtro.frequency.exponentialRampToValueAtTime(Math.max(300, f * 1.5), quando + dur * 0.6);
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, quando);
+    g.gain.exponentialRampToValueAtTime(vol, quando + 0.014);
+    g.gain.exponentialRampToValueAtTime(vol * 0.35, quando + 0.6);
+    g.gain.exponentialRampToValueAtTime(0.0001, quando + dur);
+    filtro.connect(g);
+    g.connect(saida);
+    if (eco) g.connect(eco);
+    [[1, 0, 1], [2, 2, 0.32], [3, -3, 0.1], [4, 1, 0.04]].forEach(function (h) {
       var o = ctx.createOscillator();
-      var g = ctx.createGain();
-      o.type = h[1];
+      var a = ctx.createGain();
+      o.type = "sine";
       o.frequency.value = f * h[0];
-      g.gain.setValueAtTime(0.0001, quando);
-      g.gain.exponentialRampToValueAtTime(vol * h[2], quando + 0.008);
-      g.gain.exponentialRampToValueAtTime(0.0001, quando + dur / h[0]);
-      o.connect(g);
-      g.connect(saida);
-      if (eco) g.connect(eco);
+      o.detune.value = h[1];
+      a.gain.value = h[2];
+      o.connect(a);
+      a.connect(filtro);
       o.start(quando);
       o.stop(quando + dur + 0.05);
     });
   }
 
-  // Um tempo da trilha especial. No começo de cada acorde: o acorde dedilhado devagar, às vezes só o baixo.
-  // A melodia é sorteada: poucas notas, quase sempre perto da anterior, e às vezes um trecho inteiro em silêncio.
-  function tocarEspecial(i, quando) {
-    var tempo = i % 8;
-    if (tempo === 0) {
-      if (i > 0) espAcorde = Math.random() < 0.7 ? (espAcorde + 1) % ESP_ACORDES.length : Math.floor(Math.random() * ESP_ACORDES.length);
-      espDescanso = Math.random() < 0.22 ? 8 : 0;
-      var ac = ESP_ACORDES[espAcorde];
-      var so = Math.random() < 0.25;
-      ac.forEach(function (n, k) {
-        if (so && k > 1) return;
-        piano(n, quando + k * (0.11 + Math.random() * 0.06), k === 0 ? 0.11 : 0.06, 7);
-      });
-    }
-    if (espDescanso > 0) { espDescanso -= 1; return; }
-    if (Math.random() < (tempo % 2 ? 0.18 : 0.38)) {
-      espNota = Math.max(0, Math.min(ESP_ESCALA.length - 1, espNota + [-2, -1, -1, 1, 1, 2, 0][Math.floor(Math.random() * 7)]));
-      var atraso = Math.random() < 0.3 ? 60 / ESP_BPM / 2 : 0;
-      piano(ESP_ESCALA[espNota], quando + atraso, 0.07 + Math.random() * 0.03, 4.5);
-    }
+  // Fundo suave: duas notas longas que entram devagar, com um balanço leve na afinação.
+  function fundo(notas, quando, dur) {
+    notas.forEach(function (n) {
+      var o = ctx.createOscillator();
+      var g = ctx.createGain();
+      var lfo = ctx.createOscillator();
+      var lg = ctx.createGain();
+      o.type = "triangle";
+      o.frequency.value = hz(n);
+      lfo.frequency.value = 0.2 + Math.random() * 0.2;
+      lg.gain.value = 4;
+      lfo.connect(lg);
+      lg.connect(o.detune);
+      g.gain.setValueAtTime(0.0001, quando);
+      g.gain.exponentialRampToValueAtTime(0.018, quando + dur * 0.4);
+      g.gain.exponentialRampToValueAtTime(0.0001, quando + dur);
+      o.connect(g);
+      g.connect(saida);
+      if (eco) g.connect(eco);
+      o.start(quando);
+      lfo.start(quando);
+      o.stop(quando + dur + 0.05);
+      lfo.stop(quando + dur + 0.05);
+    });
   }
 
+  // Sorteia um trecho: tom, sequência de graus (andando pelos caminhos comuns) e um motivo curto de melodia
+  // (de 3 a 5 notas, em tempos soltos) que volta em quase todos os acordes, um pouco mudado.
+  function novoTrecho() {
+    var graus = [sorte([0, 0, 3, 5])];
+    var n = 4 + Math.floor(Math.random() * 4);
+    while (graus.length < n) graus.push(sorte(ESP_CAMINHOS[graus[graus.length - 1]]));
+    var motivo = [], g = sorte([2, 4, 4, 7]), t = Math.random() < 0.5 ? 0 : 0.5;
+    var tam = 3 + Math.floor(Math.random() * 3);
+    for (var k = 0; k < tam && t < 3.6; k++) {
+      motivo.push({ g: g, t: t });
+      g += sorte([-2, -1, -1, 1, 1, 2, 3, -3]);
+      g = Math.max(0, Math.min(11, g));
+      t += sorte([0.5, 1, 1, 1.5]);
+    }
+    return { tonica: sorte(ESP_TONS), graus: graus, motivo: motivo, comFundo: Math.random() < 0.6, batida: 0, variar: 0 };
+  }
+
+  // Um tempo da trilha especial (rubato: cada nota sai um tiquinho antes ou depois).
+  function tocarEspecial(i, quando) {
+    var tempo = 60 / ESP_BPM;
+    var solto = function () { return (Math.random() - 0.5) * 0.08; };
+    if (!esp) {
+      if (espPausa > 0) { espPausa -= 1; return; }
+      esp = novoTrecho();
+    }
+    var b = esp.batida;
+    var c = Math.floor(b / 4);
+    if (c >= esp.graus.length) {
+      esp = null;
+      espPausa = 8 + Math.floor(Math.random() * 9);
+      return;
+    }
+    var gr = esp.graus[c], ton = esp.tonica;
+    if (b % 4 === 0) {
+      // Acorde aberto: baixo, quinta, sétima ou nona, e a terça uma oitava acima; dedilhado devagar ou junto.
+      var notas = [grau(ton, gr, 0), grau(ton, gr + 4, 0), grau(ton, gr + sorte([6, 8]), 0), grau(ton, gr + 2, 1)];
+      var dedilha = Math.random() < 0.6;
+      notas.forEach(function (n, k) {
+        piano(n, quando + (dedilha ? k * (0.14 + Math.random() * 0.08) : 0) + solto(), k === 0 ? 0.1 : 0.05 + Math.random() * 0.02, 7);
+      });
+      if (esp.comFundo) fundo([grau(ton, gr, 1), grau(ton, gr + 4, 1)], quando, tempo * 4.5);
+      // Em ~1 de cada 4 acordes a melodia descansa; nos outros, o motivo volta (às vezes com uma nota mudada).
+      esp.semMelodia = Math.random() < 0.25;
+      esp.variar = Math.random() < 0.45 ? 1 + Math.floor(Math.random() * esp.motivo.length) : 0;
+    }
+    if (!esp.semMelodia) {
+      var dentro = b % 4;
+      esp.motivo.forEach(function (m, k) {
+        if (m.t < dentro || m.t >= dentro + 1) return;
+        var g = m.g + (esp.variar === k + 1 ? sorte([-1, 1, 2]) : 0);
+        piano(grau(ton, g, ton >= 50 ? 1 : 2), quando + (m.t - dentro) * tempo + solto(), 0.055 + Math.random() * 0.025, 5);
+      });
+    }
+    esp.batida += 1;
+  }
+
+  // Uma colcheia: dedilhado sempre; no começo do compasso, o acorde (suave) e o baixo.
   function tocarPasso(i, quando) {
     var colcheia = 60 / BPM / 2;
     var acorde = ACORDES[Math.floor(i / 8) % ACORDES.length];
@@ -143,7 +229,7 @@
 
   function agendar() {
     var especial = trilha() === "especial";
-    var passoDur = especial ? 60 / ESP_BPM : 60 / BPM / 2;
+    var passoDur = especial ? 60 / ESP_BPM : 60 / BPM / 2; // a especial anda de tempo em tempo
     while (proximo < ctx.currentTime + 0.25) {
       if (especial) tocarEspecial(passo, proximo);
       else tocarPasso(passo, proximo);
@@ -155,7 +241,8 @@
   // Troca de trilha: recomeça do primeiro compasso (as notas que já soaram terminam sozinhas).
   function trocarTrilha() {
     passo = 0;
-    espAcorde = 0;
+    esp = null;
+    espPausa = 0;
     if (ctx) proximo = ctx.currentTime + 0.3;
   }
 
