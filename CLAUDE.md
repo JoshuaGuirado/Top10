@@ -88,7 +88,8 @@
   (medida que todo mundo encontra; personagem com a obra no nome), gerar de novo e linha nova em `TZ_DIARIO_POOLS` valendo a partir
   de amanhã (o dia 1 está fixado no teste). Chaves `tm:*`.
 - Música de fundo: `gamezi-musica.js` (raiz), feita na hora com Web Audio, sem arquivo de áudio; liga/desliga na linha "Música"
-  que ela mesma põe no `#settings-dialog` (chave `tt:musica`, a mesma para todos). Jogo novo: carregar `../gamezi-musica.js`.
+  que ela mesma põe no `#settings-dialog` (chave `tt:musica`, a mesma para todos), com a linha "Volume" logo abaixo (0 a 100 em
+  `tt:musica-volume`, ganho (v/100)²; o dono pediu margem bem grande: do silêncio a ~14× o volume antigo, que é o 26). Jogo novo: carregar `../gamezi-musica.js`.
 - Skin única do Gamezi (`gamezi-skins.js`, raiz): a mesma em todos os jogos, menos no Patozi (lá é o guarda-roupa do pato).
   Fica em `gz:skin` ({ presetId, avatar }); `gameziMinhaSkin()` lê (na 1ª vez aproveita a do Topzi ou do Cravazi) e
   `gameziGuardarSkin()` grava. A janela tem as prontas e o editor "Criar a minha"; a conta (`conta.html`) mostra e troca a skin
