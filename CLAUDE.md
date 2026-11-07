@@ -97,10 +97,11 @@
   riff curto original em loop guardado como "qual nota do acorde" (acompanha cada acorde; o dono achou notas soltas
   aleatórias), piano no mesmo ritmo a seção toda, vamp de 2–3 acordes, bumbo em todo tempo, fundo que "bombeia"; o dono pediu "estilo Ylang
   Ylang", do FKJ, que tem dono: nunca o riff dela, nem transposto), "Tempestade" (id `tempestade`, rápida no estilo czardas/
-  Presto agitato, só piano de verdade (`pianoReal`; o dono não quis som eletrônico): menor harmônica com a 7ª elevada só no V, melodia sem saltos de oitava e com nota do acorde em todo tempo forte, mão esquerda em arpejo ou "um-pá") e "Meia-Noite" (id `meianoite`, jazz de
-  clube com swing, baixo andando, prato, piano e sopros; trompete com função própria `trompete()`, natural e sem
-  agudo estridente: escorregada de afinação no ataque, brilho que acompanha o sopro, filtros sem ressonância), todas ORIGINAIS e sorteadas na hora. `AJUSTE_FAIXA` iguala o volume
-  das faixas (medir o pico de cada uma ao criar uma nova). Faixa nova: item em `FAIXAS`, nome nos 3 idiomas e o caso em
+  Presto agitato, só piano de verdade (`pianoReal`; o dono não quis som eletrônico): menor harmônica com a 7ª elevada só no V, melodia sem saltos de oitava e com nota do acorde em todo tempo forte, mão esquerda em arpejo ou "um-pá") e "Meia-Noite" (id `meianoite`, jazz SIMPLES e "escorridinho": balada lenta com UM
+  sax só — notas ligadas que escorregam, frases de 2 compassos que respiram, forma A A' B A —, piano discreto,
+  contrabaixo em 2 e vassourinha; o dono achou a versão com trompete e sax em dupla "música de shopping"), todas ORIGINAIS e sorteadas na hora. `AJUSTE_FAIXA` iguala o volume
+  das faixas (medir o pico de cada uma ao criar uma nova). `tests/musica.test.js` toca todas as faixas com um áudio de mentira
+  e acusa erro ou faixa muda (já aconteceu de apagar funções de uma faixa sem querer ao mexer em outra). Faixa nova: item em `FAIXAS`, nome nos 3 idiomas e o caso em
   `agendar()`. Nada de copiar melodia de música com dono (o dono pediu as do Minecraft/C418: só o clima, nunca as notas). Jogo novo: carregar `../gamezi-musica.js`.
 - Skin única do Gamezi (`gamezi-skins.js`, raiz): a mesma em todos os jogos, menos no Patozi (lá é o guarda-roupa do pato).
   Fica em `gz:skin` ({ presetId, avatar }); `gameziMinhaSkin()` lê (na 1ª vez aproveita a do Topzi ou do Cravazi) e
