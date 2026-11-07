@@ -68,7 +68,6 @@
     [[9, "m7"], [7, "sus"], [5, "maj7"]],
     [[5, "maj9"], [0, "maj7"]],
   ];
-  var VAR_PENTA = [0, 2, 4, 7, 9]; // o riff: pentatônica maior do tom
   // Lugares do riff dentro de 2 compassos (semicolcheias): sincopados, como no gênero.
   var VAR_LUGARES = [0, 3, 6, 8, 10, 11, 14, 16, 19, 22, 24, 26, 27, 30];
   var TEXTO_FAIXAS = { pt: "Escolher a faixa", en: "Choose the track", es: "Elegir la pista" };
@@ -426,7 +425,7 @@
     for (var t = 0; t < tempos; t++) {
       var q = quando + t * b;
       g.gain.setValueAtTime(0.004, q);
-      g.gain.linearRampToValueAtTime(0.03, q + b * 0.6);
+      g.gain.linearRampToValueAtTime(0.018, q + b * 0.6);
     }
     g.gain.linearRampToValueAtTime(0.0001, quando + tempos * b);
     filtro.connect(g);
@@ -447,17 +446,26 @@
     });
   }
 
-  // Sorteia uma seção: tom, vamp e um riff ORIGINAL de 2 compassos (5 a 7 notas em lugares sincopados).
+  // Sorteia uma seção: tom, vamp, o ritmo do piano e do baixo e um riff ORIGINAL de 2 compassos. O riff é guardado
+  // como "qual nota do acorde" (0 = a mais grave … 5), não como nota fixa: assim ele acompanha cada acorde do vamp e
+  // nunca bate com a harmonia (o dono achou umas notas aleatórias soltas em cima de uma nota só de base).
   function novaSecao() {
     var lugares = VAR_LUGARES.slice(), riff = {};
-    var tam = 5 + Math.floor(Math.random() * 3), g = 2 + Math.floor(Math.random() * 4);
+    var tam = 5 + Math.floor(Math.random() * 3), idx = 2 + Math.floor(Math.random() * 2);
     var escolhidos = [];
     while (escolhidos.length < tam) escolhidos.push(lugares.splice(Math.floor(Math.random() * lugares.length), 1)[0]);
     escolhidos.sort(function (a, b) { return a - b; }).forEach(function (l) {
-      riff[l] = g;
-      g = Math.max(0, Math.min(9, g + sorte([-2, -1, -1, 1, 1, 2, 0])));
+      riff[l] = idx;
+      idx = Math.max(0, Math.min(6, idx + sorte([-2, -1, -1, 1, 1, 2])));
     });
-    return { tom: sorte(VAR_TONS), vamp: sorte(VAR_VAMPS), riff: riff, variacao: null };
+    return {
+      tom: sorte(VAR_TONS),
+      vamp: sorte(VAR_VAMPS),
+      riff: riff,
+      variacao: null,
+      piano: sorte([[0, 6, 10], [2, 6, 11, 14], [0, 3, 8, 11], [3, 6, 10, 14]]), // onde o piano bate o acorde
+      baixo: sorte([[[0, 3], [6, 0], [10, 7]], [[0, 4], [7, 12], [10, 0]], [[0, 2], [3, 0], [8, 7], [11, 0]]]), // [lugar, intervalo]
+    };
   }
 
   // Uma semicolcheia da "Varanda". As semicolcheias "de trás" saem um pouco atrasadas (balanço).
@@ -476,7 +484,10 @@
     var mao = VAR_TIPOS[ac[1]].map(function (x) { return raiz + 12 + x - (raiz + 12 + x > 79 ? 12 : 0); });
     var solto = function () { return (Math.random() - 0.5) * 0.015; };
     var comBateria = naSecao >= 2 && !(naSecao === 15 && k >= 8);
-    // Fundo bombeando: o acorde do vamp, 2 compassos de cada vez.
+    // Notas do acorde da mão direita, de baixo para cima, em duas oitavas (o riff escolhe por posição).
+    var arpejo = mao.slice().sort(function (a, b) { return a - b; });
+    arpejo = arpejo.concat(arpejo.map(function (n) { return n + 12; }));
+    // Fundo bombeando, bem baixinho por trás: o acorde do vamp, 2 compassos de cada vez.
     if (dois === 0) fundoBombeando(mao.slice(0, 3), quando, 8);
     // Bateria: bumbo macio em todo tempo, palma/aro no 2 e no 4, shaker nas semicolcheias (mais forte no contratempo).
     if (comBateria) {
@@ -484,168 +495,32 @@
       if (k === 4 || k === 12) bateria("caixa", quando + 0.01, 0.13);
       bateria("chimbal", quando, k % 4 === 2 ? 0.045 : 0.018);
     }
-    // Baixo: segue o bumbo, com a nota no contratempo de vez em quando.
-    if (comBateria && naSecao >= 4) {
-      if (k === 0) baixo(raiz - 12, quando, sc * 3, 0.2);
-      if (k === 6 || k === 10) baixo(raiz - 12, quando, sc * 2, 0.14);
-      if (k === 14 && Math.random() < 0.5) baixo(raiz - 12 + 12, quando, sc * 1.5, 0.12);
-    }
-    // Piano elétrico com chorus (duas vozes desafinadas de leve): acordes curtos sincopados.
-    if (naSecao >= 4 && (k === 3 || k === 10) && Math.random() < 0.8) {
+    // Baixo: o mesmo desenho a seção inteira (fundamental, quinta e oitava), desde o 3º compasso.
+    if (naSecao >= 2) vr.baixo.forEach(function (b) {
+      if (b[0] === k) baixo(raiz - 12 + b[1], quando, sc * 2.5, b[1] === 0 ? 0.2 : 0.15);
+    });
+    // Piano elétrico com chorus: o acorde inteiro, sempre no mesmo ritmo da seção, desde o começo (é ele que dá a harmonia).
+    if (vr.piano.indexOf(k) >= 0) {
       mao.forEach(function (n) {
-        rhodes(n, quando + solto(), 0.03, sc * 5);
-        rhodes(n + 0.08, quando + 0.012 + solto(), 0.02, sc * 5);
+        rhodes(n, quando + solto(), 0.032, sc * 4);
+        rhodes(n + 0.08, quando + 0.012 + solto(), 0.02, sc * 4);
       });
     }
-    // O riff: 2 compassos em loop. A cada 4 repetições, uma variação (uma nota trocada ou uma a mais).
+    // O riff: 2 compassos em loop, sempre com notas do acorde da vez. A cada 4 repetições, uma variação.
     if (dois === 0) {
       vr.variacao = null;
       if (Math.floor(naSecao / 2) % 4 === 3) {
-        var ls = Object.keys(vr.riff);
-        var l = sorte(ls);
-        vr.variacao = { lugar: Number(l), g: Math.max(0, Math.min(9, vr.riff[l] + sorte([-1, 1, 2]))) };
+        var l = sorte(Object.keys(vr.riff));
+        vr.variacao = { lugar: Number(l), idx: Math.max(0, Math.min(6, vr.riff[l] + sorte([-1, 1]))) };
       }
     }
-    var g = vr.riff[dois];
-    if (vr.variacao && vr.variacao.lugar === dois) g = vr.variacao.g;
-    if (g !== undefined) {
-      var n = vr.tom + 24 + 12 * Math.floor(g / 5) + VAR_PENTA[g % 5];
-      if (n > 84) n -= 12;
-      corda(n, quando + solto(), 0.085);
+    var idx = vr.riff[dois];
+    if (vr.variacao && vr.variacao.lugar === dois) idx = vr.variacao.idx;
+    if (idx !== undefined) {
+      var n = arpejo[Math.min(idx, arpejo.length - 1)] + 12;
+      while (n > 86) n -= 12;
+      corda(n, quando + solto(), 0.08);
     }
-  }
-
-  // Grau da escala menor harmônica (pode passar de 7 ou ser negativo) → nota MIDI.
-  // Com o grau do acorde (r): fora do acorde V (grau 4), a 7ª elevada vira a natural (menor natural), que encaixa nos
-  // acordes i, iv e VI.
-  function tmpNota(d, r) {
-    var o = Math.floor(d / 7), g = ((d % 7) + 7) % 7;
-    var n = tp.tom + TMP_ESCALA[g] + 12 * o;
-    return g === 6 && r !== undefined && r % 7 !== 4 ? n - 1 : n;
-  }
-
-  // Nota do acorde (grau r: r, r+2, r+4 em cada oitava) mais perto do grau d.
-  function tmpPerto(d, r) {
-    var melhor = d, dist = 99;
-    for (var x = r - 14; x <= r + 21; x += 1) {
-      var m = ((x - r) % 7 + 7) % 7;
-      if ((m === 0 || m === 2 || m === 4) && Math.abs(x - d) < dist) { dist = Math.abs(x - d); melhor = x; }
-    }
-    return melhor;
-  }
-
-  // Seção nova (8 compassos): tom, duas progressões, jeito do piano e um motivo de 1 compasso que vai voltar.
-  function tmpSecao() {
-    // Motivo de 1 compasso: passos curtos que vão e voltam (a soma fica entre −3 e +3 da nota de partida).
-    var motivo = [], t = 0, soma = 0;
-    while (t < 16) {
-      var len = sorte([1, 1, 2, 2, 3, 4, 1]);
-      var passoM = sorte([-2, -1, 1, 2, 3, -3, 1, -1]);
-      if (Math.abs(soma + passoM) > 3) passoM = -passoM;
-      if (Math.abs(soma + passoM) > 3) passoM = 0;
-      if (motivo.length) soma += passoM;
-      motivo.push({ t: t, d: passoM, len: len });
-      t += len;
-    }
-    return {
-      tom: sorte(TMP_TONS) + 12,
-      acordes: sorte(TMP_PROGS).concat(sorte(TMP_PROGS)),
-      piano: Math.random() < 0.5 ? "arpejo" : "umpa",
-      motivo: motivo,
-      d: 7,
-      compasso: [],
-    };
-  }
-
-  // Planeja a melodia de 1 compasso (16 semicolcheias): corrida, o motivo da seção ou nota longa com volteio.
-  // Fora da região boa (graus 0 a 17), o compasso é refeito; depois de 4 tentativas, fica a nota longa com volteio,
-  // que vai para o meio (nunca um salto de oitava no meio da frase, que soava errado).
-  function tmpCompasso(r, proximo) {
-    for (var tentativa = 0; tentativa < 5; tentativa++) {
-      var notas = tmpCompassoTipo(r, proximo, tentativa < 4 ? sorte(["corrida", "motivo", "motivo", "longa", "corrida"]) : "longa");
-      var ok = notas.every(function (nn) { return nn.d >= 0 && nn.d <= 17; });
-      if (ok || tentativa === 4) {
-        tp.d = notas[notas.length - 1].d;
-        return notas;
-      }
-    }
-  }
-
-  function tmpCompassoTipo(r, proximo, tipo) {
-    var notas = [], d = tmpPerto(tp.d, r);
-    if (tipo === "corrida") {
-      // Corrida que termina EXATAMENTE numa nota do próximo acorde na última semicolcheia; se sobra tempo, começa com
-      // um volteio em volta da nota de partida. Vai para cima ou para baixo conforme o espaço que tem.
-      var tamanho = sorte([5, 6, 7, 8]);
-      var dir = d + tamanho + 1 > 16 ? -1 : d - tamanho - 1 < 1 ? 1 : sorte([1, -1]);
-      var alvo = tmpPerto(d + dir * tamanho, proximo);
-      var dist = Math.min(Math.abs(alvo - d), 15), sobra = 15 - dist, passoD = alvo >= d ? 1 : -1;
-      var x = d, viz = [0, 1, 0, -1];
-      for (var k = 0; k < 16; k++) {
-        if (k < sobra) notas.push({ t: k, d: d + viz[k % 4], len: 1 });
-        else { notas.push({ t: k, d: x, len: 1 }); x += passoD; }
-      }
-      notas[15].d = alvo;
-      // Em cada tempo a corrida se apoia numa nota do acorde (as do meio passam pela escala).
-      notas.forEach(function (nn) { if (nn.t % 4 === 0) nn.d = tmpPerto(nn.d, r); });
-    } else if (tipo === "motivo") {
-      // Se o motivo subindo sairia da região, ele vem espelhado (descendo): assim não precisa pular de oitava.
-      var soma = 0, alto = 0, baixo = 0;
-      tp.motivo.forEach(function (m, j) { if (j > 0) soma += m.d; alto = Math.max(alto, soma); baixo = Math.min(baixo, soma); });
-      var espelho = d + alto + 1 > 16 || d + baixo - 1 < 1 ? -1 : 1;
-      tp.motivo.forEach(function (m, j) {
-        var x = j === 0 ? d : d + m.d * espelho;
-        // Tempo forte e nota mais longa: sempre nota do acorde.
-        if (m.t % 4 === 0 || m.len >= 2) x = tmpPerto(x, r);
-        notas.push({ t: m.t, d: x, len: m.len });
-        d = x;
-      });
-    } else {
-      notas.push({ t: 0, d: d, len: 8 });
-      [0, 1, 0, -1].forEach(function (v, j) { notas.push({ t: 8 + j, d: d + v, len: 1 }); }); // volteio: começa na nota do acorde
-      var salto = tmpPerto(d + (d > 10 ? sorte([-2, -3, -4]) : d < 5 ? sorte([2, 3, 4]) : sorte([2, 3, -2, -3])), r);
-      notas.push({ t: 12, d: salto, len: 4 });
-    }
-    return notas;
-  }
-
-  function tocarTempestade(i, quando) {
-    var sc = 60 / TMP_BPM / 4;
-    var k = i % 16, compasso = Math.floor(i / 16);
-    if (!tp || (k === 0 && compasso % 8 === 0)) {
-      // Seção nova (às vezes em outro tom): a melodia continua no grau do tom novo mais perto da última nota tocada.
-      var ultima = tp ? tmpNota(tp.d, tp.acordes[7]) : null;
-      tp = tmpSecao();
-      tp.d = 7;
-      if (ultima !== null) {
-        var melhor = 99;
-        for (var gd = 0; gd <= 17; gd++) {
-          if (Math.abs(tmpNota(gd) - ultima) < melhor) { melhor = Math.abs(tmpNota(gd) - ultima); tp.d = gd; }
-        }
-      }
-    }
-    var c = compasso % 8;
-    var r = tp.acordes[c], prox = tp.acordes[(c + 1) % 8];
-    var acorde = [r, r + 2, r + 4];
-    if (k === 0) tp.compasso = tmpCompasso(r, prox);
-    // Mão esquerda
-    var baixoN = tmpNota(r - 14, r);
-    if (tp.piano === "arpejo") {
-      // Arpejo subindo em semicolcheias a cada tempo, e um acorde batido no 2 e no 4.
-      var grupo = [r - 7, r - 5, r - 3, r];
-      pianoReal(tmpNota(grupo[k % 4], r), quando, k % 4 === 0 ? 0.06 : 0.04, 0.9);
-      if (k === 0 || k === 8) pianoReal(baixoN, quando, 0.08, 1.6);
-      if (k === 4 || k === 12) acorde.forEach(function (x) { pianoReal(tmpNota(x, r), quando, 0.04, 0.5); });
-    } else {
-      // "Um-pá": baixo no 1 e no 3, acorde curto no 2 e no 4 (e um toquinho no contratempo).
-      if (k === 0 || k === 8) pianoReal(k === 0 ? baixoN : tmpNota(r - 10, r), quando, 0.09, 0.7);
-      if (k === 4 || k === 12) acorde.forEach(function (x) { pianoReal(tmpNota(x - 7, r), quando, 0.045, 0.35); });
-      if ((k === 6 || k === 14) && Math.random() < 0.6) acorde.forEach(function (x) { pianoReal(tmpNota(x - 7, r), quando, 0.025, 0.25); });
-    }
-    // Mão direita: a melodia, um pouco mais forte que o acompanhamento.
-    tp.compasso.forEach(function (nn) {
-      if (nn.t === k) pianoReal(tmpNota(nn.d, r), quando, nn.len >= 4 ? 0.1 : 0.085, Math.max(0.5, nn.len * sc * 2));
-    });
   }
 
   // Piano de verdade: soma de harmônicos de corda (um pouquinho mais agudos que o exato, como numa corda de aço), os
@@ -704,14 +579,67 @@
     r.stop(quando + 0.03);
   }
 
-  // Sopro: sax (mais escuro) ou trompete (mais brilhante). Filtro que abre no ataque, sopro de ar no começo e vibrato
+  // Trompete mais natural (o dono achou o antigo artificial e pediu para não ficar estridente): a nota "escorrega"
+  // de baixo para a afinação no começo (os lábios), entra devagarinho, e o brilho acompanha a força do sopro — abre no
+  // ataque e fecha um pouco depois, sem ressonância no filtro e com um segundo filtro que corta o agudo que fere.
+  function trompete(n, quando, dur, vol) {
+    var f = hz(n);
+    var o = ctx.createOscillator(), o2 = ctx.createOscillator();
+    var f1 = ctx.createBiquadFilter(), f2 = ctx.createBiquadFilter(), g = ctx.createGain();
+    var lfo = ctx.createOscillator(), lg = ctx.createGain();
+    o.type = "sawtooth";
+    o2.type = "triangle";
+    [o, o2].forEach(function (x) {
+      x.frequency.setValueAtTime(f * 0.97, quando);
+      x.frequency.exponentialRampToValueAtTime(f, quando + 0.045);
+    });
+    o2.detune.value = -4;
+    lfo.frequency.value = 5.2;
+    lg.gain.setValueAtTime(0, quando);
+    lg.gain.setValueAtTime(0, quando + Math.min(0.25, dur * 0.4));
+    lg.gain.linearRampToValueAtTime(dur > 0.45 ? 9 : 2, quando + dur);
+    lfo.connect(lg);
+    lg.connect(o.detune);
+    lg.connect(o2.detune);
+    f1.type = "lowpass";
+    f1.Q.value = 0.5;
+    var topo = Math.min(2300, f * 4.5);
+    f1.frequency.setValueAtTime(f * 1.3, quando);
+    f1.frequency.exponentialRampToValueAtTime(topo, quando + 0.06);
+    f1.frequency.exponentialRampToValueAtTime(Math.min(1700, f * 3), quando + Math.max(0.1, dur * 0.7));
+    f2.type = "lowpass";
+    f2.frequency.value = 3200;
+    f2.Q.value = 0.3;
+    var mix = ctx.createGain();
+    mix.gain.value = 0.6;
+    o2.connect(mix);
+    g.gain.setValueAtTime(0.0001, quando);
+    g.gain.exponentialRampToValueAtTime(vol, quando + 0.05);
+    g.gain.setValueAtTime(vol * 0.85, quando + Math.max(0.06, dur - 0.05));
+    g.gain.exponentialRampToValueAtTime(0.0001, quando + dur + 0.1);
+    o.connect(f1);
+    mix.connect(f1);
+    f1.connect(f2);
+    f2.connect(g);
+    g.connect(saida);
+    if (eco) {
+      var mol = ctx.createGain();
+      mol.gain.value = 0.3;
+      g.connect(mol);
+      mol.connect(eco);
+    }
+    [o, o2, lfo].forEach(function (x) { x.start(quando); x.stop(quando + dur + 0.15); });
+  }
+
+  // Sopro: o sax (o trompete tem função própria, logo acima). Filtro que abre no ataque, sopro de ar no começo e vibrato
   // que só aparece no fim das notas longas.
   function sopro(n, quando, dur, vol, instr) {
-    var f = hz(n), trompete = instr === "trompete";
+    if (instr === "trompete") return trompete(n, quando, dur, vol * 0.85);
+    var f = hz(n);
     var o = ctx.createOscillator(), o2 = ctx.createOscillator(), filtro = ctx.createBiquadFilter(), g = ctx.createGain();
     var lfo = ctx.createOscillator(), lg = ctx.createGain();
     o.type = "sawtooth";
-    o2.type = trompete ? "sawtooth" : "square";
+    o2.type = "square";
     o.frequency.value = f;
     o2.frequency.value = f;
     o2.detune.value = 5;
@@ -723,13 +651,13 @@
     lg.connect(o.detune);
     lg.connect(o2.detune);
     filtro.type = "lowpass";
-    filtro.Q.value = trompete ? 3 : 1.5;
-    var aberto = trompete ? Math.min(4500, f * 6) : Math.min(2600, f * 4);
+    filtro.Q.value = 1.5;
+    var aberto = Math.min(2600, f * 4);
     filtro.frequency.setValueAtTime(f * 1.2, quando);
     filtro.frequency.exponentialRampToValueAtTime(aberto, quando + 0.05);
     filtro.frequency.exponentialRampToValueAtTime(aberto * 0.6, quando + dur);
     var mix = ctx.createGain();
-    mix.gain.value = trompete ? 0.5 : 0.35;
+    mix.gain.value = 0.35;
     o2.connect(mix);
     g.gain.setValueAtTime(0.0001, quando);
     g.gain.exponentialRampToValueAtTime(vol, quando + 0.03);
