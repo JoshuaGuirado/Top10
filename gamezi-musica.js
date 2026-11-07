@@ -43,8 +43,10 @@
     [[5, "maj7"], [4, "m7"], [2, "m7"], [7, "d7"]],
   ];
   // "Tempestade": ORIGINAL, rápida e frenética no estilo de czardas e do Presto agitato (o dono pediu "estilo Czardas e
-  // Moonlight Sonata", com melodia criativa). Tom menor harmônico (o sabor cigano), violino com corridas, volteios e notas
-  // longas com vibrato; piano em arpejos subindo em semicolcheias ou no "um-pá" do czardas. As notas fortes da melodia
+  // Moonlight Sonata", com melodia criativa). Só piano de verdade (pianoReal; o dono não quis som eletrônico): melodia com
+  // corridas, volteios e notas longas; acompanhamento em arpejos subindo em semicolcheias ou no "um-pá" do czardas. Tom
+  // menor harmônico (o sabor cigano), mas a 7ª elevada só aparece no acorde V (nos outros, a 7ª natural), para não soar
+  // errado; a melodia anda sem saltos de oitava (o dono achou umas sequências que não encaixavam). As notas fortes da melodia
   // são sempre do acorde; cada seção tem um motivo que volta. Melodia sorteada na hora.
   var TMP_BPM = 152;
   var TMP_TONS = [57, 50, 52, 55, 48]; // Lá, Ré, Mi, Sol, Dó (menor)
@@ -84,7 +86,7 @@
   var DEDILHADO = [0, 1, 2, 1, 2, 1, 0, 2]; // qual nota do acorde em cada colcheia (mais uma oitava acima)
 
   // Acerto de volume de cada faixa, para todas soarem mais ou menos iguais ao trocar (medido no pico de cada uma).
-  var AJUSTE_FAIXA = { normal: 1, especial: 0.6, varanda: 0.34, tempestade: 0.55, meianoite: 0.36 };
+  var AJUSTE_FAIXA = { normal: 1, especial: 0.6, varanda: 0.34, tempestade: 0.32, meianoite: 0.36 };
   var ajuste = null;
   var ctx = null, saida = null, eco = null, timer = null, passo = 0, proximo = 0, tocando = false;
   var esp = null; // trecho da trilha especial que está tocando (ou null na pausa / antes de começar)
@@ -513,43 +515,13 @@
     }
   }
 
-  // Violino: dente de serra filtrado, com vibrato que cresce nas notas longas.
-  function violino(n, quando, dur, vol) {
-    var o = ctx.createOscillator(), filtro = ctx.createBiquadFilter(), g = ctx.createGain();
-    var lfo = ctx.createOscillator(), lg = ctx.createGain();
-    o.type = "sawtooth";
-    o.frequency.value = hz(n);
-    lfo.frequency.value = 5.8;
-    lg.gain.setValueAtTime(0, quando);
-    lg.gain.linearRampToValueAtTime(dur > 0.3 ? 18 : 4, quando + Math.min(dur, 0.5));
-    lfo.connect(lg);
-    lg.connect(o.detune);
-    filtro.type = "lowpass";
-    filtro.frequency.value = Math.min(4200, hz(n) * 5);
-    filtro.Q.value = 1.2;
-    g.gain.setValueAtTime(0.0001, quando);
-    g.gain.exponentialRampToValueAtTime(vol, quando + 0.015);
-    g.gain.setValueAtTime(vol * 0.85, quando + Math.max(0.02, dur - 0.03));
-    g.gain.exponentialRampToValueAtTime(0.0001, quando + dur + 0.06);
-    o.connect(filtro);
-    filtro.connect(g);
-    g.connect(saida);
-    if (eco) {
-      var mol = ctx.createGain();
-      mol.gain.value = 0.25;
-      g.connect(mol);
-      mol.connect(eco);
-    }
-    o.start(quando);
-    lfo.start(quando);
-    o.stop(quando + dur + 0.1);
-    lfo.stop(quando + dur + 0.1);
-  }
-
   // Grau da escala menor harmônica (pode passar de 7 ou ser negativo) → nota MIDI.
-  function tmpNota(d) {
-    var o = Math.floor(d / 7);
-    return tp.tom + TMP_ESCALA[((d % 7) + 7) % 7] + 12 * o;
+  // Com o grau do acorde (r): fora do acorde V (grau 4), a 7ª elevada vira a natural (menor natural), que encaixa nos
+  // acordes i, iv e VI.
+  function tmpNota(d, r) {
+    var o = Math.floor(d / 7), g = ((d % 7) + 7) % 7;
+    var n = tp.tom + TMP_ESCALA[g] + 12 * o;
+    return g === 6 && r !== undefined && r % 7 !== 4 ? n - 1 : n;
   }
 
   // Nota do acorde (grau r: r, r+2, r+4 em cada oitava) mais perto do grau d.
@@ -564,10 +536,15 @@
 
   // Seção nova (8 compassos): tom, duas progressões, jeito do piano e um motivo de 1 compasso que vai voltar.
   function tmpSecao() {
-    var motivo = [], t = 0;
+    // Motivo de 1 compasso: passos curtos que vão e voltam (a soma fica entre −3 e +3 da nota de partida).
+    var motivo = [], t = 0, soma = 0;
     while (t < 16) {
       var len = sorte([1, 1, 2, 2, 3, 4, 1]);
-      motivo.push({ t: t, d: sorte([-2, -1, 1, 2, 3, -3, 4]), len: len });
+      var passoM = sorte([-2, -1, 1, 2, 3, -3, 1, -1]);
+      if (Math.abs(soma + passoM) > 3) passoM = -passoM;
+      if (Math.abs(soma + passoM) > 3) passoM = 0;
+      if (motivo.length) soma += passoM;
+      motivo.push({ t: t, d: passoM, len: len });
       t += len;
     }
     return {
@@ -581,34 +558,54 @@
   }
 
   // Planeja a melodia de 1 compasso (16 semicolcheias): corrida, o motivo da seção ou nota longa com volteio.
+  // Fora da região boa (graus 0 a 17), o compasso é refeito; depois de 4 tentativas, fica a nota longa com volteio,
+  // que vai para o meio (nunca um salto de oitava no meio da frase, que soava errado).
   function tmpCompasso(r, proximo) {
-    var notas = [], d = tmpPerto(tp.d, r);
-    var tipo = sorte(["corrida", "motivo", "motivo", "longa", "corrida"]);
-    if (tipo === "corrida") {
-      var alvo = tmpPerto(d + sorte([-7, -5, 5, 7, 6, -6]), proximo);
-      var passoD = alvo >= d ? 1 : -1;
-      for (var k = 0; k < 16; k++) {
-        notas.push({ t: k, d: d, len: 1 });
-        if (d !== alvo) d += passoD;
-        else d += k % 2 ? 1 : -1; // chegou antes: fica tremendo em volta do alvo
+    for (var tentativa = 0; tentativa < 5; tentativa++) {
+      var notas = tmpCompassoTipo(r, proximo, tentativa < 4 ? sorte(["corrida", "motivo", "motivo", "longa", "corrida"]) : "longa");
+      var ok = notas.every(function (nn) { return nn.d >= 0 && nn.d <= 17; });
+      if (ok || tentativa === 4) {
+        tp.d = notas[notas.length - 1].d;
+        return notas;
       }
+    }
+  }
+
+  function tmpCompassoTipo(r, proximo, tipo) {
+    var notas = [], d = tmpPerto(tp.d, r);
+    if (tipo === "corrida") {
+      // Corrida que termina EXATAMENTE numa nota do próximo acorde na última semicolcheia; se sobra tempo, começa com
+      // um volteio em volta da nota de partida. Vai para cima ou para baixo conforme o espaço que tem.
+      var tamanho = sorte([5, 6, 7, 8]);
+      var dir = d + tamanho + 1 > 16 ? -1 : d - tamanho - 1 < 1 ? 1 : sorte([1, -1]);
+      var alvo = tmpPerto(d + dir * tamanho, proximo);
+      var dist = Math.min(Math.abs(alvo - d), 15), sobra = 15 - dist, passoD = alvo >= d ? 1 : -1;
+      var x = d, viz = [0, 1, 0, -1];
+      for (var k = 0; k < 16; k++) {
+        if (k < sobra) notas.push({ t: k, d: d + viz[k % 4], len: 1 });
+        else { notas.push({ t: k, d: x, len: 1 }); x += passoD; }
+      }
+      notas[15].d = alvo;
+      // Em cada tempo a corrida se apoia numa nota do acorde (as do meio passam pela escala).
+      notas.forEach(function (nn) { if (nn.t % 4 === 0) nn.d = tmpPerto(nn.d, r); });
     } else if (tipo === "motivo") {
+      // Se o motivo subindo sairia da região, ele vem espelhado (descendo): assim não precisa pular de oitava.
+      var soma = 0, alto = 0, baixo = 0;
+      tp.motivo.forEach(function (m, j) { if (j > 0) soma += m.d; alto = Math.max(alto, soma); baixo = Math.min(baixo, soma); });
+      var espelho = d + alto + 1 > 16 || d + baixo - 1 < 1 ? -1 : 1;
       tp.motivo.forEach(function (m, j) {
-        var x = j === 0 ? d : d + m.d;
-        if (m.t % 8 === 0) x = tmpPerto(x, r); // tempo forte: nota do acorde
+        var x = j === 0 ? d : d + m.d * espelho;
+        // Tempo forte e nota mais longa: sempre nota do acorde.
+        if (m.t % 4 === 0 || m.len >= 2) x = tmpPerto(x, r);
         notas.push({ t: m.t, d: x, len: m.len });
         d = x;
       });
     } else {
       notas.push({ t: 0, d: d, len: 8 });
-      [1, 0, -1, 0].forEach(function (v, j) { notas.push({ t: 8 + j, d: d + v, len: 1 }); });
-      var salto = tmpPerto(d + sorte([2, 4, -3, 5]), r);
+      [0, 1, 0, -1].forEach(function (v, j) { notas.push({ t: 8 + j, d: d + v, len: 1 }); }); // volteio: começa na nota do acorde
+      var salto = tmpPerto(d + (d > 10 ? sorte([-2, -3, -4]) : d < 5 ? sorte([2, 3, 4]) : sorte([2, 3, -2, -3])), r);
       notas.push({ t: 12, d: salto, len: 4 });
-      d = salto;
     }
-    // Não deixa a melodia fugir da região do violino.
-    notas.forEach(function (nn) { while (nn.d > 16) nn.d -= 7; while (nn.d < 0) nn.d += 7; });
-    tp.d = notas[notas.length - 1].d;
     return notas;
   }
 
@@ -616,32 +613,95 @@
     var sc = 60 / TMP_BPM / 4;
     var k = i % 16, compasso = Math.floor(i / 16);
     if (!tp || (k === 0 && compasso % 8 === 0)) {
-      var dAntes = tp ? tp.d : 7;
+      // Seção nova (às vezes em outro tom): a melodia continua no grau do tom novo mais perto da última nota tocada.
+      var ultima = tp ? tmpNota(tp.d, tp.acordes[7]) : null;
       tp = tmpSecao();
-      tp.d = dAntes;
+      tp.d = 7;
+      if (ultima !== null) {
+        var melhor = 99;
+        for (var gd = 0; gd <= 17; gd++) {
+          if (Math.abs(tmpNota(gd) - ultima) < melhor) { melhor = Math.abs(tmpNota(gd) - ultima); tp.d = gd; }
+        }
+      }
     }
     var c = compasso % 8;
     var r = tp.acordes[c], prox = tp.acordes[(c + 1) % 8];
     var acorde = [r, r + 2, r + 4];
     if (k === 0) tp.compasso = tmpCompasso(r, prox);
-    // Piano
-    var baixoN = tmpNota(r - 14);
+    // Mão esquerda
+    var baixoN = tmpNota(r - 14, r);
     if (tp.piano === "arpejo") {
       // Arpejo subindo em semicolcheias a cada tempo, e um acorde batido no 2 e no 4.
       var grupo = [r - 7, r - 5, r - 3, r];
-      piano(tmpNota(grupo[k % 4]), quando, k % 4 === 0 ? 0.07 : 0.045, 0.5);
-      if (k === 0 || k === 8) piano(baixoN, quando, 0.09, 1.2);
-      if (k === 4 || k === 12) acorde.forEach(function (x) { piano(tmpNota(x), quando, 0.05, 0.25); });
+      pianoReal(tmpNota(grupo[k % 4], r), quando, k % 4 === 0 ? 0.06 : 0.04, 0.9);
+      if (k === 0 || k === 8) pianoReal(baixoN, quando, 0.08, 1.6);
+      if (k === 4 || k === 12) acorde.forEach(function (x) { pianoReal(tmpNota(x, r), quando, 0.04, 0.5); });
     } else {
       // "Um-pá": baixo no 1 e no 3, acorde curto no 2 e no 4 (e um toquinho no contratempo).
-      if (k === 0 || k === 8) piano(k === 0 ? baixoN : tmpNota(r - 10), quando, 0.1, 0.4);
-      if (k === 4 || k === 12) acorde.forEach(function (x) { piano(tmpNota(x - 7), quando, 0.055, 0.2); });
-      if ((k === 6 || k === 14) && Math.random() < 0.6) acorde.forEach(function (x) { piano(tmpNota(x - 7), quando, 0.03, 0.12); });
+      if (k === 0 || k === 8) pianoReal(k === 0 ? baixoN : tmpNota(r - 10, r), quando, 0.09, 0.7);
+      if (k === 4 || k === 12) acorde.forEach(function (x) { pianoReal(tmpNota(x - 7, r), quando, 0.045, 0.35); });
+      if ((k === 6 || k === 14) && Math.random() < 0.6) acorde.forEach(function (x) { pianoReal(tmpNota(x - 7, r), quando, 0.025, 0.25); });
     }
-    // Violino
+    // Mão direita: a melodia, um pouco mais forte que o acompanhamento.
     tp.compasso.forEach(function (nn) {
-      if (nn.t === k) violino(tmpNota(nn.d), quando, nn.len * sc * 0.95, nn.len >= 4 ? 0.06 : 0.05);
+      if (nn.t === k) pianoReal(tmpNota(nn.d, r), quando, nn.len >= 4 ? 0.1 : 0.085, Math.max(0.5, nn.len * sc * 2));
     });
+  }
+
+  // Piano de verdade: soma de harmônicos de corda (um pouquinho mais agudos que o exato, como numa corda de aço), os
+  // agudos morrendo antes dos graves, duas cordas levemente desafinadas por nota e o "toc" do martelo no começo.
+  function pianoReal(n, quando, vol, dur) {
+    var f = hz(n);
+    var B = 0.0003; // quanto os harmônicos sobem (inarmonicidade da corda)
+    var brilho = Math.min(1, 0.5 + vol * 4);
+    var g = ctx.createGain(), filtro = ctx.createBiquadFilter();
+    filtro.type = "lowpass";
+    filtro.frequency.setValueAtTime(Math.min(9000, f * 10 * brilho), quando);
+    filtro.frequency.exponentialRampToValueAtTime(Math.min(4000, f * 3.5), quando + 0.4);
+    g.gain.value = vol;
+    filtro.connect(g);
+    g.connect(saida);
+    if (eco) {
+      var mol = ctx.createGain();
+      mol.gain.value = 0.22;
+      g.connect(mol);
+      mol.connect(eco);
+    }
+    var fim = quando + dur + 0.3;
+    for (var h = 1; h <= 7; h++) {
+      var fh = h * f * Math.sqrt(1 + B * h * h);
+      if (fh > 12000) break;
+      var amp = 1 / Math.pow(h, 1.4);
+      var queda = dur / (1 + 0.35 * (h - 1)); // agudos morrem antes
+      (h <= 2 ? [-1.2, 1.2] : [0]).forEach(function (des) {
+        var o = ctx.createOscillator(), a = ctx.createGain();
+        o.type = "sine";
+        o.frequency.value = fh;
+        o.detune.value = des;
+        a.gain.setValueAtTime(0.0001, quando);
+        a.gain.exponentialRampToValueAtTime(amp * (h <= 2 ? 0.5 : 1), quando + 0.004);
+        a.gain.exponentialRampToValueAtTime(amp * 0.35, quando + 0.08 + queda * 0.15);
+        a.gain.exponentialRampToValueAtTime(0.0001, quando + queda + 0.2);
+        o.connect(a);
+        a.connect(filtro);
+        o.start(quando);
+        o.stop(fim);
+      });
+    }
+    // Martelo: um "toc" curtinho e abafado.
+    pegarRuido();
+    var r = ctx.createBufferSource(), rf = ctx.createBiquadFilter(), rg = ctx.createGain();
+    r.buffer = ruido;
+    rf.type = "bandpass";
+    rf.frequency.value = Math.min(3000, f * 2);
+    rf.Q.value = 1;
+    rg.gain.setValueAtTime(0.08, quando);
+    rg.gain.exponentialRampToValueAtTime(0.0001, quando + 0.025);
+    r.connect(rf);
+    rf.connect(rg);
+    rg.connect(g);
+    r.start(quando, Math.random() * 0.8);
+    r.stop(quando + 0.03);
   }
 
   // Sopro: sax (mais escuro) ou trompete (mais brilhante). Filtro que abre no ataque, sopro de ar no começo e vibrato
