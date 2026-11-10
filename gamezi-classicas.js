@@ -17,16 +17,27 @@
 window.GZ_CLASSICAS = [
   {
     id: "fur-elise", autor: "Beethoven", nome: { pt: "Para Elisa", en: "Für Elise", es: "Para Elisa" },
-    bpm: 70, compasso: 6, estilo: "elise", vezes: 1, anacruse: "E5/1 D#5/1",
+    bpm: 70, compasso: 6, estilo: "nenhum", vezes: 1, anacruse: "E5/1 D#5/1",
     vozes: [
+      // A (duas vezes, com as duas terminações), B em Dó e a volta com o "tremido" de Mi e Ré#, e A de novo.
       "E5/1 D#5/1 E5/1 B4/1 D5/1 C5/1 | A4/2 -/1 C4/1 E4/1 A4/1 | B4/2 -/1 E4/1 G#4/1 B4/1 | C5/2 -/1 E4/1 E5/1 D#5/1 |" +
       "E5/1 D#5/1 E5/1 B4/1 D5/1 C5/1 | A4/2 -/1 C4/1 E4/1 A4/1 | B4/2 -/1 E4/1 C5/1 B4/1 | A4/2 -/2 E5/1 D#5/1 |" +
       "E5/1 D#5/1 E5/1 B4/1 D5/1 C5/1 | A4/2 -/1 C4/1 E4/1 A4/1 | B4/2 -/1 E4/1 G#4/1 B4/1 | C5/2 -/1 E4/1 E5/1 D#5/1 |" +
       "E5/1 D#5/1 E5/1 B4/1 D5/1 C5/1 | A4/2 -/1 C4/1 E4/1 A4/1 | B4/2 -/1 E4/1 C5/1 B4/1 | A4/2 -/1 B4/1 C5/1 D5/1 |" +
-      "E5/3 G4/1 F5/1 E5/1 | D5/3 F4/1 E5/1 D5/1 | C5/3 E4/1 D5/1 C5/1 | B4/2 -/1 E4/1 E5/1 D#5/1 |" +
+      "E5/3 G4/1 F5/1 E5/1 | D5/3 F4/1 E5/1 D5/1 | C5/3 E4/1 D5/1 C5/1 | B4/2 -/1 E4/1 E5/1 -/1 |" +
+      "-/1 E5/1 E6/1 -/2 D#5/1 | E5/1 -/2 D#5/1 E5/1 D#5/1 | E5/1 D#5/1 E5/1 D#5/1 E5/1 D#5/1 |" +
+      "E5/1 D#5/1 E5/1 B4/1 D5/1 C5/1 | A4/2 -/1 C4/1 E4/1 A4/1 | B4/2 -/1 E4/1 G#4/1 B4/1 | C5/2 -/1 E4/1 E5/1 D#5/1 |" +
       "E5/1 D#5/1 E5/1 B4/1 D5/1 C5/1 | A4/2 -/1 C4/1 E4/1 A4/1 | B4/2 -/1 E4/1 C5/1 B4/1 | A4/6",
+      // Mão esquerda: as três semicolcheias subindo de cada acorde, enquanto a mão direita respira.
+      "-/6 | A2/1 E3/1 A3/1 -/3 | E2/1 E3/1 G#3/1 -/3 | A2/1 E3/1 A3/1 -/3 |" +
+      "-/6 | A2/1 E3/1 A3/1 -/3 | E2/1 E3/1 G#3/1 -/3 | A2/1 E3/1 A3/1 -/3 |" +
+      "-/6 | A2/1 E3/1 A3/1 -/3 | E2/1 E3/1 G#3/1 -/3 | A2/1 E3/1 A3/1 -/3 |" +
+      "-/6 | A2/1 E3/1 A3/1 -/3 | E2/1 E3/1 G#3/1 -/3 | A2/1 E3/1 A3/1 -/3 |" +
+      "C3/1 G3/1 C4/1 -/3 | G2/1 G3/1 B3/1 -/3 | A2/1 E3/1 A3/1 -/3 | E2/1 E3/1 E4/1 -/3 |" +
+      "-/6 | -/6 | -/6 |" +
+      "-/6 | A2/1 E3/1 A3/1 -/3 | E2/1 E3/1 G#3/1 -/3 | A2/1 E3/1 A3/1 -/3 |" +
+      "-/6 | A2/1 E3/1 A3/1 -/3 | E2/1 E3/1 G#3/1 -/3 | A2+A3/6",
     ],
-    acordes: "- | Am | E | Am | - | Am | E | Am | - | Am | E | Am | - | Am | E | Am | C | G | Am | E | - | Am | E | Am",
   },
   {
     id: "ode-alegria", autor: "Beethoven", nome: { pt: "Ode à Alegria", en: "Ode to Joy", es: "Himno de la alegría" },
@@ -41,14 +52,20 @@ window.GZ_CLASSICAS = [
   },
   {
     id: "minueto-sol", autor: "Bach (Petzold)", nome: { pt: "Minueto em Sol", en: "Minuet in G", es: "Minueto en sol" },
-    bpm: 112, compasso: 12, estilo: "valsa", vezes: 2,
+    bpm: 112, compasso: 12, estilo: "valsa", vezes: 1,
     vozes: [
+      // Parte A (duas vezes) e parte B inteira.
       "D5/4 G4/2 A4/2 B4/2 C5/2 | D5/4 G4/4 G4/4 | E5/4 C5/2 D5/2 E5/2 F#5/2 | G5/4 G4/4 G4/4 |" +
       "C5/4 D5/2 C5/2 B4/2 A4/2 | B4/4 C5/2 B4/2 A4/2 G4/2 | F#4/4 G4/2 A4/2 B4/2 G4/2 | A4/12 |" +
       "D5/4 G4/2 A4/2 B4/2 C5/2 | D5/4 G4/4 G4/4 | E5/4 C5/2 D5/2 E5/2 F#5/2 | G5/4 G4/4 G4/4 |" +
-      "C5/4 D5/2 C5/2 B4/2 A4/2 | B4/4 C5/2 B4/2 A4/2 G4/2 | A4/4 B4/2 A4/2 G4/2 F#4/2 | G4/12",
+      "C5/4 D5/2 C5/2 B4/2 A4/2 | B4/4 C5/2 B4/2 A4/2 G4/2 | A4/4 B4/2 A4/2 G4/2 F#4/2 | G4/12 |" +
+      "B5/4 G5/2 A5/2 B5/2 G5/2 | A5/4 D5/2 E5/2 F#5/2 D5/2 | G5/4 E5/2 F#5/2 G5/2 D5/2 | C#5/4 B4/2 C#5/2 A4/4 |" +
+      "A4/2 B4/2 C#5/2 D5/2 E5/2 F#5/2 | G5/4 F#5/4 E5/4 | F#5/4 A4/4 C#5/4 | D5/12 |" +
+      "D5/4 G4/2 F#4/2 G4/4 | E5/4 G4/2 F#4/2 G4/4 | D5/4 C5/4 B4/4 | A4/2 G4/2 F#4/2 G4/2 A4/4 |" +
+      "D4/2 E4/2 F#4/2 G4/2 A4/2 B4/2 | C5/4 B4/4 A4/4 | B4/2 D5/2 G4/4 F#4/4 | G4/12",
     ],
-    acordes: "G | G | C | G | C | G | D | D | G | G | C | G | C | G | D | G",
+    acordes: "G | G | C | G | C | G | D | D | G | G | C | G | C | G | D | G |" +
+      "G | D | G | A | A | A7 | D | D | G | C | G | D | D | Am | G D | G",
   },
   {
     id: "preludio-do", autor: "Bach", nome: { pt: "Prelúdio em Dó", en: "Prelude in C", es: "Preludio en do" },
@@ -58,14 +75,16 @@ window.GZ_CLASSICAS = [
       "C4 E4 G4 C5 E5 | C4 D4 A4 D5 F5 | B3 D4 G4 D5 F5 | C4 E4 G4 C5 E5 | C4 E4 A4 E5 A5 | C4 D4 F#4 A4 D5 |" +
       "B3 D4 G4 D5 G5 | B3 C4 E4 G4 C5 | A3 C4 E4 G4 C5 | D3 A3 D4 F#4 C5 | G3 B3 D4 G4 B4 | G3 Bb3 E4 G4 C#5 |" +
       "F3 A3 D4 A4 D5 | F3 Ab3 D4 F4 B4 | E3 G3 C4 G4 C5 | E3 F3 A3 C4 F4 | D3 F3 A3 C4 F4 | G2 D3 G3 B3 F4 |" +
-      "C3 E3 G3 C4 E4",
+      "C3 E3 G3 C4 E4 | C3 G3 Bb3 C4 E4 | F2 F3 A3 C4 E4 | F#2 C3 A3 C4 Eb4 | Ab2 F3 B3 C4 D4 | G2 F3 G3 B3 D4 |" +
+      "G2 E3 G3 C4 E4 | G2 D3 G3 C4 F4 | G2 D3 G3 B3 F4 | G2 Eb3 A3 C4 F#4 | G2 E3 G3 C4 G4 | G2 D3 G3 C4 F4 |" +
+      "G2 D3 G3 B3 F4 | C2 C3 G3 Bb3 E4 | C2 C3 E3 G3 C4",
   },
   {
     id: "serenata", autor: "Mozart", nome: { pt: "Pequena Serenata Noturna", en: "Eine kleine Nachtmusik", es: "Pequeña serenata nocturna" },
     bpm: 128, compasso: 16, estilo: "alberti", vezes: 3,
     vozes: [
       "G5/4 -/2 D5/2 G5/4 -/2 D5/2 | G5/2 D5/2 G5/2 B5/2 D6/8 | C6/4 -/2 A5/2 C6/4 -/2 A5/2 | C6/2 A5/2 F#5/2 A5/2 D5/8 |" +
-      "G5/4 D5/4 G4/8",
+      "G5/4 -/12",
     ],
     acordes: "G | G | D7 | D7 | G",
   },
@@ -74,9 +93,9 @@ window.GZ_CLASSICAS = [
     bpm: 116, compasso: 8, estilo: "marcha", vezes: 3, anacruse: "B4/1 A4/1 G#4/1 A4/1",
     vozes: [
       "C5/2 -/2 D5/1 C5/1 B4/1 C5/1 | E5/2 -/2 F5/1 E5/1 D#5/1 E5/1 | B5/1 A5/1 G#5/1 A5/1 B5/1 A5/1 G#5/1 A5/1 |" +
-      "C6/4 A5/2 C6/2 | B5/2 A5/2 G#5/2 A5/2 | E5/4 B4/1 A4/1 G#4/1 A4/1",
+      "C6/4 A5/2 C6/2 | A5/4 B4/1 A4/1 G#4/1 A4/1",
     ],
-    acordes: "Am | Am | E Am | Am | E | Am E",
+    acordes: "Am | Am | E Am | Am | Am E",
   },
   {
     id: "canone", autor: "Pachelbel", nome: { pt: "Cânone em Ré", en: "Canon in D", es: "Canon en re" },
@@ -91,11 +110,15 @@ window.GZ_CLASSICAS = [
   },
   {
     id: "gymnopedie", autor: "Satie", nome: { pt: "Gymnopédie nº 1", en: "Gymnopédie No. 1", es: "Gymnopédie n.º 1" },
-    bpm: 72, compasso: 12, estilo: "gymno", vezes: 3,
+    bpm: 72, compasso: 12, estilo: "nenhum", vezes: 2,
     vozes: [
-      "-/12 | -/12 | -/12 | -/12 | -/4 F#5/4 A5/4 | G5/4 F#5/4 C#5/4 | B4/4 C#5/4 D5/4 | A4/12 | F#4/12 | -/12",
+      "-/12 | -/12 | -/12 | -/12 | -/4 F#5/4 A5/4 | G5/4 F#5/4 C#5/4 | B4/4 C#5/4 D5/4 | A4/12 | F#4/12 | -/12 | -/12 | -/12 |" +
+      "-/4 F#5/4 A5/4 | G5/4 F#5/4 C#5/4 | B4/4 C#5/4 D5/4 | A4/12 | F#4/12 | -/12",
+      // Mão esquerda de Satie: baixo grave no 1 e o acorde (sem a fundamental) do 2 ao fim, alternando Sol e Ré.
+      "G2/4 B3+D4+F#4/8 | D2/4 A3+C#4+F#4/8 | G2/4 B3+D4+F#4/8 | D2/4 A3+C#4+F#4/8 | G2/4 B3+D4+F#4/8 | D2/4 A3+C#4+F#4/8 |" +
+      "G2/4 B3+D4+F#4/8 | D2/4 A3+C#4+F#4/8 | G2/4 B3+D4+F#4/8 | D2/4 A3+C#4+F#4/8 | G2/4 B3+D4+F#4/8 | D2/4 A3+C#4+F#4/8 |" +
+      "G2/4 B3+D4+F#4/8 | D2/4 A3+C#4+F#4/8 | G2/4 B3+D4+F#4/8 | D2/4 A3+C#4+F#4/8 | G2/4 B3+D4+F#4/8 | D2/4 A3+C#4+F#4/8",
     ],
-    acordes: "Gmaj7 | Dmaj7 | Gmaj7 | Dmaj7 | Gmaj7 | Dmaj7 | Gmaj7 | Dmaj7 | Gmaj7 | Dmaj7",
   },
   {
     id: "entertainer", autor: "Scott Joplin", nome: { pt: "The Entertainer", en: "The Entertainer", es: "The Entertainer" },
@@ -108,12 +131,12 @@ window.GZ_CLASSICAS = [
   },
   {
     id: "rei-montanha", autor: "Grieg", nome: { pt: "Na Gruta do Rei da Montanha", en: "In the Hall of the Mountain King", es: "En la gruta del rey de la montaña" },
-    bpm: 96, compasso: 16, estilo: "marcha", vezes: 5, acelera: true,
+    bpm: 96, compasso: 16, estilo: "nenhum", vezes: 6, acelera: true,
     vozes: [
-      "B4/2 C#5/2 D5/2 E5/2 F#5/2 D5/2 F#5/4 | F5/2 C#5/2 F5/4 E5/2 C5/2 E5/4 |" +
-      "B4/2 C#5/2 D5/2 E5/2 F#5/2 D5/2 F#5/2 B5/2 | A5/2 F#5/2 D5/2 F#5/2 A5/8",
+      "B4/2 C#5/2 D5/2 E5/2 F#5/2 D5/2 F#5/4 | F5/2 C#5/2 F5/4 E5/2 C5/2 E5/4 | B4/2 C#5/2 D5/2 E5/2 F#5/2 D5/2 F#5/2 B5/2 | A5/2 F#5/2 D5/2 F#5/2 A5/8",
+      // Como no original: o baixo repete a melodia duas oitavas abaixo, curtinho (pizzicato).
+      "B2/1 -/1 C#3/1 -/1 D3/1 -/1 E3/1 -/1 F#3/1 -/1 D3/1 -/1 F#3/1 -/3 | F3/1 -/1 C#3/1 -/1 F3/1 -/3 E3/1 -/1 C3/1 -/1 E3/1 -/3 | B2/1 -/1 C#3/1 -/1 D3/1 -/1 E3/1 -/1 F#3/1 -/1 D3/1 -/1 F#3/1 -/1 B3/1 -/1 | A3/1 -/1 F#3/1 -/1 D3/1 -/1 F#3/1 -/1 A3/1 -/7",
     ],
-    acordes: "Bm | C#7 C | Bm | F# Bm",
   },
   {
     id: "lago-cisnes", autor: "Tchaikovsky", nome: { pt: "O Lago dos Cisnes", en: "Swan Lake", es: "El lago de los cisnes" },
@@ -139,7 +162,7 @@ window.GZ_CLASSICAS = [
       "G4/2 A4/2 B4/2 D5/2 C5/2 C5/2 E5/2 D5/2 D5/2 | G5/2 F#5/2 G5/2 D5/2 B4/2 G4/2 A4/2 B4/2 C5/2 |" +
       "D5/2 E5/2 D5/2 C5/2 B4/2 A4/2 B4/2 G4/2 A4/2 | B4/2 G4/2 E4/2 D4/2 G4/2 B4/2 G4/6",
     ],
-    acordes: "G C G | G G Am | G D7 G | G",
+    acordes: "G | G | D7 G | G",
   },
   {
     id: "brahms", autor: "Brahms", nome: { pt: "Canção de Ninar", en: "Brahms' Lullaby", es: "Canción de cuna" },
@@ -249,7 +272,7 @@ window.GZ_CLASSICAS = [
     id: "sonata-luar", autor: "Beethoven", nome: { pt: "Sonata ao Luar (início)", en: "Moonlight Sonata (opening)", es: "Claro de luna (inicio)" },
     bpm: 54, compasso: 48, unidade: 12, estilo: "nenhum", vezes: 2,
     vozes: [
-      "-/48 | -/48 | -/48 | -/48 | -/36 G#4/9 G#4/3 | G#4/48",
+      "-/48 | -/48 | -/48 | -/48 | -/36 G#4/9 G#4/3 | G#4/24 -/24",
       "G#3/4 C#4/4 E4/4 G#3/4 C#4/4 E4/4 G#3/4 C#4/4 E4/4 G#3/4 C#4/4 E4/4 |" +
       "G#3/4 C#4/4 E4/4 G#3/4 C#4/4 E4/4 G#3/4 C#4/4 E4/4 G#3/4 C#4/4 E4/4 |" +
       "A3/4 C#4/4 E4/4 A3/4 C#4/4 E4/4 A3/4 D4/4 F#4/4 A3/4 D4/4 F#4/4 |" +
