@@ -35,7 +35,6 @@ momento-musical-3 SchubertF/D780/MomentsNo3
 improviso-sol-bemol SchubertF/D899/SchubertF-D899-3-Impromptu
 cancao-ninar BrahmsJ/LullabyBrahms-C
 valsa-brahms BrahmsJ/O39/waltz-op39-15
-canone PachelbelJ/CanonInD
 arabesca-burgmuller BurgmullerJFF/O100/25EF-02
 sonatina-clementi ClementiM/O36/sonatina-1
 greensleeves Traditional/greensleeves

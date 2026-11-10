@@ -103,10 +103,14 @@
   das faixas (medir o pico de cada uma ao criar uma nova). `tests/musica.test.js` toca todas as faixas com um áudio de mentira
   e acusa erro ou faixa muda (já aconteceu de apagar funções de uma faixa sem querer ao mexer em outra). Faixa nova: item em `FAIXAS`, nome nos 3 idiomas e o caso em
   `agendar()`. Faixa "Clássicas" (id `classicas`, um item da lista como as outras — o dono não quis aba
-  nem escolher música por música; sorteia uma e emenda outra, nunca a mesma em seguida): músicas em DOMÍNIO PÚBLICO em `gamezi-classicas.js` (raiz, carregado pela
-  própria música; está no `FILES` do `sw.js`), tocadas no `pianoReal`. Formato explicado no topo do arquivo; o
-  `tests/musica.test.js` confere o tamanho de todo compasso, as notas e os acordes. Música nova: só compositor morto há mais
-  de 70 anos ou tradicional, nota a nota da partitura original (nada de arranjo moderno), no fim da lista, nos 3 idiomas. Nada de copiar melodia de música com dono (o dono pediu as do Minecraft/C418: só o clima, nunca as notas). Jogo novo: carregar `../gamezi-musica.js`.
+  nem escolher música por música; sorteia uma e emenda outra, nunca a mesma em seguida): músicas em DOMÍNIO PÚBLICO em `gamezi-classicas.js` (raiz, carregado pela própria música quando a faixa toca;
+  está no `FILES` do `sw.js`), tocadas no `pianoReal` com as notas EXATAS das partituras livres do Mutopia Project (o dono
+  achou notas erradas nas escritas de memória). Caminho: `ferramentas/classicas/lista.txt` (id e pasta no Mutopia) → o robô
+  `.github/workflows/classicas-midi.yml` baixa os MIDIs prontos para `ferramentas/classicas/midi/` (só na branch de
+  trabalho, não na `main`; o contêiner não alcança o site, e rodar os arquivos do LilyPond aqui foi bloqueado) →
+  `node ferramentas/classicas/gerar.js` lê os MIDIs (leitor próprio), corta perto de 4 min num fim de compasso e grava
+  `gamezi-classicas.js` com o crédito e a licença de cada partitura (`ferramentas/classicas/musicas.json`: nome nos 3
+  idiomas, autor, fonte). Música nova: só compositor morto há mais de 70 anos ou tradicional, nas duas listas. Nada de copiar melodia de música com dono (o dono pediu as do Minecraft/C418: só o clima, nunca as notas). Jogo novo: carregar `../gamezi-musica.js`.
 - Skin única do Gamezi (`gamezi-skins.js`, raiz): a mesma em todos os jogos, menos no Patozi (lá é o guarda-roupa do pato).
   Fica em `gz:skin` ({ presetId, avatar }); `gameziMinhaSkin()` lê (na 1ª vez aproveita a do Topzi ou do Cravazi) e
   `gameziGuardarSkin()` grava. A janela tem as prontas e o editor "Criar a minha"; a conta (`conta.html`) mostra e troca a skin
