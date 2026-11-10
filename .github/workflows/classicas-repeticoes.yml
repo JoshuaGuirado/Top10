@@ -1,0 +1,74 @@
+name: Clássicas - MIDI com as repetições desdobradas
+
+# Para as partituras do Mutopia com "casa 1 / casa 2" (ferramentas/classicas/repeticoes.txt), o MIDI pronto do site emenda
+# as casas e sai do compasso. Aqui o LilyPond gera o MIDI de novo com as repetições desdobradas (\unfoldRepeats).
+# Por segurança (o arquivo de partitura pode ter código), o LilyPond roda num job SEM permissão de escrita; o job que
+# grava na branch só copia os MIDIs, sem rodar nada das partituras. Roda à mão ou quando a lista muda.
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore: [main]
+    paths:
+      - "ferramentas/classicas/repeticoes.txt"
+      - "ferramentas/classicas/desdobrar.py"
+      - ".github/workflows/classicas-repeticoes.yml"
+
+jobs:
+  gerar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends lilypond
+      - name: Baixar as partituras do Mutopia (só as da lista)
+        run: |
+          git clone -q --filter=blob:none --no-checkout --depth 1 https://github.com/MutopiaProject/MutopiaProject mutopia
+          cd mutopia
+          git sparse-checkout init --no-cone
+          awk '{ n = split($2, p, "/"); d = ""; for (i = 1; i < n; i++) d = d p[i] "/"; print "/ftp/" d }' ../ferramentas/classicas/repeticoes.txt > .git/info/sparse-checkout
+          git checkout -q HEAD
+      - name: Gerar os MIDIs com as repetições desdobradas
+        run: |
+          mkdir -p saida
+          while read -r id arq; do
+            [ -z "$id" ] && continue
+            dir="mutopia/ftp/$(dirname "$arq")"
+            convert-ly -e -q "$dir"/*.ly > /dev/null 2>&1 || true
+            python3 ferramentas/classicas/desdobrar.py "mutopia/ftp/$arq"
+            mkdir -p "saida/$id"
+            (cd "$dir" && timeout 600 lilypond -s -dno-print-pages -o "$GITHUB_WORKSPACE/saida/$id/$id" "$(basename "$arq")") || echo "FALHOU $id"
+            ls -la "saida/$id"
+          done < ferramentas/classicas/repeticoes.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: midis-desdobrados
+          path: saida/**/*.mid*
+  gravar:
+    needs: gerar
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: midis-desdobrados
+          path: saida
+      - name: Gravar na branch (só os arquivos .mid)
+        if: github.ref_name != 'main'
+        run: |
+          mkdir -p ferramentas/classicas/midi
+          for d in saida/*/; do
+            id=$(basename "$d")
+            maior=$(ls -S "$d" | grep -iE '\.midi?$' | head -1)
+            [ -n "$maior" ] && cp "$d/$maior" "ferramentas/classicas/midi/$id.mid" && echo "ok $id ($maior)"
+          done
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ferramentas/classicas/midi
+          git commit -m "Clássicas: MIDIs com as repetições desdobradas [skip ci]" || exit 0
+          git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}"
