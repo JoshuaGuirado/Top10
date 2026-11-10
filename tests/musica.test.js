@@ -69,30 +69,21 @@ test("toda faixa tem nome nos 3 idiomas e acerto de volume", () => {
   }
 });
 
-test("clássicas: todo compasso com o tamanho certo, notas e acordes que existem, e todas tocam", () => {
+test("clássicas: todas tiradas das partituras do Mutopia, com crédito, notas no piano e duração boa", () => {
   const { janela } = tocar("classicas", 1);
   const lista = janela.GZ_CLASSICAS;
-  assert.ok(lista.length >= 20, `${lista.length} músicas`);
+  assert.ok(lista.length >= 35, `${lista.length} músicas`);
   const ids = new Set();
   for (const p of lista) {
     assert.ok(!ids.has(p.id), "id repetido: " + p.id);
     ids.add(p.id);
     assert.ok(p.nome.pt && p.nome.en && p.nome.es && p.autor, p.id + ": nome nos 3 idiomas e autor");
-    const vozes = p.vozes.map((v) => janela.gameziMusica.lerVoz(v));
-    vozes.forEach((v, k) => {
-      v.compassos.forEach((tam, c) => assert.equal(tam, p.compasso, `${p.id}, voz ${k + 1}, compasso ${c + 1}: ${tam} em vez de ${p.compasso}`));
-      assert.equal(v.compassos.length, vozes[0].compassos.length, `${p.id}: voz ${k + 1} com outro número de compassos`);
-    });
-    if (p.acordes) {
-      const n = p.acordes.split("|").length;
-      if (vozes.length) assert.equal(n, vozes[0].compassos.length, `${p.id}: ${n} acordes para ${vozes[0].compassos.length} compassos`);
-    }
-    if (p.anacruse) assert.ok(janela.gameziMusica.lerVoz(p.anacruse).total < p.compasso, p.id + ": anacruse maior que um compasso");
-    const m = janela.gameziMusica.montarClassica(p); // lê acordes e estilos (acorde ou estilo errado dá erro aqui)
-    assert.ok(m.eventos.length > 10, p.id + ": poucas notas");
-    assert.ok(m.eventos.every((e) => e.n >= 21 && e.n <= 108), p.id + ": nota fora do piano");
-    assert.ok(m.duracao > 8 && m.duracao < 240, `${p.id}: dura ${Math.round(m.duracao)} s`);
+    assert.match(p.fonte, /^Mutopia Project, partitura digitada por .+ \((Public Domain|Creative Commons .+)\)$/, p.id + ": crédito e licença");
+    const m = janela.gameziMusica.montarClassica(p);
+    assert.ok(m.eventos.length > 50, p.id + ": poucas notas");
+    assert.ok(m.eventos.every((e) => e.n >= 21 && e.n <= 108 && e.vol > 0 && e.dur > 0), p.id + ": nota fora do piano");
+    assert.ok(m.duracao > 20 && m.duracao < 280, `${p.id}: dura ${Math.round(m.duracao)} s`);
   }
-  // A faixa emenda uma música na outra: em 6 minutos passa por várias sem parar.
-  assert.ok(tocar("classicas", 360).notas > 2000, "a faixa Clássicas parou");
+  // A faixa emenda uma música na outra: em 10 minutos passa por várias sem parar.
+  assert.ok(tocar("classicas", 600).notas > 5000, "a faixa Clássicas parou");
 });

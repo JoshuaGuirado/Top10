@@ -96,7 +96,7 @@
   var DEDILHADO = [0, 1, 2, 1, 2, 1, 0, 2]; // qual nota do acorde em cada colcheia (mais uma oitava acima)
 
   // Acerto de volume de cada faixa, para todas soarem mais ou menos iguais ao trocar (medido no pico de cada uma).
-  var AJUSTE_FAIXA = { normal: 1, especial: 0.6, varanda: 0.34, tempestade: 0.32, meianoite: 0.36, classicas: 0.6 };
+  var AJUSTE_FAIXA = { normal: 1, especial: 0.6, varanda: 0.34, tempestade: 0.32, meianoite: 0.36, classicas: 0.45 };
   // Faixa "Clássicas": músicas em DOMÍNIO PÚBLICO (gamezi-classicas.js, carregado sozinho), tocadas no piano de verdade.
   // Sorteia uma e, quando acaba, sorteia outra (nunca a mesma em seguida). É uma faixa como as outras (o dono não quis
   // aba separada nem escolher música por música).
@@ -927,152 +927,35 @@
     return window.GZ_CLASSICAS || [];
   }
 
-  // "C#4" → 61 (dó central = C4 = 60).
-  var NOTA_LETRA = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
-  function notaMidi(txt) {
-    var m = /^([A-G])(#|b)?(-?\d)$/.exec(txt);
-    if (!m) throw new Error("nota inválida: " + txt);
-    return NOTA_LETRA[m[1]] + (m[2] === "#" ? 1 : m[2] === "b" ? -1 : 0) + 12 * (Number(m[3]) + 1);
-  }
-
-  // Uma voz ("nota/duração ... | ...") → { eventos: [{ u, d, notas }], compassos: [unidades de cada compasso] }.
-  function lerVoz(txt) {
-    var eventos = [], compassos = [], u = 0;
-    txt.split("|").forEach(function (comp) {
-      var tam = 0;
-      comp.trim().split(/\s+/).filter(Boolean).forEach(function (tok) {
-        var partes = tok.split("/");
-        var d = Number(partes[1]);
-        if (!(d > 0)) throw new Error("duração inválida: " + tok);
-        if (partes[0] !== "-") eventos.push({ u: u + tam, d: d, notas: partes[0].split("+").map(notaMidi) });
-        tam += d;
-      });
-      compassos.push(tam);
-      u += tam;
-    });
-    return { eventos: eventos, compassos: compassos, total: u };
-  }
-
-  // Acorde cifrado ("F#m7", "Bb", "Gmaj7") → { raiz (0 a 11), notas (intervalos) }.
-  var ACORDE_TIPOS = { "": [0, 4, 7], m: [0, 3, 7], "7": [0, 4, 7, 10], m7: [0, 3, 7, 10], maj7: [0, 4, 7, 11], dim: [0, 3, 6], aug: [0, 4, 8], "6": [0, 4, 7, 9] };
-  function lerAcorde(txt) {
-    var m = /^([A-G])(#|b)?(.*)$/.exec(txt);
-    if (!m || !ACORDE_TIPOS[m[3]]) throw new Error("acorde inválido: " + txt);
-    return { raiz: (NOTA_LETRA[m[1]] + (m[2] === "#" ? 1 : m[2] === "b" ? -1 : 0) + 12) % 12, notas: ACORDE_TIPOS[m[3]] };
-  }
-
-  // Baixo (entre Mi1 e Ré#2… Mi2) e mão esquerda (entre Fá3 e Sol4) de um acorde.
-  function baixoDe(ac) {
-    var n = 36 + ac.raiz;
-    return n < 40 ? n + 12 : n;
-  }
-  function maoDe(ac) {
-    return ac.notas.map(function (x) {
-      var n = 48 + ((ac.raiz + x) % 12);
-      return n < 53 ? n + 12 : n;
-    }).sort(function (a, b) { return a - b; });
-  }
-
-  // Acompanhamento a partir dos acordes, compasso a compasso. Devolve eventos { u, d, notas, vol }.
-  function gerarAcomp(peca, compassos) {
-    var ev = [], un = peca.unidade || 4, comp = peca.compasso, u0 = 0;
-    var linhas = (peca.acordes || "").split("|").map(function (x) { return x.trim(); });
-    compassos.forEach(function (tam, c) {
-      var linha = linhas[c] || "-";
-      if (peca.estilo === "preludio") {
-        // Bach: as duas primeiras notas seguram, as outras três em semicolcheias (2 vezes por compasso).
-        var n5 = linha.split(/\s+/).map(notaMidi);
-        [0, 8].forEach(function (m) {
-          ev.push({ u: u0 + m, d: 8, notas: [n5[0]], vol: 0.05 });
-          ev.push({ u: u0 + m + 1, d: 7, notas: [n5[1]], vol: 0.045 });
-          [2, 3, 4, 2, 3, 4].forEach(function (k, j) { ev.push({ u: u0 + m + 2 + j, d: 1.5, notas: [n5[k]], vol: 0.05 }); });
-        });
-        u0 += tam;
-        return;
-      }
-      var partes = linha.split(/\s+/).filter(Boolean);
-      var seg = tam / partes.length;
-      partes.forEach(function (sim, j) {
-        if (sim === "-") return;
-        var ac = lerAcorde(sim), b = baixoDe(ac), mao = maoDe(ac), u = u0 + j * seg;
-        var e = function (du, d, notas, vol) { if (du < seg) ev.push({ u: u + du, d: d, notas: notas, vol: vol }); };
-        var tempo = un; // unidades por tempo
-        switch (peca.estilo) {
-          case "valsa": // baixo no 1, acorde no 2 e no 3
-            e(0, tempo, [b], 0.06);
-            for (var t = tempo; t < seg; t += tempo) e(t, tempo * 0.9, mao, 0.032);
-            break;
-          case "gymno": // baixo grave no 1, acorde segurado do 2 até o fim
-            e(0, seg, [b - 12 >= 31 ? b - 12 : b], 0.055);
-            e(tempo, seg - tempo, mao, 0.03);
-            break;
-          case "alberti": // baixo-alto-meio-alto em colcheias
-            for (var a = 0, k = 0; a < seg; a += tempo / 2, k++) e(a, tempo / 2, [mao[[0, 2, 1, 2][k % 4]]], 0.032);
-            e(0, seg, [b], 0.045);
-            break;
-          case "arpejo": // arpejo subindo e descendo em colcheias, com o baixo
-            var arp = [b].concat(mao, [mao[0] + 12]);
-            var ordem = [0, 1, 2, 3, 4, 3, 2, 1];
-            for (var q = 0, w = 0; q < seg; q += tempo / 2, w++) e(q, tempo, [arp[ordem[w % ordem.length] % arp.length]], w % 8 === 0 ? 0.05 : 0.03);
-            break;
-          case "canon": // baixo segurado e arpejo leve em colcheias
-            e(0, seg, [b], 0.055);
-            for (var z = 0, y = 0; z < seg; z += tempo / 2, y++) e(z, tempo, [mao[y % mao.length] + (y % 6 >= 3 ? 12 : 0)], 0.022);
-            break;
-          case "bloco": // acorde batido em colcheias, baixo no começo
-            e(0, seg, [b], 0.05);
-            for (var x = 0; x < seg; x += tempo / 2) e(x, tempo / 2, mao, x === 0 ? 0.03 : 0.02);
-            break;
-          case "marcha": // baixo e acorde curtos, alternando
-          case "rag":
-            for (var r = 0, v = 0; r < seg; r += tempo / (comp <= 8 ? 2 : 1), v++) {
-              if (v % 2 === 0) e(r, tempo / 2, [v % 4 === 2 ? b + 7 : b], 0.06);
-              else e(r, tempo / 2, mao, 0.034);
-            }
-            break;
-          case "elise": // três semicolcheias subindo no começo do compasso (baixo, quinta, oitava)
-            e(0, seg, [b], 0.05);
-            e(1, seg - 1, [b + 7], 0.035);
-            e(2, seg - 2, [b + 12], 0.035);
-            break;
-          default:
-            e(0, seg, [b].concat(mao), 0.035);
-        }
-      });
-      u0 += tam;
-    });
-    return ev;
-  }
-
-  // Monta a música inteira (anacruse + repetições) em eventos com tempo em segundos.
-  function montarClassica(peca) {
-    var un = peca.unidade || 4;
-    var vozes = peca.vozes.map(lerVoz);
-    var compassos = vozes.length ? vozes[0].compassos : (peca.acordes || "").split("|").map(function () { return peca.compasso; });
-    var acomp = peca.acordes ? gerarAcomp(peca, compassos) : [];
-    var total = compassos.reduce(function (a, b) { return a + b; }, 0);
-    var ana = peca.anacruse ? lerVoz(peca.anacruse) : null;
-    var eventos = [], s = 0;
-    var porUnidade = 60 / peca.bpm / un;
-    var push = function (e, inicio, segU, vol, sobe) {
-      e.notas.forEach(function (n) {
-        eventos.push({ s: inicio + e.u * segU, n: n + (sobe || 0), dur: Math.max(0.35, e.d * segU * 1.15 + 0.2), vol: vol });
-      });
+  // Notas compactadas por ferramentas/classicas/gerar.js (a partir dos MIDIs das partituras do Mutopia): cada nota é
+  // espera desde a anterior, duração (centésimos de segundo), altura (− 21) e força (0 a 7), números em base 64 de
+  // tamanho variável (5 bits por letra; o 6º bit diz que o número continua).
+  var ALFA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+  function lerNotas(txt) {
+    var pos = 0, t = 0, eventos = [];
+    var num = function () {
+      var v = 0, desloca = 0, c;
+      do {
+        c = ALFA.indexOf(txt.charAt(pos++));
+        if (c < 0) throw new Error("notas inválidas");
+        v += (c & 31) * Math.pow(2, desloca);
+        desloca += 5;
+      } while (c & 32);
+      return v;
     };
-    if (ana) {
-      ana.eventos.forEach(function (e) { push(e, 0, porUnidade, 0.09, peca.oitava); });
-      s = ana.total * porUnidade;
+    while (pos < txt.length) {
+      t += num() / 100;
+      var d = num() / 100, n = num() + 21, forca = num();
+      // o pedal do piano não vem no MIDI: a nota soa um pouco mais que o escrito
+      eventos.push({ s: t, n: n, dur: Math.max(0.3, d * 1.05 + 0.25), vol: 0.03 + forca * 0.011 });
     }
-    for (var r = 0; r < (peca.vezes || 1); r++) {
-      var segU = porUnidade / (peca.acelera ? Math.pow(1.13, r) : 1);
-      vozes.forEach(function (v, k) {
-        v.eventos.forEach(function (e) { push(e, s, segU, k === 0 ? 0.09 : 0.05, k === 0 ? peca.oitava : 0); });
-      });
-      acomp.forEach(function (e) { push(e, s, segU, e.vol, 0); });
-      s += total * segU;
-    }
-    eventos.sort(function (a, b) { return a.s - b.s; });
-    return { peca: peca, eventos: eventos, i: 0, duracao: s };
+    return eventos;
+  }
+
+  function montarClassica(peca) {
+    var eventos = lerNotas(peca.notas);
+    var fim = eventos.reduce(function (a, e) { return Math.max(a, e.s + e.dur); }, 0);
+    return { peca: peca, eventos: eventos, i: 0, duracao: fim };
   }
 
   // Sorteia a próxima (diferente da que acabou) e começa daqui a pouco.
@@ -1319,5 +1202,5 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", colocarNasConfiguracoes);
   else colocarNasConfiguracoes();
 
-  window.gameziMusica = { comecar: comecar, parar: parar, ligada: ligada, volume: volume, trilha: trilha, lerVoz: lerVoz, montarClassica: montarClassica };
+  window.gameziMusica = { comecar: comecar, parar: parar, ligada: ligada, volume: volume, trilha: trilha, montarClassica: montarClassica };
 })();
