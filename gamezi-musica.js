@@ -27,7 +27,7 @@
     { id: "varanda", nome: { pt: "Varanda", en: "Porch", es: "Terraza" } },
     { id: "tempestade", nome: { pt: "Tempestade", en: "Tempest", es: "Tempestad" } },
     { id: "meianoite", nome: { pt: "Meia-Noite", en: "Midnight", es: "Medianoche" } },
-    { id: "classicas", nome: { pt: "Clássicas", en: "Classical", es: "Clásicas" }, aba: true }, // fica na aba própria
+    { id: "classicas", nome: { pt: "Clássicas", en: "Classical", es: "Clásicas" } },
   ];
   // "Meia-Noite": jazz ORIGINAL, simples e "escorridinho" (o dono achou a 1ª versão com cara de música de shopping):
   // balada lenta com UM sax só fazendo a melodia — notas ligadas que escorregam de uma para a outra, frases de 2
@@ -97,11 +97,9 @@
 
   // Acerto de volume de cada faixa, para todas soarem mais ou menos iguais ao trocar (medido no pico de cada uma).
   var AJUSTE_FAIXA = { normal: 1, especial: 0.6, varanda: 0.34, tempestade: 0.32, meianoite: 0.36, classicas: 0.6 };
-  // Aba "Clássicas": músicas em DOMÍNIO PÚBLICO (gamezi-classicas.js, carregado sozinho), tocadas no piano de verdade.
-  // A escolhida fica em tt:musica-classica: "todas" (sorteia uma, e ao acabar sorteia outra) ou o id de uma (repete).
-  var CHAVE_CLASSICA = "tt:musica-classica";
-  var TEXTO_ABAS = { faixas: { pt: "Faixas", en: "Tracks", es: "Pistas" }, classicas: { pt: "Clássicas", en: "Classical", es: "Clásicas" } };
-  var TEXTO_TODAS = { pt: "Todas, sorteadas", en: "All, shuffled", es: "Todas, al azar" };
+  // Faixa "Clássicas": músicas em DOMÍNIO PÚBLICO (gamezi-classicas.js, carregado sozinho), tocadas no piano de verdade.
+  // Sorteia uma e, quando acaba, sorteia outra (nunca a mesma em seguida). É uma faixa como as outras (o dono não quis
+  // aba separada nem escolher música por música).
   var cl = null; // música clássica tocando: { peca, eventos, i, t0, fim }
   var ajuste = null;
   var ctx = null, saida = null, eco = null, timer = null, passo = 0, proximo = 0, tocando = false;
@@ -929,12 +927,6 @@
     return window.GZ_CLASSICAS || [];
   }
 
-  function classicaEscolhida() {
-    var c = null;
-    try { c = localStorage.getItem(CHAVE_CLASSICA); } catch (e) { /* sem armazenamento */ }
-    return classicas().some(function (p) { return p.id === c; }) ? c : "todas";
-  }
-
   // "C#4" → 61 (dó central = C4 = 60).
   var NOTA_LETRA = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
   function notaMidi(txt) {
@@ -1083,16 +1075,12 @@
     return { peca: peca, eventos: eventos, i: 0, duracao: s };
   }
 
-  // Sorteia a próxima (ou repete a escolhida) e começa daqui a pouco.
+  // Sorteia a próxima (diferente da que acabou) e começa daqui a pouco.
   function proximaClassica(quando) {
     var lista = classicas();
     if (!lista.length) return;
-    var escolha = classicaEscolhida(), peca;
-    if (escolha !== "todas") peca = lista.filter(function (p) { return p.id === escolha; })[0];
-    else {
-      var outras = lista.filter(function (p) { return !cl || p.id !== cl.peca.id; });
-      peca = outras[Math.floor(Math.random() * outras.length)];
-    }
+    var outras = lista.filter(function (p) { return !cl || p.id !== cl.peca.id; });
+    var peca = outras[Math.floor(Math.random() * outras.length)];
     cl = montarClassica(peca);
     cl.t0 = quando;
     cl.fim = quando + cl.duracao;
@@ -1235,13 +1223,6 @@
         ".musica-faixas{display:flex;flex-wrap:wrap;gap:8px;padding:2px 0 12px;border-bottom:1.5px solid var(--line,#ddd)}" +
         ".musica-faixa{font:inherit;font-weight:700;font-size:.9rem;padding:8px 14px;border-radius:999px;cursor:pointer;" +
         "border:1.5px solid var(--line,#ddd);background:transparent;color:inherit}" +
-        ".musica-abas{display:flex;gap:4px;width:100%;margin-bottom:4px}" +
-        ".musica-aba{font:inherit;font-weight:800;font-size:.85rem;padding:6px 12px;border:0;border-bottom:2.5px solid transparent;" +
-        "background:none;color:var(--muted,#888);cursor:pointer}" +
-        ".musica-aba[aria-selected=true]{color:inherit;border-bottom-color:var(--accent,#ff4d3d)}" +
-        ".musica-itens{display:flex;flex-wrap:wrap;gap:8px;width:100%}" +
-        ".musica-classicas{max-height:240px;overflow-y:auto;padding-right:4px}" +
-        ".musica-faixa small{display:block;font-size:.7rem;font-weight:600;opacity:.65}" +
         ".musica-faixa[aria-pressed=true]{background:var(--fg,#1a1a1a);color:var(--bg,#fff);border-color:var(--fg,#1a1a1a)}";
       document.head.appendChild(css);
     }
@@ -1252,13 +1233,8 @@
     var b = linha.querySelector("#musica-btn");
     var faixa = linhaVol.querySelector("input");
     var numero = linhaVol.querySelector("output");
-    // Aba aberta na lista: "faixas" (as faixas criadas) ou "classicas" (as músicas clássicas).
-    var aba = trilha() === "classicas" ? "classicas" : "faixas";
-    var tocar = function (id, classica) {
-      if (classica) {
-        try { localStorage.setItem(CHAVE_CLASSICA, classica); } catch (e) { /* vale só agora */ }
-      }
-      if (id !== trilha() || classica) {
+    var tocar = function (id) {
+      if (id !== trilha()) {
         try { localStorage.setItem(CHAVE_TRILHA, id); } catch (e) { /* vale só agora */ }
         trocarTrilha();
       }
@@ -1267,17 +1243,11 @@
       comecar();
       atualizar();
     };
-    var chip = function (texto, ativo, aoClicar, extra) {
+    var chip = function (texto, ativo, aoClicar) {
       var bt = document.createElement("button");
       bt.type = "button";
       bt.className = "musica-faixa";
-      bt.innerHTML = "";
-      bt.appendChild(document.createTextNode(texto));
-      if (extra) {
-        var sm = document.createElement("small");
-        sm.textContent = extra;
-        bt.appendChild(sm);
-      }
+      bt.textContent = texto;
       bt.setAttribute("aria-pressed", ativo ? "true" : "false");
       bt.onclick = aoClicar;
       return bt;
@@ -1292,42 +1262,10 @@
       seta.setAttribute("aria-label", TEXTO_FAIXAS[l]);
       seta.title = TEXTO_FAIXAS[l];
       lista.innerHTML = "";
-      var abas = document.createElement("div");
-      abas.className = "musica-abas";
-      ["faixas", "classicas"].forEach(function (a) {
-        var bt = document.createElement("button");
-        bt.type = "button";
-        bt.className = "musica-aba";
-        bt.dataset.aba = a;
-        bt.textContent = TEXTO_ABAS[a][l];
-        bt.setAttribute("aria-selected", a === aba ? "true" : "false");
-        bt.onclick = function () {
-          aba = a;
-          if (a === "classicas") carregarClassicas(atualizar);
-          atualizar();
-        };
-        abas.appendChild(bt);
-      });
-      lista.appendChild(abas);
-      var itens = document.createElement("div");
-      itens.className = "musica-itens" + (aba === "classicas" ? " musica-classicas" : "");
-      lista.appendChild(itens);
-      if (aba === "classicas") {
-        var esc = classicaEscolhida(), tocando = escolhida === "classicas";
-        var bTodas = chip("🔀 " + TEXTO_TODAS[l], tocando && esc === "todas", function () { tocar("classicas", "todas"); });
-        bTodas.dataset.classica = "todas";
-        itens.appendChild(bTodas);
-        classicas().forEach(function (p) {
-          var bt = chip(p.nome[l], tocando && esc === p.id, function () { tocar("classicas", p.id); }, p.autor);
-          bt.dataset.classica = p.id;
-          itens.appendChild(bt);
-        });
-      }
       FAIXAS.forEach(function (f) {
-        if (f.aba || aba !== "faixas") return;
         var bt = chip(f.nome[l], f.id === escolhida, function () { tocar(f.id); });
         bt.dataset.faixa = f.id;
-        itens.appendChild(bt);
+        lista.appendChild(bt);
       });
       rotuloVol.textContent = TEXTO_VOLUME[l];
       faixa.setAttribute("aria-label", TEXTO_VOLUME[l]);

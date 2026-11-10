@@ -23,7 +23,7 @@ function no() {
   });
 }
 
-function tocar(faixa, segundos, classica) {
+function tocar(faixa, segundos) {
   let notas = 0, tick = null;
   const ctx = {
     currentTime: 0, sampleRate: 8000, state: "running", destination: no(),
@@ -32,7 +32,7 @@ function tocar(faixa, segundos, classica) {
   };
   for (const tipo of ["Gain", "BiquadFilter", "Convolver", "BufferSource"]) ctx["create" + tipo] = () => no();
   ctx.createOscillator = () => { const o = no(); o.start = () => { notas++; }; return o; };
-  const guardado = { "tt:musica-trilha": faixa, "tt:musica-classica": classica || "todas" };
+  const guardado = { "tt:musica-trilha": faixa };
   const janela = {
     AudioContext: function () { return ctx; },
     localStorage: { getItem: (k) => (k in guardado ? guardado[k] : null), setItem: (k, v) => { guardado[k] = v; } },
@@ -93,6 +93,6 @@ test("clássicas: todo compasso com o tamanho certo, notas e acordes que existem
     assert.ok(m.eventos.every((e) => e.n >= 21 && e.n <= 108), p.id + ": nota fora do piano");
     assert.ok(m.duracao > 8 && m.duracao < 240, `${p.id}: dura ${Math.round(m.duracao)} s`);
   }
-  // Cada uma escolhida sozinha toca.
-  for (const p of lista) assert.ok(tocar("classicas", 20, p.id).notas > 20, p.id + " não tocou");
+  // A faixa emenda uma música na outra: em 6 minutos passa por várias sem parar.
+  assert.ok(tocar("classicas", 360).notas > 2000, "a faixa Clássicas parou");
 });

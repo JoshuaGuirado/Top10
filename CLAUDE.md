@@ -102,8 +102,8 @@
   contrabaixo em 2 e vassourinha; o dono achou a versão com trompete e sax em dupla "música de shopping"), todas ORIGINAIS e sorteadas na hora. `AJUSTE_FAIXA` iguala o volume
   das faixas (medir o pico de cada uma ao criar uma nova). `tests/musica.test.js` toca todas as faixas com um áudio de mentira
   e acusa erro ou faixa muda (já aconteceu de apagar funções de uma faixa sem querer ao mexer em outra). Faixa nova: item em `FAIXAS`, nome nos 3 idiomas e o caso em
-  `agendar()`. Aba "Clássicas" (faixa `classicas`, escolhida em `tt:musica-classica`: "todas" sorteia
-  e emenda outra, ou o id de uma, que repete): músicas em DOMÍNIO PÚBLICO em `gamezi-classicas.js` (raiz, carregado pela
+  `agendar()`. Faixa "Clássicas" (id `classicas`, um item da lista como as outras — o dono não quis aba
+  nem escolher música por música; sorteia uma e emenda outra, nunca a mesma em seguida): músicas em DOMÍNIO PÚBLICO em `gamezi-classicas.js` (raiz, carregado pela
   própria música; está no `FILES` do `sw.js`), tocadas no `pianoReal`. Formato explicado no topo do arquivo; o
   `tests/musica.test.js` confere o tamanho de todo compasso, as notas e os acordes. Música nova: só compositor morto há mais
   de 70 anos ou tradicional, nota a nota da partitura original (nada de arranjo moderno), no fim da lista, nos 3 idiomas. Nada de copiar melodia de música com dono (o dono pediu as do Minecraft/C418: só o clima, nunca as notas). Jogo novo: carregar `../gamezi-musica.js`.
