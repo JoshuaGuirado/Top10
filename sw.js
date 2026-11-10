@@ -2,7 +2,7 @@
 // Cada jogo fica numa pasta (topzi/…, patozi/…); os arquivos dele entram na lista com o caminho da pasta.
 // Online, busca sempre a versão nova (rede primeiro); sem internet, usa a cópia guardada.
 
-const CACHE = "gamezi-v55";
+const CACHE = "gamezi-v56";
 const FILES = [
   "./",
   "index.html",
