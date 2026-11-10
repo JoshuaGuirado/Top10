@@ -11,6 +11,8 @@
 // nunca repete igual; nenhuma melodia ou sequência de acordes de música existente — copiar isso não pode.
 
 (function () {
+  // Onde este arquivo está (para carregar gamezi-classicas.js do mesmo lugar, de qualquer pasta de jogo).
+  var BASE = (document.currentScript && document.currentScript.src || "").replace(/[^/]*$/, "");
   var CHAVE = "tt:musica";
   var CHAVE_VOLUME = "tt:musica-volume";
   var TEXTO = { pt: "Música", en: "Music", es: "Música" };
@@ -25,6 +27,7 @@
     { id: "varanda", nome: { pt: "Varanda", en: "Porch", es: "Terraza" } },
     { id: "tempestade", nome: { pt: "Tempestade", en: "Tempest", es: "Tempestad" } },
     { id: "meianoite", nome: { pt: "Meia-Noite", en: "Midnight", es: "Medianoche" } },
+    { id: "classicas", nome: { pt: "Clássicas", en: "Classical", es: "Clásicas" }, aba: true }, // fica na aba própria
   ];
   // "Meia-Noite": jazz ORIGINAL, simples e "escorridinho" (o dono achou a 1ª versão com cara de música de shopping):
   // balada lenta com UM sax só fazendo a melodia — notas ligadas que escorregam de uma para a outra, frases de 2
@@ -93,7 +96,13 @@
   var DEDILHADO = [0, 1, 2, 1, 2, 1, 0, 2]; // qual nota do acorde em cada colcheia (mais uma oitava acima)
 
   // Acerto de volume de cada faixa, para todas soarem mais ou menos iguais ao trocar (medido no pico de cada uma).
-  var AJUSTE_FAIXA = { normal: 1, especial: 0.6, varanda: 0.34, tempestade: 0.32, meianoite: 0.36 };
+  var AJUSTE_FAIXA = { normal: 1, especial: 0.6, varanda: 0.34, tempestade: 0.32, meianoite: 0.36, classicas: 0.6 };
+  // Aba "Clássicas": músicas em DOMÍNIO PÚBLICO (gamezi-classicas.js, carregado sozinho), tocadas no piano de verdade.
+  // A escolhida fica em tt:musica-classica: "todas" (sorteia uma, e ao acabar sorteia outra) ou o id de uma (repete).
+  var CHAVE_CLASSICA = "tt:musica-classica";
+  var TEXTO_ABAS = { faixas: { pt: "Faixas", en: "Tracks", es: "Pistas" }, classicas: { pt: "Clássicas", en: "Classical", es: "Clásicas" } };
+  var TEXTO_TODAS = { pt: "Todas, sorteadas", en: "All, shuffled", es: "Todas, al azar" };
+  var cl = null; // música clássica tocando: { peca, eventos, i, t0, fim }
   var ajuste = null;
   var ctx = null, saida = null, eco = null, timer = null, passo = 0, proximo = 0, tocando = false;
   var esp = null; // trecho da trilha especial que está tocando (ou null na pausa / antes de começar)
@@ -915,8 +924,209 @@
     });
   }
 
+  // ───────────── Clássicas ─────────────
+  function classicas() {
+    return window.GZ_CLASSICAS || [];
+  }
+
+  function classicaEscolhida() {
+    var c = null;
+    try { c = localStorage.getItem(CHAVE_CLASSICA); } catch (e) { /* sem armazenamento */ }
+    return classicas().some(function (p) { return p.id === c; }) ? c : "todas";
+  }
+
+  // "C#4" → 61 (dó central = C4 = 60).
+  var NOTA_LETRA = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+  function notaMidi(txt) {
+    var m = /^([A-G])(#|b)?(-?\d)$/.exec(txt);
+    if (!m) throw new Error("nota inválida: " + txt);
+    return NOTA_LETRA[m[1]] + (m[2] === "#" ? 1 : m[2] === "b" ? -1 : 0) + 12 * (Number(m[3]) + 1);
+  }
+
+  // Uma voz ("nota/duração ... | ...") → { eventos: [{ u, d, notas }], compassos: [unidades de cada compasso] }.
+  function lerVoz(txt) {
+    var eventos = [], compassos = [], u = 0;
+    txt.split("|").forEach(function (comp) {
+      var tam = 0;
+      comp.trim().split(/\s+/).filter(Boolean).forEach(function (tok) {
+        var partes = tok.split("/");
+        var d = Number(partes[1]);
+        if (!(d > 0)) throw new Error("duração inválida: " + tok);
+        if (partes[0] !== "-") eventos.push({ u: u + tam, d: d, notas: partes[0].split("+").map(notaMidi) });
+        tam += d;
+      });
+      compassos.push(tam);
+      u += tam;
+    });
+    return { eventos: eventos, compassos: compassos, total: u };
+  }
+
+  // Acorde cifrado ("F#m7", "Bb", "Gmaj7") → { raiz (0 a 11), notas (intervalos) }.
+  var ACORDE_TIPOS = { "": [0, 4, 7], m: [0, 3, 7], "7": [0, 4, 7, 10], m7: [0, 3, 7, 10], maj7: [0, 4, 7, 11], dim: [0, 3, 6], aug: [0, 4, 8], "6": [0, 4, 7, 9] };
+  function lerAcorde(txt) {
+    var m = /^([A-G])(#|b)?(.*)$/.exec(txt);
+    if (!m || !ACORDE_TIPOS[m[3]]) throw new Error("acorde inválido: " + txt);
+    return { raiz: (NOTA_LETRA[m[1]] + (m[2] === "#" ? 1 : m[2] === "b" ? -1 : 0) + 12) % 12, notas: ACORDE_TIPOS[m[3]] };
+  }
+
+  // Baixo (entre Mi1 e Ré#2… Mi2) e mão esquerda (entre Fá3 e Sol4) de um acorde.
+  function baixoDe(ac) {
+    var n = 36 + ac.raiz;
+    return n < 40 ? n + 12 : n;
+  }
+  function maoDe(ac) {
+    return ac.notas.map(function (x) {
+      var n = 48 + ((ac.raiz + x) % 12);
+      return n < 53 ? n + 12 : n;
+    }).sort(function (a, b) { return a - b; });
+  }
+
+  // Acompanhamento a partir dos acordes, compasso a compasso. Devolve eventos { u, d, notas, vol }.
+  function gerarAcomp(peca, compassos) {
+    var ev = [], un = peca.unidade || 4, comp = peca.compasso, u0 = 0;
+    var linhas = (peca.acordes || "").split("|").map(function (x) { return x.trim(); });
+    compassos.forEach(function (tam, c) {
+      var linha = linhas[c] || "-";
+      if (peca.estilo === "preludio") {
+        // Bach: as duas primeiras notas seguram, as outras três em semicolcheias (2 vezes por compasso).
+        var n5 = linha.split(/\s+/).map(notaMidi);
+        [0, 8].forEach(function (m) {
+          ev.push({ u: u0 + m, d: 8, notas: [n5[0]], vol: 0.05 });
+          ev.push({ u: u0 + m + 1, d: 7, notas: [n5[1]], vol: 0.045 });
+          [2, 3, 4, 2, 3, 4].forEach(function (k, j) { ev.push({ u: u0 + m + 2 + j, d: 1.5, notas: [n5[k]], vol: 0.05 }); });
+        });
+        u0 += tam;
+        return;
+      }
+      var partes = linha.split(/\s+/).filter(Boolean);
+      var seg = tam / partes.length;
+      partes.forEach(function (sim, j) {
+        if (sim === "-") return;
+        var ac = lerAcorde(sim), b = baixoDe(ac), mao = maoDe(ac), u = u0 + j * seg;
+        var e = function (du, d, notas, vol) { if (du < seg) ev.push({ u: u + du, d: d, notas: notas, vol: vol }); };
+        var tempo = un; // unidades por tempo
+        switch (peca.estilo) {
+          case "valsa": // baixo no 1, acorde no 2 e no 3
+            e(0, tempo, [b], 0.06);
+            for (var t = tempo; t < seg; t += tempo) e(t, tempo * 0.9, mao, 0.032);
+            break;
+          case "gymno": // baixo grave no 1, acorde segurado do 2 até o fim
+            e(0, seg, [b - 12 >= 31 ? b - 12 : b], 0.055);
+            e(tempo, seg - tempo, mao, 0.03);
+            break;
+          case "alberti": // baixo-alto-meio-alto em colcheias
+            for (var a = 0, k = 0; a < seg; a += tempo / 2, k++) e(a, tempo / 2, [mao[[0, 2, 1, 2][k % 4]]], 0.032);
+            e(0, seg, [b], 0.045);
+            break;
+          case "arpejo": // arpejo subindo e descendo em colcheias, com o baixo
+            var arp = [b].concat(mao, [mao[0] + 12]);
+            var ordem = [0, 1, 2, 3, 4, 3, 2, 1];
+            for (var q = 0, w = 0; q < seg; q += tempo / 2, w++) e(q, tempo, [arp[ordem[w % ordem.length] % arp.length]], w % 8 === 0 ? 0.05 : 0.03);
+            break;
+          case "canon": // baixo segurado e arpejo leve em colcheias
+            e(0, seg, [b], 0.055);
+            for (var z = 0, y = 0; z < seg; z += tempo / 2, y++) e(z, tempo, [mao[y % mao.length] + (y % 6 >= 3 ? 12 : 0)], 0.022);
+            break;
+          case "bloco": // acorde batido em colcheias, baixo no começo
+            e(0, seg, [b], 0.05);
+            for (var x = 0; x < seg; x += tempo / 2) e(x, tempo / 2, mao, x === 0 ? 0.03 : 0.02);
+            break;
+          case "marcha": // baixo e acorde curtos, alternando
+          case "rag":
+            for (var r = 0, v = 0; r < seg; r += tempo / (comp <= 8 ? 2 : 1), v++) {
+              if (v % 2 === 0) e(r, tempo / 2, [v % 4 === 2 ? b + 7 : b], 0.06);
+              else e(r, tempo / 2, mao, 0.034);
+            }
+            break;
+          case "elise": // três semicolcheias subindo no começo do compasso (baixo, quinta, oitava)
+            e(0, seg, [b], 0.05);
+            e(1, seg - 1, [b + 7], 0.035);
+            e(2, seg - 2, [b + 12], 0.035);
+            break;
+          default:
+            e(0, seg, [b].concat(mao), 0.035);
+        }
+      });
+      u0 += tam;
+    });
+    return ev;
+  }
+
+  // Monta a música inteira (anacruse + repetições) em eventos com tempo em segundos.
+  function montarClassica(peca) {
+    var un = peca.unidade || 4;
+    var vozes = peca.vozes.map(lerVoz);
+    var compassos = vozes.length ? vozes[0].compassos : (peca.acordes || "").split("|").map(function () { return peca.compasso; });
+    var acomp = peca.acordes ? gerarAcomp(peca, compassos) : [];
+    var total = compassos.reduce(function (a, b) { return a + b; }, 0);
+    var ana = peca.anacruse ? lerVoz(peca.anacruse) : null;
+    var eventos = [], s = 0;
+    var porUnidade = 60 / peca.bpm / un;
+    var push = function (e, inicio, segU, vol, sobe) {
+      e.notas.forEach(function (n) {
+        eventos.push({ s: inicio + e.u * segU, n: n + (sobe || 0), dur: Math.max(0.35, e.d * segU * 1.15 + 0.2), vol: vol });
+      });
+    };
+    if (ana) {
+      ana.eventos.forEach(function (e) { push(e, 0, porUnidade, 0.09, peca.oitava); });
+      s = ana.total * porUnidade;
+    }
+    for (var r = 0; r < (peca.vezes || 1); r++) {
+      var segU = porUnidade / (peca.acelera ? Math.pow(1.13, r) : 1);
+      vozes.forEach(function (v, k) {
+        v.eventos.forEach(function (e) { push(e, s, segU, k === 0 ? 0.09 : 0.05, k === 0 ? peca.oitava : 0); });
+      });
+      acomp.forEach(function (e) { push(e, s, segU, e.vol, 0); });
+      s += total * segU;
+    }
+    eventos.sort(function (a, b) { return a.s - b.s; });
+    return { peca: peca, eventos: eventos, i: 0, duracao: s };
+  }
+
+  // Sorteia a próxima (ou repete a escolhida) e começa daqui a pouco.
+  function proximaClassica(quando) {
+    var lista = classicas();
+    if (!lista.length) return;
+    var escolha = classicaEscolhida(), peca;
+    if (escolha !== "todas") peca = lista.filter(function (p) { return p.id === escolha; })[0];
+    else {
+      var outras = lista.filter(function (p) { return !cl || p.id !== cl.peca.id; });
+      peca = outras[Math.floor(Math.random() * outras.length)];
+    }
+    cl = montarClassica(peca);
+    cl.t0 = quando;
+    cl.fim = quando + cl.duracao;
+    if (aoTrocarClassica) aoTrocarClassica();
+  }
+  var aoTrocarClassica = null;
+
+  function agendarClassicas() {
+    if (!classicas().length) { carregarClassicas(); return; }
+    if (!cl) proximaClassica(ctx.currentTime + 0.3);
+    // Acabou: um respiro de 1,5 s e a próxima.
+    if (cl.i >= cl.eventos.length && ctx.currentTime > cl.fim + 1.2) proximaClassica(ctx.currentTime + 0.3);
+    while (cl.i < cl.eventos.length && cl.t0 + cl.eventos[cl.i].s < ctx.currentTime + 0.3) {
+      var e = cl.eventos[cl.i++];
+      var quando = Math.max(ctx.currentTime + 0.01, cl.t0 + e.s + (Math.random() - 0.5) * 0.012);
+      pianoReal(e.n, quando, e.vol * (0.9 + Math.random() * 0.2), e.dur);
+    }
+  }
+
+  var carregando = false;
+  function carregarClassicas(depois) {
+    if (window.GZ_CLASSICAS) { if (depois) depois(); return; }
+    if (carregando || !document.createElement) return;
+    carregando = true;
+    var sc = document.createElement("script");
+    sc.src = BASE + "gamezi-classicas.js";
+    sc.onload = function () { carregando = false; if (depois) depois(); };
+    sc.onerror = function () { carregando = false; };
+    document.head.appendChild(sc);
+  }
+
   function agendar() {
     var t = trilha();
+    if (t === "classicas") return agendarClassicas();
     var especial = t === "especial";
     var passoDur = especial ? 60 / ESP_BPM : t === "varanda" ? 60 / VAR_BPM / 4 : t === "tempestade" ? 60 / TMP_BPM / 4 : t === "meianoite" ? 60 / JZ_BPM / 2 : 60 / BPM / 2;
     while (proximo < ctx.currentTime + 0.25) {
@@ -938,6 +1148,7 @@
     vr = null;
     tp = null;
     jz = null;
+    cl = null;
     if (ctx) proximo = ctx.currentTime + 0.3;
     if (ajuste) ajuste.gain.setTargetAtTime(AJUSTE_FAIXA[trilha()], ctx.currentTime, 0.1);
   }
@@ -1024,6 +1235,13 @@
         ".musica-faixas{display:flex;flex-wrap:wrap;gap:8px;padding:2px 0 12px;border-bottom:1.5px solid var(--line,#ddd)}" +
         ".musica-faixa{font:inherit;font-weight:700;font-size:.9rem;padding:8px 14px;border-radius:999px;cursor:pointer;" +
         "border:1.5px solid var(--line,#ddd);background:transparent;color:inherit}" +
+        ".musica-abas{display:flex;gap:4px;width:100%;margin-bottom:4px}" +
+        ".musica-aba{font:inherit;font-weight:800;font-size:.85rem;padding:6px 12px;border:0;border-bottom:2.5px solid transparent;" +
+        "background:none;color:var(--muted,#888);cursor:pointer}" +
+        ".musica-aba[aria-selected=true]{color:inherit;border-bottom-color:var(--accent,#ff4d3d)}" +
+        ".musica-itens{display:flex;flex-wrap:wrap;gap:8px;width:100%}" +
+        ".musica-classicas{max-height:240px;overflow-y:auto;padding-right:4px}" +
+        ".musica-faixa small{display:block;font-size:.7rem;font-weight:600;opacity:.65}" +
         ".musica-faixa[aria-pressed=true]{background:var(--fg,#1a1a1a);color:var(--bg,#fff);border-color:var(--fg,#1a1a1a)}";
       document.head.appendChild(css);
     }
@@ -1034,32 +1252,82 @@
     var b = linha.querySelector("#musica-btn");
     var faixa = linhaVol.querySelector("input");
     var numero = linhaVol.querySelector("output");
+    // Aba aberta na lista: "faixas" (as faixas criadas) ou "classicas" (as músicas clássicas).
+    var aba = trilha() === "classicas" ? "classicas" : "faixas";
+    var tocar = function (id, classica) {
+      if (classica) {
+        try { localStorage.setItem(CHAVE_CLASSICA, classica); } catch (e) { /* vale só agora */ }
+      }
+      if (id !== trilha() || classica) {
+        try { localStorage.setItem(CHAVE_TRILHA, id); } catch (e) { /* vale só agora */ }
+        trocarTrilha();
+      }
+      // Escolheu com a música desligada: liga, para ouvir.
+      if (!ligada()) guardar(true);
+      comecar();
+      atualizar();
+    };
+    var chip = function (texto, ativo, aoClicar, extra) {
+      var bt = document.createElement("button");
+      bt.type = "button";
+      bt.className = "musica-faixa";
+      bt.innerHTML = "";
+      bt.appendChild(document.createTextNode(texto));
+      if (extra) {
+        var sm = document.createElement("small");
+        sm.textContent = extra;
+        bt.appendChild(sm);
+      }
+      bt.setAttribute("aria-pressed", ativo ? "true" : "false");
+      bt.onclick = aoClicar;
+      return bt;
+    };
     var atualizar = function () {
       var l = idioma();
       rotulo.textContent = TEXTO[l];
       var escolhida = trilha();
-      atual.textContent = FAIXAS.filter(function (f) { return f.id === escolhida; })[0].nome[l];
+      var nomeAtual = FAIXAS.filter(function (f) { return f.id === escolhida; })[0].nome[l];
+      if (escolhida === "classicas" && cl) nomeAtual += " · " + cl.peca.nome[l];
+      atual.textContent = nomeAtual;
       seta.setAttribute("aria-label", TEXTO_FAIXAS[l]);
       seta.title = TEXTO_FAIXAS[l];
       lista.innerHTML = "";
-      FAIXAS.forEach(function (f) {
+      var abas = document.createElement("div");
+      abas.className = "musica-abas";
+      ["faixas", "classicas"].forEach(function (a) {
         var bt = document.createElement("button");
         bt.type = "button";
-        bt.className = "musica-faixa";
-        bt.dataset.faixa = f.id;
-        bt.textContent = f.nome[l];
-        bt.setAttribute("aria-pressed", f.id === escolhida ? "true" : "false");
+        bt.className = "musica-aba";
+        bt.dataset.aba = a;
+        bt.textContent = TEXTO_ABAS[a][l];
+        bt.setAttribute("aria-selected", a === aba ? "true" : "false");
         bt.onclick = function () {
-          if (f.id !== trilha()) {
-            try { localStorage.setItem(CHAVE_TRILHA, f.id); } catch (e) { /* vale só agora */ }
-            trocarTrilha();
-          }
-          // Escolheu uma faixa com a música desligada: liga, para ouvir.
-          if (!ligada()) guardar(true);
-          comecar();
+          aba = a;
+          if (a === "classicas") carregarClassicas(atualizar);
           atualizar();
         };
-        lista.appendChild(bt);
+        abas.appendChild(bt);
+      });
+      lista.appendChild(abas);
+      var itens = document.createElement("div");
+      itens.className = "musica-itens" + (aba === "classicas" ? " musica-classicas" : "");
+      lista.appendChild(itens);
+      if (aba === "classicas") {
+        var esc = classicaEscolhida(), tocando = escolhida === "classicas";
+        var bTodas = chip("🔀 " + TEXTO_TODAS[l], tocando && esc === "todas", function () { tocar("classicas", "todas"); });
+        bTodas.dataset.classica = "todas";
+        itens.appendChild(bTodas);
+        classicas().forEach(function (p) {
+          var bt = chip(p.nome[l], tocando && esc === p.id, function () { tocar("classicas", p.id); }, p.autor);
+          bt.dataset.classica = p.id;
+          itens.appendChild(bt);
+        });
+      }
+      FAIXAS.forEach(function (f) {
+        if (f.aba || aba !== "faixas") return;
+        var bt = chip(f.nome[l], f.id === escolhida, function () { tocar(f.id); });
+        bt.dataset.faixa = f.id;
+        itens.appendChild(bt);
       });
       rotuloVol.textContent = TEXTO_VOLUME[l];
       faixa.setAttribute("aria-label", TEXTO_VOLUME[l]);
@@ -1068,6 +1336,8 @@
       linhaVol.style.opacity = ligada() ? "1" : ".55";
       desenharBotao(b);
     };
+    aoTrocarClassica = function () { if (document.getElementById("musica-btn")) atualizar(); };
+    if (trilha() === "classicas") carregarClassicas(atualizar);
     seta.onclick = function () {
       lista.hidden = !lista.hidden;
       seta.setAttribute("aria-expanded", lista.hidden ? "false" : "true");
@@ -1111,5 +1381,5 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", colocarNasConfiguracoes);
   else colocarNasConfiguracoes();
 
-  window.gameziMusica = { comecar: comecar, parar: parar, ligada: ligada, volume: volume, trilha: trilha };
+  window.gameziMusica = { comecar: comecar, parar: parar, ligada: ligada, volume: volume, trilha: trilha, lerVoz: lerVoz, montarClassica: montarClassica };
 })();
