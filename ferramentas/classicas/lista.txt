@@ -1,4 +1,3 @@
-fur-elise BeethovenLv/WoO59/fur_Elise_WoO59
 sonata-luar BeethovenLv/O27/moonlight
 patetica-2 BeethovenLv/O13/pathetique-2
 ode-alegria BeethovenLv/ode
@@ -12,17 +11,13 @@ noturno-op9-2 ChopinFF/O9/chopin_nocturne_op9_n2
 preludio-op28-4 ChopinFF/O28/Chop-28-4
 preludio-op28-7 ChopinFF/O28/Chop-28-7
 gota-chuva ChopinFF/O28/Chop-28-15
-valsa-minuto ChopinFF/O64/chopin_valse_op64_no1
 fantasia-improviso ChopinFF/O66/chopin_fantaisie-impromptu
 noturno-mi-menor ChopinFF/O72/nocturne_in_e_minor
 clair-de-lune DebussyC/L75/debussy_Ste_Bergamesq_Clair
 arabesque-1 DebussyC/L66/debussy_Arabesque_1
-gymnopedie-1 SatieE/gymnopedie_1
 gymnopedie-3 SatieE/gymnopedie_3
 gnossienne-1 SatieE/Gnossienne/no_1
 entertainer JoplinS/entertainer
-maple-leaf JoplinS/maple
-solace JoplinS/solace
 traumerei SchumannR/O15/SchumannOp15No07
 schumann-melodia SchumannR/O68/schumann-op68-01-melodie
 campones-alegre SchumannR/O68/schumann-op68-10-gai-laboureur
@@ -35,7 +30,6 @@ momento-musical-3 SchubertF/D780/MomentsNo3
 improviso-sol-bemol SchubertF/D899/SchubertF-D899-3-Impromptu
 cancao-ninar BrahmsJ/LullabyBrahms-C
 valsa-brahms BrahmsJ/O39/waltz-op39-15
-arabesca-burgmuller BurgmullerJFF/O100/25EF-02
 sonatina-clementi ClementiM/O36/sonatina-1
 greensleeves Traditional/greensleeves
 amazing-grace Traditional/amazing-mutopia

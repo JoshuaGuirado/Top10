@@ -110,7 +110,10 @@
   trabalho, não na `main`; o contêiner não alcança o site, e rodar os arquivos do LilyPond aqui foi bloqueado) →
   `node ferramentas/classicas/gerar.js` lê os MIDIs (leitor próprio), corta perto de 4 min num fim de compasso e grava
   `gamezi-classicas.js` com o crédito e a licença de cada partitura (`ferramentas/classicas/musicas.json`: nome nos 3
-  idiomas, autor, fonte). Música nova: só compositor morto há mais de 70 anos ou tradicional, nas duas listas. Nada de copiar melodia de música com dono (o dono pediu as do Minecraft/C418: só o clima, nunca as notas). Jogo novo: carregar `../gamezi-musica.js`.
+  idiomas, autor, fonte). Música nova: só compositor morto há mais de 70 anos ou tradicional, nas duas listas. Nome sempre o ORIGINAL (o mesmo nos 3
+  idiomas; o dono não quis traduzido); ordem embaralhada que só repete depois de tocar todas. Partitura com
+  `\alternative` (casa 1/casa 2) sem `\unfoldRepeats` no MIDI fica FORA: o MIDI emenda as casas e sai do compasso
+  (Für Elise, Valsa do Minuto, Gymnopédie nº 1, Maple Leaf, Solace e a Arabesca do Burgmüller saíram por isso). Nada de copiar melodia de música com dono (o dono pediu as do Minecraft/C418: só o clima, nunca as notas). Jogo novo: carregar `../gamezi-musica.js`.
 - Skin única do Gamezi (`gamezi-skins.js`, raiz): a mesma em todos os jogos, menos no Patozi (lá é o guarda-roupa do pato).
   Fica em `gz:skin` ({ presetId, avatar }); `gameziMinhaSkin()` lê (na 1ª vez aproveita a do Topzi ou do Cravazi) e
   `gameziGuardarSkin()` grava. A janela tem as prontas e o editor "Criar a minha"; a conta (`conta.html`) mostra e troca a skin

@@ -958,12 +958,22 @@
     return { peca: peca, eventos: eventos, i: 0, duracao: fim };
   }
 
-  // Sorteia a próxima (diferente da que acabou) e começa daqui a pouco.
+  // Ordem embaralhada (sempre diferente): toca todas antes de repetir alguma, e uma nova rodada embaralhada nunca
+  // começa com a que acabou de tocar.
+  var fila = [];
   function proximaClassica(quando) {
     var lista = classicas();
     if (!lista.length) return;
-    var outras = lista.filter(function (p) { return !cl || p.id !== cl.peca.id; });
-    var peca = outras[Math.floor(Math.random() * outras.length)];
+    if (!fila.length) {
+      fila = lista.slice();
+      for (var i = fila.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1)), x = fila[i];
+        fila[i] = fila[j];
+        fila[j] = x;
+      }
+      if (cl && fila.length > 1 && fila[0].id === cl.peca.id) fila.push(fila.shift());
+    }
+    var peca = fila.shift();
     cl = montarClassica(peca);
     cl.t0 = quando;
     cl.fim = quando + cl.duracao;
@@ -976,10 +986,13 @@
     if (!cl) proximaClassica(ctx.currentTime + 0.3);
     // Acabou: um respiro de 1,5 s e a próxima.
     if (cl.i >= cl.eventos.length && ctx.currentTime > cl.fim + 1.2) proximaClassica(ctx.currentTime + 0.3);
-    while (cl.i < cl.eventos.length && cl.t0 + cl.eventos[cl.i].s < ctx.currentTime + 0.3) {
+    // Agenda com 1 s de antecedência (aparelho lento não atrasa as notas). Nota que mesmo assim chegou atrasada é
+    // pulada, e não empurrada para depois: empurrar tirava a música do compasso.
+    while (cl.i < cl.eventos.length && cl.t0 + cl.eventos[cl.i].s < ctx.currentTime + 1) {
       var e = cl.eventos[cl.i++];
-      var quando = Math.max(ctx.currentTime + 0.01, cl.t0 + e.s + (Math.random() - 0.5) * 0.012);
-      pianoReal(e.n, quando, e.vol * (0.9 + Math.random() * 0.2), e.dur);
+      var quando = cl.t0 + e.s;
+      if (quando < ctx.currentTime) continue;
+      pianoReal(e.n, quando, e.vol * (0.92 + Math.random() * 0.16), e.dur);
     }
   }
 
