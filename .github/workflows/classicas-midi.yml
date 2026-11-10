@@ -1,0 +1,49 @@
+name: Clássicas - baixar MIDIs
+
+# Baixa do Mutopia Project (partituras livres de obras em domínio público) o MIDI pronto de cada música da lista
+# ferramentas/classicas/lista.txt ("id pasta-no-mutopia"). Só baixa arquivos (MIDI é dado, não código); quem lê as notas
+# é ferramentas/classicas/gerar.js, no computador. Os MIDIs ficam na branch de trabalho (não levar para a main).
+# Roda à mão (Actions → Clássicas - baixar MIDIs → Run workflow) ou quando a lista muda.
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore: [main]
+    paths:
+      - "ferramentas/classicas/lista.txt"
+      - ".github/workflows/classicas-midi.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  baixar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Baixar os MIDIs
+        run: |
+          mkdir -p ferramentas/classicas/midi
+          cd ferramentas/classicas/midi
+          while read -r id pasta; do
+            [ -z "$id" ] && continue
+            nome=$(basename "$pasta")
+            base="https://www.mutopiaproject.org/ftp/$pasta/$nome"
+            if curl -fsSL --retry 3 -o "$id.mid" "$base.mid"; then
+              echo "ok  $id"
+            elif curl -fsSL --retry 3 -o "$id.zip" "$base-mids.zip"; then
+              mkdir -p "$id" && unzip -o -q "$id.zip" -d "$id" && rm "$id.zip"
+              echo "zip $id: $(ls "$id" | tr '\n' ' ')"
+            else
+              rm -f "$id.mid" "$id.zip"
+              echo "FALTOU $id ($base)"
+            fi
+          done < ../lista.txt
+      - name: Gravar na branch
+        if: github.ref_name != 'main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ferramentas/classicas/midi
+          git commit -m "Clássicas: MIDIs do Mutopia [skip ci]" || exit 0
+          git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}"
