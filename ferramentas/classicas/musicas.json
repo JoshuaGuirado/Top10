@@ -33,5 +33,11 @@
   {"id":"valsa-brahms","autor":"Brahms","nome":{"pt":"Walzer op. 39 Nr. 15","en":"Walzer op. 39 Nr. 15","es":"Walzer op. 39 Nr. 15"},"fonte":"Mutopia Project, partitura digitada por Brian D. Rude (Public Domain)"},
   {"id":"sonatina-clementi","autor":"Clementi","nome":{"pt":"Sonatina op. 36 n° 1","en":"Sonatina op. 36 n° 1","es":"Sonatina op. 36 n° 1"},"fonte":"Mutopia Project, partitura digitada por Brian D. Rude (Public Domain)"},
   {"id":"greensleeves","autor":"Tradicional inglesa","nome":{"pt":"Greensleeves","en":"Greensleeves","es":"Greensleeves"},"fonte":"Mutopia Project, partitura digitada por Steve Dunlop (Public Domain)"},
-  {"id":"amazing-grace","autor":"Tradicional (hino)","nome":{"pt":"Amazing Grace","en":"Amazing Grace","es":"Amazing Grace"},"fonte":"Mutopia Project, partitura digitada por Breizh Partitions (Creative Commons Attribution-ShareAlike 3.0)"}
+  {"id":"amazing-grace","autor":"Tradicional (hino)","nome":{"pt":"Amazing Grace","en":"Amazing Grace","es":"Amazing Grace"},"fonte":"Mutopia Project, partitura digitada por Breizh Partitions (Creative Commons Attribution-ShareAlike 3.0)"},
+  {"id":"fur-elise","autor":"Beethoven","nome":{"pt":"Für Elise","en":"Für Elise","es":"Für Elise"},"fonte":"Mutopia Project, partitura digitada por Stelios Samelis (Public Domain)"},
+  {"id":"valsa-minuto","autor":"Chopin","nome":{"pt":"Valse op. 64 n° 1","en":"Valse op. 64 n° 1","es":"Valse op. 64 n° 1"},"fonte":"Mutopia Project, partitura digitada por Magnus Lewis-Smith (Public Domain)"},
+  {"id":"gymnopedie-1","autor":"Satie","nome":{"pt":"Gymnopédie n° 1","en":"Gymnopédie n° 1","es":"Gymnopédie n° 1"},"fonte":"Mutopia Project, partitura digitada por Evin Robertson (Public Domain)"},
+  {"id":"maple-leaf","autor":"Scott Joplin","nome":{"pt":"Maple Leaf Rag","en":"Maple Leaf Rag","es":"Maple Leaf Rag"},"fonte":"Mutopia Project, partitura digitada por Chris Sawer (Public Domain)"},
+  {"id":"solace","autor":"Scott Joplin","nome":{"pt":"Solace","en":"Solace","es":"Solace"},"fonte":"Mutopia Project, partitura digitada por Magnus Lewis-Smith (Public Domain)"},
+  {"id":"arabesca-burgmuller","autor":"Burgmüller","nome":{"pt":"L'Arabesque, op. 100 n° 2","en":"L'Arabesque, op. 100 n° 2","es":"L'Arabesque, op. 100 n° 2"},"fonte":"Mutopia Project, partitura digitada por Bas Wassink (Public Domain)"}
 ]

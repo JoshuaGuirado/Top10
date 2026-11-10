@@ -1,6 +1,3 @@
 fur-elise BeethovenLv/WoO59/fur_Elise_WoO59/fur_Elise_WoO59.ly
-valsa-minuto ChopinFF/O64/chopin_valse_op64_no1/chopin_valse_op64_no1-lys/chopin_valse_op64_no1.ly
 gymnopedie-1 SatieE/gymnopedie_1/gymnopedie_1.ly
-maple-leaf JoplinS/maple/maple.ly
-solace JoplinS/solace/solace-lys/joplin_solace.ly
 arabesca-burgmuller BurgmullerJFF/O100/25EF-02/25EF-02.ly
