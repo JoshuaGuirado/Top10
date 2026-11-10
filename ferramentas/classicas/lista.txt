@@ -33,3 +33,9 @@ valsa-brahms BrahmsJ/O39/waltz-op39-15
 sonatina-clementi ClementiM/O36/sonatina-1
 greensleeves Traditional/greensleeves
 amazing-grace Traditional/amazing-mutopia
+fur-elise BeethovenLv/WoO59/fur_Elise_WoO59
+valsa-minuto ChopinFF/O64/chopin_valse_op64_no1
+gymnopedie-1 SatieE/gymnopedie_1
+maple-leaf JoplinS/maple
+solace JoplinS/solace
+arabesca-burgmuller BurgmullerJFF/O100/25EF-02
