@@ -116,6 +116,10 @@
   `#unfold-repeats`) sai do compasso: essas vão em `ferramentas/classicas/repeticoes.txt`, e o robô
   `.github/workflows/classicas-repeticoes.yml` gera o MIDI de novo com o LilyPond num job SEM permissão de escrita (o dono
   liberou; o arquivo de partitura pode ter código) e grava só o .mid (Für Elise, Gymnopédie nº 1 e a Arabesca do Burgmüller). Nada de copiar melodia de música com dono (o dono pediu as do Minecraft/C418: só o clima, nunca as notas). Jogo novo: carregar `../gamezi-musica.js`.
+- Brilho da tela: `gamezi-brilho.js` (raiz), no `<head>` de todas as páginas com conta (portal, conta, ranking e jogos), para a
+  tela já abrir escura. Camada preta por cima de tudo (sem pegar o toque) e filtro nas janelas abertas; linha "Brilho" de
+  10 a 100 nas Configurações, igual à do volume (o dono quis escurecer mais que o mínimo do aparelho). Valor em `gz:brilho`.
+  Jogo novo: carregar `../gamezi-brilho.js` no `<head>`.
 - Skin única do Gamezi (`gamezi-skins.js`, raiz): a mesma em todos os jogos, menos no Patozi (lá é o guarda-roupa do pato).
   Fica em `gz:skin` ({ presetId, avatar }); `gameziMinhaSkin()` lê (na 1ª vez aproveita a do Topzi ou do Cravazi) e
   `gameziGuardarSkin()` grava. A janela tem as prontas e o editor "Criar a minha"; a conta (`conta.html`) mostra e troca a skin
