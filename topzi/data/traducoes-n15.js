@@ -1,0 +1,25 @@
+// Títulos [inglês, espanhol] das listas de data/listas-n15.js.
+
+Object.assign(LIST_I18N, {
+  "n15-en-rosto": ["The 10 parts of the face in English", "Las 10 partes de la cara en inglés"],
+  "n15-en-fazenda": ["The 10 farm animals in English", "Los 10 animales de granja en inglés"],
+  "n15-en-selvagens": ["The 10 most basic wild animals in English", "Los 10 animales salvajes más básicos en inglés"],
+  "n15-en-insetos": ["The 10 most basic insects and bugs in English", "Los 10 insectos y bichos más básicos en inglés"],
+  "n15-en-legumes": ["The 10 most basic vegetables in English", "Las 10 verduras y hortalizas más básicas en inglés"],
+  "n15-en-bebidas": ["The 10 most basic drinks in English", "Las 10 bebidas más básicas en inglés"],
+  "n15-en-material": ["The 10 school supplies in English", "Los 10 útiles escolares en inglés"],
+  "n15-en-natureza": ["The 10 most basic places in nature in English", "Los 10 lugares de la naturaleza más básicos en inglés"],
+  "n15-en-pronomes": ["The 10 most used pronouns in English", "Los 10 pronombres más usados en inglés"],
+  "n15-en-preposicoes": ["The 10 most used prepositions in English", "Las 10 preposiciones más usadas en inglés"],
+  "n15-en-tecnologia": ["The 10 most basic technology words in English", "Las 10 palabras de tecnología más básicas en inglés"],
+  "n15-en-cortesia": ["The 10 most used polite words in English", "Las 10 palabras de cortesía más usadas en inglés"],
+  "n15-en-formas": ["The 10 geometric shapes in English", "Las 10 formas geométricas en inglés"],
+  "n15-en-instrumentos": ["The 10 musical instruments in English", "Los 10 instrumentos musicales en inglés"],
+  "n15-en-quando": ["The 10 most used time words (when?) in English", "Las 10 palabras de tiempo (¿cuándo?) más usadas en inglés"],
+  "n15-en-rotina": ["The 10 most basic daily routine verbs in English", "Los 10 verbos de la rutina más básicos en inglés"],
+  "n15-en-perguntas": ["The 10 question words in English", "Las 10 palabras interrogativas en inglés"],
+  "n15-en-cores-30": ["The 10 less basic colors in English", "Los 10 colores menos básicos en inglés"],
+  "n15-30-en-adjetivos": ["The 30 most basic adjectives in English", "Los 30 adjetivos más básicos en inglés"],
+  "n15-30-falsos-cognatos": ["The 30 most famous English false friends (for Portuguese speakers)", "Los 30 falsos amigos del inglés más famosos (para hablantes de portugués)"],
+  "n15-50-en-irregulares": ["The 50 most common irregular verbs in English", "Los 50 verbos irregulares más comunes en inglés"],
+});
