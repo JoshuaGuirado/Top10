@@ -16,6 +16,12 @@
   `sh tests/banco.sh` se tiver Postgres (o GitHub roda sozinho). O dono atualiza o Supabase colando o `schema.sql` inteiro.
 - Listas novas de 10 itens: entram no fim (arquivo novo carregado depois dos outros) e precisam de uma linha
   nova em `DAILY_POOLS` (`topzi/js/diaria.js`) valendo a partir de amanhã, senão a lista do dia de hoje muda.
+- Desafio do dia do Topzi em três tamanhos, com abas Top 10 / Top 30 / Top 50 no cartão do início (`topzi/js/diaria.js`; o
+  `size` das funções, 10 quando não vem): a Lista do dia (Top 10, dia 1 = 1º/10/2026, resultados em `diaria`) e o Top 30 e o
+  Top 50 do dia (dia 1 = 14/11/2026, resultados em `diaria30`/`diaria50`, sorteio em `DAILY_POOLS_BIG`; o dia 1 de cada um
+  está fixado em `tests/diaria.test.js`). Vidas = `TEAM_LIVES` (3, 6 e 10). Ranking: tabelas `topzi30_diario`/`topzi50_diario`
+  pela função `topzi_registrar_diario_grande` e `gamezi_ranking_dia('topzi30'|'topzi50', …)`. Listas novas de 30 ou 50: linha
+  nova em `DAILY_POOLS_BIG` valendo a partir de amanhã. O Top 30 e o Top 50 não entram nas ligas nem no `gamezi_uso`.
 - Lista oficial nova precisa do título em inglês e espanhol em `topzi/data/traducoes-titulos.js` (o teste
   `tests/traducoes.test.js` acusa). Itens com nome diferente em outro idioma vão em `topzi/data/traducoes-itens-*.js`;
   nome com dois sentidos (Lula, Peru, Natal…) usa a chave `"id-da-lista/Nome"`.

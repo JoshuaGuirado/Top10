@@ -1009,35 +1009,44 @@ async function renderOnlineHistory() {
   }).join("");
 }
 
-// ───────────── ranking da lista do dia ─────────────
-// O resultado entra pelo banco (topzi_registrar_diario confere o dia e se os pontos são possíveis) com o
-// tempo da partida, que desempata. Quem lê e desenha o ranking é ../gamezi-ranking.js (igual em todos os jogos).
+// ───────────── ranking do desafio do dia ─────────────
+// O resultado entra pelo banco (topzi_registrar_diario, ou topzi_registrar_diario_grande no Top 30 e no Top 50, confere
+// o dia e se os pontos são possíveis) com o tempo da partida, que desempata. Quem lê e desenha o ranking é
+// ../gamezi-ranking.js (igual em todos os jogos), com o jogo "topzi", "topzi30" ou "topzi50".
 // Banco sem a função (schema.sql antigo): o ranking só não aparece.
 
-async function sendDailyScore(num, res) {
+function dailyRankGame(size = 10) {
+  return size === 10 ? "topzi" : "topzi" + size;
+}
+
+async function sendDailyScore(num, res, size = 10) {
   if (!onlineConfigured()) return;
   await ensureOnline();
   ensurePlayers();
   const nick = gameziNick(players[0].nick);
   if (!nick) return; // sem nome não entra no ranking (o nome é pedido antes da lista do dia)
-  gameziEvento("desafio_do_dia", { jogo: "topzi", pontos: res.score });
+  gameziEvento("desafio_do_dia", { jogo: dailyRankGame(size), pontos: res.score });
   const args = { p_dia: num, p_lista: res.listId, p_nick: nick, p_pontos: res.score, p_acertos: res.found.filter(Boolean).length };
+  if (size !== 10) {
+    await sb.rpc("topzi_registrar_diario_grande", { ...args, p_tamanho: size, p_tempo: gameziTempoValido(res.ms) });
+    return;
+  }
   const { error } = await sb.rpc("topzi_registrar_diario", { ...args, p_tempo: gameziTempoValido(res.ms) });
   // Banco ainda sem o tempo (schema.sql antigo): registra sem ele.
   if (error && error.code === "PGRST202") await sb.rpc("topzi_registrar_diario", args);
 }
 
 // Ranking do dia na tela de resultado (e a posição no cartão do início).
-async function renderDailyRanking(num, box) {
+async function renderDailyRanking(num, box, size = 10) {
   if (!onlineConfigured() || !box) return;
-  await gameziRankingDesenhar(box, ensureOnline().then(() => sb), "topzi", num, lang);
+  await gameziRankingDesenhar(box, ensureOnline().then(() => sb), dailyRankGame(size), num, lang);
 }
 
-async function dailyPositionLine(num) {
+async function dailyPositionLine(num, size = 10) {
   if (!onlineConfigured() || !gameziSessao()) return null;
   try {
     await ensureOnline();
-    return (await gameziRankingBuscar(sb, "topzi", num)).eu;
+    return (await gameziRankingBuscar(sb, dailyRankGame(size), num)).eu;
   } catch (e) {
     return null;
   }

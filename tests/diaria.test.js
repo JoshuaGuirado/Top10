@@ -30,3 +30,19 @@ test("listas novas não mudam a lista do dia que já passou", () => {
   assert.equal(dailyPool(7).length, 294);
   assert.equal(dailyList(7).id, "disney-classicos");
 });
+
+test("Top 30 e Top 50 do dia: começam em 14/11/2026, listas do tamanho certo, sem repetir e o dia 1 fixo", () => {
+  assert.equal(todayNumber(new Date(2026, 10, 14, 12), 30), 1);
+  assert.equal(todayNumber(new Date(2026, 10, 14, 12), 50), 1);
+  assert.equal(todayNumber(new Date(2026, 10, 14, 12)), 45); // o Top 10 continua contando de 1º/10
+  for (const tam of [30, 50]) {
+    assert.equal(dailyList(1, tam).items.length, tam);
+    const size = dailyPool(500, tam).length;
+    const ids = new Set();
+    for (let d = 500; d < 500 + size; d++) ids.add(dailyList(d, tam).id);
+    assert.equal(ids.size, size, `Top ${tam} repetiu lista antes de passar por todas`);
+  }
+  // Listas novas de 30 ou 50 não podem mudar o desafio de um dia que já começou (linha nova em DAILY_POOLS_BIG).
+  assert.equal(dailyList(1, 30).id, "30-legumes");
+  assert.equal(dailyList(1, 50).id, "50-jogos-playstation");
+});

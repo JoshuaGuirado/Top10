@@ -92,7 +92,7 @@ $("rematch-btn").addEventListener("click", () => {
   else openLists();
 });
 $("share-btn").addEventListener("click", (e) => {
-  if (game && game.daily) shareText(dailyShareText(game.daily, dailyResultOf(game)), e.currentTarget, t("results.share"));
+  if (game && game.daily) shareText(dailyShareText(game.daily, dailyResultOf(game), game.dailySize), e.currentTarget, t("results.share"));
 });
 $("new-players-btn").addEventListener("click", () => {
   renderPlayersScreen();

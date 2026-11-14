@@ -3,7 +3,7 @@
 const TURN_DELAY = 950;
 let game = null;
 
-// opts.daily: número da lista do dia (joga só o jogador 1, contra a lista).
+// opts.daily: número do desafio do dia (joga só o jogador 1, contra a lista); opts.dailySize: 10, 30 ou 50.
 // opts.online: { roster, timer } quando este aparelho é o anfitrião de uma sala online.
 function startGame(list, opts = {}) {
   const daily = opts.daily || null;
@@ -19,7 +19,8 @@ function startGame(list, opts = {}) {
   const roster = daily ? [players[0]] : online ? online.roster : players.slice(0, playerCount);
   // Morte súbita: uma vida para cada um, com ou sem a opção de vidas ligada.
   const sudden = !daily && !!mode().sudden;
-  const lives = daily ? 3 : sudden ? 1 : TEAM_LIVES[n] || Math.max(3, Math.round(n / 5));
+  // Desafio do dia: 3 vidas no Top 10, 6 no Top 30 e 10 no Top 50 (as mesmas do modo equipe).
+  const lives = daily ? TEAM_LIVES[n] || 3 : sudden ? 1 : TEAM_LIVES[n] || Math.max(3, Math.round(n / 5));
   const withLives = daily || sudden ? true : online ? !!online.lives : livesOn();
   // Fora do modo equipe, cada jogador tem as próprias vidas.
   const ownLives = withLives && !vsList;
@@ -47,6 +48,7 @@ function startGame(list, opts = {}) {
     vsList,
     teams,
     daily,
+    dailySize: daily ? opts.dailySize || 10 : null,
     dailyCounts: !!opts.counts,
     livesOn: withLives,
     ownLives,
@@ -85,7 +87,7 @@ function startGame(list, opts = {}) {
 function setupGameScreen() {
   const list = game.list;
   const cat = categoryOf(list);
-  const tag = (game.daily ? ` · ${t("daily.tag", { n: game.daily })}` : game.vsList ? ` · ${t("mode.equipe.name")}` : game.teams ? ` · ${t("mode.times.name")}` : "") + (game.online ? " · Online" : "");
+  const tag = (game.daily ? ` · ${dailyTag(game.daily, game.dailySize)}` : game.vsList ? ` · ${t("mode.equipe.name")}` : game.teams ? ` · ${t("mode.times.name")}` : "") + (game.online ? " · Online" : "");
   $("game-cat").innerHTML = `${icon(cat.id)}${escapeHtml(catLabel(cat))} · ${t("game.items", { n: list.items.length })}${tag}`;
   $("game-title").textContent = listTitle(list);
   $("source").textContent = t("game.source", { src: listSource(list) });

@@ -1,4 +1,4 @@
--- Os 12 jogos no banco: ranking do dia de todos e, nos jogos do kit, o resultado do dia e a sala online inteira
+-- Os 12 jogos (e o Top 30 e o Top 50 do dia do Topzi) no banco: ranking do dia de todos e, nos jogos do kit, o resultado do dia e a sala online inteira
 -- (criar, entrar, começar, histórico, passar o anfitrião e sair).
 \set ON_ERROR_STOP 1
 insert into auth.users values ('11111111-1111-1111-1111-111111111111','a@x'), ('22222222-2222-2222-2222-222222222222','b@x') on conflict do nothing;
@@ -35,5 +35,29 @@ begin
     else
       raise notice '% ok (ranking)', j;
     end if;
+  end loop;
+end $$;
+
+-- Topzi: Top 30 e Top 50 do dia (dia 1 = 14/11/2026). Resultado possível entra, impossível é recusado, ranking aparece.
+do $$
+declare tam int; dia int; n int; r record; recusou boolean;
+begin
+  dia := ((now() at time zone 'utc')::date - date '2026-11-14') + 1;
+  foreach tam in array array[30, 50] loop
+    perform set_config('request.jwt.claim.sub', '11111111-1111-1111-1111-111111111111', true);
+    -- 3 acertos: no mínimo 1+2+3 = 6 e no máximo (tam-2)+(tam-1)+tam
+    perform public.topzi_registrar_diario_grande(tam, dia, 'lista', 'Ana', 3 * tam - 3, 3, 90000);
+    perform set_config('request.jwt.claim.sub', '22222222-2222-2222-2222-222222222222', true);
+    recusou := false;
+    begin
+      perform public.topzi_registrar_diario_grande(tam, dia, 'lista', 'Beto', 3 * tam, 3, 80000); -- impossível com 3 acertos
+    exception when others then recusou := true;
+    end;
+    if not recusou then raise exception 'topzi% aceitou pontos impossíveis', tam; end if;
+    perform public.topzi_registrar_diario_grande(tam, dia, 'lista', 'Beto', 6, 3, 80000);
+    select count(*) into n from public.gamezi_ranking_dia('topzi' || tam, dia, 10);
+    select * into r from public.gamezi_ranking_dia('topzi' || tam, dia, 10) limit 1;
+    if n <> 2 or r.nick <> 'Ana' or r.pontos <> 3 * tam - 3 then raise exception 'topzi% ranking errado: % %', tam, n, r; end if;
+    raise notice 'topzi% ok (ranking)', tam;
   end loop;
 end $$;

@@ -228,7 +228,7 @@ function showResults() {
   $("daily-ranking").hidden = true;
   if (game.daily && typeof renderDailyRanking === "function") {
     const g = game;
-    Promise.resolve(g.rankSent).then(() => game === g && renderDailyRanking(g.daily, $("daily-ranking")));
+    Promise.resolve(g.rankSent).then(() => game === g && renderDailyRanking(g.daily, $("daily-ranking"), g.dailySize));
   }
   if (game.online) onlineGameFinished();
   renderResults(record ? [["rs.record", { n: record.score }]] : "");
