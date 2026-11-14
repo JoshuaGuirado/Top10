@@ -844,6 +844,10 @@ body[data-screen="game"] .profile-btn, body[data-screen="profile"] .profile-btn 
 .home-row b, .daily-name { font-stretch: 75%; font-weight: 800; font-size: 1.4rem; line-height: 1.05; }
 .home-row span { color: var(--muted); font-size: .85rem; }
 .daily { border: 2px solid var(--accent); display: grid; gap: 12px; }
+.daily-tabs { display: flex; gap: 6px; margin-bottom: 2px; }
+.daily-tab { flex: 1; font: inherit; font-weight: 800; font-size: .85rem; padding: 7px 0; border-radius: 999px; cursor: pointer;
+  border: 1.5px solid var(--line); background: transparent; color: var(--muted); }
+.daily-tab[aria-selected="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
 .daily-top { display: flex; align-items: center; gap: 10px; }
 .daily-top .btn { flex: none; white-space: nowrap; }
 .daily-top .btn.ghost { background: var(--bg); }

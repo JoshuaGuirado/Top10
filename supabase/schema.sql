@@ -2021,6 +2021,55 @@ begin
   end loop;
 end $$;
 
+-- Topzi: Top 30 e Top 50 do dia (o dia 1 dos dois é 14/11/2026). Mesmo jeito da lista do dia, com listas de 30 ou 50:
+-- o nº k vale k pontos, então com N acertos os pontos vão de 1+…+N até (tamanho−N+1)+…+tamanho.
+do $$
+declare
+  tabela text;
+begin
+  foreach tabela in array array['topzi30_diario', 'topzi50_diario'] loop
+    execute format($t$
+      create table if not exists public.%I (
+        dia integer not null check (dia >= 1),
+        user_id uuid not null references auth.users (id) on delete cascade,
+        nick text not null default '' check (char_length(nick) <= 16),
+        lista text not null default '' check (char_length(lista) <= 80),
+        pontos integer not null check (pontos between 0 and 1275),
+        acertos smallint not null check (acertos between 0 and 50),
+        tempo_ms integer check (tempo_ms between 0 and 86400000),
+        created_at timestamptz not null default now(),
+        primary key (dia, user_id)
+      )$t$, tabela);
+    execute format('create index if not exists %I on public.%I (dia, pontos desc, tempo_ms)', tabela || '_tempo_idx', tabela);
+    execute format('drop trigger if exists %I on public.%I', tabela || '_nick_limpo', tabela);
+    execute format('create trigger %I before insert or update of nick on public.%I for each row execute function public.gamezi_limpar_nick()', tabela || '_nick_limpo', tabela);
+    execute format('alter table public.%I enable row level security', tabela); -- sem regras: só as funções leem e gravam
+  end loop;
+end $$;
+comment on table public.topzi30_diario is 'Topzi: resultado de cada um no Top 30 do dia (ranking)';
+comment on table public.topzi50_diario is 'Topzi: resultado de cada um no Top 50 do dia (ranking)';
+
+create or replace function public.topzi_registrar_diario_grande(p_tamanho integer, p_dia integer, p_lista text, p_nick text,
+  p_pontos integer, p_acertos integer, p_tempo integer default null)
+returns void language plpgsql security definer set search_path = public as $$
+declare
+  hoje integer := ((now() at time zone 'utc')::date - date '2026-11-14') + 1;
+begin
+  if auth.uid() is null then raise exception 'Entre para registrar o resultado.'; end if;
+  if p_tamanho is null or p_tamanho not in (30, 50) then raise exception 'Desafio desconhecido.'; end if;
+  if p_dia is null or p_dia < 1 or p_dia not between hoje - 1 and hoje + 1 then raise exception 'Esse dia já passou.'; end if;
+  if p_acertos is null or p_acertos not between 0 and p_tamanho then raise exception 'Resultado inválido.'; end if;
+  if p_pontos is null or p_pontos < p_acertos * (p_acertos + 1) / 2 or p_pontos > p_acertos * (2 * p_tamanho + 1 - p_acertos) / 2 then
+    raise exception 'Resultado inválido.';
+  end if;
+  execute format('insert into public.%I (dia, user_id, nick, lista, pontos, acertos, tempo_ms) values ($1, $2, $3, $4, $5, $6, $7) '
+    'on conflict (dia, user_id) do nothing', 'topzi' || p_tamanho || '_diario')
+    using p_dia, auth.uid(), left(coalesce(p_nick, ''), 16), left(coalesce(p_lista, ''), 80), p_pontos, p_acertos,
+          case when p_tempo between 0 and 86400000 then p_tempo end;
+end $$;
+
+grant execute on function public.topzi_registrar_diario_grande(integer, integer, text, text, integer, integer, integer) to authenticated;
+
 -- Topzi e Patozi: as funções de registrar ganham o tempo (opcional, para o jogo antigo em cache continuar entrando).
 drop function if exists public.topzi_registrar_diario(integer, text, text, integer, integer);
 create or replace function public.topzi_registrar_diario(p_dia integer, p_lista text, p_nick text, p_pontos integer, p_acertos integer, p_tempo integer default null)
@@ -2237,7 +2286,7 @@ create or replace function public.gamezi_ranking_dia(p_jogo text, p_dia integer,
 returns table (posicao bigint, nick text, pontos integer, tempo_ms integer, eu boolean, total bigint)
 language plpgsql stable security definer set search_path = public as $$
 begin
-  if p_jogo is null or p_jogo not in ('topzi', 'patozi', 'datazi', 'maisoumenozi', 'cravazi', 'tamanhozi', 'emojizi', 'contazi', 'memorizi', 'fotozi', 'censurazi', 'corzi') then raise exception 'Jogo desconhecido.'; end if;
+  if p_jogo is null or p_jogo not in ('topzi', 'topzi30', 'topzi50', 'patozi', 'datazi', 'maisoumenozi', 'cravazi', 'tamanhozi', 'emojizi', 'contazi', 'memorizi', 'fotozi', 'censurazi', 'corzi') then raise exception 'Jogo desconhecido.'; end if;
   return query execute format($q$
     with r as (
       select d.nick, d.pontos::integer as pontos, d.tempo_ms, d.user_id,

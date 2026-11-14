@@ -488,6 +488,8 @@ Object.assign(TEXTS, {
 // ───────────── lista do dia, perfil, conta e online ─────────────
 Object.assign(TEXTS, {
   "daily.title": ["Lista do dia", "Daily list", "Lista del día"],
+  "daily.titleBig": ["Top {tam} do dia", "Daily Top {tam}", "Top {tam} del día"],
+  "daily.tagBig": ["Top {tam} do dia #{n}", "Daily Top {tam} #{n}", "Top {tam} del día #{n}"],
   "daily.tag": ["Lista do dia #{n}", "Daily list #{n}", "Lista del día #{n}"],
   "daily.all": ["Ver todos os dias", "See all days", "Ver todos los días"],
   "daily.less": ["Ver só esta semana", "Show only this week", "Ver solo esta semana"],

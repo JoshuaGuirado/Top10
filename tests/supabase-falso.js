@@ -7,6 +7,7 @@
     topzi_salas: ["code"], topzi_sala_jogadores: ["room_code", "user_id"], topzi_perfis: ["id"], topzi_partidas: ["id"],
     patozi_salas: ["code"], patozi_sala_jogadores: ["sala_code", "user_id"], patozi_perfis: ["id"], patozi_partidas: ["id"],
     patozi_diario: ["dia", "user_id"], patozi_sugestoes: ["id"], topzi_diario: ["dia", "user_id"],
+    topzi30_diario: ["dia", "user_id"], topzi50_diario: ["dia", "user_id"],
     datazi_diario: ["dia", "user_id"], maisoumenozi_diario: ["dia", "user_id"], tamanhozi_diario: ["dia", "user_id"],
     cravazi_salas: ["code"], cravazi_sala_jogadores: ["sala_code", "user_id"], cravazi_partidas: ["id"], cravazi_diario: ["dia", "user_id"],
     tamanhozi_salas: ["code"], tamanhozi_sala_jogadores: ["sala_code", "user_id"], tamanhozi_partidas: ["id"],
@@ -161,6 +162,12 @@
       }
       if (nome === "topzi_registrar_diario") {
         if (!db.topzi_diario.some((x) => x.dia === a.p_dia && x.user_id === uid)) db.topzi_diario.push({ dia: a.p_dia, user_id: uid, nick: a.p_nick, lista: a.p_lista, pontos: a.p_pontos, acertos: a.p_acertos, tempo_ms: a.p_tempo ?? null, created_at: now() });
+        save(db);
+        return { data: null, error: null };
+      }
+      if (nome === "topzi_registrar_diario_grande") {
+        const tabela = "topzi" + a.p_tamanho + "_diario";
+        if (!db[tabela].some((x) => x.dia === a.p_dia && x.user_id === uid)) db[tabela].push({ dia: a.p_dia, user_id: uid, nick: a.p_nick, lista: a.p_lista, pontos: a.p_pontos, acertos: a.p_acertos, tempo_ms: a.p_tempo ?? null, created_at: now() });
         save(db);
         return { data: null, error: null };
       }
